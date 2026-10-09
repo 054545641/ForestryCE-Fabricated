@@ -15,6 +15,7 @@ import forestry.core.engine.genetics.TaxonManager;
 import forestry.apiimpl.plugin.PluginManager;
 import forestry.core.platform.block.TileStreamUpdateTracker;
 import forestry.core.platform.client.CoreClientHandler;
+import forestry.core.platform.compat.patchouli.PatchouliCompat;
 import forestry.core.engine.climate.ForestryClimateManager;
 import forestry.core.platform.commands.DiagnosticsCommand;
 import forestry.core.platform.commands.DumpCommand;
@@ -40,6 +41,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -95,6 +97,11 @@ public class ModuleCore extends BlankForestryModule {
 
 	private static void onCommonSetup(FMLCommonSetupEvent event) {
 		event.enqueueWork(ModuleCore::ensureApiInitialized);
+
+		// an incompatible version fails the mods.toml check before this runs, so isLoaded means compatible
+		if (ModList.get().isLoaded("patchouli")) {
+			PatchouliCompat.init();
+		}
 	}
 
 	private static void registerForestryRegistries(NewRegistryEvent event) {

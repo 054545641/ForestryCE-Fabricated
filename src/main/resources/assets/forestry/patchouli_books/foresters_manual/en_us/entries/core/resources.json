@@ -11,7 +11,7 @@
       "type": "crafting",
       "title": "for.gui.book.patchouli.entry.core.resources2",
       "recipe": "forestry:apatite_block",
-      "recipe2": "forestry:apatite_from_resource_storage_apatite"
+      "recipe2": "forestry:apatite_from_apatite_block"
     },
     {
       "type": "crafting",
@@ -24,7 +24,7 @@
       "type": "crafting",
       "title": "for.gui.book.patchouli.entry.core.resources5",
       "recipe": "forestry:bronze_block",
-      "recipe2": "forestry:ingot_bronze_from_resource_storage_bronze"
+      "recipe2": "forestry:bronze_ingot_from_bronze_block"
     }
   ]
 }

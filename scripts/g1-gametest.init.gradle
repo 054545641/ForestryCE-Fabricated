@@ -1,0 +1,6 @@
+allprojects {
+    afterEvaluate {
+        neoForge.runs.gameTestServer.gameDirectory.set(layout.projectDirectory.dir(
+            '.local/g1-audit-gametest-' + providers.gradleProperty('withPatchouli').getOrElse('true')))
+    }
+}

@@ -1164,6 +1164,8 @@
   "_comment": "BOOK -- ORIGINAL",
   "_comment": "###################",
   "item.forestry.foresters_manual": "林业员手册",
+  "item.forestry.foresters_manual.missing_patchouli": "阅读林务员手册需要安装与当前版本匹配的帕秋莉（Patchouli）",
+  "item.forestry.foresters_manual.missing_patchouli_hint": "需要安装帕秋莉（Patchouli）才能阅读",
   "for.gui.book.element.crafting": "合成",
   "for.gui.book.about.title": "关于本书",
   "for.gui.book.about": "§o本书为Binnie收集并整理的《养蜂入门指南》和《林业员图鉴》残卷辑录，两书原作者均为人称“Sengir爵士”的疯狂养蜂人。§r",

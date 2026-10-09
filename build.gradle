@@ -431,6 +431,56 @@ tasks.named('check') {
 	dependsOn checkCoreLayers
 }
 
+// Gate for the Patchouli decoupling: vazkii types may appear only in the compat package's
+// bytecode. The manual item, forestry.api, the mod entry classes and unconditional event
+// subscribers must not resolve them, or a missing Patchouli fails class loading at runtime.
+// Constant-pool scan, not an import scan: method descriptors and erased generics carry the
+// reference too. Same trick as the ModKit scan in checkJarPartition
+var checkPatchouliBoundary = tasks.register('checkPatchouliBoundary') {
+	group = 'verification'
+	description = 'Fails if a class outside forestry.core.platform.compat.patchouli references vazkii.patchouli bytecode'
+
+	dependsOn sourceSets.main.classesTaskName
+	contentModules.each { dependsOn sourceSets[it].classesTaskName }
+	outputs.upToDateWhen { false }
+
+	doLast {
+		var allowedPrefix = 'forestry/core/platform/compat/patchouli/'
+		var offenders = new TreeSet<String>()
+		var scanned = 0
+
+		([sourceSets.main] + contentModules.collect { sourceSets[it] }).each { sourceSet ->
+			sourceSet.output.classesDirs.files.findAll { it.isDirectory() }.each { dir ->
+				dir.eachFileRecurse(groovy.io.FileType.FILES) { file ->
+					if (!file.name.endsWith('.class')) {
+						return
+					}
+					scanned++
+					var relative = dir.toPath().relativize(file.toPath()).toString().replace(File.separatorChar, '/' as char)
+					if (relative.startsWith(allowedPrefix)) {
+						return
+					}
+					if (new String(file.bytes, 'ISO-8859-1').contains('vazkii/patchouli')) {
+						offenders.add(relative)
+					}
+				}
+			}
+		}
+
+		if (!offenders.isEmpty()) {
+			throw new GradleException(
+					"vazkii.patchouli types may only be referenced from ${allowedPrefix}:\n  "
+					+ offenders.join('\n  ')
+					+ "\nRoute the call through forestry.core.manual.ManualAccess so a missing Patchouli cannot reach it.")
+		}
+		logger.lifecycle("checkPatchouliBoundary: ${scanned} classes scanned, vazkii.patchouli confined to the compat package")
+	}
+}
+
+tasks.named('check') {
+	dependsOn checkPatchouliBoundary
+}
+
 repositories {
 	maven {
 		name = 'jei'
@@ -493,9 +543,13 @@ dependencies {
 	implementation "top.theillusivec4.curios:curios-neoforge:${curiosVersion}+${minecraftVersion}"
 	// Ponder OPTIONAL
 	implementation("net.createmod.ponder:ponder-neoforge:${ponderVersion}+mc${minecraftVersion}")
-	// PATCHOULI REQUIRED
+	// PATCHOULI OPTIONAL: the compile-time API always stays, the dev runtime mod sits behind an
+	// explicit switch so -PwithPatchouli=false exercises the missing-dependency boot and manual
+	// behaviour without editing the build file
 	compileOnly "vazkii.patchouli:Patchouli:$patchouliVersion-NEOFORGE:api"
-	runtimeOnly "vazkii.patchouli:Patchouli:$patchouliVersion-NEOFORGE"
+	if (providers.gradleProperty('withPatchouli').orElse('true').get().toBoolean()) {
+		runtimeOnly "vazkii.patchouli:Patchouli:$patchouliVersion-NEOFORGE"
+	}
 	// ModKit DEV ONLY
 	modkit 'com.github.thedarkcolour:ModKit:c0c491b35bf7c5785b933b27966a9c0b9dee4163'
 
@@ -956,14 +1010,14 @@ if (System.getenv('CURSEFORGE_TOKEN')) {
 			releaseType = 'release'
 
 			addGameVersion(project.minecraftVersion)
-			addGameVersion('Forge')
-			addGameVersion('Java 17')
+			addGameVersion('NeoForge')
+			addGameVersion('Java 21')
 
 			mainArtifact(jar.archiveFile) {
 				displayName = "Forestry: Community Edition ${project.version}"
 				relations {
 					optionalDependency 'jei'
-					requiredDependency 'patchouli'
+					optionalDependency 'patchouli'
 				}
 			}
 		}
@@ -977,7 +1031,7 @@ modrinth {
 	versionNumber = version.toString()
 	versionType = 'release'
 	gameVersions = [minecraftVersion]
-	loaders = ['forge']
+	loaders = ['neoforge']
 	changelog = getChangelog(project.version)
 
 	uploadFile = jar
@@ -987,7 +1041,7 @@ modrinth {
 
 	dependencies {
 		optional.project('jei')
-		required.project('patchouli')
+		optional.project('patchouli')
 	}
 }
 

@@ -2971,7 +2971,6 @@ forestry:forestry forestry:pipette x1
 forestry:forestry forestry:portable_analyzer x1
 forestry:forestry forestry:proven_grafter x1
 forestry:forestry forestry:proven_scoop x1
-forestry:forestry forestry:pulsating_dust x1
 forestry:forestry forestry:pulsating_mesh x1
 forestry:forestry forestry:rainmaker x1
 forestry:forestry forestry:raw_tin x1

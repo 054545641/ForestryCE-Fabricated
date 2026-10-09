@@ -73,7 +73,7 @@ public class GenomeBaselineTest {
 			return;
 		}
 
-		String expectedNorm = expected.strip();
+		String expectedNorm = expected.replace("\r\n", "\n").strip();
 		String actualNorm = actual.strip();
 		if (!expectedNorm.equals(actualNorm)) {
 			writeActualForDebugging(actualNorm);

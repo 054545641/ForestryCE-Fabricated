@@ -25,6 +25,9 @@ Refer to the translation guide [HERE](https://github.com/thedarkcolour/ForestryC
 To build a mod JAR, open a command line and type "gradlew build".
 The finished JAR will be under `./build/libs`.
 
+Windows users can follow the [local NeoForge 1.21.1 setup guide](docs/local-development.zh-CN.md)
+to install a project-local JDK and use `gradlew-local.bat` for builds and client runs.
+
 ### Contributing Code
 Forestry is a large and complex project that I spent hundreds of hours working on, so I am always open to contributions.
 

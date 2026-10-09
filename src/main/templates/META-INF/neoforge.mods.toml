@@ -25,7 +25,7 @@ side = "BOTH"
 
 [[dependencies.forestry]]
 modId = "patchouli"
-type = "REQUIRED"
+type = "OPTIONAL"
 versionRange = "${patchouliVersionRange}"
 ordering = "NONE"
 side = "BOTH"
