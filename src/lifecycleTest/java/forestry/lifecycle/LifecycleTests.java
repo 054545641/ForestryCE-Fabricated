@@ -58,6 +58,8 @@ public final class LifecycleTests {
 	private static boolean checkedUnbound;
 
 	static {
+		TESTS.register("fluid_player_movement", () -> FluidMovementTests::playerMovement);
+		TESTS.register("fluid_honey_current_release", () -> FluidMovementTests::honeyCurrentRelease);
 		TESTS.register("analyzer_vanilla_saplings", () -> AnalyzerRegressionTests::vanillaSaplings);
 		TESTS.register("analyzer_repeated_bees", () -> AnalyzerRegressionTests::repeatedBees);
 		TESTS.register("analyzer_plant_oak", () -> AnalyzerRegressionTests::plantAnalyzedOak);

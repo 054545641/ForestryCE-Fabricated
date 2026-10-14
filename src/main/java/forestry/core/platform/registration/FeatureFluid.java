@@ -8,11 +8,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.BaseFlowingFluid;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -152,6 +154,14 @@ public class FeatureFluid extends ModFeature implements IFluidFeature {
 			this.color = forestryProps.particleColor;
 			this.stillTexture = forestryProps.resources[0];
 			this.flowingTexture = forestryProps.resources[1];
+		}
+
+		@Override
+		public boolean move(LivingEntity entity, Vec3 movementVector, double gravity) {
+			// Non-water-like fluids in 26.2 need an explicit movement handler.
+			// Retain the previous water movement, including drag, without enabling other water interactions.
+			entity.travelInWater(movementVector, gravity, entity.getDeltaMovement().y <= 0.0, entity.getY());
+			return true;
 		}
 
 		public int getColor() {
