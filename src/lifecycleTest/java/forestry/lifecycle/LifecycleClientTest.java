@@ -32,6 +32,8 @@ public final class LifecycleClientTest {
 	@SubscribeEvent
 	public static void tick(ClientTickEvent.Post event) {
 		if (Boolean.getBoolean("forestry.lifecycle.escritoireTest")) return;
+		if (Boolean.getBoolean("forestry.lifecycle.powerTest")) return;
+		if (Boolean.getBoolean("forestry.lifecycle.analyzerTest")) return;
 		if (!Boolean.getBoolean("forestry.lifecycle.clientAutoExit") || finished) return;
 		Minecraft client = Minecraft.getInstance();
 		if (Boolean.getBoolean("forestry.lifecycle.creativeTest")) {

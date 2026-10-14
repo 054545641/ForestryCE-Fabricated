@@ -58,6 +58,9 @@ public final class LifecycleTests {
 	private static boolean checkedUnbound;
 
 	static {
+		TESTS.register("analyzer_vanilla_saplings", () -> AnalyzerRegressionTests::vanillaSaplings);
+		TESTS.register("analyzer_repeated_bees", () -> AnalyzerRegressionTests::repeatedBees);
+		TESTS.register("analyzer_plant_oak", () -> AnalyzerRegressionTests::plantAnalyzedOak);
 		TESTS.register("n4_blocked_nursery", () -> N4GameplayTests::blockedNursery);
 		TESTS.register("n4_farm_5x4x5", () -> h -> N4WorldgenTests.farmSize(h, 5, 5));
 		TESTS.register("n4_farm_5x4x4", () -> h -> N4WorldgenTests.farmSize(h, 5, 4));

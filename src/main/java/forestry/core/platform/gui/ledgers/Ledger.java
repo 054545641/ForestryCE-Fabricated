@@ -258,7 +258,7 @@ public abstract class Ledger {
 
 	protected int drawText(GuiGraphicsExtractor graphics, String string, int x, int y) {
 		Minecraft mc = Minecraft.getInstance();
-		graphics.text(mc.font, string, x, y, this.fontColorText, false);
+		graphics.text(mc.font, string, x, y, 0xff000000 | this.fontColorText, false);
 		return mc.font.lineHeight;
 	}
 }

@@ -16,7 +16,6 @@ import forestry.core.platform.network.packets.PacketItemStackDisplay;
 import forestry.core.platform.util.GeneticsUtil;
 import forestry.core.platform.util.InventoryUtil;
 import forestry.core.platform.util.NetworkUtil;
-import forestry.core.platform.util.SpeciesUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -129,7 +128,7 @@ public class TileAnalyzer extends TilePowered implements WorldlyContainer, ILiqu
 	private Integer getInputSlotIndex() {
 		for (int slotIndex = 0; slotIndex < this.invInput.getContainerSize(); slotIndex++) {
 			ItemStack stack = this.invInput.getItem(slotIndex);
-			if (IIndividualHandlerItem.isIndividual(stack)) {
+			if (IIndividualHandlerItem.isIndividual(GeneticsUtil.convertToGeneticEquivalent(stack))) {
 				return slotIndex;
 			}
 		}
@@ -207,13 +206,10 @@ public class TileAnalyzer extends TilePowered implements WorldlyContainer, ILiqu
 		}
 
 		ItemStack original = this.invInput.getItem(slotIndex);
-		ItemStack inputStack = original.copy();
+		// Keep raw inputs intact until the same transaction moves their genetic equivalent into processing.
+		ItemStack inputStack = GeneticsUtil.convertToGeneticEquivalent(original.copy());
 		if (inputStack.isEmpty()) {
 			return;
-		}
-
-		if (!SpeciesUtil.TREE_TYPE.get().isMember(inputStack)) {
-			inputStack = GeneticsUtil.convertToGeneticEquivalent(inputStack);
 		}
 
 		try (var transaction = beginWorkTransaction()) {

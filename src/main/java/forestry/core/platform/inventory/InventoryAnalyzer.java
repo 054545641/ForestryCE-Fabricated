@@ -5,7 +5,6 @@ import forestry.api.core.genetics.capability.IIndividualHandlerItem;
 import forestry.core.content.analyzer.TileAnalyzer;
 import forestry.core.platform.util.GeneticsUtil;
 import forestry.core.platform.util.SlotUtil;
-import forestry.core.platform.util.SpeciesUtil;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -28,7 +27,7 @@ public class InventoryAnalyzer extends InventoryAdapterTile<TileAnalyzer> {
 	@Override
 	public boolean canSlotAccept(int slotIndex, ItemStack stack) {
 		if (SlotUtil.isSlotInRange(slotIndex, SLOT_INPUT_1, SLOT_INPUT_COUNT)) {
-			return IIndividualHandlerItem.isIndividual(stack);
+			return IIndividualHandlerItem.isIndividual(GeneticsUtil.convertToGeneticEquivalent(stack));
 		} else if (slotIndex == SLOT_CAN) {
 			Optional<FluidStack> fluid = Optional.of(FluidUtil.getFirstStackContained(stack)).filter(fluidStack -> !fluidStack.isEmpty());
 			return fluid.map(f -> this.tile.getTankManager().canFillFluidType(f)).orElse(false);
@@ -40,14 +39,5 @@ public class InventoryAnalyzer extends InventoryAdapterTile<TileAnalyzer> {
 	@Override
 	public boolean canTakeItemThroughFace(int slotIndex, ItemStack stack, Direction side) {
 		return SlotUtil.isSlotInRange(slotIndex, SLOT_OUTPUT_1, SLOT_OUTPUT_COUNT);
-	}
-
-	@Override
-	public void setItem(int slotId, ItemStack itemStack) {
-		if (!SpeciesUtil.TREE_TYPE.get().isMember(itemStack)) {
-			itemStack = GeneticsUtil.convertToGeneticEquivalent(itemStack);
-		}
-
-		super.setItem(slotId, itemStack);
 	}
 }

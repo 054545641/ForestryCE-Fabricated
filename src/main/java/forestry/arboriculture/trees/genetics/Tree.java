@@ -94,7 +94,8 @@ public class Tree extends Individual<ITreeSpecies, ITree, ITreeSpeciesType> impl
 	}
 
 	public static boolean canPlantTreeOn(BlockState state) {
-		return state.is(BlockTags.DIRT);
+		// Since 26.2, grass, moss and other planting soils are no longer all in DIRT.
+		return state.is(BlockTags.SUPPORTS_VEGETATION);
 	}
 
 	@Override
