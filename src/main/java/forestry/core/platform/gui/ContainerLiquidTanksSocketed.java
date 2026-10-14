@@ -8,8 +8,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import forestry.core.platform.fluids.StandardTank;
 
 import javax.annotation.Nullable;
@@ -29,7 +27,6 @@ public abstract class ContainerLiquidTanksSocketed<T extends BlockEntity & ILiqu
 
 	/* IContainerLiquidTanks */
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void handlePipetteClickClient(int slot, Player player) {
         this.tanksHelper.handlePipetteClickClient(slot, player);
 	}
@@ -62,7 +59,6 @@ public abstract class ContainerLiquidTanksSocketed<T extends BlockEntity & ILiqu
 
 	/* IContainerSocketed */
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void handleChipsetClick(int slot) {
         this.socketedHelper.handleChipsetClick(slot);
 	}
@@ -73,7 +69,6 @@ public abstract class ContainerLiquidTanksSocketed<T extends BlockEntity & ILiqu
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void handleSolderingIronClick(int slot) {
         this.socketedHelper.handleSolderingIronClick(slot);
 	}

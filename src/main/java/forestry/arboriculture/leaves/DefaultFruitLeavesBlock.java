@@ -23,8 +23,6 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
@@ -104,7 +102,6 @@ public class DefaultFruitLeavesBlock extends AbstractLeavesBlock implements ILea
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public int colorMultiplier(BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int tintIndex) {
 		if (tintIndex == AbstractLeavesBlock.FRUIT_COLOR_INDEX) {
 			IFruit genome = this.type.getFruit();

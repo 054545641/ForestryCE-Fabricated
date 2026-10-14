@@ -13,8 +13,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import javax.annotation.Nullable;
@@ -22,7 +20,6 @@ import javax.annotation.Nullable;
 /**
  * Slot for liquid tanks
  */
-@OnlyIn(Dist.CLIENT)
 public class TankWidget extends Widget {
 
 	private int overlayTexX = 176;

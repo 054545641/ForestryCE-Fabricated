@@ -20,8 +20,6 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.glfw.GLFW;
 
@@ -257,12 +255,10 @@ public class LetterScreen extends GuiForestry<LetterMenu> {
 		NetworkUtil.sendToServer(packet);
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	private void setText() {
 		setText(this.text.getValue());
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	private void setText(String text) {
 		if (this.isProcessedLetter || this.lastSyncedText.equals(text)) {
 			return;

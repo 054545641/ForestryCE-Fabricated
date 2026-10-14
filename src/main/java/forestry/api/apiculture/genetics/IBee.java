@@ -12,8 +12,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -41,7 +39,6 @@ public interface IBee extends IIndividualLiving {
 
 	IEffectData[] doEffect(IEffectData[] storedData, IBeeHousing housing);
 
-	@OnlyIn(Dist.CLIENT)
 	IEffectData[] doFX(IEffectData[] storedData, IBeeHousing housing);
 
 	/**

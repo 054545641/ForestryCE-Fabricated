@@ -4,8 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -43,7 +41,6 @@ public class StringUtil {
 		return Component.literal(line.toString());
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	public static int getLineHeight(int maxWidth, FormattedText... strings) {
 		Minecraft minecraft = Minecraft.getInstance();
 		Font fontRenderer = minecraft.font;

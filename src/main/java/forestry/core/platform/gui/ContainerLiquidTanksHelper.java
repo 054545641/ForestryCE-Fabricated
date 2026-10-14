@@ -15,8 +15,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidType;
 
 import javax.annotation.Nullable;
@@ -29,7 +27,6 @@ public class ContainerLiquidTanksHelper<T extends BlockEntity & ILiquidTankTile>
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void handlePipetteClickClient(int slot, Player player) {
 		ItemStack itemstack = player.containerMenu.getCarried();
 		if (itemstack.getItem() instanceof IToolPipette) {

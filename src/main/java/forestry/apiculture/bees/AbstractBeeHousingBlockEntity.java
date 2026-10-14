@@ -25,8 +25,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import forestry.core.platform.util.ValueIOUtil;
@@ -92,7 +90,6 @@ public abstract class AbstractBeeHousingBlockEntity extends TileBase implements 
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void handleUpdateTag(ValueInput input) {
 		CompoundTag tag = ValueIOUtil.toTag(input);
 		HolderLookup.Provider registries = input.lookup();
@@ -129,7 +126,6 @@ public abstract class AbstractBeeHousingBlockEntity extends TileBase implements 
 		}
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	public static void doPollenFX(Level world, double xCoord, double yCoord, double zCoord) {
 		double fxX = xCoord + 0.5F;
 		double fxY = yCoord + 0.25F;

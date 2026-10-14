@@ -7,8 +7,6 @@ import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 
@@ -24,7 +22,6 @@ public class BlockHoneyComb extends Block implements IColoredBlock {
 		return this.type;
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int colorMultiplier(BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int tintIndex) {
 		EnumHoneyComb honeyComb = this.type;

@@ -7,8 +7,6 @@ import forestry.core.platform.item.ITintedItem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 /**
  * Item for the tile-less genetic leaves ({@link DefaultLeavesBlock} and
@@ -32,7 +30,6 @@ public class DefaultLeavesBlockItem extends ItemBlockForestry<AbstractLeavesBloc
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public int getColorFromItemStack(ItemStack itemStack, int renderPass) {
 		ForestryLeafType type = leafType();
 		if (renderPass == AbstractLeavesBlock.FRUIT_COLOR_INDEX) {

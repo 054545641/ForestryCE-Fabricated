@@ -34,8 +34,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.transfer.ResourceHandler;
@@ -65,7 +63,6 @@ public class TileBottler extends TilePowered implements WorldlyContainer, ILiqui
 			+ forestry.core.platform.util.InventoryData.writeStack(this.currentRecipe.outputStack, this.level.registryAccess());
 		configureWork(key, Math.round(fillTime * STEPS_PER_RECIPE_TIME), emptying ? 0 : Math.round(fillTime * ENERGY_PER_RECIPE_TIME));
 	}
-	@OnlyIn(Dist.CLIENT)
 	public boolean isFillRecipe;
 
 	public TileBottler(BlockPos pos, BlockState state) {

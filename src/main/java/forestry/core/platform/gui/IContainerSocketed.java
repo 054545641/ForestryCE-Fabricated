@@ -2,16 +2,12 @@ package forestry.core.platform.gui;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 public interface IContainerSocketed {
-	@OnlyIn(Dist.CLIENT)
 	void handleChipsetClick(int slot);
 
 	void handleChipsetClickServer(int slot, ServerPlayer player, ItemStack itemstack);
 
-	@OnlyIn(Dist.CLIENT)
 	void handleSolderingIronClick(int slot);
 
 	void handleSolderingIronClickServer(int slot, ServerPlayer player, ItemStack itemstack);

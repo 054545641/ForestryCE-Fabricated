@@ -12,8 +12,6 @@ import forestry.core.platform.util.NetworkUtil;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 public class ContainerSocketedHelper<T extends BlockEntity & ISocketable> implements IContainerSocketed {
 
@@ -24,7 +22,6 @@ public class ContainerSocketedHelper<T extends BlockEntity & ISocketable> implem
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void handleChipsetClick(int slot) {
 		NetworkUtil.sendToServer(new PacketChipsetClick(slot));
 	}
@@ -61,7 +58,6 @@ public class ContainerSocketedHelper<T extends BlockEntity & ISocketable> implem
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void handleSolderingIronClick(int slot) {
 		NetworkUtil.sendToServer(new PacketSolderingIronClick(slot));
 	}

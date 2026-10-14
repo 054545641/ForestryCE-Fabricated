@@ -22,8 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
@@ -308,7 +306,6 @@ public abstract class EngineBlockEntity extends TileBase implements IActivatable
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void readData(RegistryFriendlyByteBuf data) {
 		super.readData(data);
         this.active = data.readBoolean();

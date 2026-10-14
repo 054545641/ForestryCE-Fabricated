@@ -8,8 +8,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 public class FarmLedger extends Ledger {
 	private final IFarmLedgerDelegate delegate;
@@ -23,7 +21,6 @@ public class FarmLedger extends Ledger {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void draw(GuiGraphicsExtractor graphics, int y, int x) {
 
 		// Draw background

@@ -5,8 +5,6 @@ import forestry.api.core.INbtWritable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.List;
 
@@ -71,14 +69,12 @@ public interface IBeekeepingLogic extends INbtWritable, INbtReadable {
 	 * Whether bee fx should be active.
 	 * Internally, this is automatically synced to the client.
 	 */
-	@OnlyIn(Dist.CLIENT)
 	boolean canDoBeeFX();
 
 	/**
 	 * Display bee fx. Calls IBee.doFX(IEffectData[] storedData, IBeeHousing housing) on the queen.
 	 * Internally, the queen is automatically synced to the client for the fx.
 	 */
-	@OnlyIn(Dist.CLIENT)
 	void doBeeFX();
 
 	/**

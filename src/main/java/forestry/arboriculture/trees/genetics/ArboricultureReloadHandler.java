@@ -27,7 +27,11 @@ public final class ArboricultureReloadHandler {
 		}
 		ImmutableMap<Identifier, ITreeSpecies> allSpecies = builder.build();
 		((SpeciesType<ITreeSpecies, ?>) type).setSpecies(allSpecies);
-		Forestry.LOGGER.info("Loaded {} tree species", allSpecies.size());
+		if (allSpecies.isEmpty()) {
+			Forestry.LOGGER.warn("No tree species loaded from datapacks; Forestry leaves have no species to use");
+		} else {
+			Forestry.LOGGER.info("Loaded {} tree species", allSpecies.size());
+		}
 	}
 
 	private ArboricultureReloadHandler() {

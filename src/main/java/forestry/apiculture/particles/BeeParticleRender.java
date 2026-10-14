@@ -11,8 +11,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.genetics.IBeeSpecies;
@@ -28,7 +26,6 @@ import forestry.core.platform.util.VecUtil;
  * Bee-specific particle spawns. Split out of {@link ParticleRender} so the base artifact does not
  * name bee types; the generic spawns and {@link ParticleRender#shouldSpawnParticle} stay in core.
  */
-@OnlyIn(Dist.CLIENT)
 public class BeeParticleRender {
 	public static void addBeeHiveFX(IBeeHousing housing, IGenome genome, List<BlockPos> flowerPositions) {
 		LevelAccessor world1 = housing.getLevel();

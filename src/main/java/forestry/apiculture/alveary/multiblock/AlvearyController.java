@@ -35,8 +35,6 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.HashSet;
 import java.util.List;
@@ -189,7 +187,6 @@ public class AlvearyController extends MultiblockController implements IAlvearyC
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void clientTick(int tickCount) {
 		for (IAlvearyComponent.Active activeComponent : this.activeComponents) {
 			activeComponent.updateClient(tickCount);

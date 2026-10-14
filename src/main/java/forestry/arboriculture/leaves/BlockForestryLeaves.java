@@ -25,8 +25,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
@@ -143,7 +141,6 @@ public class BlockForestryLeaves extends AbstractLeavesBlock implements Bonemeal
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public int colorMultiplier(BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int tintIndex) {
 		if (level != null && pos != null) {
 			LeavesBlockEntity leaves = TileUtil.getTile(level, pos, LeavesBlockEntity.class);

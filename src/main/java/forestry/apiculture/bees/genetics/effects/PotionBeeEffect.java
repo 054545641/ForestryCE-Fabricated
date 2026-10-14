@@ -20,8 +20,6 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -114,7 +112,6 @@ public class PotionBeeEffect extends ThrottledBeeEffect {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public IEffectData doFX(IGenome genome, IEffectData storedData, IBeeHousing housing) {
 		Level level = housing.getLevel();
 		if (level.getRandom().nextBoolean()) {

@@ -10,8 +10,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 public class TradeStationCarrier implements IPostalCarrier {
 	private final Identifier iconID;
@@ -26,7 +24,6 @@ public class TradeStationCarrier implements IPostalCarrier {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public TextureAtlasSprite getSprite() {
 		return IForestryClientApi.INSTANCE.getTextureManager().getSprite(this.iconID);
 	}

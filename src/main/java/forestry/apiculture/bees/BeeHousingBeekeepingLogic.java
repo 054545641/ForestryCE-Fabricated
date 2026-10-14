@@ -29,8 +29,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.NeoForge;
 
 import javax.annotation.Nullable;
@@ -455,13 +453,11 @@ public class BeeHousingBeekeepingLogic implements IBeekeepingLogic {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public boolean canDoBeeFX() {
 		return !Minecraft.getInstance().isPaused() && this.active;
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void doBeeFX() {
 		if (this.queen != null) {
 			this.queen.doFX(this.effectData, this.housing);

@@ -13,8 +13,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -102,7 +100,6 @@ public abstract class ContainerTile<T extends BlockEntity> extends ContainerFore
 		}
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	public void onGuiEnergy(int energyStored) {
 		if (this.tile instanceof IPowerHandler handler) {
 			ForestryEnergyStorage energyStorage = handler.getEnergyManager();

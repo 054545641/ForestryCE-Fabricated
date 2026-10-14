@@ -24,8 +24,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 public class LogPileBlock extends Block {
 	public static final BooleanProperty IS_ACTIVE = BooleanProperty.create("active");
@@ -132,7 +130,6 @@ public class LogPileBlock extends Block {
 		return super.getLightEmission(state, world, pos);
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource rand) {
 		if (state.getValue(IS_ACTIVE)) {

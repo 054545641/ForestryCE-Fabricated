@@ -28,8 +28,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import forestry.api.ForestryDataMaps;
@@ -300,7 +298,6 @@ public class PeatEngineBlockEntity extends EngineBlockEntity implements WorldlyC
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void readData(RegistryFriendlyByteBuf data) {
 		super.readData(data);
         this.sockets.readData(data);

@@ -28,8 +28,6 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 
 import javax.annotation.Nullable;
@@ -64,7 +62,6 @@ public class BlockBase<P extends Enum<P> & IBlockType> extends BlockForestry imp
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public float getShadeBrightness(BlockState p_220080_1_, BlockGetter p_220080_2_, BlockPos p_220080_3_) {
 		return 0.2F;
 	}

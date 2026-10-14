@@ -17,8 +17,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.List;
 import forestry.apiculture.bees.HasFlowersCache;
@@ -139,13 +137,11 @@ public class HiveBeekeepingLogic implements IBeekeepingLogic {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public boolean canDoBeeFX() {
 		return !Minecraft.getInstance().isPaused() && this.active;
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void doBeeFX() {
 		IBee queen = this.housing.getContainedBee();
 		queen.doFX(this.effectData, this.housing);

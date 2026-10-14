@@ -14,8 +14,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -59,7 +57,6 @@ public class DefaultLeavesBlock extends AbstractLeavesBlock implements ILeafType
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public int colorMultiplier(BlockState state, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos, int tintIndex) {
 		return IForestryClientApi.INSTANCE.getTreeManager().getTint(this.type.getIndividual().getSpecies()).get(level, pos);
 	}

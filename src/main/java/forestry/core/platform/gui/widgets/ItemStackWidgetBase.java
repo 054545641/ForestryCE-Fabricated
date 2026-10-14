@@ -5,8 +5,6 @@ import forestry.core.platform.gui.GuiUtil;
 import forestry.core.platform.util.ItemTooltipUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 public abstract class ItemStackWidgetBase extends Widget {
 	public ItemStackWidgetBase(WidgetManager widgetManager, int xPos, int yPos) {
@@ -23,7 +21,6 @@ public abstract class ItemStackWidgetBase extends Widget {
 		}
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	@Override
 	public ToolTip getToolTip(int mouseX, int mouseY) {
 		ItemStack itemStack = getItemStack();

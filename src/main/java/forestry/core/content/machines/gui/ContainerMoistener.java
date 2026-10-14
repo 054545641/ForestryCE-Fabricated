@@ -13,8 +13,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.SimpleContainerData;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +70,6 @@ public class ContainerMoistener extends ContainerLiquidTanks<TileMoistener> impl
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void setData(int messageId, int data) {
 		super.setData(messageId, data);
 

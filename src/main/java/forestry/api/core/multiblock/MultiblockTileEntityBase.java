@@ -12,8 +12,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import com.mojang.serialization.MapCodec;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 /**
  * Base logic class for multiblock-connected tile entities.
@@ -111,7 +109,6 @@ public abstract class MultiblockTileEntityBase<T extends IMultiblockLogic> exten
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public final void onDataPacket(Connection network, ValueInput valueInput) {
 		handleUpdateTag(valueInput);
 	}

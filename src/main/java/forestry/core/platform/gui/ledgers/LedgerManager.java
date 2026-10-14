@@ -9,14 +9,11 @@ import forestry.core.platform.gui.GuiForestry;
 import forestry.core.platform.gui.GuiUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
 public class LedgerManager {
 	private final List<Ledger> ledgers = new ArrayList<>();
 	private final List<ErrorLedger> errorLedgers = new ArrayList<>();

@@ -9,8 +9,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.List;
 
@@ -56,7 +54,6 @@ public class IgnitionBeeEffect extends ThrottledBeeEffect {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public IEffectData doFX(IGenome genome, IEffectData storedData, IBeeHousing housing) {
 		ClientLevel level = (ClientLevel) housing.getLevel();
 		if (level.getRandom().nextInt(2) != 0) {

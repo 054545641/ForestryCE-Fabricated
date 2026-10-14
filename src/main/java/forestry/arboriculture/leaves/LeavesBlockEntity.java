@@ -41,8 +41,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.model.data.ModelData;
 import net.neoforged.neoforge.model.data.ModelProperty;
 
@@ -264,7 +262,6 @@ public class LeavesBlockEntity extends TileTreeContainer implements IFruitBearer
 		return tree != null && !isDestroyed(tree, this.damage) && tree.getMate() != null;
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	public int getFoliageColour() {
 		final int baseColor = IForestryClientApi.INSTANCE.getTreeManager().getTint(this.species).get(this.level instanceof net.minecraft.client.renderer.block.BlockAndTintGetter tintLevel ? tintLevel : null, this.worldPosition);
 

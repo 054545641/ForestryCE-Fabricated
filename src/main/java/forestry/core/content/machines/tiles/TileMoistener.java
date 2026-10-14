@@ -35,8 +35,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
@@ -134,7 +132,6 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void readData(RegistryFriendlyByteBuf data) {
 		super.readData(data);
         this.tankManager.readData(data);

@@ -10,8 +10,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -53,7 +51,6 @@ public class CircuitBoard implements ICircuitBoard {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void addTooltip(List<Component> list) {
 		if (this.layout != null) {
 			list.add(Component.literal(this.layout.getUsage().getString() + ":").withStyle(ChatFormatting.GOLD));

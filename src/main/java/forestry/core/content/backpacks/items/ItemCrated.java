@@ -9,8 +9,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.function.Supplier;
 
@@ -56,7 +54,6 @@ public class ItemCrated extends ItemForestry implements ITintedItem {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public int getColorFromItemStack(ItemStack stack, int renderPass) {
 		ItemStack contained = this.contained.get();
 

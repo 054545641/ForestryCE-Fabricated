@@ -23,8 +23,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -158,7 +156,6 @@ public class LetterMenu extends ContainerItemInventory<LetterInventory> implemen
 		return getLetter().getText();
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	public void setText(String text) {
 		getLetter().setText(text);
 

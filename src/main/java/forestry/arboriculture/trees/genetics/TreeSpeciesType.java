@@ -122,10 +122,11 @@ public class TreeSpeciesType extends SpeciesType<ITreeSpecies, ITree> implements
 	}
 
 	private void rebuildLeafTypes(ImmutableMap<Identifier, ITreeSpecies> allSpecies) {
-		// Fail-soft fallback for a leaf type whose species a datapack removed: use the default species so
-		// ForestryLeafType#getIndividual() stays non-null whenever any species are loaded (its block-color/name/item
-		// consumers deref it unguarded). Resolved via the map directly (not getDefaultSpecies(), which throws when the
-		// default id itself is absent) so it is null only in the empty-at-setup window, where nothing renders yet.
+		// setup registers bindings before the first datapack load supplies species
+		if (allSpecies.isEmpty()) {
+			return;
+		}
+		// leaf blocks still need an individual when a datapack removes their species
 		ITreeSpecies fallback = allSpecies.get(getKaryotype().getDefaultSpecies());
 		for (ForestryLeafType type : ForestryLeafType.allValues()) {
 			ITreeSpecies species = allSpecies.get(type.getSpeciesId());
@@ -135,9 +136,7 @@ public class TreeSpeciesType extends SpeciesType<ITreeSpecies, ITree> implements
 			if (species != null) {
 				type.setSpecies(species);
 			} else {
-				// Empty at setup before the datapack loads (no species at all, not even the default). Warn instead of
-				// throwing and leave the back-ref for the datapack load to populate; nothing renders in this window.
-				Forestry.LOGGER.warn("ForestryLeafType {} has no tree species with id {} and no default to fall back to (not yet loaded)", type.getSerializedName(), type.getSpeciesId());
+				Forestry.LOGGER.warn("ForestryLeafType {} has no tree species with id {} and no default to fall back to", type.getSerializedName(), type.getSpeciesId());
 			}
 		}
 	}
