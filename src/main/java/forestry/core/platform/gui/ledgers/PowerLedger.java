@@ -4,7 +4,7 @@ import forestry.api.client.ForestrySprites;
 import forestry.api.client.IForestryClientApi;
 import forestry.core.platform.gui.GuiUtil;
 import forestry.core.content.energy.ForestryEnergyStorage;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 public class PowerLedger extends Ledger {
@@ -17,7 +17,7 @@ public class PowerLedger extends Ledger {
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int y, int x) {
+	public void draw(GuiGraphicsExtractor graphics, int y, int x) {
 		// Draw background
 		drawBackground(graphics, y, x);
 

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.Forestry;
 import forestry.api.apiculture.IBeeJubilance;
@@ -19,32 +19,32 @@ import forestry.core.platform.util.SpeciesUtil;
 
 public final class ApicultureReloadHandler {
 	@SuppressWarnings("unchecked")
-	public static void rebuildSpecies(Map<ResourceLocation, BeeSpeciesDefinition> defs) {
+	public static void rebuildSpecies(Map<Identifier, BeeSpeciesDefinition> defs) {
 		IBeeSpeciesType type = SpeciesUtil.BEE_TYPE.get();
-		ImmutableMap.Builder<ResourceLocation, IBeeSpecies> builder = ImmutableMap.builderWithExpectedSize(defs.size());
-		for (Map.Entry<ResourceLocation, BeeSpeciesDefinition> entry : defs.entrySet()) {
-			ResourceLocation id = entry.getKey();
+		ImmutableMap.Builder<Identifier, IBeeSpecies> builder = ImmutableMap.builderWithExpectedSize(defs.size());
+		for (Map.Entry<Identifier, BeeSpeciesDefinition> entry : defs.entrySet()) {
+			Identifier id = entry.getKey();
 			BeeSpecies species = BeeSpeciesProjector.project(type, id, entry.getValue());
 			if (species != null) {
 				builder.put(id, species);
 			}
 		}
-		ImmutableMap<ResourceLocation, IBeeSpecies> allSpecies = builder.build();
+		ImmutableMap<Identifier, IBeeSpecies> allSpecies = builder.build();
 		((SpeciesType<IBeeSpecies, ?>) type).setSpecies(allSpecies);
 		Forestry.LOGGER.info("Loaded {} bee species", allSpecies.size());
 	}
 
-	public static void rebuildBeeEffects(Map<ResourceLocation, IBeeEffect> dataDefinitions) {
+	public static void rebuildBeeEffects(Map<Identifier, IBeeEffect> dataDefinitions) {
 		BeeSpeciesType type = (BeeSpeciesType) SpeciesUtil.BEE_TYPE.get();
-		Map<ResourceLocation, IBeeEffect> effective = new LinkedHashMap<>(type.getCodeBeeEffects());
+		Map<Identifier, IBeeEffect> effective = new LinkedHashMap<>(type.getCodeBeeEffects());
 		// datapack effects replace code-registered effects with the same ID
 		effective.putAll(dataDefinitions);
 		type.setBeeEffects(ImmutableMap.copyOf(effective));
 	}
 
-	public static void rebuildJubilances(Map<ResourceLocation, IBeeJubilance> dataDefinitions) {
+	public static void rebuildJubilances(Map<Identifier, IBeeJubilance> dataDefinitions) {
 		BeeSpeciesType type = (BeeSpeciesType) SpeciesUtil.BEE_TYPE.get();
-		Map<ResourceLocation, IBeeJubilance> effective = new LinkedHashMap<>(type.getCodeJubilances());
+		Map<Identifier, IBeeJubilance> effective = new LinkedHashMap<>(type.getCodeJubilances());
 		// datapack jubilances replace code-registered jubilances with the same ID
 		effective.putAll(dataDefinitions);
 		type.setJubilances(ImmutableMap.copyOf(effective));

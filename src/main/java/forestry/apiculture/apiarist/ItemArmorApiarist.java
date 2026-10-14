@@ -1,39 +1,50 @@
 package forestry.apiculture.apiarist;
 
 import forestry.api.ForestryConstants;
+import forestry.api.ForestryTags;
 import forestry.api.apiculture.IBeeProtection;
 import forestry.api.apiculture.genetics.IBeeEffect;
-import forestry.core.features.CoreItems;
-import forestry.core.content.resources.EnumCraftingMaterial;
-import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.EquipmentAssets;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.EnumMap;
 import java.util.Map;
 
-public class ItemArmorApiarist extends ArmorItem {
-	private static final Holder<ArmorMaterial> APIARIST_ARMOR_MATERIAL = Holder.direct(new ArmorMaterial(
-		Map.of(
-			ArmorItem.Type.BOOTS, 1,
-			ArmorItem.Type.LEGGINGS, 2,
-			ArmorItem.Type.CHESTPLATE, 3,
-			ArmorItem.Type.HELMET, 1,
-			ArmorItem.Type.BODY, 3
-		),
+/**
+ * Apiarist's armor. 26.2: no more {@code ArmorItem}; armor is a plain item whose properties get
+ * armor behavior from {@link Item.Properties#humanoidArmor(ArmorMaterial, ArmorType)} and whose
+ * look comes from a data-driven {@link EquipmentAsset}.
+ */
+public class ItemArmorApiarist extends Item {
+	public static final ResourceKey<EquipmentAsset> APIARIST_ARMOR_ASSET = ResourceKey.create(EquipmentAssets.ROOT_ID, ForestryConstants.forestry("apiarist_armor"));
+
+	private static final ArmorMaterial APIARIST_ARMOR_MATERIAL = new ArmorMaterial(
+		15,
+		makeDefense(1, 2, 3, 1),
 		15,
 		SoundEvents.ARMOR_EQUIP_LEATHER,
-		() -> Ingredient.of(CoreItems.CRAFTING_MATERIALS.get(EnumCraftingMaterial.WOVEN_SILK).get()),
-		List.of(new ArmorMaterial.Layer(ForestryConstants.forestry("apiarist_armor"))),
 		0.0F,
-		0.0F
-	));
+		0.0F,
+		ForestryTags.Items.REPAIRS_APIARIST_ARMOR,
+		APIARIST_ARMOR_ASSET
+	);
+
+	private static Map<ArmorType, Integer> makeDefense(int boots, int leggings, int chestplate, int helmet) {
+		Map<ArmorType, Integer> defense = new EnumMap<>(ArmorType.class);
+		defense.put(ArmorType.BOOTS, boots);
+		defense.put(ArmorType.LEGGINGS, leggings);
+		defense.put(ArmorType.CHESTPLATE, chestplate);
+		defense.put(ArmorType.HELMET, helmet);
+		return defense;
+	}
 
 	public enum BeeProtection implements IBeeProtection {
 		INSTANCE;
@@ -44,7 +55,7 @@ public class ItemArmorApiarist extends ArmorItem {
 		}
 	}
 
-	public ItemArmorApiarist(ArmorItem.Type type) {
-		super(APIARIST_ARMOR_MATERIAL, type, new Item.Properties());
+	public ItemArmorApiarist(ArmorType type, Properties properties) {
+		super(properties.humanoidArmor(APIARIST_ARMOR_MATERIAL, type));
 	}
 }

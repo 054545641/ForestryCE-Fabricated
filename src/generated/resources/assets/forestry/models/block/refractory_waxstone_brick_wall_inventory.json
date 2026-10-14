@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:block/wall_inventory",
   "textures": {
+    "texture": "forestry:block/refractory_waxstone_bricks",
     "wall": "forestry:block/refractory_waxstone_bricks"
   }
 }

@@ -3,15 +3,9 @@
   "category": "building",
   "group": "alveary",
   "key": {
-    "#": {
-      "item": "forestry:golden_electron_tube"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "X": {
-      "item": "forestry:alveary_block"
-    }
+    "#": "forestry:golden_electron_tube",
+    "I": "#c:ingots/iron",
+    "X": "forestry:alveary_block"
   },
   "pattern": [
     "I I",
@@ -19,7 +13,6 @@
     "I#I"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:alveary_fan"
   }
 }

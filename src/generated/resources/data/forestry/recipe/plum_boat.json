@@ -1,14 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "P": [
-      {
-        "item": "forestry:plum_planks"
-      },
-      {
-        "item": "forestry:plum_fireproof_planks"
-      }
+      "forestry:plum_planks",
+      "forestry:plum_fireproof_planks"
     ]
   },
   "pattern": [
@@ -16,7 +11,6 @@
     "PPP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:plum_boat"
   }
 }

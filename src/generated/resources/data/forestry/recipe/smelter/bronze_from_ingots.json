@@ -4,22 +4,16 @@
   "inputs": [
     {
       "count": 3,
-      "ingredient": {
-        "tag": "c:ingots/copper"
-      }
+      "ingredient": "#c:ingots/copper"
     },
     {
       "count": 1,
-      "ingredient": {
-        "tag": "c:ingots/tin"
-      }
+      "ingredient": "#c:ingots/tin"
     }
   ],
   "output": {
     "count": 4,
-    "ingredient": {
-      "tag": "c:ingots/bronze"
-    }
+    "ingredient": "#c:ingots/bronze"
   },
   "processingTime": 40
 }

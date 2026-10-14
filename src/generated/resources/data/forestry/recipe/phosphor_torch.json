@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    ".": {
-      "item": "forestry:phosphor"
-    },
-    "^": {
-      "tag": "minecraft:coals"
-    },
-    "|": {
-      "item": "minecraft:stick"
-    }
+    ".": "forestry:phosphor",
+    "^": "#minecraft:coals",
+    "|": "minecraft:stick"
   },
   "pattern": [
     ".",

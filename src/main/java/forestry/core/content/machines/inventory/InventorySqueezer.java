@@ -1,5 +1,9 @@
 package forestry.core.content.machines.inventory;
 
+import net.neoforged.neoforge.transfer.transaction.RootCommitJournal;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+
 import forestry.core.platform.fluids.FluidHelper;
 import forestry.core.platform.fluids.ForestryFluids;
 import forestry.core.platform.fluids.TankManager;
@@ -15,10 +19,11 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 
 import java.util.List;
 
@@ -48,7 +53,7 @@ public class InventorySqueezer extends InventoryAdapterTile<TileSqueezer> {
 				return false;
 			}
 
-			RecipeManager recipeManager = this.tile.getLevel().getRecipeManager();
+			RecipeMap recipeManager = RecipeUtils.getRecipeMap(this.tile.getLevel());
 			return RecipeUtils.isSqueezerIngredient(recipeManager, stack) || RecipeUtils.getSqueezerContainerRecipe(recipeManager, stack) != null;
 		}
 
@@ -115,21 +120,13 @@ public class InventorySqueezer extends InventoryAdapterTile<TileSqueezer> {
 			//Then, check if there is actually enough fluid to make this item.
 			if (fluidStack.getAmount() < fluidAmount) return;
 
-			//Then, check if the resultant item can be put into the output
-			ItemStack out = this.getItem(SLOT_CAN_OUTPUT);
-			// Deviation from 1.20.1: every potion is Items.POTION in 1.21, so out.is(result.getItem()) would let a
-			// water bottle stack onto any other potion. Compare components too.
-			if ((ItemStack.isSameItemSameComponents(out, result) && out.getCount() < result.getMaxStackSize()) || out.isEmpty()) {
-				//If it can, move it there
-				this.setItem(SLOT_CAN_INPUT, input.copyWithCount(input.getCount() - 1));
-				tankManager.drain(new FluidStack(fluidStack.getFluid(), fluidAmount), IFluidHandler.FluidAction.EXECUTE);
-
-				if (out.isEmpty()) {
-					this.setItem(SLOT_CAN_OUTPUT, result);
-				} else {
-					int amount = this.getItem(SLOT_CAN_OUTPUT).getCount();
-					this.setItem(SLOT_CAN_OUTPUT, result.copyWithCount(amount + 1));
-				}
+			try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+				var items = getTransferHandler();
+				if (items.extract(SLOT_CAN_INPUT, ItemResource.of(input), 1, tx) != 1) return;
+				if (tankManager.extract(FluidResource.of(fluidStack), fluidAmount, tx) != fluidAmount) return;
+				if (items.insert(SLOT_CAN_OUTPUT, ItemResource.of(result), 1, tx) != 1) return;
+				new RootCommitJournal(this::setChanged).updateSnapshots(tx);
+				tx.commit();
 			}
 		}
 	}

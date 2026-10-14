@@ -1,7 +1,7 @@
 package forestry.core.platform.util.datastructures;
 
 import forestry.core.platform.util.ItemStackUtil;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -19,7 +19,7 @@ public class ItemStackMap<T> extends StackMap<ItemStack, T> {
 
 	@Override
 	protected boolean isValidKey(Object key) {
-		return key instanceof ItemStack || key instanceof Item || key instanceof String || key instanceof ResourceLocation;
+		return key instanceof ItemStack || key instanceof Item || key instanceof String || key instanceof Identifier;
 	}
 
 	@Override

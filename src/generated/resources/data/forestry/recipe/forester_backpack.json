@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "#": {
-      "tag": "minecraft:wool"
-    },
-    "V": {
-      "tag": "minecraft:logs"
-    },
-    "X": {
-      "tag": "c:strings"
-    },
-    "Y": {
-      "tag": "c:chests/wooden"
-    }
+    "#": "#minecraft:wool",
+    "V": "#minecraft:logs",
+    "X": "#c:strings",
+    "Y": "#c:chests/wooden"
   },
   "pattern": [
     "X#X",
@@ -21,7 +13,6 @@
     "X#X"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:forester_backpack"
   }
 }

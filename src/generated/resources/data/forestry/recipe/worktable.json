@@ -1,16 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:book"
-    },
-    "C": {
-      "tag": "c:chests/wooden"
-    },
-    "T": {
-      "tag": "c:player_workstations/crafting_tables"
-    }
+    "B": "minecraft:book",
+    "C": "#c:chests/wooden",
+    "T": "#c:player_workstations/crafting_tables"
   },
   "pattern": [
     "B",
@@ -18,7 +11,6 @@
     "C"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:worktable"
   }
 }

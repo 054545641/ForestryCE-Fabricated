@@ -13,7 +13,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.item.crafting.Recipe;
 import net.neoforged.neoforge.common.Tags;
@@ -71,17 +71,17 @@ public class MutationProvider implements DataProvider {
 	}
 
 	// chance in [0, 1]
-	protected MutationRecipeBuilder add(ResourceLocation speciesTypeId, ResourceLocation first, ResourceLocation second, ResourceLocation result, float chance) {
+	protected MutationRecipeBuilder add(Identifier speciesTypeId, Identifier first, Identifier second, Identifier result, float chance) {
 		MutationRecipeBuilder builder = new MutationRecipeBuilder(speciesTypeId, first, second, result, chance);
 		this.pending.add(builder);
 		return builder;
 	}
 
-	protected MutationRecipeBuilder tree(ResourceLocation first, ResourceLocation second, ResourceLocation result, float chance) {
+	protected MutationRecipeBuilder tree(Identifier first, Identifier second, Identifier result, float chance) {
 		return add(ForestrySpeciesTypes.TREE, first, second, result, chance);
 	}
 
-	protected MutationRecipeBuilder butterfly(ResourceLocation first, ResourceLocation second, ResourceLocation result, float chance) {
+	protected MutationRecipeBuilder butterfly(Identifier first, Identifier second, Identifier result, float chance) {
 		return add(ForestrySpeciesTypes.BUTTERFLY, first, second, result, chance);
 	}
 
@@ -91,14 +91,14 @@ public class MutationProvider implements DataProvider {
 		for (MutationRecipeBuilder builder : this.pending) {
 			String base = folder(builder.getSpeciesTypeId()) + "/" + builder.getResultId().getPath();
 			int n = counters.merge(base, 1, Integer::sum);
-			ResourceLocation id = ForestryConstants.forestry(base + "_" + n);
+			Identifier id = ForestryConstants.forestry(base + "_" + n);
 			MutationRecipe recipe = builder.build(id);
 			futures.add(DataProvider.saveStable(cache, registries, Recipe.CODEC, recipe, this.recipePathProvider.json(id)));
 		}
 		return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
 	}
 
-	private static String folder(ResourceLocation speciesTypeId) {
+	private static String folder(Identifier speciesTypeId) {
 		if (speciesTypeId.equals(ForestrySpeciesTypes.BEE)) {
 			return "bee_mutation";
 		} else if (speciesTypeId.equals(ForestrySpeciesTypes.TREE)) {
@@ -110,18 +110,18 @@ public class MutationProvider implements DataProvider {
 	}
 
 	private void bees() {
-		ResourceLocation[] overworldHiveBees = {FOREST, MARSHY, MEADOWS, MODEST, SAVANNA, TROPICAL, VALIANT, WINTRY, LUSH, AQUATIC};
+		Identifier[] overworldHiveBees = {FOREST, MARSHY, MEADOWS, MODEST, SAVANNA, TROPICAL, VALIANT, WINTRY, LUSH, AQUATIC};
 
 		// Common
 		for (int i = 0; i < overworldHiveBees.length; i++) {
-			ResourceLocation firstParent = overworldHiveBees[i];
+			Identifier firstParent = overworldHiveBees[i];
 			for (int j = i + 1; j < overworldHiveBees.length; j++) {
 				add(ForestrySpeciesTypes.BEE, firstParent, overworldHiveBees[j], COMMON, 0.15f);
 			}
 		}
 
 		// Cultivated
-		for (ResourceLocation secondParent : overworldHiveBees) {
+		for (Identifier secondParent : overworldHiveBees) {
 			add(ForestrySpeciesTypes.BEE, COMMON, secondParent, CULTIVATED, 0.12f);
 		}
 
@@ -133,12 +133,12 @@ public class MutationProvider implements DataProvider {
 		add(ForestrySpeciesTypes.BEE, DILIGENT, UNWEARY, INDUSTRIOUS, 0.08f);
 
 		// Sinister
-		for (ResourceLocation parent : new ResourceLocation[]{MODEST, TROPICAL}) {
+		for (Identifier parent : new Identifier[]{MODEST, TROPICAL}) {
 			add(ForestrySpeciesTypes.BEE, ForestryBeeSpecies.CULTIVATED, parent, ForestryBeeSpecies.SINISTER, 0.6f).biome(BiomeTags.IS_NETHER);
 		}
 
 		// Fiendish
-		for (ResourceLocation parent : new ResourceLocation[]{CULTIVATED, MODEST, TROPICAL}) {
+		for (Identifier parent : new Identifier[]{CULTIVATED, MODEST, TROPICAL}) {
 			add(ForestrySpeciesTypes.BEE, ForestryBeeSpecies.SINISTER, parent, ForestryBeeSpecies.FIENDISH, 0.4f).biome(BiomeTags.IS_NETHER);
 		}
 

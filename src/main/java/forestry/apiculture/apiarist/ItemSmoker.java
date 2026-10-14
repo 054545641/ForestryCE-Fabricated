@@ -3,11 +3,9 @@ package forestry.apiculture.apiarist;
 import forestry.api.apiculture.hives.IHiveTile;
 import forestry.core.platform.item.ItemForestry;
 import forestry.core.platform.render.ParticleRender;
-import forestry.core.platform.tile.TileUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,14 +16,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 public class ItemSmoker extends ItemForestry {
-	public ItemSmoker() {
-		super(new Properties().stacksTo(1));
+	public ItemSmoker(Properties properties) {
+		super(properties.stacksTo(1));
 	}
 
-	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
-		if (level.isClientSide && isSelected && level.random.nextInt(40) == 0) {
-			addSmoke(level, entity, 1);
+	/** Called only by the client player-tick handler; idle smoke never changes hive state. */
+	public void clientIdleTick(Player player) {
+		if (player.level().isClientSide() && !player.isUsingItem() && player.level().getRandom().nextInt(40) == 0) {
+			addSmoke(player.level(), player, 1);
 		}
 	}
 
@@ -36,7 +34,7 @@ public class ItemSmoker extends ItemForestry {
 
 	private static HumanoidArm getHandSide(Entity entity) {
 		if (entity instanceof LivingEntity LivingEntity) {
-			InteractionHand activeHand = LivingEntity.getUsedItemHand();
+			InteractionHand activeHand = LivingEntity.isUsingItem() ? LivingEntity.getUsedItemHand() : InteractionHand.MAIN_HAND;
 			HumanoidArm handSide = LivingEntity.getMainArm();
 			if (activeHand == InteractionHand.OFF_HAND) {
 				handSide = handSide.getOpposite();
@@ -64,24 +62,30 @@ public class ItemSmoker extends ItemForestry {
 		Vec3 scaledOffset = handOffset.scale(1.0 / distance);
 		Vec3 smokePos = lookDistance.add(entity.position()).add(scaledOffset);
 
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			ParticleRender.addEntitySmokeFX(level, smokePos.x, smokePos.y + 1, smokePos.z);
 		}
 
 		BlockPos blockPos = BlockPos.containing(smokePos.x, smokePos.y + 1, smokePos.z);
-		TileUtil.actOnTile(level, blockPos, IHiveTile.class, IHiveTile::calmBees);
+		calmAt(level, blockPos);
+	}
+
+	private static void calmAt(Level level, BlockPos pos) {
+		if (!level.isClientSide() && level.hasChunkAt(pos) && level.getBlockEntity(pos) instanceof IHiveTile hive) {
+			hive.calmBees();
+		}
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		player.startUsingItem(hand);
 		ItemStack itemStack = player.getItemInHand(hand);
-		return new InteractionResultHolder<>(InteractionResult.SUCCESS, itemStack);
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override
 	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
-		TileUtil.actOnTile(context.getLevel(), context.getClickedPos(), IHiveTile.class, IHiveTile::calmBees);
+		calmAt(context.getLevel(), context.getClickedPos());
 		return super.onItemUseFirst(stack, context);
 	}
 

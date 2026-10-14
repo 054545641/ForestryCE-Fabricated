@@ -59,7 +59,7 @@ public class LetterMenu extends ContainerItemInventory<LetterInventory> implemen
 		}
 
 		// Rip open delivered mails
-		if (!player.level().isClientSide) {
+		if (!player.level().isClientSide()) {
 			if (inventory.getLetter().isProcessed()) {
 				inventory.onLetterOpened();
 			}
@@ -75,7 +75,7 @@ public class LetterMenu extends ContainerItemInventory<LetterInventory> implemen
 
 	@Override
 	public void removed(Player playerEntity) {
-		if (!playerEntity.level().isClientSide) {
+		if (!playerEntity.level().isClientSide()) {
 			ILetter letter = this.inventory.getLetter();
 			if (!letter.isProcessed()) {
 				IMailAddress sender = new MailAddress(playerEntity.getGameProfile());
@@ -119,18 +119,21 @@ public class LetterMenu extends ContainerItemInventory<LetterInventory> implemen
 	}
 
 	public void handleRequestLetterInfo(Player player, String recipientName, IPostalCarrier carrier) {
-		MinecraftServer server = player.getServer();
+		if (getLetter().isProcessed()) return;
+		MinecraftServer server = player.level() instanceof ServerLevel level ? level.getServer() : null;
 		if (server == null) {
 			Forestry.LOGGER.error("Could not get server");
 			return;
 		}
-		IMailAddress recipient = getRecipient(server, recipientName, carrier);
+		this.carrier = carrier;
+		IMailAddress recipient = recipientName.isBlank() ? MailAddress.INVALID : getRecipient(server, recipientName, carrier);
+		this.tradeInfo = null;
 
 		getLetter().setRecipient(recipient);
 
 		// Update the trading info
-		if (recipient.getCarrier().equals(PostalCarriers.TRADER.value())) {
-			updateTradeInfo(player.level(), recipient);
+		if (carrier.equals(PostalCarriers.TRADER.value())) {
+			updateTradeInfo(player.level(), recipient.isValid() ? recipient : null);
 		}
 
 		// TODO: Move this to the carrier to make it more extensible
@@ -163,13 +166,13 @@ public class LetterMenu extends ContainerItemInventory<LetterInventory> implemen
 	}
 
 	public void handleSetText(String text) {
-		getLetter().setText(text);
+		if (!getLetter().isProcessed() && text.length() <= 128) getLetter().setText(text);
 	}
 
 	/* Managing Trade info */
 	private void updateTradeInfo(Level world, @Nullable IMailAddress address) {
 		// Updating is done by the server.
-		if (world.isClientSide) {
+		if (world.isClientSide()) {
 			return;
 		}
 

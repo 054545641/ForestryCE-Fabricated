@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/crates/unpack/forestry/humus",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:crated_humus"
-      }
+      "forestry:crated_humus"
     ],
     "result": {
       "count": 9,

@@ -4,7 +4,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.Forestry;
 import forestry.api.core.genetics.alleles.Allele;
@@ -21,15 +21,15 @@ import forestry.api.plugin.IGenomeBuilder;
  * {@link IGenomeBuilder#setInactive}, leaving an unnamed side at its karyotype or taxon default.
  * <p>
  * Reference chromosomes (non-null {@link IChromosome#resolver()}) take their dominance from the referenced value
- * rather than from the serialized allele, exactly as {@code Genome.Builder}'s {@code ResourceLocation} overload does.
+ * rather than from the serialized allele, exactly as {@code Genome.Builder}'s {@code Identifier} overload does.
  */
 public final class GenomeProjection {
 	private GenomeProjection() {
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static void applyOverrides(IGenomeBuilder builder, IKaryotype karyotype, Map<ResourceLocation, AlleleOverride<?>> overrides) {
-		for (Map.Entry<ResourceLocation, AlleleOverride<?>> e : overrides.entrySet()) {
+	public static void applyOverrides(IGenomeBuilder builder, IKaryotype karyotype, Map<Identifier, AlleleOverride<?>> overrides) {
+		for (Map.Entry<Identifier, AlleleOverride<?>> e : overrides.entrySet()) {
 			IChromosome<?> chromosome = karyotype.getChromosome(e.getKey());
 			if (chromosome == null) {
 				Forestry.LOGGER.warn("Skipping unknown chromosome {} in genome override", e.getKey());
@@ -60,7 +60,7 @@ public final class GenomeProjection {
 		if (allele == null || resolver == null) {
 			return allele;
 		}
-		ResourceLocation reference = (ResourceLocation) allele.value();
+		Identifier reference = (Identifier) allele.value();
 		return new Allele<>(reference, resolver.isDominant(reference));
 	}
 }

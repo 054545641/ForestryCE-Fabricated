@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:kapok_planks"
-      },
-      {
-        "item": "forestry:kapok_fireproof_planks"
-      }
+      "forestry:kapok_planks",
+      "forestry:kapok_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:kapok_pressure_plate"
   }
 }

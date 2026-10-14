@@ -8,7 +8,7 @@ import forestry.api.core.ToleranceType;
  * Plain inline allele value constants used by base Forestry. An {@link Allele} is just a value plus its dominance;
  * these constants are convenient, reusable building blocks for default genomes and karyotype defaults. They are no
  * longer interned or registered. Reference values (species, flower types, effects, fruits, cocoons, activity) are now
- * referenced directly by their {@link net.minecraft.resources.ResourceLocation} ids, not via constants here.
+ * referenced directly by their {@link net.minecraft.resources.Identifier} ids, not via constants here.
  */
 public class ForestryAlleles {
 	// Booleans

@@ -1,13 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "tag": "c:dusts/ash"
-    },
-    "X": {
-      "tag": "c:gems/apatite"
-    }
+    "#": "#c:dusts/ash",
+    "X": "#c:gems/apatite"
   },
   "pattern": [
     "###",

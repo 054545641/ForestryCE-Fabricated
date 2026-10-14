@@ -1,13 +1,14 @@
 package forestry.core.data.builder;
 
+import java.util.Optional;
 import forestry.core.content.machines.recipes.CarpenterRecipe;
-import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.ImpossibleTrigger;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
+import net.minecraft.advancements.triggers.Criterion;
+import net.minecraft.advancements.triggers.ImpossibleTrigger;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -21,7 +22,7 @@ public class CarpenterRecipeBuilder {
 	private int packagingTime = 5;
 	@Nullable
 	private FluidStack liquid;
-	private Ingredient box;
+	private Optional<Ingredient> box = Optional.empty();
 	private CraftingRecipe recipe;
 	@Nullable
 	private ItemStack result;
@@ -37,21 +38,21 @@ public class CarpenterRecipeBuilder {
 	}
 
 	public CarpenterRecipeBuilder setBox(Ingredient box) {
-		this.box = box;
+		this.box = Optional.of(box);
 		return this;
 	}
 
 	public CarpenterRecipeBuilder recipe(ShapedRecipeBuilder recipe) {
 		RecipeCapture capture = new RecipeCapture();
-		recipe.unlockedBy("impossible", IMPOSSIBLE).save(capture, ResourceLocation.withDefaultNamespace("forestry_carpenter_shaped"));
-		this.recipe = capture.recipe(ResourceLocation.withDefaultNamespace("forestry_carpenter_shaped"), CraftingRecipe.class);
+		recipe.unlockedBy("impossible", IMPOSSIBLE).save(capture, net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, Identifier.withDefaultNamespace("forestry_carpenter_shaped")));
+		this.recipe = capture.recipe(Identifier.withDefaultNamespace("forestry_carpenter_shaped"), CraftingRecipe.class);
 		return this;
 	}
 
 	public CarpenterRecipeBuilder recipe(ShapelessRecipeBuilder recipe) {
 		RecipeCapture capture = new RecipeCapture();
-		recipe.unlockedBy("impossible", IMPOSSIBLE).save(capture, ResourceLocation.withDefaultNamespace("forestry_carpenter_shapeless"));
-		this.recipe = capture.recipe(ResourceLocation.withDefaultNamespace("forestry_carpenter_shapeless"), CraftingRecipe.class);
+		recipe.unlockedBy("impossible", IMPOSSIBLE).save(capture, net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, Identifier.withDefaultNamespace("forestry_carpenter_shapeless")));
+		this.recipe = capture.recipe(Identifier.withDefaultNamespace("forestry_carpenter_shapeless"), CraftingRecipe.class);
 		return this;
 	}
 
@@ -66,7 +67,7 @@ public class CarpenterRecipeBuilder {
 		return this;
 	}
 
-	public void build(RecipeOutput output, ResourceLocation id) {
-		output.accept(id, new CarpenterRecipe(id, this.packagingTime, this.liquid == null ? FluidStack.EMPTY : this.liquid, this.box, this.recipe, this.result), null);
+	public void build(RecipeOutput output, Identifier id) {
+		output.accept(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id), new CarpenterRecipe(id, this.packagingTime, this.liquid == null ? FluidStack.EMPTY : this.liquid, this.box, this.recipe, this.result), null);
 	}
 }

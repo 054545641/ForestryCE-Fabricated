@@ -5,7 +5,7 @@ import forestry.api.core.genetics.IMutation;
 import forestry.api.core.genetics.IMutationManager;
 import forestry.api.core.genetics.ISpecies;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.util.RandomSource;
 
 import java.util.ArrayList;

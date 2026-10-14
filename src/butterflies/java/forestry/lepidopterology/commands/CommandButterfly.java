@@ -32,7 +32,7 @@ public class CommandButterfly {
 
 		public static int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
 			int killCount = 0;
-			for (Entity butterfly : context.getSource().getPlayerOrException().serverLevel().getEntities(LepidopterologyEntities.BUTTERFLY.entityType(), EntitySelector.ENTITY_STILL_ALIVE)) {
+			for (Entity butterfly : context.getSource().getPlayerOrException().level().getEntities(LepidopterologyEntities.BUTTERFLY.entityType(), EntitySelector.ENTITY_STILL_ALIVE)) {
 				butterfly.remove(Entity.RemovalReason.KILLED);
 				killCount++;
 			}

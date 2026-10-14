@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "forestry:apiarist_armor"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "forestry:apiarist_armor"
+      }
+    ]
+  }
+}

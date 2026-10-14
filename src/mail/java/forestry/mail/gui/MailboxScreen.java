@@ -10,10 +10,8 @@ public class MailboxScreen extends GuiForestry<MailboxMenu> {
 	private final MailboxBlockEntity tile;
 
 	public MailboxScreen(MailboxMenu container, Inventory inv, Component title) {
-		super(Constants.TEXTURE_PATH_GUI + "/mailbox.png", container, inv, title);
+		super(Constants.TEXTURE_PATH_GUI + "/mailbox.png", container, inv, title, 230, 227);
 		this.tile = container.getTile();
-		this.imageWidth = 230;
-		this.imageHeight = 227;
 	}
 
 	@Override

@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/padauk_planks"
-  }
+  "parent": "forestry:block/padauk_sign_rot_0"
 }

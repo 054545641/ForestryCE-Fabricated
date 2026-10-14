@@ -5,7 +5,7 @@ import forestry.core.platform.gui.widgets.SocketWidget;
 import forestry.core.platform.gui.widgets.TankWidget;
 import forestry.core.content.energy.menu.BiogasEngineMenu;
 import forestry.core.content.energy.tiles.BiogasEngineBlockEntity;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -22,15 +22,15 @@ public class BiogasEngineScreen extends EngineScreen<BiogasEngineMenu, BiogasEng
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
-		super.renderBg(graphics, partialTicks, mouseX, mouseY);
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 
 		int temperature = this.engine.getOperatingTemperatureScaled(16);
 		if (temperature > 16) {
 			temperature = 16;
 		}
 		if (temperature > 0) {
-			graphics.blit(this.textureFile, this.leftPos + 53, this.topPos + 47 + 16 - temperature, 176, 60 + 16 - temperature, 4, temperature);
+			graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.textureFile, this.leftPos + 53, this.topPos + 47 + 16 - temperature, 176, 60 + 16 - temperature, 4, temperature, 256, 256);
 		}
 	}
 }

@@ -2,7 +2,7 @@ package forestry.lepidopterology.features;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -18,5 +18,7 @@ public class LepidopterologyRecipes {
 	private static final IFeatureRegistry REGISTRY = ModFeatureRegistry.get(ForestryModuleIds.LEPIDOPTEROLOGY);
 	private static final DeferredRegister<RecipeSerializer<?>> SERIALIZERS = REGISTRY.getRegistry(Registries.RECIPE_SERIALIZER);
 
-	public static final DeferredHolder<RecipeSerializer<?>, SimpleCraftingRecipeSerializer<?>> MATING_SERIALIZER = SERIALIZERS.register("butterfly_mating", () -> new SimpleCraftingRecipeSerializer<>(ButterflyMatingRecipe::new));
+	public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ButterflyMatingRecipe>> MATING_SERIALIZER = SERIALIZERS.register("butterfly_mating", () -> new RecipeSerializer<>(
+		CraftingBookCategory.CODEC.optionalFieldOf("category", CraftingBookCategory.MISC).xmap(ButterflyMatingRecipe::new, ButterflyMatingRecipe::category),
+		CraftingBookCategory.STREAM_CODEC.map(ButterflyMatingRecipe::new, ButterflyMatingRecipe::category).cast()));
 }

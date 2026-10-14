@@ -45,7 +45,7 @@ public class IgnitionBeeEffect extends ThrottledBeeEffect {
 				duration = 350;
 			}
 
-			if (level.random.nextInt(1000) >= chance) {
+			if (level.getRandom().nextInt(1000) >= chance) {
 				continue;
 			}
 
@@ -59,7 +59,7 @@ public class IgnitionBeeEffect extends ThrottledBeeEffect {
 	@OnlyIn(Dist.CLIENT)
 	public IEffectData doFX(IGenome genome, IEffectData storedData, IBeeHousing housing) {
 		ClientLevel level = (ClientLevel) housing.getLevel();
-		if (level.random.nextInt(2) != 0) {
+		if (level.getRandom().nextInt(2) != 0) {
 			super.doFX(genome, storedData, housing);
 		} else {
 			Vec3 beeFXCoordinates = housing.getBeeFXCoordinates();

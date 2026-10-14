@@ -4,13 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import forestry.core.platform.fluids.ForestryFluids;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
@@ -29,28 +24,12 @@ public class RenderUtil {
 		}
 	}
 
-	// requires external push/pop
-	public static void renderDisplayStack(PoseStack stack, ItemRenderer itemRenderer, ItemStack displayStack, Level level, float partialTick, MultiBufferSource buffers, int light) {
-		BakedModel itemModel = itemRenderer.getModel(displayStack, level, null, 1);
-		boolean isGui3d = itemModel.isGui3d();
-		float smoothTick = ((float) (int) level.getGameTime()) + partialTick;
-		float f1 = Mth.sin(smoothTick / 10.0f) * 0.1f + 0.1f;
-		float f2 = itemModel.getTransforms().getTransform(ItemDisplayContext.GROUND).scale.y();
-		stack.translate(0, f1 + 0.25f * f2, 0);
-		stack.mulPose(Axis.YP.rotation(smoothTick / 20f));
-
-		itemRenderer.render(displayStack, ItemDisplayContext.GROUND, false, stack, buffers, light, OverlayTexture.NO_OVERLAY, itemModel);
-
-		if (!isGui3d) {
-			stack.translate(0.0, 0.0, 0.09375F);
-		}
-	}
 
 	public static int getFluidColor(Fluid fluid) {
-		FluidType attributes = fluid.getFluidType();
-		int color = IClientFluidTypeExtensions.of(attributes).getTintColor();
+		var model = net.minecraft.client.Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.defaultFluidState());
+		int color = model.fluidTintSource() == null ? -1 : model.fluidTintSource().color(fluid.defaultFluidState());
 		ForestryFluids definition = ForestryFluids.getFluidDefinition(fluid);
-		if (color < 0) {
+		if (color == -1) {
 			color = 0x0000ff;
 			if (definition != null) {
 				color = definition.getParticleColor();

@@ -58,7 +58,7 @@ public abstract class NonStackingBeeEffect implements IBeeEffect {
 	private void performGlobalEffect(LevelTickEvent.Pre event) {
 		Level level = event.getLevel();
 
-		if (level.isClientSide || level.getGameTime() % IBeekeepingLogic.DEFAULT_WORK_THROTTLE != 0) {
+		if (level.isClientSide() || level.getGameTime() % IBeekeepingLogic.DEFAULT_WORK_THROTTLE != 0) {
 			return;
 		}
 

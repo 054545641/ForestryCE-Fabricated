@@ -10,7 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -29,14 +29,14 @@ public interface IButterflySpeciesType extends ISpeciesType<IButterflySpecies, I
 	 * only; the {@code cocoon} reference chromosome itself resolves through {@link #getCocoonSafe} so a
 	 * datapack-authored species referencing an unregistered cocoon id can't crash saved/rendered butterflies.
 	 */
-	IButterflyCocoon getCocoon(ResourceLocation id);
+	IButterflyCocoon getCocoon(Identifier id);
 
 	/**
 	 * @return The cocoon registered with the given ID, or {@code null} if none is registered (graceful fallback
 	 * variant; backs the {@code cocoon} reference chromosome).
 	 */
 	@Nullable
-	IButterflyCocoon getCocoonSafe(ResourceLocation id);
+	IButterflyCocoon getCocoonSafe(Identifier id);
 
 	/**
 	 * @return The butterfly effect registered with the given ID, throwing if none is registered. For internal/fail-fast
@@ -44,14 +44,14 @@ public interface IButterflySpeciesType extends ISpeciesType<IButterflySpecies, I
 	 * {@link #getButterflyEffectSafe} so a datapack-authored species referencing an unregistered effect id can't
 	 * crash saved/rendered butterflies.
 	 */
-	IButterflyEffect getButterflyEffect(ResourceLocation id);
+	IButterflyEffect getButterflyEffect(Identifier id);
 
 	/**
 	 * @return The butterfly effect registered with the given ID, or {@code null} if none is registered (graceful
 	 * fallback variant; backs the {@code butterfly_effect} reference chromosome).
 	 */
 	@Nullable
-	IButterflyEffect getButterflyEffectSafe(ResourceLocation id);
+	IButterflyEffect getButterflyEffectSafe(Identifier id);
 
 	/**
 	 * Spawns the given butterfly in the world.

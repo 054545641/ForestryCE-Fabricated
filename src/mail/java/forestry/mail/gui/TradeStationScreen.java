@@ -4,7 +4,7 @@ import forestry.core.platform.config.Constants;
 import forestry.core.platform.gui.GuiForestry;
 import forestry.core.platform.render.ColourProperties;
 import forestry.mail.tradestation.TradeStationBlockEntity;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -12,31 +12,29 @@ public class TradeStationScreen extends GuiForestry<TradeStationMenu> {
 	private final TradeStationBlockEntity tile;
 
 	public TradeStationScreen(TradeStationMenu container, Inventory inv, Component title) {
-		super(Constants.TEXTURE_PATH_GUI + "/trade_station.png", container, inv, title);
+		super(Constants.TEXTURE_PATH_GUI + "/trade_station.png", container, inv, title, 226, 220);
 		this.tile = container.getTile();
-		this.imageWidth = 226;
-		this.imageHeight = 220;
 	}
 
 	@Override
-	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+	protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 		Component name = this.tile.getTitle();
-		graphics.drawString(this.font, name, this.textLayout.getCenteredOffset(name), 6, ColourProperties.INSTANCE.get("gui.mail.text"));
+		graphics.text(this.font, name, this.textLayout.getCenteredOffset(name), 6, (0xFF000000 | ColourProperties.INSTANCE.get("gui.mail.text")));
 
 		Component receive = Component.translatable("for.gui.mail.receive");
-		graphics.drawString(this.font, receive, this.textLayout.getCenteredOffset(receive, 70) + 51, 45, ColourProperties.INSTANCE.get("gui.mail.text"));
+		graphics.text(this.font, receive, this.textLayout.getCenteredOffset(receive, 70) + 51, 45, (0xFF000000 | ColourProperties.INSTANCE.get("gui.mail.text")));
 
 		Component send = Component.translatable("for.gui.mail.send");
-		graphics.drawString(this.font, send, this.textLayout.getCenteredOffset(send, 70) + 51, 99, ColourProperties.INSTANCE.get("gui.mail.text"));
+		graphics.text(this.font, send, this.textLayout.getCenteredOffset(send, 70) + 51, 99, (0xFF000000 | ColourProperties.INSTANCE.get("gui.mail.text")));
 
-		super.renderLabels(graphics, mouseX, mouseY);
+		super.extractLabels(graphics, mouseX, mouseY);
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
-		super.renderBg(graphics, partialTicks, mouseX, mouseY);
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 
-		graphics.drawString(this.font, this.menu.getAddress().getName(), this.leftPos + 19, this.topPos + 22, ColourProperties.INSTANCE.get("gui.mail.text"));
+		graphics.text(this.font, this.menu.getAddress().getName(), this.leftPos + 19, this.topPos + 22, (0xFF000000 | ColourProperties.INSTANCE.get("gui.mail.text")));
 	}
 
 	@Override

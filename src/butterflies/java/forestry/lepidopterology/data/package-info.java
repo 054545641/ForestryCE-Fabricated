@@ -3,7 +3,8 @@
  * creature name (ex. {@code ButterflyTaxonProvider}); a jar-wide provider takes the module name
  * (ex. {@code LepidopterologyRecipeProvider}).
  */
-@javax.annotation.ParametersAreNonnullByDefault
 @forestry.core.platform.util.FieldsAreNonnullByDefault
-@net.minecraft.MethodsReturnNonnullByDefault
+@NullMarked
 package forestry.lepidopterology.data;
+
+import org.jspecify.annotations.NullMarked;

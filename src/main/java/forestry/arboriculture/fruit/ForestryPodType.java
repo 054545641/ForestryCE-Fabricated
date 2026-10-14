@@ -4,7 +4,7 @@ import forestry.api.arboriculture.genetics.IFruit;
 import forestry.api.core.IBlockSubtype;
 import forestry.core.platform.util.SpeciesUtil;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Locale;
 import forestry.api.arboriculture.ForestryFruits;
@@ -16,9 +16,9 @@ public enum ForestryPodType implements IBlockSubtype {
 	PAPAYA(ForestryFruits.PAPAYA),
 	COCONUT(ForestryFruits.COCONUT);
 
-	private final ResourceLocation fruitId;
+	private final Identifier fruitId;
 
-	ForestryPodType(ResourceLocation fruitId) {
+	ForestryPodType(Identifier fruitId) {
 		this.fruitId = fruitId;
 	}
 

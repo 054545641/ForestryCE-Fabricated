@@ -184,13 +184,13 @@ public enum WoodAccess {
 		register(VanillaWoodType.CHERRY, WoodBlockKind.PRESSURE_PLATE, false, Blocks.CHERRY_PRESSURE_PLATE.defaultBlockState(), () -> Items.CHERRY_PRESSURE_PLATE);
 
 		// Log tags
-		registerLogTag(VanillaWoodType.OAK, false, BlockTags.OAK_LOGS, ItemTags.OAK_LOGS);
-		registerLogTag(VanillaWoodType.SPRUCE, false, BlockTags.SPRUCE_LOGS, ItemTags.SPRUCE_LOGS);
-		registerLogTag(VanillaWoodType.BIRCH, false, BlockTags.BIRCH_LOGS, ItemTags.BIRCH_LOGS);
+		registerLogTag(VanillaWoodType.OAK, false, net.minecraft.tags.BlockItemTags.OAK_LOGS.block(), ItemTags.OAK_LOGS);
+		registerLogTag(VanillaWoodType.SPRUCE, false, net.minecraft.tags.BlockItemTags.SPRUCE_LOGS.block(), ItemTags.SPRUCE_LOGS);
+		registerLogTag(VanillaWoodType.BIRCH, false, net.minecraft.tags.BlockItemTags.BIRCH_LOGS.block(), ItemTags.BIRCH_LOGS);
 		registerLogTag(VanillaWoodType.JUNGLE, false, BlockTags.JUNGLE_LOGS, ItemTags.JUNGLE_LOGS);
-		registerLogTag(VanillaWoodType.ACACIA, false, BlockTags.ACACIA_LOGS, ItemTags.ACACIA_LOGS);
-		registerLogTag(VanillaWoodType.DARK_OAK, false, BlockTags.DARK_OAK_LOGS, ItemTags.DARK_OAK_LOGS);
-		registerLogTag(VanillaWoodType.CHERRY, false, BlockTags.CHERRY_LOGS, ItemTags.CHERRY_LOGS);
+		registerLogTag(VanillaWoodType.ACACIA, false, net.minecraft.tags.BlockItemTags.ACACIA_LOGS.block(), ItemTags.ACACIA_LOGS);
+		registerLogTag(VanillaWoodType.DARK_OAK, false, net.minecraft.tags.BlockItemTags.DARK_OAK_LOGS.block(), ItemTags.DARK_OAK_LOGS);
+		registerLogTag(VanillaWoodType.CHERRY, false, net.minecraft.tags.BlockItemTags.CHERRY_LOGS.block(), ItemTags.CHERRY_LOGS);
 		for (VanillaWoodType type : VanillaWoodType.VALUES) {
 			registerLogTag(type, true, type.fireproofBlockTag, type.fireproofItemTag);
 		}

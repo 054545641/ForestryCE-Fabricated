@@ -8,7 +8,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.core.genetics.IGenome;
 import forestry.api.core.genetics.alleles.Allele;
@@ -28,14 +28,14 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Karyotype implements IKaryotype {
-	private final ResourceLocation id;
+	private final Identifier id;
 	private final ImmutableList<IChromosome<?>> chromosomes;
-	private final ImmutableMap<ResourceLocation, IChromosome<?>> byId;
-	private final IChromosome<ResourceLocation> speciesChromosome;
+	private final ImmutableMap<Identifier, IChromosome<?>> byId;
+	private final IChromosome<Identifier> speciesChromosome;
 	// Eager defaults for data chromosomes; reference chromosomes store an ID resolved lazily (post-population).
 	private final ImmutableMap<IChromosome<?>, Allele<?>> dataDefaults;
-	private final ImmutableMap<IChromosome<?>, ResourceLocation> referenceDefaults;
-	private final ResourceLocation defaultSpecies;
+	private final ImmutableMap<IChromosome<?>, Identifier> referenceDefaults;
+	private final Identifier defaultSpecies;
 	private final Set<IChromosome<?>> weaklyInherited;
 	private final Codec<IGenome> genomeCodec;
 	private final StreamCodec<RegistryFriendlyByteBuf, IGenome> genomeStreamCodec;
@@ -43,7 +43,7 @@ public class Karyotype implements IKaryotype {
 	@Nullable
 	private ImmutableMap<IChromosome<?>, Allele<?>> allDefaults;
 
-	public Karyotype(ResourceLocation id, ImmutableList<IChromosome<?>> chromosomes, IChromosome<ResourceLocation> speciesChromosome, ImmutableMap<IChromosome<?>, Allele<?>> dataDefaults, ImmutableMap<IChromosome<?>, ResourceLocation> referenceDefaults, Set<IChromosome<?>> weaklyInherited, ResourceLocation defaultSpecies) {
+	public Karyotype(Identifier id, ImmutableList<IChromosome<?>> chromosomes, IChromosome<Identifier> speciesChromosome, ImmutableMap<IChromosome<?>, Allele<?>> dataDefaults, ImmutableMap<IChromosome<?>, Identifier> referenceDefaults, Set<IChromosome<?>> weaklyInherited, Identifier defaultSpecies) {
 		this.id = id;
 		this.chromosomes = chromosomes;
 		this.speciesChromosome = speciesChromosome;
@@ -52,7 +52,7 @@ public class Karyotype implements IKaryotype {
 		this.weaklyInherited = weaklyInherited;
 		this.defaultSpecies = defaultSpecies;
 
-		ImmutableMap.Builder<ResourceLocation, IChromosome<?>> byId = ImmutableMap.builderWithExpectedSize(chromosomes.size());
+		ImmutableMap.Builder<Identifier, IChromosome<?>> byId = ImmutableMap.builderWithExpectedSize(chromosomes.size());
 		for (IChromosome<?> chromosome : chromosomes) {
 			byId.put(chromosome.id(), chromosome);
 		}
@@ -107,7 +107,7 @@ public class Karyotype implements IKaryotype {
 	}
 
 	@Override
-	public ResourceLocation id() {
+	public Identifier id() {
 		return this.id;
 	}
 
@@ -122,19 +122,19 @@ public class Karyotype implements IKaryotype {
 	}
 
 	@Override
-	public IChromosome<ResourceLocation> getSpeciesChromosome() {
+	public IChromosome<Identifier> getSpeciesChromosome() {
 		return this.speciesChromosome;
 	}
 
 	@Nullable
 	@Override
-	public IChromosome<?> getChromosome(ResourceLocation id) {
+	public IChromosome<?> getChromosome(Identifier id) {
 		return this.byId.get(id);
 	}
 
 	@Override
 	public Codec<IChromosome<?>> chromosomeKeyCodec() {
-		return ResourceLocation.CODEC.flatXmap(
+		return Identifier.CODEC.flatXmap(
 				rid -> {
 					IChromosome<?> chromosome = this.byId.get(rid);
 					return chromosome != null ? DataResult.success(chromosome) : DataResult.error(() -> "Unknown chromosome: " + rid);
@@ -159,7 +159,7 @@ public class Karyotype implements IKaryotype {
 	}
 
 	private Allele<?> resolveReferenceDefault(IChromosome<?> chromosome) {
-		ResourceLocation refId = this.referenceDefaults.get(chromosome);
+		Identifier refId = this.referenceDefaults.get(chromosome);
 		if (refId == null) {
 			throw new IllegalArgumentException("Chromosome " + chromosome.id() + " is not part of karyotype " + this.id);
 		}
@@ -186,7 +186,7 @@ public class Karyotype implements IKaryotype {
 	}
 
 	@Override
-	public ResourceLocation getDefaultSpecies() {
+	public Identifier getDefaultSpecies() {
 		return this.defaultSpecies;
 	}
 
@@ -208,12 +208,12 @@ public class Karyotype implements IKaryotype {
 	public static class Builder implements IKaryotypeBuilder {
 		private final LinkedHashMap<IChromosome<?>, ChromosomeBuilder<?>> chromosomes = new LinkedHashMap<>();
 		@Nullable
-		private IChromosome<ResourceLocation> speciesChromosome;
+		private IChromosome<Identifier> speciesChromosome;
 		@Nullable
-		private ResourceLocation defaultSpeciesId;
+		private Identifier defaultSpeciesId;
 
 		@Override
-		public void setSpecies(IChromosome<ResourceLocation> species, ResourceLocation defaultId) {
+		public void setSpecies(IChromosome<Identifier> species, Identifier defaultId) {
 			if (this.speciesChromosome != null && this.speciesChromosome != species) {
 				throw new IllegalStateException("The species chromosome for this karyotype has already been set: " + this.speciesChromosome.id() + ", but tried setting to " + species.id());
 			}
@@ -230,8 +230,8 @@ public class Karyotype implements IKaryotype {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public IChromosomeBuilder<ResourceLocation> set(IChromosome<ResourceLocation> chromosome, ResourceLocation defaultId) {
-			ChromosomeBuilder<ResourceLocation> builder = (ChromosomeBuilder<ResourceLocation>) this.chromosomes.computeIfAbsent(chromosome, key -> new ChromosomeBuilder<>(chromosome));
+		public IChromosomeBuilder<Identifier> set(IChromosome<Identifier> chromosome, Identifier defaultId) {
+			ChromosomeBuilder<Identifier> builder = (ChromosomeBuilder<Identifier>) this.chromosomes.computeIfAbsent(chromosome, key -> new ChromosomeBuilder<>(chromosome));
 			builder.defaultAllele = null;
 			builder.defaultReferenceId = defaultId;
 			return builder;
@@ -247,12 +247,12 @@ public class Karyotype implements IKaryotype {
 			return (IChromosomeBuilder<V>) builder;
 		}
 
-		public Karyotype build(ResourceLocation id) {
+		public Karyotype build(Identifier id) {
 			Preconditions.checkState(this.defaultSpeciesId != null && this.speciesChromosome != null, "IKaryotypeBuilder is missing a species chromosome.");
 
 			ImmutableList.Builder<IChromosome<?>> order = ImmutableList.builderWithExpectedSize(this.chromosomes.size() + 1);
 			ImmutableMap.Builder<IChromosome<?>, Allele<?>> dataDefaults = ImmutableMap.builder();
-			ImmutableMap.Builder<IChromosome<?>, ResourceLocation> referenceDefaults = ImmutableMap.builder();
+			ImmutableMap.Builder<IChromosome<?>, Identifier> referenceDefaults = ImmutableMap.builder();
 			Set<IChromosome<?>> weaklyInherited = Collections.newSetFromMap(new IdentityHashMap<>());
 
 			// Species chromosome goes first.

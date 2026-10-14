@@ -3,12 +3,10 @@ package forestry.core.data;
 import java.util.Set;
 
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-import thedarkcolour.modkit.data.DataHelper;
-import thedarkcolour.modkit.data.ProviderRegistrar;
 
 import forestry.api.ForestryConstants;
 
@@ -20,14 +18,14 @@ import forestry.api.ForestryConstants;
 public abstract class ContentJarData implements IForestryDataProvider {
 	private final String jar;
 	private final String root;
-	private final Set<ResourceLocation> moduleIds;
+	private final Set<Identifier> moduleIds;
 
 	/**
 	 * @param jar       The jar name the generator keys this jar's providers by. Ex. {@code "mail"}
 	 * @param root      The generated resource root, one of the {@link DataRoots} constants
 	 * @param moduleIds The modules this jar ships, which decide the ids it names
 	 */
-	protected ContentJarData(String jar, String root, Set<ResourceLocation> moduleIds) {
+	protected ContentJarData(String jar, String root, Set<Identifier> moduleIds) {
 		// A jar that claims nothing generates nothing and hands every one of its ids back to core,
 		// which is never what was meant
 		if (moduleIds.isEmpty()) {
@@ -39,7 +37,7 @@ public abstract class ContentJarData implements IForestryDataProvider {
 	}
 
 	@Override
-	public final Set<ResourceLocation> moduleIds() {
+	public final Set<Identifier> moduleIds() {
 		return this.moduleIds;
 	}
 
@@ -55,14 +53,12 @@ public abstract class ContentJarData implements IForestryDataProvider {
 		// An item model is generated for an id this jar's modules registered and for nothing else, so
 		// the model lands in the jar shipping the item it draws. English is not scoped this way; base
 		// writes every key, content ids included. See Data#gatherData
-		Set<ResourceLocation> owned = JarModules.ownedIds(this.moduleIds);
-		DataHelper helper = new DataHelper.Builder(ForestryConstants.MOD_ID, event)
-			.packOutput(output)
-			.addProvider(registrar)
-			.entryFilter(owned::contains)
-			.build();
+		Set<Identifier> owned = JarModules.ownedIds(this.moduleIds);
+		ScopedDataHelper helper = new ScopedDataHelper(ForestryConstants.MOD_ID, event, output, this.jar);
 
 		addProviders(new JarScope(event, output, helper, registrar));
+		registrar.addProvider(event.getGenerator(), true, new forestry.core.data.models.ForestryItemDefinitions(output, owned::contains));
+		helper.attach();
 	}
 
 	/**

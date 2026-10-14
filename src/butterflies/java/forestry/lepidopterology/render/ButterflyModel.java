@@ -1,8 +1,5 @@
 package forestry.lepidopterology.render;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import forestry.lepidopterology.entities.EntityButterfly;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -12,15 +9,12 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 
-public class ButterflyModel extends EntityModel<EntityButterfly> {
-	private final ModelPart root;
+public class ButterflyModel extends EntityModel<ButterflyRenderState> {
 	private final ModelPart leftWing;
 	private final ModelPart rightWing;
 
-	private float scale;
-
 	public ButterflyModel(ModelPart root) {
-		this.root = root;
+		super(root);
 		this.leftWing = root.getChild("left_wing");
 		this.rightWing = root.getChild("right_wing");
 	}
@@ -53,21 +47,14 @@ public class ButterflyModel extends EntityModel<EntityButterfly> {
 		return LayerDefinition.create(mesh, 64, 32);
 	}
 
-	public void setScale(float scale) {
-		this.scale = scale;
-	}
-
-	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer builder, int light, int overlay, int color) {
-		poseStack.scale(this.scale, this.scale, this.scale);
-		poseStack.translate(0.0F, 1.45f / this.scale, 0.0F);
-
-        this.root.render(poseStack, builder, light, overlay, color);
-	}
-
-	@Override
-	public void setupAnim(EntityButterfly entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.leftWing.zRot = Mth.cos(ageInTicks * 1.3f) * Mth.PI * 0.25f;
-        this.rightWing.zRot = -this.leftWing.zRot;
+	@Override public void setupAnim(ButterflyRenderState state) {
+		super.setupAnim(state);
+		// Equivalent to the old render-time scale followed by 1.45 / size translation, without division by zero.
+		this.root.y += 1.45f * 16f;
+		this.root.xScale = state.size;
+		this.root.yScale = state.size;
+		this.root.zScale = state.size;
+		this.leftWing.zRot = Mth.cos(state.wingFlap * 1.3f) * Mth.PI * 0.25f;
+		this.rightWing.zRot = -this.leftWing.zRot;
 	}
 }

@@ -6,20 +6,11 @@
     "id": "forestry:liquid_glass"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "L": {
-        "tag": "c:gems/lapis"
-      },
-      "S": {
-        "item": "forestry:phosphorescent_jelly"
-      },
-      "T": {
-        "tag": "c:nuggets/tin"
-      },
-      "^": {
-        "tag": "c:silicon"
-      }
+      "L": "#c:gems/lapis",
+      "S": "forestry:phosphorescent_jelly",
+      "T": "#c:nuggets/tin",
+      "^": "#c:silicon"
     },
     "pattern": [
       " T ",
@@ -27,7 +18,6 @@
       " ^ "
     ],
     "result": {
-      "count": 1,
       "id": "forestry:solar_cell"
     }
   }

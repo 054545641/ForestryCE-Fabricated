@@ -11,7 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -30,18 +30,18 @@ public interface ITreeSpeciesType extends ISpeciesType<ITreeSpecies, ITree> {
 	/**
 	 * @return The fruit registered with the given ID. Backs the {@code fruits} reference chromosome.
 	 */
-	IFruit getFruit(ResourceLocation id);
+	IFruit getFruit(Identifier id);
 
 	/**
 	 * @return The fruit registered with the given ID, or {@code null} if none is registered (graceful fallback variant).
 	 */
 	@Nullable
-	IFruit getFruitSafe(ResourceLocation id);
+	IFruit getFruitSafe(Identifier id);
 
 	/**
 	 * @return The tree effect registered with the given ID. Backs the {@code tree_effect} reference chromosome.
 	 */
-	ITreeEffect getTreeEffect(ResourceLocation id);
+	ITreeEffect getTreeEffect(Identifier id);
 
 	/**
 	 * Register a leaf random tick handler. Used for butterfly spawner.

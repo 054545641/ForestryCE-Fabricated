@@ -3,16 +3,11 @@
   "category": "redstone",
   "ingredients": [
     [
-      {
-        "item": "forestry:jacaranda_planks"
-      },
-      {
-        "item": "forestry:jacaranda_fireproof_planks"
-      }
+      "forestry:jacaranda_planks",
+      "forestry:jacaranda_fireproof_planks"
     ]
   ],
   "result": {
-    "count": 1,
     "id": "forestry:jacaranda_button"
   }
 }

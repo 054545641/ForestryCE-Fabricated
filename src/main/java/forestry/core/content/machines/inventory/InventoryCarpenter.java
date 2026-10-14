@@ -1,5 +1,7 @@
 package forestry.core.content.machines.inventory;
 
+import java.util.Optional;
+
 
 import forestry.core.platform.inventory.InventoryAdapterTile;
 import forestry.core.platform.util.RecipeUtils;
@@ -7,7 +9,7 @@ import forestry.core.platform.util.SlotUtil;
 import forestry.core.content.machines.tiles.TileCarpenter;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 
 public class InventoryCarpenter extends InventoryAdapterTile<TileCarpenter> {
 	public final static int SLOT_BOX = 9;
@@ -24,9 +26,9 @@ public class InventoryCarpenter extends InventoryAdapterTile<TileCarpenter> {
 	@Override
 	public boolean canSlotAccept(int slotIndex, ItemStack stack) {
 		if (slotIndex == SLOT_CAN_INPUT) {
-			return FluidUtil.getFluidContained(stack).filter(f -> this.tile.getTankManager().canFillFluidType(f)).isPresent();
+			return Optional.of(FluidUtil.getFirstStackContained(stack)).filter(fluidStack -> !fluidStack.isEmpty()).filter(f -> this.tile.getTankManager().canFillFluidType(f)).isPresent();
 		} else if (slotIndex == SLOT_BOX) {
-			return RecipeUtils.isCarpenterBox(this.tile.getLevel().getRecipeManager(), stack);
+			return RecipeUtils.isCarpenterBox(RecipeUtils.getRecipeMap(this.tile.getLevel()), stack);
 		} else if (canSlotAccept(SLOT_CAN_INPUT, stack) || canSlotAccept(SLOT_BOX, stack)) {
 			return false;
 		}

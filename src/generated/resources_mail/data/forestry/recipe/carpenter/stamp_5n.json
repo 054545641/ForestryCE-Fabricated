@@ -1,20 +1,14 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/stamp_5n",
   "liquid": {
     "amount": 300,
     "id": "forestry:seed_oil"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "tag": "c:ingots/tin"
-      },
-      "P": {
-        "item": "minecraft:paper"
-      }
+      "#": "#c:ingots/tin",
+      "P": "minecraft:paper"
     },
     "pattern": [
       "###",

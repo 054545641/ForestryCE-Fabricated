@@ -1,7 +1,7 @@
 package forestry.api.plugin;
 
 import forestry.api.client.plugin.IClientRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 
@@ -48,7 +48,8 @@ public interface IForestryPlugin {
 	}
 
 	/**
-	 * Called after all species are registered. Register circuits and circuit layout types heere.
+	 * Called after default item components bind (and again on datapack reload).
+	 * Register circuits and circuit layout types here; ItemStacks can be constructed in this hook.
 	 */
 	default void registerCircuits(ICircuitRegistration circuits) {
 	}
@@ -56,6 +57,7 @@ public interface IForestryPlugin {
 	default void registerErrors(IErrorRegistration errors) {
 	}
 
+	/** Rebuilds farm definitions after components bind and species load; also called on reload. */
 	default void registerFarming(IFarmingRegistration farming) {
 	}
 
@@ -76,7 +78,7 @@ public interface IForestryPlugin {
 	/**
 	 * @return Unique ID for this plugin.
 	 */
-	ResourceLocation id();
+	Identifier id();
 
 	/**
 	 * @return Whether this plugin should have any of its registerGenetics, registerApiculture, etc. methods called.

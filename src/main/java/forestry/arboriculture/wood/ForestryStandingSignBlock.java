@@ -18,8 +18,8 @@ import javax.annotation.Nullable;
 public class ForestryStandingSignBlock extends StandingSignBlock implements IWoodTyped {
 	private final ForestryWoodType type;
 
-	public ForestryStandingSignBlock(ForestryWoodType type) {
-		super(type.getWoodType(), Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0F).ignitedByLava());
+	public ForestryStandingSignBlock(Properties properties, ForestryWoodType type) {
+		super(type.getWoodType(), properties.mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollision().strength(1.0F).ignitedByLava());
 
 		this.type = type;
 	}

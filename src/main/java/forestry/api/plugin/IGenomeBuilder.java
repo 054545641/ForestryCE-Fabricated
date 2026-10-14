@@ -4,11 +4,11 @@ import forestry.api.core.genetics.IGenome;
 import forestry.api.core.genetics.alleles.Allele;
 import forestry.api.core.genetics.alleles.AllelePair;
 import forestry.api.core.genetics.alleles.IChromosome;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Used to create a genome. Alleles are inline values ({@link Allele}); reference chromosomes accept a
- * {@link ResourceLocation} which is resolved (with the value's default dominance) at apply time.
+ * {@link Identifier} which is resolved (with the value's default dominance) at apply time.
  */
 public interface IGenomeBuilder {
 	/**
@@ -33,7 +33,7 @@ public interface IGenomeBuilder {
 	 * Sets a reference chromosome (species, flower type, effect, ...) by the referenced value's ID. The value's
 	 * declared dominance is resolved at apply time.
 	 */
-	void set(IChromosome<ResourceLocation> chromosome, ResourceLocation id);
+	void set(IChromosome<Identifier> chromosome, Identifier id);
 
 	/**
 	 * Sets the active (expressed) allele for the chromosome.

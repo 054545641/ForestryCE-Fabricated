@@ -1,0 +1,83 @@
+var productionSets = ['main', 'butterflies', 'farms', 'mail']
+var jeiPatterns = ['**/jei/**', 'forestry/apiculture/compat/**', 'forestry/arboriculture/compat/**',
+                   'forestry/core/content/backpacks/compat/**', 'forestry/core/content/worktable/compat/**',
+                   'forestry/core/platform/client/compat/CoreJeiPlugin.java', 'forestry/core/platform/util/JeiUtil.java',
+                   'forestry/lepidopterology/compat/**', 'forestry/agriculture/compat/**', 'forestry/mail/compat/**']
+var optionalPatterns = [
+    patchouli: ['forestry/core/platform/compat/patchouli/**'],
+    kubejs: ['forestry/core/platform/compat/kubejs/**'],
+    curios: ['forestry/core/platform/compat/curios/**', 'forestry/core/platform/compat/ModuleCurios.java']
+]
+
+sourceSets {
+    datagen {
+        java.setSrcDirs(productionSets.collect { "src/${it}/java" } + ['src/datagen/java'])
+        java.include 'forestry/**/data/**'
+        java.include 'forestry/datagen/**'
+        resources.setSrcDirs(['src/datagen/resources'])
+        resources.include 'META-INF/services/forestry.core.data.IForestryDataProvider'
+        resources.include 'META-INF/neoforge.mods.toml'
+    }
+}
+productionSets.each { owner ->
+    sourceSets[owner].java.exclude 'forestry/**/data/**'
+    sourceSets[owner].java.exclude jeiPatterns
+    sourceSets[owner].resources.exclude 'META-INF/services/forestry.core.data.IForestryDataProvider'
+    sourceSets.datagen.compileClasspath += sourceSets[owner].output
+    sourceSets.datagen.runtimeClasspath += sourceSets[owner].output
+    var adapter = sourceSets.create("${owner}Jei") {
+        java.srcDir "src/${owner}/java"
+        java.include jeiPatterns
+    }
+    adapter.compileClasspath += sourceSets[owner].output + sourceSets.main.output
+    adapter.runtimeClasspath += sourceSets[owner].output + sourceSets.main.output
+    if (owner != 'main') {
+        adapter.compileClasspath += sourceSets.mainJei.output
+        adapter.runtimeClasspath += sourceSets.mainJei.output
+    }
+    neoForge.addModdingDependenciesTo(adapter)
+    dependencies.add(adapter.compileOnlyConfigurationName, "mezz.jei:jei-${minecraftVersion}-neoforge-api:${jeiVersion}")
+    dependencies.add(adapter.runtimeOnlyConfigurationName, "mezz.jei:jei-${minecraftVersion}-neoforge:${jeiVersion}")
+}
+optionalPatterns.each { integration, patterns ->
+    sourceSets.main.java.exclude patterns
+    var adapter = sourceSets.create(integration) {
+        java.srcDir 'src/main/java'
+        java.include patterns
+    }
+    adapter.compileClasspath += sourceSets.main.output
+    adapter.runtimeClasspath += sourceSets.main.output
+    neoForge.addModdingDependenciesTo(adapter)
+}
+neoForge.addModdingDependenciesTo(sourceSets.datagen)
+dependencies {
+    curiosCompileOnly "top.theillusivec4.curios:curios-neoforge:${curiosVersion}"
+    curiosRuntimeOnly "top.theillusivec4.curios:curios-neoforge:${curiosVersion}"
+    datagenImplementation "com.github.thedarkcolour:ModKit:${modkitVersion}"
+    datagenCompileOnly "top.theillusivec4.curios:curios-neoforge:${curiosVersion}"
+    datagenRuntimeOnly "top.theillusivec4.curios:curios-neoforge:${curiosVersion}"
+}
+
+configurations.gametestCompileOnly.extendsFrom configurations.datagenImplementation
+configurations.gametestRuntimeOnly.extendsFrom configurations.datagenImplementation, configurations.datagenRuntimeOnly
+
+['patchouli', 'kubejs'].each { integration ->
+    if (providers.gradleProperty('with' + integration.capitalize()).orElse('false').get().toBoolean()) {
+        throw new GradleException("${integration}: no verified 26.2 API configured; see docs/local-development.zh-CN.md")
+    }
+    tasks.named(sourceSets[integration].compileJavaTaskName) {
+        doFirst { throw new GradleException("${integration}: configure and verify a 26.2 dependency before compiling this adapter") }
+    }
+}
+productionSets.each { owner ->
+    sourceSets[owner].resources {
+        exclude 'kubejs.plugins.txt'
+        exclude 'assets/forestry/patchouli_books/**'
+        exclude 'data/forestry/patchouli_books/**'
+    }
+}
+tasks.named('processResources', ProcessResources) {
+    filesMatching('META-INF/services/forestry.api.plugin.IForestryPlugin') {
+        filter { line -> line.contains('forestry.core.platform.compat.kubejs.') ? null : line }
+    }
+}

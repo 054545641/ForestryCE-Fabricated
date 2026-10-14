@@ -139,14 +139,14 @@ public class TransformBlockBeeEffect extends ThrottledBeeEffect {
 	@Override
 	public IEffectData doEffectThrottled(IGenome genome, IEffectData storedData, IBeeHousing housing) {
 		Level level = housing.getLevel();
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return storedData;
 		}
 		// Inclusive: the activation is skipped only when the housing is strictly warmer than the bound.
 		if (this.maxTemperature.isPresent() && !housing.temperature().isCoolerOrEqual(this.maxTemperature.get())) {
 			return storedData;
 		}
-		RandomSource rand = level.random;
+		RandomSource rand = level.getRandom();
 		// Skip the RNG draw entirely when chance is 1 so a guaranteed effect does not perturb the shared world RNG
 		// state.
 		if (this.chance < 1.0f && rand.nextFloat() >= this.chance) {

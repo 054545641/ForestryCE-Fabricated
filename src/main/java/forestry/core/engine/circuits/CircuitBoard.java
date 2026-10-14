@@ -9,7 +9,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -30,12 +30,12 @@ public class CircuitBoard implements ICircuitBoard {
 	}
 
 	public CircuitBoard(CompoundTag compound) {
-        this.type = EnumCircuitBoardType.values()[compound.getShort("T")];
+        this.type = EnumCircuitBoardType.values()[compound.getShortOr("T", (short) 0)];
 
 		// Layout
 		ICircuitLayout layout = null;
 		if (compound.contains("LY")) {
-			layout = IForestryApi.INSTANCE.getCircuitManager().getLayout(compound.getString("LY"));
+			layout = IForestryApi.INSTANCE.getCircuitManager().getLayout(compound.getStringOr("LY", ""));
 		}
 		this.layout = layout;
 
@@ -45,7 +45,7 @@ public class CircuitBoard implements ICircuitBoard {
 			if (!compound.contains("CA.I" + i)) {
 				continue;
 			}
-			ICircuit circuit = IForestryApi.INSTANCE.getCircuitManager().getCircuit(compound.getString("CA.I" + i));
+			ICircuit circuit = IForestryApi.INSTANCE.getCircuitManager().getCircuit(compound.getStringOr("CA.I" + i, ""));
 			if (circuit != null) {
                 this.circuits[i] = circuit;
 			}
@@ -64,7 +64,7 @@ public class CircuitBoard implements ICircuitBoard {
 				}
 			}
 
-			if (Screen.hasShiftDown() || extendedTooltip.size() <= 4) {
+			if (net.minecraft.client.Minecraft.getInstance().hasShiftDown() || extendedTooltip.size() <= 4) {
 				list.addAll(extendedTooltip);
 			} else {
 				list.add(Component.literal("<").withStyle(ChatFormatting.UNDERLINE, ChatFormatting.GRAY)
@@ -151,7 +151,7 @@ public class CircuitBoard implements ICircuitBoard {
 
 	@Nullable
 	@Override
-	public ResourceLocation getSocketType() {
+	public Identifier getSocketType() {
 		if (this.layout == null) {
 			return null;
 		}

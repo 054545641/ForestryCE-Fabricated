@@ -1,10 +1,7 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "forestry:cobbled_honeystone"
-  },
+  "ingredient": "forestry:cobbled_honeystone",
   "result": {
-    "count": 1,
     "id": "forestry:cobbled_honeystone_wall"
   }
 }

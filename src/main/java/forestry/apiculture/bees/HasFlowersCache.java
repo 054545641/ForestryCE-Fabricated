@@ -159,14 +159,12 @@ public class HasFlowersCache implements INbtWritable, INbtReadable, IStreamable 
 
 	@Override
 	public void read(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		if (!compoundNBT.contains(NBT_KEY)) {
-			return;
-		}
-
-		CompoundTag hasFlowerCacheNBT = compoundNBT.getCompound(NBT_KEY);
-        this.flowerCoords.clear();
+		CompoundTag hasFlowerCacheNBT = compoundNBT.getCompoundOrEmpty(NBT_KEY);
+		this.flowerCoords.clear();
+		this.flowerData = null;
+		this.needsSync = true;
 		if (hasFlowerCacheNBT.contains(NBT_KEY_FLOWERS)) {
-			int[] flowersList = hasFlowerCacheNBT.getIntArray(NBT_KEY_FLOWERS);
+			int[] flowersList = hasFlowerCacheNBT.getIntArray(NBT_KEY_FLOWERS).orElse(new int[0]);
 			if (flowersList.length % 3 == 0) {
 				int flowerCount = flowersList.length / 3;
 

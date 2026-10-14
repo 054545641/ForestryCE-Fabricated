@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:poplar_planks"
-      },
-      {
-        "item": "forestry:poplar_fireproof_planks"
-      }
+      "forestry:poplar_planks",
+      "forestry:poplar_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:poplar_pressure_plate"
   }
 }

@@ -1,18 +1,12 @@
 {
   "type": "forestry:carpenter",
-  "box": {
-    "item": "forestry:carton"
-  },
+  "box": "forestry:carton",
   "id": "forestry:carpenter/kit_sword",
   "recipe": {
     "category": "equipment",
     "key": {
-      "#": {
-        "tag": "c:ingots/bronze"
-      },
-      "X": {
-        "item": "minecraft:stick"
-      }
+      "#": "#c:ingots/bronze",
+      "X": "minecraft:stick"
     },
     "pattern": [
       " # ",
@@ -20,7 +14,6 @@
       " X "
     ],
     "result": {
-      "count": 1,
       "id": "forestry:sword_kit"
     }
   },

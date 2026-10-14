@@ -9,7 +9,7 @@ import forestry.api.client.lepidopterology.IButterflyClientManager;
 import forestry.api.client.plugin.IClientHelper;
 import forestry.arboriculture.client.plugin.ClientHelper;
 import forestry.core.platform.render.ForestryTextureManager;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,7 +81,7 @@ public class ForestryClientApiImpl implements IForestryClientApi {
 	}
 
 	// Must be called after textureManager is initialized in Minecraft's constructor.
-	public void initializeTextureManager(RegisterClientReloadListenersEvent event) {
+	public void initializeTextureManager(AddClientReloadListenersEvent event) {
 		this.textureManager = new ForestryTextureManager();
 	}
 

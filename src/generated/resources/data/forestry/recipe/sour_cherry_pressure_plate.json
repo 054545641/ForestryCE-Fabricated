@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:sour_cherry_planks"
-      },
-      {
-        "item": "forestry:sour_cherry_fireproof_planks"
-      }
+      "forestry:sour_cherry_planks",
+      "forestry:sour_cherry_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:sour_cherry_pressure_plate"
   }
 }

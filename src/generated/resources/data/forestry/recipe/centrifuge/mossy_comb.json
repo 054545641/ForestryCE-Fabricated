@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/mossy_comb",
-  "input": {
-    "item": "forestry:mossy_comb"
-  },
+  "input": "forestry:mossy_comb",
   "products": [
     {
       "chance": 1.0,

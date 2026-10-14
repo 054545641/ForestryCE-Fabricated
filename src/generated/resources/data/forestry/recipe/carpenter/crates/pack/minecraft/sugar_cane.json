@@ -1,19 +1,14 @@
 {
   "type": "forestry:carpenter",
-  "box": {
-    "item": "forestry:crate"
-  },
+  "box": "forestry:crate",
   "id": "forestry:carpenter/crates/pack/minecraft/sugar_cane",
   "liquid": {
     "amount": 100,
     "id": "minecraft:water"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "item": "minecraft:sugar_cane"
-      }
+      "#": "minecraft:sugar_cane"
     },
     "pattern": [
       "###",
@@ -21,7 +16,6 @@
       "###"
     ],
     "result": {
-      "count": 1,
       "id": "forestry:crated_sugar_cane"
     }
   },

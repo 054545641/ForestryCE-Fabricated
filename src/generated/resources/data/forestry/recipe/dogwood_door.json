@@ -4,12 +4,8 @@
   "group": "wooden_door",
   "key": {
     "#": [
-      {
-        "item": "forestry:dogwood_planks"
-      },
-      {
-        "item": "forestry:dogwood_fireproof_planks"
-      }
+      "forestry:dogwood_planks",
+      "forestry:dogwood_fireproof_planks"
     ]
   },
   "pattern": [

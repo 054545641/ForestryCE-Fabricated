@@ -4,7 +4,7 @@ import forestry.api.core.IItemSubtype;
 import net.minecraft.world.item.Item;
 
 import java.util.Collection;
-import java.util.function.BiFunction;
+import forestry.core.platform.util.datastructures.TriFunction;
 import java.util.stream.Collectors;
 
 public class FeatureItemTable<I extends Item, R extends IItemSubtype, C extends IItemSubtype> extends FeatureTable<FeatureItemTable.Builder<I, R, C>, FeatureItem<I>, R, C> {
@@ -14,7 +14,7 @@ public class FeatureItemTable<I extends Item, R extends IItemSubtype, C extends 
 
 	@Override
 	protected FeatureItem<I> createFeature(Builder<I, R, C> builder, R rowType, C columnType) {
-		return builder.registry.item(() -> builder.constructor.apply(rowType, columnType), builder.getIdentifier(rowType, columnType));
+		return builder.registry.item(properties -> builder.constructor.apply(rowType, columnType, properties), builder.getIdentifier(rowType, columnType));
 	}
 
 	public Collection<I> getBlocks() {
@@ -23,9 +23,9 @@ public class FeatureItemTable<I extends Item, R extends IItemSubtype, C extends 
 
 	public static class Builder<I extends Item, R extends IItemSubtype, C extends IItemSubtype> extends FeatureTable.Builder<R, C, FeatureItemTable<I, R, C>> {
 		private final FeatureRegistry registry;
-		private final BiFunction<R, C, I> constructor;
+		private final TriFunction<R, C, Item.Properties, I> constructor;
 
-		public Builder(FeatureRegistry registry, BiFunction<R, C, I> constructor) {
+		public Builder(FeatureRegistry registry, TriFunction<R, C, Item.Properties, I> constructor) {
 			super(registry);
 			this.registry = registry;
 			this.constructor = constructor;

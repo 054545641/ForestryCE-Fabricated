@@ -11,7 +11,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.apiculture.genetics.IBeeEffect;
 
@@ -19,9 +19,9 @@ import forestry.api.apiculture.genetics.IBeeEffect;
 public class BeeEffectProvider implements DataProvider {
 	private final PackOutput.PathProvider pathProvider;
 	private final CompletableFuture<HolderLookup.Provider> lookupProvider;
-	private final Map<ResourceLocation, IBeeEffect> effects;
+	private final Map<Identifier, IBeeEffect> effects;
 
-	public BeeEffectProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, Map<ResourceLocation, IBeeEffect> effects) {
+	public BeeEffectProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, Map<Identifier, IBeeEffect> effects) {
 		this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "bee_effect");
 		this.lookupProvider = lookupProvider;
 		this.effects = effects;

@@ -3,9 +3,7 @@
   "category": "building",
   "group": "bark",
   "key": {
-    "#": {
-      "item": "forestry:lemon_stripped_log"
-    }
+    "#": "forestry:lemon_stripped_log"
   },
   "pattern": [
     "##",

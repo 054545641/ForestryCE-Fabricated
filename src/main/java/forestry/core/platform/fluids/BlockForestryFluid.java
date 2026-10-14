@@ -1,5 +1,7 @@
 package forestry.core.platform.fluids;
 
+import net.minecraft.world.entity.InsideBlockEffectApplier;
+
 import forestry.core.platform.registration.FeatureFluid;
 import forestry.core.platform.registration.FluidProperties;
 import net.minecraft.core.BlockPos;
@@ -41,7 +43,7 @@ public class BlockForestryFluid extends LiquidBlock {
 	}
 
 	private static BlockBehaviour.Properties createBlockProperties(BlockBehaviour.Properties blockProperties, FluidProperties properties) {
-		blockProperties.liquid().noCollission().noLootTable().replaceable();
+		blockProperties.liquid().noCollision().noLootTable().replaceable();
 
 		if (properties.luminosity > 0) {
 			var luminosity = properties.luminosity;
@@ -52,7 +54,7 @@ public class BlockForestryFluid extends LiquidBlock {
 	}
 
 	@Override
-	public void entityInside(BlockState pState, Level pLevel, BlockPos pPos, Entity entity) {
+	public void entityInside(BlockState pState, Level pLevel, BlockPos pPos, Entity entity, InsideBlockEffectApplier effects, boolean isPrecise) {
 		if (this.freezing) {
 			entity.setIsInPowderSnow(true);
 		} else if (this.burning) {

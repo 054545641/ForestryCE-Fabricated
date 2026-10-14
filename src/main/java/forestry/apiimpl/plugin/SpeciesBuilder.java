@@ -9,13 +9,13 @@ import forestry.api.core.genetics.ISpeciesType;
 import forestry.api.plugin.IGenomeBuilder;
 import forestry.api.plugin.ISpeciesBuilder;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 public abstract class SpeciesBuilder<T extends ISpeciesType<S, ?>, S extends ISpecies<?>, B extends ISpeciesBuilder<T, S, B>> implements ISpeciesBuilder<T, S, B> {
-	protected final ResourceLocation id;
+	protected final Identifier id;
 	protected final String genus;
 	protected final String species;
 
@@ -31,7 +31,7 @@ public abstract class SpeciesBuilder<T extends ISpeciesType<S, ?>, S extends ISp
 	protected ISpeciesFactory<T, S, B> factory;
 	protected int escritoireColor = -1;
 
-	public SpeciesBuilder(ResourceLocation id, String genus, String species) {
+	public SpeciesBuilder(Identifier id, String genus, String species) {
 		this.id = id;
 		this.genus = genus;
 		this.species = species;

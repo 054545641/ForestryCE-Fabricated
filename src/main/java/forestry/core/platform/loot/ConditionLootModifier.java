@@ -8,7 +8,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -27,11 +27,12 @@ import java.util.function.Consumer;
 public class ConditionLootModifier extends LootModifier {
 	public static final MapCodec<ConditionLootModifier> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 		LOOT_CONDITIONS_CODEC.fieldOf("conditions").forGetter(lm -> lm.conditions),
-		ResourceLocation.CODEC.fieldOf("table").forGetter(lm -> lm.tableLocation),
+		Codec.INT.optionalFieldOf("priority", IGlobalLootModifier.DEFAULT_PRIORITY).forGetter(lm -> lm.priority),
+		Identifier.CODEC.fieldOf("table").forGetter(lm -> lm.tableLocation),
 		Codec.list(Codec.STRING).fieldOf("extensions").forGetter(o -> o.extensions)
 	).apply(instance, ConditionLootModifier::new));
 
-	private final ResourceLocation tableLocation;
+	private final Identifier tableLocation;
 	private final List<String> extensions;
 
 	/**
@@ -43,10 +44,10 @@ public class ConditionLootModifier extends LootModifier {
 	 */
 	private boolean operates = false;
 
-	public ConditionLootModifier(ResourceLocation location, List<String> extensions) {
+	public ConditionLootModifier(Identifier location, List<String> extensions) {
 		super(new LootItemCondition[]{
 			LootTableIdCondition.builder(location).build()
-		});
+		}, IGlobalLootModifier.DEFAULT_PRIORITY);
 		this.tableLocation = location;
 		this.extensions = extensions;
 	}
@@ -57,8 +58,8 @@ public class ConditionLootModifier extends LootModifier {
 		return newArray;
 	}
 
-	private ConditionLootModifier(LootItemCondition[] conditions, ResourceLocation location, List<String> extensions) {
-		super(merge(conditions, LootTableIdCondition.builder(location).build()));
+	private ConditionLootModifier(LootItemCondition[] conditions, int priority, Identifier location, List<String> extensions) {
+		super(merge(conditions, LootTableIdCondition.builder(location).build()), priority);
 		this.tableLocation = location;
 		this.extensions = extensions;
 	}
@@ -69,22 +70,24 @@ public class ConditionLootModifier extends LootModifier {
 			return generatedLoot;
 		}
 
-        this.operates = true;
+		this.operates = true;
+		try {
+			for (String extension : this.extensions) {
+				Identifier location = ForestryConstants.forestry(this.tableLocation.getPath() + "/" + extension);
+				ResourceKey<LootTable> tableKey = ResourceKey.create(Registries.LOOT_TABLE, location);
+				LootTable table = context.getResolver().lookup(Registries.LOOT_TABLE)
+					.flatMap(r -> r.get(tableKey))
+					.map(Holder::value)
+					.orElse(LootTable.EMPTY);
 
-		for (String extension : this.extensions) {
-			ResourceLocation location = ForestryConstants.forestry(this.tableLocation.getPath() + "/" + extension);
-			ResourceKey<LootTable> tableKey = ResourceKey.create(Registries.LOOT_TABLE, location);
-			LootTable table = context.getResolver().lookup(Registries.LOOT_TABLE)
-				.flatMap(r -> r.get(tableKey))
-				.map(Holder::value)
-				.orElse(LootTable.EMPTY);
-
-			if (table != LootTable.EMPTY) {
-				table.getRandomItems(context, generatedLoot::add);
+				if (table != LootTable.EMPTY) {
+					table.getRandomItems(context, generatedLoot::add);
+				}
 			}
-		}
 
-        this.operates = false;
+		} finally {
+			this.operates = false;
+		}
 		return generatedLoot;
 	}
 

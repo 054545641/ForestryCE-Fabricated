@@ -2,7 +2,7 @@ package forestry.api.plugin;
 
 import forestry.api.core.genetics.alleles.Allele;
 import forestry.api.core.genetics.alleles.IChromosome;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Configures the chromosome set (karyotype) of a species type and the default allele for each chromosome.
@@ -15,7 +15,7 @@ public interface IKaryotypeBuilder {
 	 * @param species   The species (reference) chromosome.
 	 * @param defaultId The ID of the default species, used as a fallback when a genome is unavailable or corrupt.
 	 */
-	void setSpecies(IChromosome<ResourceLocation> species, ResourceLocation defaultId);
+	void setSpecies(IChromosome<Identifier> species, Identifier defaultId);
 
 	/**
 	 * Adds a data chromosome with the given default allele.
@@ -33,7 +33,7 @@ public interface IKaryotypeBuilder {
 	 * Adds a reference chromosome (species, flower type, effect, ...) with the given default value ID. The value's
 	 * declared dominance is resolved lazily, after registries are populated.
 	 */
-	IChromosomeBuilder<ResourceLocation> set(IChromosome<ResourceLocation> chromosome, ResourceLocation defaultId);
+	IChromosomeBuilder<Identifier> set(IChromosome<Identifier> chromosome, Identifier defaultId);
 
 	/**
 	 * Returns the chromosome builder for an already-added chromosome (e.g. to set weak inheritance).

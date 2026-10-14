@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/reclaim_bronze_pickaxe",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:broken_survivalists_pickaxe"
-      }
+      "forestry:broken_survivalists_pickaxe"
     ],
     "result": {
       "count": 2,

@@ -39,7 +39,7 @@ public abstract class AbstractArboricultureFeature extends AbstractForestryFeatu
 	protected static final int minPodHeight = 3;
 
 	// skips performance-heavy checks during world generation or sapling generation
-	public static final ThreadLocal<Boolean> SKIP_EXTENDED_CHECKS = ThreadLocal.withInitial(() -> false);
+	public static final ThreadLocal<Boolean> SKIP_EXTENDED_CHECKS = forestry.arboriculture.leaves.BlockExtendedLeaves.SKIP_EXTENDED_CHECKS;
 
 	protected final ITreeGenData tree;
 
@@ -92,9 +92,13 @@ public abstract class AbstractArboricultureFeature extends AbstractForestryFeatu
 				// Correctly update the leaf distance states on the leaf blocks
 				DiscreteVoxelShape voxelshapepart = updateLeaves(level, contour);
 				// Call updateShape method on all blocks on the edge of the tree's bounding box
+				boolean previousSkip = SKIP_EXTENDED_CHECKS.get();
 				SKIP_EXTENDED_CHECKS.set(true);
-				StructureTemplate.updateShapeAtEdge(level, 3, voxelshapepart, contour.boundingBox.minX(), contour.boundingBox.minY(), contour.boundingBox.minZ());
-				SKIP_EXTENDED_CHECKS.set(false);
+				try {
+					StructureTemplate.updateShapeAtEdge(level, 3, voxelshapepart, contour.boundingBox.minX(), contour.boundingBox.minY(), contour.boundingBox.minZ());
+				} finally {
+					SKIP_EXTENDED_CHECKS.set(previousSkip);
+				}
 			}
 			return true;
 		}
@@ -146,7 +150,7 @@ public abstract class AbstractArboricultureFeature extends AbstractForestryFeatu
 
 					discretevoxelshape.fill(blockpos1.getX() - pBox.minX(), blockpos1.getY() - pBox.minY(), blockpos1.getZ() - pBox.minZ());
 
-					for (Direction direction : Direction.VALUES) {
+					for (Direction direction : Direction.values()) {
 						blockpos$mutableblockpos.setWithOffset(blockpos1, direction);
 						if (pBox.isInside(blockpos$mutableblockpos)) {
 							int k = blockpos$mutableblockpos.getX() - pBox.minX();

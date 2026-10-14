@@ -6,23 +6,23 @@ import java.util.Map;
 
 import com.mojang.datafixers.util.Pair;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.client.lepidopterology.IButterflyClientManager;
 import forestry.api.lepidopterology.ForestryButterflySpecies;
 import forestry.api.lepidopterology.genetics.IButterflySpecies;
 
 public class ButterflyClientManager implements IButterflyClientManager {
-	private final Map<ResourceLocation, Pair<ResourceLocation, ResourceLocation>> textures;
+	private final Map<Identifier, Pair<Identifier, Identifier>> textures;
 
-	public ButterflyClientManager(Map<ResourceLocation, Pair<ResourceLocation, ResourceLocation>> textures) {
+	public ButterflyClientManager(Map<Identifier, Pair<Identifier, Identifier>> textures) {
 		this.textures = textures;
 	}
 
 	@Override
-	public Pair<ResourceLocation, ResourceLocation> getTextures(IButterflySpecies species) {
-		ResourceLocation id = species.id();
-		Pair<ResourceLocation, ResourceLocation> pair = this.textures.get(id);
+	public Pair<Identifier, Identifier> getTextures(IButterflySpecies species) {
+		Identifier id = species.id();
+		Pair<Identifier, Identifier> pair = this.textures.get(id);
 		if (pair != null) {
 			return pair;
 		}
@@ -33,8 +33,8 @@ public class ButterflyClientManager implements IButterflyClientManager {
 	}
 
 	@Override
-	public Pair<ResourceLocation, ResourceLocation> getDefaultTextures() {
-		Pair<ResourceLocation, ResourceLocation> cabbageWhite = this.textures.get(ForestryButterflySpecies.CABBAGE_WHITE);
+	public Pair<Identifier, Identifier> getDefaultTextures() {
+		Pair<Identifier, Identifier> cabbageWhite = this.textures.get(ForestryButterflySpecies.CABBAGE_WHITE);
 		if (cabbageWhite != null) {
 			return cabbageWhite;
 		}
@@ -43,15 +43,15 @@ public class ButterflyClientManager implements IButterflyClientManager {
 	}
 
 	@Override
-	public Collection<Pair<ResourceLocation, ResourceLocation>> getAllTextures() {
+	public Collection<Pair<Identifier, Identifier>> getAllTextures() {
 		return Collections.unmodifiableCollection(this.textures.values());
 	}
 
-	private static Pair<ResourceLocation, ResourceLocation> defaultTexturesFor(ResourceLocation id) {
+	private static Pair<Identifier, Identifier> defaultTexturesFor(Identifier id) {
 		String path = id.getPath().replace("butterfly_", "");
 		return Pair.of(
-			ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "item/butterfly/" + path),
-			ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "textures/entity/butterfly/" + path + ".png")
+			Identifier.fromNamespaceAndPath(id.getNamespace(), "item/butterfly/" + path),
+			Identifier.fromNamespaceAndPath(id.getNamespace(), "textures/entity/butterfly/" + path + ".png")
 		);
 	}
 }

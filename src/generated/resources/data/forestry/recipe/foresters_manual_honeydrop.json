@@ -1,16 +1,10 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "item": "minecraft:book"
-    },
-    {
-      "item": "forestry:honey_drop"
-    }
+    "minecraft:book",
+    "forestry:honey_drop"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:foresters_manual"
   }
 }

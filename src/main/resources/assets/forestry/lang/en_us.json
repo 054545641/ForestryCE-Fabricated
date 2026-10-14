@@ -2546,6 +2546,8 @@
   "entity.minecraft.villager.forestry.arborist": "Arborist",
   "entity.forestry.chest_boat": "Boat with Chest",
   "entity.forestry.boat": "Boat",
+  "entity.forestry.villager.beekeeper": "Beekeeper",
+  "entity.forestry.villager.arborist": "Arborist",
   "forestry.date.month.1": "Jan. %s",
   "forestry.date.month.2": "Feb. %s",
   "forestry.date.month.3": "Mar. %s",

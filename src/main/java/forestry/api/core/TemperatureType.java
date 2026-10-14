@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 
 import forestry.api.ForestryTags;
 import forestry.api.client.ForestrySprites;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
@@ -30,10 +30,10 @@ public enum TemperatureType implements StringRepresentable {
 	public static final Codec<TemperatureType> CODEC = StringRepresentable.fromEnum(TemperatureType::values);
 
 	public final TagKey<Biome> tag;
-	public final ResourceLocation iconTexture;
+	public final Identifier iconTexture;
 	public final int color;
 
-	TemperatureType(TagKey<Biome> tag, ResourceLocation iconSprite, int color) {
+	TemperatureType(TagKey<Biome> tag, Identifier iconSprite, int color) {
 		this.tag = tag;
 		this.iconTexture = iconSprite;
 		this.color = color;

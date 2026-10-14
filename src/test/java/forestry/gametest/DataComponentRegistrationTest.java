@@ -7,7 +7,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -43,8 +43,8 @@ public class DataComponentRegistrationTest {
 	}
 
 	private static void check(List<String> broken, String path, DataComponentType<?> type) {
-		ResourceLocation expected = ForestryConstants.forestry(path);
-		ResourceLocation actual = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(type);
+		Identifier expected = ForestryConstants.forestry(path);
+		Identifier actual = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(type);
 
 		if (actual == null) {
 			broken.add(expected + " resolved to a component that is not in the registry at all");

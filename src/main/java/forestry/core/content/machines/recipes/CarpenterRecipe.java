@@ -1,5 +1,6 @@
 package forestry.core.content.machines.recipes;
 
+import forestry.api.core.machines.IForestryRecipe;
 import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
@@ -11,9 +12,10 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -22,6 +24,7 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStackTemplate;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -30,8 +33,8 @@ public class CarpenterRecipe implements ICarpenterRecipe {
 	// Inner crafting recipe is either Shaped or Shapeless; dispatch via Either so
 	// existing data (e.g. wood pulp, bronze ingot) using shapeless can persist.
 	private static final Codec<CraftingRecipe> CRAFTING_RECIPE_CODEC = Codec.either(
-		RecipeSerializer.SHAPED_RECIPE.codec().codec(),
-		RecipeSerializer.SHAPELESS_RECIPE.codec().codec()
+		ShapedRecipe.SERIALIZER.codec().codec(),
+		ShapelessRecipe.SERIALIZER.codec().codec()
 	).xmap(
 		either -> either.map(sr -> (CraftingRecipe) sr, slr -> (CraftingRecipe) slr),
 		cr -> {
@@ -42,27 +45,35 @@ public class CarpenterRecipe implements ICarpenterRecipe {
 	);
 
 	private static final MapCodec<CarpenterRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-		ResourceLocation.CODEC.fieldOf("id").forGetter(CarpenterRecipe::getId),
+		Identifier.CODEC.fieldOf("id").forGetter(CarpenterRecipe::getId),
 		Codec.INT.fieldOf("time").forGetter(CarpenterRecipe::getPackagingTime),
-		FluidStack.OPTIONAL_CODEC.optionalFieldOf("liquid", FluidStack.EMPTY).forGetter(CarpenterRecipe::getInputFluid),
-		Ingredient.CODEC.fieldOf("box").forGetter(CarpenterRecipe::getBox),
+		net.minecraft.util.ExtraCodecs.optionalEmptyMap(FluidStackTemplate.CODEC).optionalFieldOf("liquid", Optional.empty()).forGetter(r -> r.liquid),
+		Ingredient.CODEC.optionalFieldOf("box").forGetter(CarpenterRecipe::getBox),
 		CRAFTING_RECIPE_CODEC.fieldOf("recipe").forGetter(CarpenterRecipe::getCraftingGridRecipe),
-		ItemStack.STRICT_CODEC.optionalFieldOf("result").forGetter(CarpenterRecipe::getOptionalResult)
-	).apply(instance, (id, time, liquid, box, recipe, optResult) -> new CarpenterRecipe(id, time, liquid, box, recipe, optResult.orElse(null))));
+		ItemStackTemplate.CODEC.optionalFieldOf("result").forGetter(r -> r.result)
+	).apply(instance, (id, time, liquid, box, recipe, optResult) -> new CarpenterRecipe(id, time, liquid, box, recipe, optResult)));
 	private static final StreamCodec<RegistryFriendlyByteBuf, CarpenterRecipe> STREAM_CODEC = StreamCodec.of(
-		Serializer::toNetwork,
-		Serializer::fromNetwork
+		NetworkCodecs::toNetwork,
+		NetworkCodecs::fromNetwork
 	);
 
-	private final ResourceLocation id;
+	private final Identifier id;
 	private final int packagingTime;
-	private final FluidStack liquid;
-	private final Ingredient box;
+	private final Optional<FluidStackTemplate> liquid;
+	private final Optional<Ingredient> box;
 	private final CraftingRecipe recipe;
-	@Nullable
-	private final ItemStack result;
+	private final Optional<ItemStackTemplate> result;
 
-	public CarpenterRecipe(ResourceLocation id, int packagingTime, FluidStack liquid, Ingredient box, CraftingRecipe recipe, @Nullable ItemStack result) {
+	public CarpenterRecipe(Identifier id, int packagingTime, FluidStack liquid, Ingredient box, CraftingRecipe recipe, @Nullable ItemStack result) {
+		this(id, packagingTime, liquid, Optional.of(box), recipe, result);
+	}
+
+	public CarpenterRecipe(Identifier id, int packagingTime, FluidStack liquid, Optional<Ingredient> box, CraftingRecipe recipe, @Nullable ItemStack result) {
+		this(id, packagingTime, liquid.isEmpty() ? Optional.empty() : Optional.of(FluidStackTemplate.fromNonEmptyStack(liquid)),
+			box, recipe, result == null || result.isEmpty() ? Optional.empty() : Optional.of(ItemStackTemplate.fromNonEmptyStack(result)));
+	}
+
+	public CarpenterRecipe(Identifier id, int packagingTime, Optional<FluidStackTemplate> liquid, Optional<Ingredient> box, CraftingRecipe recipe, Optional<ItemStackTemplate> result) {
 		Preconditions.checkNotNull(id, "Recipe identifier cannot be null");
 		Preconditions.checkNotNull(liquid, "Recipe liquid cannot be null; use FluidStack.EMPTY for no fluid input");
 		Preconditions.checkNotNull(box);
@@ -85,13 +96,13 @@ public class CarpenterRecipe implements ICarpenterRecipe {
 	}
 
 	@Override
-	public Ingredient getBox() {
+	public Optional<Ingredient> getBox() {
 		return this.box;
 	}
 
 	@Override
 	public FluidStack getInputFluid() {
-		return this.liquid;
+		return this.liquid.map(FluidStackTemplate::create).orElse(FluidStack.EMPTY);
 	}
 
 	@Override
@@ -101,24 +112,24 @@ public class CarpenterRecipe implements ICarpenterRecipe {
 
 	@Override
 	public ItemStack getResultItem(HolderLookup.Provider lookupProvider) {
-		return this.result != null ? this.result : this.recipe.getResultItem(lookupProvider);
+		return this.result.map(ItemStackTemplate::create).orElseGet(() -> this.recipe.assemble(net.minecraft.world.item.crafting.CraftingInput.EMPTY));
 	}
 
 	Optional<ItemStack> getOptionalResult() {
-		return Optional.ofNullable(this.result);
+		return this.result.map(ItemStackTemplate::create);
 	}
 
 	@Override
 	public boolean matches(FluidStack fluid, ItemStack boxStack, Container craftingInventory, Level level) {
-		FluidStack liquid = this.liquid;
+		FluidStack liquid = getInputFluid();
 		if (!liquid.isEmpty()) {
 			if (fluid.isEmpty() || !(FluidStack.isSameFluidSameComponents(fluid, liquid) && fluid.getAmount() >= liquid.getAmount())) {
 				return false;
 			}
 		}
 
-		Ingredient box = this.box;
-		if (!box.isEmpty() && !box.test(boxStack)) {
+		Optional<Ingredient> box = this.box;
+		if (box.isPresent() && !box.get().test(boxStack)) {
 			return false;
 		}
 
@@ -126,64 +137,53 @@ public class CarpenterRecipe implements ICarpenterRecipe {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return this.id;
 	}
 
 	@Override
-	public RecipeSerializer<?> getSerializer() {
+	public RecipeSerializer<? extends IForestryRecipe> getSerializer() {
 		return FactoryRecipeTypes.CARPENTER.serializer();
 	}
 
 	@Override
-	public RecipeType<?> getType() {
+	public RecipeType<? extends IForestryRecipe> getType() {
 		return FactoryRecipeTypes.CARPENTER.type();
 	}
 
-	public static class Serializer implements RecipeSerializer<CarpenterRecipe> {
-		@Override
-		public MapCodec<CarpenterRecipe> codec() {
-			return CODEC;
-		}
+	public static final RecipeSerializer<CarpenterRecipe> SERIALIZER = new RecipeSerializer<>(CODEC, STREAM_CODEC);
 
-		@Override
-		public StreamCodec<RegistryFriendlyByteBuf, CarpenterRecipe> streamCodec() {
-			return STREAM_CODEC;
-		}
+	private static class NetworkCodecs {
 
 		private static CarpenterRecipe fromNetwork(RegistryFriendlyByteBuf buffer) {
-			ResourceLocation recipeId = ResourceLocation.STREAM_CODEC.decode(buffer);
+			Identifier recipeId = Identifier.STREAM_CODEC.decode(buffer);
 			int packagingTime = ByteBufCodecs.VAR_INT.decode(buffer);
-			FluidStack liquid = FluidStack.OPTIONAL_STREAM_CODEC.decode(buffer);
-			Ingredient box = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
+			Optional<FluidStackTemplate> liquid = ByteBufCodecs.optional(FluidStackTemplate.STREAM_CODEC).decode(buffer);
+			Optional<Ingredient> box = Ingredient.OPTIONAL_CONTENTS_STREAM_CODEC.decode(buffer);
 			CraftingRecipe internal = buffer.readBoolean()
-				? RecipeSerializer.SHAPED_RECIPE.streamCodec().decode(buffer)
-				: RecipeSerializer.SHAPELESS_RECIPE.streamCodec().decode(buffer);
-			ItemStack result = buffer.readBoolean() ? ItemStack.STREAM_CODEC.decode(buffer) : null;
+				? ShapedRecipe.SERIALIZER.streamCodec().decode(buffer)
+				: ShapelessRecipe.SERIALIZER.streamCodec().decode(buffer);
+			Optional<ItemStackTemplate> result = ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).decode(buffer);
 
 			return new CarpenterRecipe(recipeId, packagingTime, liquid, box, internal, result);
 		}
 
 		private static void toNetwork(RegistryFriendlyByteBuf buffer, CarpenterRecipe recipe) {
-			ResourceLocation.STREAM_CODEC.encode(buffer, recipe.id);
+			Identifier.STREAM_CODEC.encode(buffer, recipe.id);
 			ByteBufCodecs.VAR_INT.encode(buffer, recipe.packagingTime);
-			FluidStack.OPTIONAL_STREAM_CODEC.encode(buffer, recipe.liquid);
-			Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.box);
+			ByteBufCodecs.optional(FluidStackTemplate.STREAM_CODEC).encode(buffer, recipe.liquid);
+			Ingredient.OPTIONAL_CONTENTS_STREAM_CODEC.encode(buffer, recipe.box);
 			if (recipe.recipe instanceof ShapedRecipe shaped) {
 				buffer.writeBoolean(true);
-				RecipeSerializer.SHAPED_RECIPE.streamCodec().encode(buffer, shaped);
+				ShapedRecipe.SERIALIZER.streamCodec().encode(buffer, shaped);
 			} else if (recipe.recipe instanceof ShapelessRecipe shapeless) {
 				buffer.writeBoolean(false);
-				RecipeSerializer.SHAPELESS_RECIPE.streamCodec().encode(buffer, shapeless);
+				ShapelessRecipe.SERIALIZER.streamCodec().encode(buffer, shapeless);
 			} else {
 				throw new IllegalStateException("Unsupported CraftingRecipe type for CarpenterRecipe network sync: " + recipe.recipe.getClass().getName());
 			}
 
-			boolean hasResult = recipe.result != null;
-			buffer.writeBoolean(hasResult);
-			if (hasResult) {
-				ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
-			}
+			ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).encode(buffer, recipe.result);
 		}
 	}
 }

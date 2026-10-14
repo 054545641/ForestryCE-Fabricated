@@ -1,13 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "item": "minecraft:iron_bars"
-    },
-    "X": {
-      "tag": "c:ingots/iron"
-    }
+    "#": "minecraft:iron_bars",
+    "X": "#c:ingots/iron"
   },
   "pattern": [
     "X X",
@@ -15,7 +10,6 @@
     "XXX"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:burn_barrel"
   }
 }

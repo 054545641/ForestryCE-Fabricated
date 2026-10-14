@@ -8,7 +8,7 @@ import forestry.api.plugin.IFarmTypeBuilder;
 import forestry.api.plugin.IWindfallFarmableBuilder;
 import forestry.core.platform.util.ModUtil;
 import forestry.agriculture.farmlogic.FarmType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
 
 public class FarmTypeBuilder implements IFarmTypeBuilder {
-	private final ResourceLocation id;
+	private final Identifier id;
 	private final ImmutableSet.Builder<Soil> soils = new ImmutableSet.Builder<>();
 	private final IdentityHashMap<Item, WindfallFarmableBuilder> windfallFarmables = new IdentityHashMap<>();
 	private final IdentityHashMap<Item, Consumer<IWindfallFarmableBuilder>> windfallFarmableModifications = new IdentityHashMap<>();
@@ -37,7 +37,7 @@ public class FarmTypeBuilder implements IFarmTypeBuilder {
 	@Nullable
 	private IWaterConsumption waterConsumption;
 
-	public FarmTypeBuilder(ResourceLocation id, BiFunction<IFarmType, Boolean, IFarmLogic> factory, ItemStack icon) {
+	public FarmTypeBuilder(Identifier id, BiFunction<IFarmType, Boolean, IFarmLogic> factory, ItemStack icon) {
 		this.id = id;
 		this.factory = factory;
 		this.icon = icon;

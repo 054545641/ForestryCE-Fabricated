@@ -79,7 +79,7 @@ public class CatalogMenu extends AbstractContainerMenu implements IGuiSelectable
 	}
 
 	private void rebuildStationsList() {
-		if (this.player.level().isClientSide) {
+		if (this.player.level().isClientSide()) {
 			return;
 		}
 
@@ -123,7 +123,7 @@ public class CatalogMenu extends AbstractContainerMenu implements IGuiSelectable
 	/* Managing Trade info */
 	private void updateTradeInfo() {
 		// Updating is done by the server.
-		if (this.player.level().isClientSide) {
+		if (this.player.level().isClientSide()) {
 			return;
 		}
 

@@ -53,7 +53,7 @@ public class DefaultTreeGenerator implements ITreeGenerator {
 			return this.woodType.setDefaultLeaves(level, pos, genome, rand, null);
 		} else {
 			BlockState leaves = ArboricultureBlocks.LEAVES.defaultState();
-			boolean placed = level.setBlock(pos, LeavesBlock.updateDistance(leaves, level, pos), 19);
+			boolean placed = level.setBlock(pos, forestry.arboriculture.leaves.BlockExtendedLeaves.updateDistance(leaves, level, pos), 19);
 			if (!placed) {
 				return false;
 			}

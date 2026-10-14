@@ -5,7 +5,7 @@ import forestry.api.client.ForestrySprites;
 import forestry.api.client.IForestryClientApi;
 import forestry.core.platform.owner.IOwnedTile;
 import forestry.core.platform.util.PlayerUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 
@@ -31,7 +31,7 @@ public class OwnerLedger extends Ledger {
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int y, int x) {
+	public void draw(GuiGraphicsExtractor graphics, int y, int x) {
 		// Draw background
 		drawBackground(graphics, y, x);
 

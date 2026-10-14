@@ -1,37 +1,17 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "item": "forestry:tin_nugget"
-    },
-    {
-      "item": "forestry:tin_nugget"
-    },
-    {
-      "item": "forestry:tin_nugget"
-    },
-    {
-      "item": "forestry:tin_nugget"
-    },
-    {
-      "item": "forestry:tin_nugget"
-    },
-    {
-      "item": "forestry:tin_nugget"
-    },
-    {
-      "item": "forestry:tin_nugget"
-    },
-    {
-      "item": "forestry:tin_nugget"
-    },
-    {
-      "item": "forestry:tin_nugget"
-    }
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:tin_ingot"
   }
 }

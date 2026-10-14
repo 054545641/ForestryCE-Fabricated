@@ -15,7 +15,8 @@ import forestry.core.engine.genetics.TaxonManager;
 import forestry.apiimpl.plugin.PluginManager;
 import forestry.core.platform.block.TileStreamUpdateTracker;
 import forestry.core.platform.client.CoreClientHandler;
-import forestry.core.platform.compat.patchouli.PatchouliCompat;
+import forestry.core.manual.IManualAccess;
+import forestry.core.manual.ManualAccess;
 import forestry.core.engine.climate.ForestryClimateManager;
 import forestry.core.platform.commands.DiagnosticsCommand;
 import forestry.core.platform.commands.DumpCommand;
@@ -37,7 +38,7 @@ import forestry.modules.ModuleUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.neoforged.bus.api.IEventBus;
@@ -46,10 +47,11 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
+import net.neoforged.neoforge.event.DefaultDataComponentsBoundEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -58,6 +60,9 @@ import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 import java.util.List;
+import java.util.Set;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
+import java.util.ServiceLoader;
 import java.util.function.Consumer;
 import forestry.core.platform.PickupHandlerCore;
 
@@ -66,7 +71,7 @@ public class ModuleCore extends BlankForestryModule {
 	private static volatile boolean apiInitialized = false;
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return ForestryModuleIds.CORE;
 	}
 
@@ -83,13 +88,16 @@ public class ModuleCore extends BlankForestryModule {
 		modBus.addListener(ModuleCore::onCommonSetup);
 		modBus.addListener(ModuleCore::registerCapabilities);
 		modBus.addListener(ModuleCore::registerGlobalLootModifiers);
+		modBus.addListener(ModuleCore::registerRecipeIngredients);
 		modBus.addListener(ModuleCore::registerForestryRegistries);
-		modBus.addListener(ModuleCore::onGatherData);
+		modBus.addListener((GatherDataEvent.Client event) -> ensureApiInitialized());
+		modBus.addListener((GatherDataEvent.Server event) -> ensureApiInitialized());
 
 		ModuleUtil.loadFeatureProviders();
 		NeoForge.EVENT_BUS.addListener(ModuleCore::onItemPickup);
 		NeoForge.EVENT_BUS.addListener(ModuleCore::onLevelTick);
 		NeoForge.EVENT_BUS.addListener(ModuleCore::onTagsUpdated);
+		NeoForge.EVENT_BUS.addListener(ModuleCore::onDataComponentsBound);
 		NeoForge.EVENT_BUS.addListener(ModuleCore::onAddReloadListeners);
 		NeoForge.EVENT_BUS.addListener(ModuleCore::registerCommands);
 		NeoForge.EVENT_BUS.addListener(ModuleCore::onDatapackSync);
@@ -98,9 +106,9 @@ public class ModuleCore extends BlankForestryModule {
 	private static void onCommonSetup(FMLCommonSetupEvent event) {
 		event.enqueueWork(ModuleCore::ensureApiInitialized);
 
-		// an incompatible version fails the mods.toml check before this runs, so isLoaded means compatible
+		// the adapter may be absent even when the upstream mod is installed
 		if (ModList.get().isLoaded("patchouli")) {
-			PatchouliCompat.init();
+			ServiceLoader.load(IManualAccess.class).findFirst().ifPresent(ManualAccess::install);
 		}
 	}
 
@@ -116,18 +124,7 @@ public class ModuleCore extends BlankForestryModule {
 		event.register(ForestryRegistries.FLOWER_TYPE_SERIALIZER);
 	}
 
-	private static void onGatherData(net.neoforged.neoforge.data.event.GatherDataEvent event) {
-		// Datagen skips FMLCommonSetupEvent, so initialize the API here so data
-		// providers can resolve TreeManager / BeeManager / ButterflyManager.
-		ensureApiInitialized();
-	}
-
-	/** todo remove
-	 * Idempotent bootstrap of Forestry's runtime API. Some client-side events
-	 * (e.g. ModelEvent.RegisterGeometryLoaders) fire before FMLCommonSetupEvent
-	 * is processed and need TreeManager / BeeManager / etc. already wired up.
-	 * Safe to call from any post-RegisterEvent context.
-	 */
+	// datagen skips common setup and may initialize the API first
 	public static synchronized void ensureApiInitialized() {
 		if (apiInitialized) {
 			return;
@@ -137,16 +134,35 @@ public class ModuleCore extends BlankForestryModule {
 		apiInitialized = true;
 	}
 
+	private static void onDataComponentsBound(DefaultDataComponentsBoundEvent event) {
+		if (event.shouldUpdateStaticData()) refreshDataRegistrations();
+	}
+
+	/** Rebuild after components bind, and after a remote client's tree species arrive. */
+	public static void refreshDataRegistrations() {
+		ensureApiInitialized();
+		for (IForestryModule module : IForestryApi.INSTANCE.getModuleManager().getLoadedModules()) {
+			module.applyLoadedDataRegistration();
+		}
+	}
+
 	private static void registerCapabilities(RegisterCapabilitiesEvent event) {
 		event.registerItem(ForestryCapabilities.SPECTACLE_VISION, (stack, context) -> ItemSpectacles.SPECTACLE_VISION, CoreItems.SPECTACLES.item());
-		event.registerItem(Capabilities.FluidHandler.ITEM, (stack, context) -> ((ItemPipette) stack.getItem()).createFluidHandler(stack), CoreItems.PIPETTE.item());
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, CoreTiles.ANALYZER.tileType(), (tile, side) -> tile.getItemHandler(side));
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, CoreTiles.ESCRITOIRE.tileType(), (tile, side) -> tile.getItemHandler(side));
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, CoreTiles.APIARIST_CHEST.tileType(), (tile, side) -> tile.getItemHandler(side));
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, CoreTiles.ARBORIST_CHEST.tileType(), (tile, side) -> tile.getItemHandler(side));
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, CoreTiles.LEPIDOPTERIST_CHEST.tileType(), (tile, side) -> tile.getItemHandler(side));
-		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, CoreTiles.ANALYZER.tileType(), (tile, side) -> tile.getEnergyHandler(side));
-		event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, CoreTiles.ANALYZER.tileType(), (tile, side) -> tile.getTankManager());
+		event.registerItem(Capabilities.Fluid.ITEM, (stack, context) -> ((ItemPipette) stack.getItem()).createFluidHandler(context), CoreItems.PIPETTE.item());
+		event.registerBlockEntity(Capabilities.Item.BLOCK, CoreTiles.ANALYZER.tileType(), (tile, side) -> tile.getItemHandler(side));
+		event.registerBlockEntity(Capabilities.Item.BLOCK, CoreTiles.ESCRITOIRE.tileType(), (tile, side) -> tile.getItemHandler(side));
+		event.registerBlockEntity(Capabilities.Item.BLOCK, CoreTiles.APIARIST_CHEST.tileType(), (tile, side) -> tile.getItemHandler(side));
+		event.registerBlockEntity(Capabilities.Item.BLOCK, CoreTiles.ARBORIST_CHEST.tileType(), (tile, side) -> tile.getItemHandler(side));
+		event.registerBlockEntity(Capabilities.Item.BLOCK, CoreTiles.LEPIDOPTERIST_CHEST.tileType(), (tile, side) -> tile.getItemHandler(side));
+		event.registerBlockEntity(Capabilities.Energy.BLOCK, CoreTiles.ANALYZER.tileType(), (tile, side) -> tile.getEnergyHandler(side));
+		event.registerBlockEntity(Capabilities.Fluid.BLOCK, CoreTiles.ANALYZER.tileType(), (tile, side) -> tile.getTankManager());
+	}
+
+	private static void registerRecipeIngredients(RegisterEvent event) {
+		event.register(NeoForgeRegistries.Keys.INGREDIENT_TYPES, helper -> helper.register(ForestryConstants.forestry("fluid_container"),
+			forestry.core.platform.recipes.FluidContainerIngredient.TYPE));
+		event.register(Registries.SLOT_DISPLAY, helper -> helper.register(ForestryConstants.forestry("fluid_container"),
+			forestry.core.platform.recipes.FluidContainerIngredient.Display.TYPE));
 	}
 
 	private static void registerGlobalLootModifiers(RegisterEvent event) {
@@ -176,48 +192,45 @@ public class ModuleCore extends BlankForestryModule {
 
 	private static void onTagsUpdated(TagsUpdatedEvent event) {
 		if (event.shouldUpdateStaticData()) {
-			event.getRegistryAccess().registry(Registries.BIOME).ifPresent(registry -> ((ForestryClimateManager) IForestryApi.INSTANCE.getClimateManager()).onBiomesReloaded(registry));
+			event.getRegistries().lookup(Registries.BIOME).ifPresent(registry -> ((ForestryClimateManager) IForestryApi.INSTANCE.getClimateManager()).onBiomesReloaded(registry));
 		}
 	}
 
-	private static void onAddReloadListeners(AddReloadListenerEvent event) {
-		event.addListener((prepBarrier, resourceManager, prepProfiler, reloadProfiler, backgroundExecutor, gameExecutor) -> {
-			return prepBarrier.wait(Unit.INSTANCE).thenRunAsync(() -> {
+	private static void onAddReloadListeners(AddServerReloadListenersEvent event) {
+		Set<Identifier> existing = Set.copyOf(event.getRegistry().keySet());
+		event.addListener(ForestryConstants.forestry("recipe_cache"), (sharedState, backgroundExecutor, barrier, gameExecutor) ->
+			barrier.wait(Unit.INSTANCE).thenRunAsync(() -> {
 				RecipeManagers.invalidateCaches();
 				NetworkUtil.sendToAllPlayers(new RecipeCachePacket());
-			});
-		});
+			}, gameExecutor));
 
-		// Load datapack taxa from the "taxon" folder and merge them onto the code-registered taxonomy. Registered
-		// before any module's species loader: a species' genus is resolved to a taxon as it is projected, so taxa
-		// must exist first.
-		event.addListener(TaxonManager.INSTANCE);
-		// Flower types are shared by bees and butterflies, so base loads them. They must be in place
-		// before any pollinating species is projected, which is why this sits with the taxa rather
-		// than in apiculture's listener
-		event.addListener(FlowerTypeManager.INSTANCE);
-
-		// Modules load in dependency order (see ForestryModuleManager), which is also the order their data
-		// depends on: core's taxa, then apiculture's flower types/effects/species, then arboriculture's
-		// trees, then lepidopterology's butterflies. Apply order follows registration order.
-		// todo check whether an event with explicit ordering phases would be better than leaning on module
-		//  dependency order here. It works, but the coupling is implicit: a module that needs another
-		//  module's data loaded first has to express that as a load-order dependency even when it has no
-		//  other reason to depend on it.
+		// taxa and flower types must exist before any species is projected
+		event.addListener(ForestryConstants.forestry("taxa"), TaxonManager.INSTANCE);
+		event.addListener(ForestryConstants.forestry("flower_types"), FlowerTypeManager.INSTANCE);
 		for (IForestryModule module : IForestryApi.INSTANCE.getModuleManager().getLoadedModules()) {
 			module.registerReloadListeners(event);
 		}
 
-		// Rebuild each species type's mutation index from the (re)loaded mutation recipes. Mod reload listeners run
-		// after vanilla ones (and the reload barrier applies listeners in order), so by the apply phase the vanilla
-		// RecipeManager is fully populated. Run on the game executor since this mutates shared species-type state.
 		RecipeManager recipeManager = event.getServerResources().getRecipeManager();
-		event.addListener((prepBarrier, resourceManager, prepProfiler, reloadProfiler, backgroundExecutor, gameExecutor) -> {
-			return prepBarrier.wait(Unit.INSTANCE).thenRunAsync(() -> GeneticsReloadHandler.rebuildMutations(recipeManager), gameExecutor);
-		});
+		event.addListener(ForestryConstants.forestry("mutations"), (sharedState, backgroundExecutor, barrier, gameExecutor) ->
+			barrier.wait(Unit.INSTANCE).thenRunAsync(() -> GeneticsReloadHandler.rebuildMutations(recipeManager), gameExecutor));
+
+		List<Identifier> order = event.getRegistry().keySet().stream().filter(id -> !existing.contains(id)).toList();
+		for (int i = 1; i < order.size(); i++) {
+			event.addDependency(order.get(i - 1), order.get(i));
+		}
 	}
 
 	private static void onDatapackSync(OnDatapackSyncEvent event) {
+		// NeoForge sends requested recipes after species packets and tag synchronization
+		event.sendRecipes(net.minecraft.world.item.crafting.RecipeType.CRAFTING);
+		forestry.core.platform.registration.ModFeatureRegistry.getRegistries().values().forEach(mod ->
+			mod.getModules().values().forEach(module -> module.getFeatures().forEach(feature -> {
+				if (feature instanceof forestry.core.platform.registration.FeatureRecipeType<?> recipe) {
+					event.sendRecipes(recipe.type());
+				}
+			})));
+
 		TaxonSyncPacket taxa = new TaxonSyncPacket(TaxonManager.INSTANCE.getDefinitions());
 		FlowerTypeSyncPacket flowerTypes = new FlowerTypeSyncPacket(FlowerTypeManager.INSTANCE.getDefinitions());
 
@@ -251,9 +264,13 @@ public class ModuleCore extends BlankForestryModule {
 
 	@Override
 	public void applyPluginRegistration() {
-		PluginManager.registerCircuits();
 		PluginManager.registerGenetics();
 		PluginManager.registerPollen();
+	}
+
+	@Override
+	public void applyLoadedDataRegistration() {
+		PluginManager.registerCircuits();
 	}
 
 	@Override
@@ -262,7 +279,7 @@ public class ModuleCore extends BlankForestryModule {
 	}
 
 	@Override
-	public List<ResourceLocation> getModuleDependencies() {
+	public List<Identifier> getModuleDependencies() {
 		return List.of();
 	}
 

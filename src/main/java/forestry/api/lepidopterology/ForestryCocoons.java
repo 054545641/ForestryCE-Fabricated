@@ -1,12 +1,12 @@
 package forestry.api.lepidopterology;
 
 import forestry.api.ForestryConstants;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * IDs of all butterfly cocoons registered by base Forestry.
  */
 public class ForestryCocoons {
-	public static final ResourceLocation DEFAULT = ForestryConstants.forestry("cocoon_default");
-	public static final ResourceLocation SILK = ForestryConstants.forestry("cocoon_silk");
+	public static final Identifier DEFAULT = ForestryConstants.forestry("cocoon_default");
+	public static final Identifier SILK = ForestryConstants.forestry("cocoon_silk");
 }

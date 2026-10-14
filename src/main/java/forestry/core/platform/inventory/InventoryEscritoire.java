@@ -73,7 +73,7 @@ public class InventoryEscritoire extends InventoryAdapterTile<TileEscritoire> {
 				}
 			}
 			Level level = this.tile.getLevel();
-			if (level != null && !level.isClientSide) {
+			if (level != null && !level.isClientSide()) {
 				EscritoireGame game = this.tile.getGame();
 				game.initialize(specimen);
 			}

@@ -9,7 +9,7 @@ import forestry.core.content.energy.features.EnergyTiles;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,8 +18,19 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public class ClockworkEngineBlockEntity extends EngineBlockEntity {
+
+	private record FuelState(float tension, short delay) {}
+	@Override protected Object captureFuelState() { return new FuelState(this.tension, this.delay); }
+	@Override protected void restoreFuelState(Object value) {
+		var state = (FuelState) value;
+		this.tension = state.tension();
+		this.delay = state.delay();
+	}
 
 	private final static float WIND_EXHAUSTION = 0.05f;
 	private final static float WIND_TENSION_BASE = 0.5f;
@@ -32,7 +43,7 @@ public class ClockworkEngineBlockEntity extends EngineBlockEntity {
 	private float tension = 0.0f;
 	private short delay = 0;
 
-	private static final ResourceLocation CLOCKWORK_ENGINE_HURT_PLAYER = ForestryConstants.forestry("take_damage_from_clockwork_engine");
+	private static final Identifier CLOCKWORK_ENGINE_HURT_PLAYER = ForestryConstants.forestry("take_damage_from_clockwork_engine");
 
 	public ClockworkEngineBlockEntity(BlockPos pos, BlockState state) {
 		super(EnergyTiles.CLOCKWORK_ENGINE.tileType(), pos, state, "", ENGINE_CLOCKWORK_HEAT_MAX, 10000);
@@ -54,7 +65,7 @@ public class ClockworkEngineBlockEntity extends EngineBlockEntity {
 
 		player.causeFoodExhaustion(WIND_EXHAUSTION);
 		if (this.tension > ENGINE_CLOCKWORK_WIND_MAX + 0.1 * WIND_TENSION_BASE) {
-			if (player.hurt(CoreDamageTypes.source(this.level, CoreDamageTypes.CLOCKWORK), 6)) {
+			if (player.hurtServer(player.level(), CoreDamageTypes.source(this.level, CoreDamageTypes.CLOCKWORK), 6)) {
 				AdvancementHelper.tryUnlock(player, CLOCKWORK_ENGINE_HURT_PLAYER);
 			}
 		}
@@ -65,18 +76,26 @@ public class ClockworkEngineBlockEntity extends EngineBlockEntity {
 
 	/* LOADING & SAVING */
 	@Override
-	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-		super.loadAdditional(nbt, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag nbt = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
 
-        this.tension = nbt.getFloat("tension");
+        this.tension = nbt.getFloatOr("tension", 0.0f);
+		this.delay = (short) Math.clamp(nbt.getIntOr("WindDelay", 0), 0, WIND_DELAY);
 	}
 
 
 	@Override
-	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-		super.saveAdditional(nbt, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag nbt = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
 
 		nbt.putFloat("tension", this.tension);
+		nbt.putInt("WindDelay", this.delay);
+
+		ValueIOUtil.mergeInto(output, nbt);
 	}
 
 	@Override
@@ -98,7 +117,7 @@ public class ClockworkEngineBlockEntity extends EngineBlockEntity {
 	}
 
 	@Override
-	public void burn() {
+	public void burnFuel() {
         this.heat = (int) (this.tension * 10000);
 
 		if (this.delay > 0) {
@@ -109,6 +128,7 @@ public class ClockworkEngineBlockEntity extends EngineBlockEntity {
 		if (!isBurning()) {
 			return;
 		}
+		if (this.energyStorage.getEnergyStored() >= this.energyStorage.getMaxEnergyStored()) return;
 
 		if (this.tension > 0.01f) {
             this.tension *= 0.9995f;
@@ -116,7 +136,7 @@ public class ClockworkEngineBlockEntity extends EngineBlockEntity {
             this.tension = 0;
 		}
         this.energyStorage.generateEnergy(ENGINE_CLOCKWORK_ENERGY_PER_CYCLE * (int) this.tension);
-        this.level.updateNeighbourForOutputSignal(this.worldPosition, getBlockState().getBlock());
+        
 	}
 
 	@Override

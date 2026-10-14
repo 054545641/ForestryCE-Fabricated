@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -20,8 +20,8 @@ import forestry.core.platform.util.SpeciesUtil;
 @GameTestHolder(ForestryConstants.MOD_ID)
 @PrefixGameTestTemplate(false)
 public class BeeSpeciesProviderTest {
-	private static final ResourceLocation SPECIES = ForestryConstants.forestry("test_jubilant");
-	private static final ResourceLocation JUBILANCE = ForestryConstants.forestry("test_jubilance");
+	private static final Identifier SPECIES = ForestryConstants.forestry("test_jubilant");
+	private static final Identifier JUBILANCE = ForestryConstants.forestry("test_jubilance");
 
 	@GameTest(template = "empty")
 	public static void jubilanceIsGenerated(GameTestHelper helper) {
@@ -43,7 +43,7 @@ public class BeeSpeciesProviderTest {
 		helper.succeed();
 	}
 
-	private static Map<ResourceLocation, BeeSpeciesDefinition> build(Consumer<IApicultureRegistration> species) {
+	private static Map<Identifier, BeeSpeciesDefinition> build(Consumer<IApicultureRegistration> species) {
 		return BeeSpeciesProvider.buildDefinitions(SpeciesUtil.BEE_TYPE.get(), species);
 	}
 }

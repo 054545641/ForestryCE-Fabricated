@@ -10,7 +10,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -30,7 +30,7 @@ public class EventHandlerApiculture {
 	public static void onEntityJoinWorld(EntityJoinLevelEvent event) {
 		Entity entity = event.getEntity();
 		if (entity instanceof Villager villager) {
-			if (villager.getVillagerData().getProfession().equals(ApicultureVillagers.PROF_BEEKEEPER.get())) {
+			if (villager.getVillagerData().profession().is(ApicultureVillagers.PROF_BEEKEEPER.getKey())) {
 				villager.goalSelector.addGoal(6, new ApiaristAI(villager, 0.6));
 			}
 		}
@@ -58,8 +58,8 @@ public class EventHandlerApiculture {
 
 	@SubscribeEvent
 	public static void serverAboutToStart(ServerAboutToStartEvent event) {
-		Registry<StructureTemplatePool> pools = event.getServer().registryAccess().registry(Registries.TEMPLATE_POOL).orElseThrow();
-		Registry<StructureProcessorList> processors = event.getServer().registryAccess().registry(Registries.PROCESSOR_LIST).orElseThrow();
+		Registry<StructureTemplatePool> pools = event.getServer().registryAccess().lookup(Registries.TEMPLATE_POOL).orElseThrow();
+		Registry<StructureProcessorList> processors = event.getServer().registryAccess().lookup(Registries.PROCESSOR_LIST).orElseThrow();
 
 		VillagerJigsaw.init(pools, processors);
 	}

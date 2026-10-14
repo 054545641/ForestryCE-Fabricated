@@ -6,7 +6,5 @@
     "amount": 375,
     "id": "forestry:liquid_glass"
   },
-  "resource": {
-    "item": "minecraft:glass_pane"
-  }
+  "resource": "minecraft:glass_pane"
 }

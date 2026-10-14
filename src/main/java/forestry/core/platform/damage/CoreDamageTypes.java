@@ -16,6 +16,6 @@ public class CoreDamageTypes {
 	public static final ResourceKey<DamageType> CLOCKWORK = ResourceKey.create(Registries.DAMAGE_TYPE, ForestryConstants.forestry("clockwork"));
 
 	public static DamageSource source(LevelReader level, ResourceKey<DamageType> type) {
-		return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(type));
+		return new DamageSource(level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(type));
 	}
 }

@@ -2,12 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "building",
   "ingredients": [
-    {
-      "item": "forestry:decorative_log_pile"
-    }
+    "forestry:decorative_log_pile"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:log_pile"
   }
 }

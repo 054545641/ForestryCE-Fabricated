@@ -1,6 +1,5 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/plywood",
   "liquid": {
     "amount": 100,
@@ -9,12 +8,8 @@
   "recipe": {
     "category": "building",
     "key": {
-      "^": {
-        "tag": "c:sawdust"
-      },
-      "_": {
-        "tag": "minecraft:wooden_slabs"
-      }
+      "^": "#c:sawdust",
+      "_": "#minecraft:wooden_slabs"
     },
     "pattern": [
       "___",

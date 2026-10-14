@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
-      "model": "forestry:block/lime_hanging_sign"
+    "facing=east": {
+      "model": "forestry:block/lime_wall_hanging_sign",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "forestry:block/lime_wall_hanging_sign",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "forestry:block/lime_wall_hanging_sign"
+    },
+    "facing=west": {
+      "model": "forestry:block/lime_wall_hanging_sign",
+      "y": 90
     }
   }
 }

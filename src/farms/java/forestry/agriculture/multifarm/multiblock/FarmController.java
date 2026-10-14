@@ -1,5 +1,6 @@
 package forestry.agriculture.multifarm.multiblock;
 
+import forestry.core.platform.fluids.FluidHelper;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import forestry.api.ForestryTags;
@@ -37,7 +38,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -46,7 +47,8 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import javax.annotation.Nullable;
@@ -76,6 +78,7 @@ public class FarmController extends MultiblockController implements IFarmControl
 		super(world);
 
 		this.inventory = new InventoryFarm(this);
+		this.inventory.setInventoryOwner(this::setChanged);
 		this.manager = new FarmManager(this);
 		this.sockets = new InventoryAdapter(1, "sockets");
 
@@ -123,7 +126,7 @@ public class FarmController extends MultiblockController implements IFarmControl
 				this.manager.addListener(listenerPart.getFarmListener());
 			}
 			if (part instanceof IFarmComponent.Active active) {
-				this.farmActiveComponents.put(active, this.level.random.nextInt(256));
+				this.farmActiveComponents.put(active, this.level.getRandom().nextInt(256));
 			}
 		}
 	}
@@ -337,13 +340,13 @@ public class FarmController extends MultiblockController implements IFarmControl
 
 	@Override
 	public boolean hasLiquid(FluidStack liquid) {
-		FluidStack drained = this.manager.getResourceTank().drainInternal(liquid, IFluidHandler.FluidAction.SIMULATE);
+		FluidStack drained = FluidHelper.simulateDrain(this.manager.getResourceTank().internal(), liquid);
 		return FluidStack.matches(liquid, drained);
 	}
 
 	@Override
 	public void removeLiquid(FluidStack liquid) {
-        this.manager.getResourceTank().drain(liquid.getAmount(), IFluidHandler.FluidAction.EXECUTE);
+        FluidHelper.drain(this.manager.getResourceTank().internal(), liquid.getAmount());
 	}
 
 	@Override
@@ -421,7 +424,7 @@ public class FarmController extends MultiblockController implements IFarmControl
 	}
 
 	@Override
-	public ResourceLocation getSocketType() {
+	public Identifier getSocketType() {
 		return ForestryCircuitSocketTypes.FARM;
 	}
 

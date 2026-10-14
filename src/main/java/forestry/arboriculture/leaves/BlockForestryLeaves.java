@@ -1,6 +1,7 @@
 package forestry.arboriculture.leaves;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import forestry.api.ForestryTags;
 import forestry.api.arboriculture.genetics.ITree;
 import forestry.api.arboriculture.genetics.TreeLifeStage;
@@ -14,7 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.*;
@@ -95,7 +96,7 @@ public class BlockForestryLeaves extends AbstractLeavesBlock implements Bonemeal
 	}
 
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		LeavesBlockEntity leaves = TileUtil.getTile(level, pos, LeavesBlockEntity.class);
 		if (leaves != null) {
 			IButterfly caterpillar = leaves.getCaterpillar();
@@ -107,17 +108,17 @@ public class BlockForestryLeaves extends AbstractLeavesBlock implements Bonemeal
 					for (ItemStack fruit : leaves.pickFruit(ItemStack.EMPTY)) {
 						ItemHandlerHelper.giveItemToPlayer(player, fruit);
 					}
-					return ItemInteractionResult.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 			} else if (heldItem.is(ForestryTags.Items.SCOOPS) && caterpillar != null) {
 				ItemStack butterfly = SpeciesUtil.BUTTERFLY_TYPE.get().createStack(caterpillar, ButterflyLifeStage.CATERPILLAR);
 				ItemStackUtil.dropItemStackAsEntity(butterfly, level, pos.below());
 				leaves.setCaterpillar(null);
-				return ItemInteractionResult.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 		}
 
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.TRY_WITH_EMPTY_HAND;
 	}
 
 	/* IGrowable */
@@ -154,6 +155,6 @@ public class BlockForestryLeaves extends AbstractLeavesBlock implements Bonemeal
 				}
 			}
 		}
-		return FoliageColor.getDefaultColor();
+		return FoliageColor.FOLIAGE_DEFAULT;
 	}
 }

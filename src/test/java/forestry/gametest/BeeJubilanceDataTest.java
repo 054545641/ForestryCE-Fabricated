@@ -21,7 +21,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -44,7 +44,7 @@ import forestry.core.platform.util.SpeciesUtil;
 @GameTestHolder(ForestryConstants.MOD_ID)
 @PrefixGameTestTemplate(false)
 public class BeeJubilanceDataTest {
-	private static final ResourceLocation TEST_ID = ForestryConstants.forestry("test_requires_gold");
+	private static final Identifier TEST_ID = ForestryConstants.forestry("test_requires_gold");
 	private static final String JSON = "{\"type\":\"forestry:requires_resource\",\"blocks\":\"minecraft:gold_block\"}";
 
 	private static IBeeJubilance parse(GameTestHelper helper) {
@@ -112,7 +112,7 @@ public class BeeJubilanceDataTest {
 	@GameTest(template = "empty")
 	public static void datapackJubilanceMergesOntoCodeJubilances(GameTestHelper helper) {
 		IBeeSpeciesType type = SpeciesUtil.BEE_TYPE.get();
-		Map<ResourceLocation, IBeeJubilance> original = BeeJubilanceManager.INSTANCE.getDefinitions();
+		Map<Identifier, IBeeJubilance> original = BeeJubilanceManager.INSTANCE.getDefinitions();
 		try {
 			ApicultureReloadHandler.rebuildJubilances(Map.of(TEST_ID, parse(helper)));
 			if (type.getJubilanceSafe(TEST_ID) == null) {

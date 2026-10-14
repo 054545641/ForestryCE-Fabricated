@@ -1,5 +1,6 @@
 package forestry.apiculture;
 
+import forestry.api.ForestryConstants;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import forestry.api.ForestryCapabilities;
 import forestry.api.ForestryDataMaps;
@@ -40,8 +41,10 @@ import forestry.core.platform.util.NetworkUtil;
 import forestry.core.platform.util.SpeciesUtil;
 import forestry.modules.BlankForestryModule;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Items;
+import net.minecraft.core.component.DataComponents;
+import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -54,7 +57,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
@@ -77,12 +80,12 @@ public class ModuleApiculture extends BlankForestryModule {
 	private static void registerBrewingRecipes(RegisterBrewingRecipesEvent event) {
 		// BREWING RECIPES
 		event.getBuilder().addRecipe(
-			Ingredient.of(PotionContents.createItemStack(Items.POTION, Potions.AWKWARD)),
-			Ingredient.of(ApicultureItems.POLLEN_CLUSTER.stack(EnumPollenCluster.NORMAL, 1)),
+			DataComponentIngredient.of(DataComponents.POTION_CONTENTS, new PotionContents(Potions.AWKWARD), Items.POTION),
+			Ingredient.of(ApicultureItems.POLLEN_CLUSTER.item(EnumPollenCluster.NORMAL)),
 			PotionContents.createItemStack(Items.POTION, Potions.HEALING));
 		event.getBuilder().addRecipe(
-			Ingredient.of(PotionContents.createItemStack(Items.POTION, Potions.AWKWARD)),
-			Ingredient.of(ApicultureItems.POLLEN_CLUSTER.stack(EnumPollenCluster.CRYSTALLINE, 1)),
+			DataComponentIngredient.of(DataComponents.POTION_CONTENTS, new PotionContents(Potions.AWKWARD), Items.POTION),
+			Ingredient.of(ApicultureItems.POLLEN_CLUSTER.item(EnumPollenCluster.CRYSTALLINE)),
 			PotionContents.createItemStack(Items.POTION, Potions.REGENERATION));
 	}
 
@@ -92,17 +95,17 @@ public class ModuleApiculture extends BlankForestryModule {
 			ApicultureItems.APIARIST_CHEST.item(),
 			ApicultureItems.APIARIST_LEGS.item(),
 			ApicultureItems.APIARIST_BOOTS.item());
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ApicultureTiles.ALVEARY_PLAIN.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ApicultureTiles.ALVEARY_SIEVE.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ApicultureTiles.ALVEARY_SWARMER.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ApicultureTiles.ALVEARY_HYGROREGULATOR.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ApicultureTiles.ALVEARY_STABILISER.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ApicultureTiles.ALVEARY_FAN.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ApicultureTiles.ALVEARY_HEATER.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ApicultureTiles.APIARY.tileType(), TileForestry::getItemHandler);
-		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, ApicultureTiles.ALVEARY_FAN.tileType(), AlvearyClimatizerBlockEntity::getEnergyHandler);
-		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, ApicultureTiles.ALVEARY_HEATER.tileType(), AlvearyClimatizerBlockEntity::getEnergyHandler);
-		event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ApicultureTiles.ALVEARY_HYGROREGULATOR.tileType(), AlvearyHygroregulatorBlockEntity::getFluidHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_PLAIN.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_SIEVE.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_SWARMER.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_HYGROREGULATOR.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_STABILISER.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_FAN.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_HEATER.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.APIARY.tileType(), TileForestry::getItemHandler);
+		event.registerBlockEntity(Capabilities.Energy.BLOCK, ApicultureTiles.ALVEARY_FAN.tileType(), AlvearyClimatizerBlockEntity::getEnergyHandler);
+		event.registerBlockEntity(Capabilities.Energy.BLOCK, ApicultureTiles.ALVEARY_HEATER.tileType(), AlvearyClimatizerBlockEntity::getEnergyHandler);
+		event.registerBlockEntity(Capabilities.Fluid.BLOCK, ApicultureTiles.ALVEARY_HYGROREGULATOR.tileType(), AlvearyHygroregulatorBlockEntity::getFluidHandler);
 	}
 
 	private static void onNetherBeeMate(ForestryEvent.BeeMatingEvent event) {
@@ -113,13 +116,7 @@ public class ModuleApiculture extends BlankForestryModule {
 
 	private static void modifySnifferLoot(LootTableLoadEvent event) {
 		if (event.getKey().equals(BuiltInLootTables.SNIFFER_DIGGING)) {
-			LootPool main = event.getTable().getPool("main");
-
-			if (main != null) {
-				List<LootPoolEntryContainer> entries = new ArrayList<>(main.entries);
-				entries.add(LootItem.lootTableItem(ApicultureItems.AMBER_DRONE).build());
-				main.entries = entries;
-			}
+			forestry.core.platform.loot.LootPoolInjection.append(event, "main", LootItem.lootTableItem(ApicultureItems.AMBER_DRONE).build());
 		}
 	}
 
@@ -129,39 +126,34 @@ public class ModuleApiculture extends BlankForestryModule {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return ForestryModuleIds.APICULTURE;
 	}
 
 	// declared so the load order that carries the reload ordering is stated rather than incidental
 	@Override
-	public List<ResourceLocation> getModuleDependencies() {
+	public List<Identifier> getModuleDependencies() {
 		return List.of(ForestryModuleIds.CORE);
 	}
 
-	/**
-	 * Order within this method matters. Apply order follows registration order, and bee species
-	 * projection resolves each genome's flower type and bee_effect reference as it runs, so both must
-	 * already be loaded. The same applies to the jubilance of each species. Core's taxa are registered before any module for the same reason.
-	 */
 	@Override
-	public void registerReloadListeners(AddReloadListenerEvent event) {
+	public void registerReloadListeners(AddServerReloadListenersEvent event) {
 		// Flower types load in ModuleCore, not here: butterflies carry the same FLOWER_TYPE
 		// chromosome, so base owns them.
 
 		// Load bee effects from the "bee_effect" folder. Registered before BeeSpeciesManager: species
 		// projection resolves each genome's bee_effect reference via getBeeEffect, so effects must exist
 		// first.
-		event.addListener(BeeEffectManager.INSTANCE);
+		event.addListener(ForestryConstants.forestry("bee_effects"), BeeEffectManager.INSTANCE);
 
 		// before BeeSpeciesManager, a species resolves its jubilance when it is built
-		event.addListener(BeeJubilanceManager.INSTANCE);
+		event.addListener(ForestryConstants.forestry("bee_jubilance"), BeeJubilanceManager.INSTANCE);
 
 		// Load bee species from the "bee_species" datapack folder and rebuild the live species map from
 		// them. SimpleJsonResourceReloadListener#apply already runs on the game executor, so no extra
 		// marshalling is needed here. Core registers the mutation rebuild after every module, and
 		// mutations must resolve species that already exist in the live map.
-		event.addListener(BeeSpeciesManager.INSTANCE);
+		event.addListener(ForestryConstants.forestry("bee_species"), BeeSpeciesManager.INSTANCE);
 	}
 
 	@Override
@@ -187,7 +179,6 @@ public class ModuleApiculture extends BlankForestryModule {
 		modBus.addListener(ModuleApiculture::onCommonSetup);
 
 		NeoForge.EVENT_BUS.addListener(ModuleApiculture::registerBrewingRecipes);
-		NeoForge.EVENT_BUS.addListener(ApicultureVillagers::villagerTrades);
 		NeoForge.EVENT_BUS.addListener(ModuleApiculture::onNetherBeeMate);
 		NeoForge.EVENT_BUS.addListener(ModuleApiculture::modifySnifferLoot);
 	}
@@ -226,11 +217,11 @@ public class ModuleApiculture extends BlankForestryModule {
 
 		// id-keyed: resolving a specific species happens at render time, so the (possibly
 		// datapack-driven) species list is not needed here.
-		IdentityHashMap<ILifeStage, ResourceLocation> defaultBeeModels = new IdentityHashMap<>();
-		IdentityHashMap<ILifeStage, Map<ResourceLocation, ResourceLocation>> customBeeModels = new IdentityHashMap<>();
+		IdentityHashMap<ILifeStage, Identifier> defaultBeeModels = new IdentityHashMap<>();
+		IdentityHashMap<ILifeStage, Map<Identifier, Identifier>> customBeeModels = new IdentityHashMap<>();
 
 		for (ILifeStage stage : SpeciesUtil.BEE_TYPE.get().getLifeStages()) {
-			ResourceLocation defaultModel = Objects.requireNonNull(impl.getDefaultBeeModel(stage), "IClientRegistration.setDefaultBeeModel has not been called for life stage " + stage.getSerializedName() + ", unable to resolve bee default model");
+			Identifier defaultModel = Objects.requireNonNull(impl.getDefaultBeeModel(stage), "IClientRegistration.setDefaultBeeModel has not been called for life stage " + stage.getSerializedName() + ", unable to resolve bee default model");
 			defaultBeeModels.put(stage, defaultModel);
 			customBeeModels.put(stage, impl.getBeeModels().getOrDefault(stage, Map.of()));
 		}

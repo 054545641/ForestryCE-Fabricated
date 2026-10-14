@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
-      "model": "forestry:block/ginkgo_sign"
+    "facing=east": {
+      "model": "forestry:block/ginkgo_wall_sign",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "forestry:block/ginkgo_wall_sign",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "forestry:block/ginkgo_wall_sign"
+    },
+    "facing=west": {
+      "model": "forestry:block/ginkgo_wall_sign",
+      "y": 90
     }
   }
 }

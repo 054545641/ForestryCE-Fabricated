@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -42,14 +42,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CandleBlock;
 import forestry.core.platform.block.BlockBase;
 import net.minecraft.core.Direction;
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import forestry.core.data.models.BlockAssetsProvider;
+import forestry.core.data.models.ModelVariant;
+import forestry.core.data.models.ModelAsset;
 
-public class ForestryBlockStateProvider extends BlockStateProvider {
-	public ForestryBlockStateProvider(PackOutput output, ExistingFileHelper exFileHelper) {
-		super(output, ForestryConstants.MOD_ID, exFileHelper);
+public class ForestryBlockStateProvider extends BlockAssetsProvider {
+	public ForestryBlockStateProvider(PackOutput output) {
+		super(output);
 	}
 
 	@Override
@@ -80,7 +79,7 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 		// Fluids (doesn't actually show in game, but silences the warning spam from Minecraft)
 		for (ForestryFluids fluid : ForestryFluids.values()) {
 			Block block = fluid.getFeature().fluidBlock().block();
-			ModelFile blockModel = particleOnly(this, path(block), fluid.getFeature().properties().resources[0]);
+			ModelAsset blockModel = particleOnly(this, path(block), fluid.getFeature().properties().resources[0]);
 			singleModelBlock(this, block, blockModel);
 		}
 
@@ -89,8 +88,8 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 			Block defaultBlock = ArboricultureBlocks.LEAVES_DEFAULT.get(treeType).block();
 			Block defaultFruitBlock = ArboricultureBlocks.LEAVES_DEFAULT_FRUIT.get(treeType).block();
 			Block decorativeBlock = ArboricultureBlocks.LEAVES_DECORATIVE.get(treeType).block();
-			ResourceLocation particle = IForestryClientApi.INSTANCE.getTreeManager().getLeafSprite(treeType.getIndividual().getSpecies()).get(false, true);
-			ModelFile file = models().getBuilder(path(defaultBlock)).texture("particle", particle);
+			Identifier particle = IForestryClientApi.INSTANCE.getTreeManager().getLeafSprite(treeType.getIndividual().getSpecies()).get(false, true);
+			ModelAsset file = models().getBuilder(path(defaultBlock)).texture("particle", particle);
 
 			singleModelBlock(this, defaultBlock, file);
 			singleModelBlock(this, defaultFruitBlock, file);
@@ -106,9 +105,9 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 			BlockBeeHive feature = ApicultureBlocks.HIVE.get(type).block();
 			String path = path(feature);
 
-			ResourceLocation side = modBlock(this, "hive/" + type.getSerializedName() + "_side");
-			ResourceLocation top = modBlock(this, "hive/" + type.getSerializedName() + "_top");
-			ResourceLocation bottom = modBlock(this, "hive/" + type.getSerializedName() + "_bottom");
+			Identifier side = modBlock(this, "hive/" + type.getSerializedName() + "_side");
+			Identifier top = modBlock(this, "hive/" + type.getSerializedName() + "_top");
+			Identifier bottom = modBlock(this, "hive/" + type.getSerializedName() + "_bottom");
 
 			singleModelBlock(this, feature, models().cubeBottomTop(path, side, bottom, top));
 			generic3d(feature);
@@ -123,14 +122,17 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 		existingModelBlock(CharcoalBlocks.ASH.block());
 		existingModelBlock(CharcoalBlocks.CHARCOAL.block());
 		existingModelBlock(CharcoalBlocks.LOG_PILE.block());
-		existingModelBlock(ArboricultureBlocks.SAPLING_GE.block());
+		var saplingModel = new com.google.gson.JsonObject(); saplingModel.addProperty("type", "forestry:sapling_ge");
+		var saplingVariants = new com.google.gson.JsonObject(); saplingVariants.add("", saplingModel);
+		var saplingState = new com.google.gson.JsonObject(); saplingState.add("variants", saplingVariants);
+		blockStateJson(ArboricultureBlocks.SAPLING_GE.block(), saplingState);
 		// Peat gets four random Y rotations of its one model rather than a single "" variant
 		getVariantBuilder(CoreBlocks.PEAT.block()).partialState().setModels(
-			ConfiguredModel.allYRotations(models().getExistingFile(modBlock(this, path(CoreBlocks.PEAT.block()))), 0, false)
+			ModelVariant.allYRotations(models().getExistingFile(modBlock(this, path(CoreBlocks.PEAT.block()))), 0, false)
 		);
 
 		// Comb blocks all share the block_bee_combs model.
-		ModelFile combModel = models().getExistingFile(modBlock(this, "block_bee_combs"));
+		ModelAsset combModel = models().getExistingFile(modBlock(this, "block_bee_combs"));
 		for (Block block : ApicultureBlocks.COMB_BLOCK.blockArray()) singleModelBlock(this, block, combModel);
 
 		// Resource storage blocks use block/storage/<type>.
@@ -185,7 +187,7 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 			String name = hasAsh
 				? (lit ? "burn_barrel_full_burning" : "burn_barrel_full")
 				: (lit ? "burn_barrel_burning" : "burn_barrel_empty");
-			return ConfiguredModel.builder().modelFile(models().getExistingFile(modBlock(this, name))).build();
+			return ModelVariant.builder().modelFile(models().getExistingFile(modBlock(this, name))).build();
 		});
 
 		// Turf. Both keep their hand-authored 1.20.1 models, an inline cube tinted by the grass colour, which no
@@ -253,7 +255,7 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 
 		getVariantBuilder(candle).forAllStates(state -> {
 			String shape = state.getValue(BlockJumboCandle.SHAPE).getSerializedName();
-			return ConfiguredModel.builder()
+			return ModelVariant.builder()
 				.modelFile(models().getExistingFile(modBlock(this, "candles/" + name + "_jumbo_" + shape)))
 				.build();
 		});
@@ -274,7 +276,7 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 	 * @param top    The texture on the top face
 	 */
 	private void jumboCandleModel(String name, String shape, String bottom, String side, String top) {
-		ResourceLocation sideTexture = modBlock(this, "candles/" + name + "_" + side);
+		Identifier sideTexture = modBlock(this, "candles/" + name + "_" + side);
 
 		models().withExistingParent("block/candles/" + name + "_jumbo_" + shape, modBlock(this, "candles/jumbo_" + shape))
 			.texture("bottom", modBlock(this, "candles/" + name + "_" + bottom))
@@ -308,30 +310,30 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 	 */
 	private void vanillaCandle(Block block) {
 		String name = path(block);
-		ResourceLocation texture = modBlock(this, "candles/" + name);
-		ResourceLocation litTexture = modBlock(this, "candles/" + name + "_lit");
+		Identifier texture = modBlock(this, "candles/" + name);
+		Identifier litTexture = modBlock(this, "candles/" + name + "_lit");
 
-		ModelFile one = candleCountModel(name, "one", "template_candle", texture);
-		ModelFile oneLit = candleCountModel(name, "one_lit", "template_candle", litTexture);
-		ModelFile two = candleCountModel(name, "two", "template_two_candles", texture);
-		ModelFile twoLit = candleCountModel(name, "two_lit", "template_two_candles", litTexture);
-		ModelFile three = candleCountModel(name, "three", "template_three_candles", texture);
-		ModelFile threeLit = candleCountModel(name, "three_lit", "template_three_candles", litTexture);
-		ModelFile four = candleCountModel(name, "four", "template_four_candles", texture);
-		ModelFile fourLit = candleCountModel(name, "four_lit", "template_four_candles", litTexture);
+		ModelAsset one = candleCountModel(name, "one", "template_candle", texture);
+		ModelAsset oneLit = candleCountModel(name, "one_lit", "template_candle", litTexture);
+		ModelAsset two = candleCountModel(name, "two", "template_two_candles", texture);
+		ModelAsset twoLit = candleCountModel(name, "two_lit", "template_two_candles", litTexture);
+		ModelAsset three = candleCountModel(name, "three", "template_three_candles", texture);
+		ModelAsset threeLit = candleCountModel(name, "three_lit", "template_three_candles", litTexture);
+		ModelAsset four = candleCountModel(name, "four", "template_four_candles", texture);
+		ModelAsset fourLit = candleCountModel(name, "four_lit", "template_four_candles", litTexture);
 
 		getVariantBuilder(block).forAllStates(state -> {
 			int count = state.getValue(CandleBlock.CANDLES);
 			boolean lit = state.getValue(CandleBlock.LIT);
 
-			ModelFile model = switch (count) {
+			ModelAsset model = switch (count) {
 				case 2 -> lit ? twoLit : two;
 				case 3 -> lit ? threeLit : three;
 				case 4 -> lit ? fourLit : four;
 				default -> lit ? oneLit : one;
 			};
 
-			return ConfiguredModel.builder().modelFile(model).build();
+			return ModelVariant.builder().modelFile(model).build();
 		});
 
 		// Deviation from 1.20.1: the two item models were hand-authored there. They are generated here, from
@@ -348,7 +350,7 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 	 * @param texture The texture on every face, which is also the particle
 	 * @return The registered model
 	 */
-	private ModelFile candleCountModel(String name, String count, String parent, ResourceLocation texture) {
+	private ModelAsset candleCountModel(String name, String count, String parent, Identifier texture) {
 		return models().withExistingParent("block/candles/" + name + "_" + count, mcBlock(this, parent))
 			.texture("all", texture)
 			.texture("particle", texture);
@@ -369,8 +371,8 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 		generic3d(sheet);
 
 		BlockPlywoodBlock block = CoreBlocks.PLYWOOD_BLOCK.block();
-		ResourceLocation top = modBlock(this, "plywood_top");
-		ModelFile model = models().withExistingParent(path(block), mcBlock(this, "cube_column"))
+		Identifier top = modBlock(this, "plywood_top");
+		ModelAsset model = models().withExistingParent(path(block), mcBlock(this, "cube_column"))
 			.texture("end", top)
 			.texture("side", modBlock(this, "plywood_side"))
 			.texture("particle", top);
@@ -387,7 +389,7 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 	 */
 	private void stoneFamily(CoreBlocks.StoneFamily family) {
 		Block base = family.base().block();
-		ResourceLocation texture = modBlock(this, path(base));
+		Identifier texture = modBlock(this, path(base));
 
 		simpleBlock(base);
 		generic3d(base);
@@ -424,7 +426,7 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 	 */
 	private void chiseledColumn(Block block) {
 		String name = path(block);
-		ResourceLocation top = modBlock(this, name + "_top");
+		Identifier top = modBlock(this, name + "_top");
 
 		singleModelBlock(this, block, models().cubeBottomTop(name, modBlock(this, name + "_side"), top, top));
 		generic3d(block);
@@ -437,8 +439,8 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 	// provider rather than by this one. Every static below does the same and takes BlockStateProvider,
 	// so a content jar's provider can call any of them through the one handle it already holds, without
 	// checking which sibling wants a narrower type
-	public static void horizontalMachine(BlockStateProvider states, Block block, String prefix, int down, int up, int north, int south, int east, int west, int particle) {
-		ModelFile model = states.models().withExistingParent(path(block), states.mcLoc("block/cube"))
+	public static void horizontalMachine(BlockAssetsProvider states, Block block, String prefix, int down, int up, int north, int south, int east, int west, int particle) {
+		ModelAsset model = states.models().withExistingParent(path(block), states.mcLoc("block/cube"))
 			.texture("particle", states.modLoc("block/" + prefix + "." + particle))
 			.texture("down", states.modLoc("block/" + prefix + "." + down))
 			.texture("up", states.modLoc("block/" + prefix + "." + up))
@@ -471,7 +473,7 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 					.texture("base", modLoc(baseTexture))
 					.texture("particle", modLoc(particleTexture));
 
-				getVariantBuilder(machine).forAllStates(state -> ConfiguredModel.builder()
+				getVariantBuilder(machine).forAllStates(state -> ModelVariant.builder()
 					.modelFile(models().getExistingFile(modLoc("block/" + name)))
 					.rotationY(rotationFromFacing(state.getValue(BlockBase.FACING)))
 					.build());
@@ -489,7 +491,7 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 
 				getVariantBuilder(machine).forAllStates(state -> {
 					int level = state.getValue(BlockFactoryPlain.TANK_RESOURCE_LEVEL);
-					return ConfiguredModel.builder()
+					return ModelVariant.builder()
 						.modelFile(models().getExistingFile(modLoc("block/" + name + "_res_" + level)))
 						.rotationY(rotationFromFacing(state.getValue(BlockBase.FACING)))
 						.build();
@@ -508,7 +510,7 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 
 				getVariantBuilder(machine).forAllStates(state -> {
 					int level = state.getValue(BlockFactoryPlain.TANK_PRODUCT_LEVEL);
-					return ConfiguredModel.builder()
+					return ModelVariant.builder()
 						.modelFile(models().getExistingFile(modLoc("block/" + name + "_prod_" + level)))
 						.rotationY(rotationFromFacing(state.getValue(BlockBase.FACING)))
 						.build();
@@ -533,7 +535,7 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 					int right = state.getValue(BlockFactoryPlain.TANK_PRODUCT_LEVEL);
 					String modelName = name + "_res_" + left + "_prod_" + right;
 
-					return ConfiguredModel.builder()
+					return ModelVariant.builder()
 						.modelFile(models().getExistingFile(modLoc("block/" + modelName)))
 						.rotationY(rotationFromFacing(state.getValue(BlockBase.FACING)))
 						.build();
@@ -561,16 +563,16 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 		singleModelBlock(this, block, models().getExistingFile(modBlock(this, modelPath)));
 	}
 
-	public static void singleModelBlock(BlockStateProvider states, Block defaultBlock, ModelFile file) {
+	public static void singleModelBlock(BlockAssetsProvider states, Block defaultBlock, ModelAsset file) {
 		states.getVariantBuilder(defaultBlock).partialState().modelForState().modelFile(file).addModel();
 	}
 
-	public static ModelFile particleOnly(BlockStateProvider states, String path, ResourceLocation particleTexture) {
+	public static ModelAsset particleOnly(BlockAssetsProvider states, String path, Identifier particleTexture) {
 		return states.models().getBuilder(path).texture("particle", particleTexture);
 	}
 
 	// Makes a 3d cube of a block for item model
-	public static void generic3d(BlockStateProvider states, Block block) {
+	public static void generic3d(BlockAssetsProvider states, Block block) {
 		String path = path(block);
 		states.itemModels().withExistingParent(path, states.modLoc("block/" + path));
 	}
@@ -581,11 +583,11 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 	 * (different identity, same name). Build the variant manually using BlockBase.FACING so the
 	 * lookup succeeds.
 	 */
-	public static void horizontalForestryBlock(BlockStateProvider states, Block block, ModelFile model) {
+	public static void horizontalForestryBlock(BlockAssetsProvider states, Block block, ModelAsset model) {
 		states.getVariantBuilder(block).forAllStates(state -> {
 			Direction facing = state.getValue(BlockBase.FACING);
 			int yRot = ((int) facing.toYRot() + 180) % 360;
-			return ConfiguredModel.builder()
+			return ModelVariant.builder()
 				.modelFile(model)
 				.rotationY(yRot)
 				.build();
@@ -603,7 +605,7 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 	 */
 	private void agingSoil(Block block, IntegerProperty property) {
 		String name = path(block);
-		Map<Integer, ModelFile> models = new HashMap<>();
+		Map<Integer, ModelAsset> models = new HashMap<>();
 
 		for (int age : property.getPossibleValues()) {
 			// age 0 keeps the bare name so the hand-written item model can still parent it
@@ -611,16 +613,16 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 			models.put(age, models().cubeAll(model, modBlock(this, model)));
 		}
 
-		getVariantBuilder(block).forAllStates(state -> ConfiguredModel.builder()
+		getVariantBuilder(block).forAllStates(state -> ModelVariant.builder()
 			.modelFile(models.get(state.getValue(property)))
 			.build());
 	}
 
-	protected static ResourceLocation withSuffix(ResourceLocation loc, String suffix) {
+	protected static Identifier withSuffix(Identifier loc, String suffix) {
 		return loc.withSuffix(suffix);
 	}
 
-	protected static ResourceLocation withPrefix(String prefix, ResourceLocation loc) {
+	protected static Identifier withPrefix(String prefix, Identifier loc) {
 		String oldPath = loc.getPath();
 		int slash = oldPath.lastIndexOf('/') + 1;
 
@@ -634,11 +636,11 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 		itemModels().withExistingParent(path(block), modLoc("block/" + path(otherParent)));
 	}
 
-	public void generic3d(Block block, ResourceLocation otherParentId) {
-		itemModels().withExistingParent(path(block), ResourceLocation.fromNamespaceAndPath(otherParentId.getNamespace(), "block/" + otherParentId.getPath()));
+	public void generic3d(Block block, Identifier otherParentId) {
+		itemModels().withExistingParent(path(block), Identifier.fromNamespaceAndPath(otherParentId.getNamespace(), "block/" + otherParentId.getPath()));
 	}
 
-	protected ModelFile existingMcBlock(String path) {
+	protected ModelAsset existingMcBlock(String path) {
 		return models().getExistingFile(mcBlock(this, path));
 	}
 
@@ -651,15 +653,15 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 		return ModUtil.getRegistryName(block).getPath();
 	}
 
-	public static ModelFile.UncheckedModelFile file(ResourceLocation resourceLoc) {
-		return new ModelFile.UncheckedModelFile(resourceLoc);
+	public static ModelAsset file(Identifier resourceLoc) {
+		return new ModelAsset(resourceLoc);
 	}
 
-	public static ResourceLocation modBlock(BlockStateProvider states, String name) {
+	public static Identifier modBlock(BlockAssetsProvider states, String name) {
 		return states.modLoc("block/" + name);
 	}
 
-	public static ResourceLocation mcBlock(BlockStateProvider states, String name) {
+	public static Identifier mcBlock(BlockAssetsProvider states, String name) {
 		return states.mcLoc("block/" + name);
 	}
 
@@ -670,15 +672,15 @@ public class ForestryBlockStateProvider extends BlockStateProvider {
 	/**
 	 * Makes a 2d single layer item like hopper, gold ingot, or redstone dust item models
 	 */
-	public void generic2d(ResourceLocation itemId) {
+	public void generic2d(Identifier itemId) {
 		layer0(itemId, "item/generated");
 	}
 
-	public void layer0(ResourceLocation itemId, String parentName) {
+	public void layer0(Identifier itemId, String parentName) {
 		String path = itemId.getPath();
 
 		itemModels().getBuilder(path)
-			.parent(new ModelFile.UncheckedModelFile(parentName))
-			.texture("layer0", ResourceLocation.fromNamespaceAndPath(itemId.getNamespace(), "item/" + path));
+			.parent(new ModelAsset(parentName))
+			.texture("layer0", Identifier.fromNamespaceAndPath(itemId.getNamespace(), "item/" + path));
 	}
 }

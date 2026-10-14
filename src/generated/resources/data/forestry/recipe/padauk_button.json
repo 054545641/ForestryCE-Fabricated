@@ -3,16 +3,11 @@
   "category": "redstone",
   "ingredients": [
     [
-      {
-        "item": "forestry:padauk_planks"
-      },
-      {
-        "item": "forestry:padauk_fireproof_planks"
-      }
+      "forestry:padauk_planks",
+      "forestry:padauk_fireproof_planks"
     ]
   ],
   "result": {
-    "count": 1,
     "id": "forestry:padauk_button"
   }
 }

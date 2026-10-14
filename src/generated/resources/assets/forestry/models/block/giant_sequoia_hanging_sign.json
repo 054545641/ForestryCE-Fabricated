@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/giant_sequoia_planks"
-  }
+  "parent": "forestry:block/giant_sequoia_hanging_sign_rot_0"
 }

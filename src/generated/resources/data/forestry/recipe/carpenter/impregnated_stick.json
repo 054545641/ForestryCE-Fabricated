@@ -1,17 +1,13 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/impregnated_stick",
   "liquid": {
     "amount": 100,
     "id": "forestry:seed_oil"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "tag": "minecraft:logs"
-      }
+      "#": "#minecraft:logs"
     },
     "pattern": [
       "#",

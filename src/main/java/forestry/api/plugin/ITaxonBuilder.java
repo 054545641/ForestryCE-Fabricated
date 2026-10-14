@@ -2,7 +2,7 @@ package forestry.api.plugin;
 
 import forestry.api.core.genetics.alleles.Allele;
 import forestry.api.core.genetics.alleles.IChromosome;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 
@@ -53,7 +53,7 @@ public interface ITaxonBuilder {
 	 * @param chromosome The reference chromosome to set.
 	 * @param id         The ID of the default referenced value.
 	 */
-	default void setDefaultChromosome(IChromosome<ResourceLocation> chromosome, ResourceLocation id) {
+	default void setDefaultChromosome(IChromosome<Identifier> chromosome, Identifier id) {
 		setDefaultChromosome(chromosome, id, true);
 	}
 
@@ -64,5 +64,5 @@ public interface ITaxonBuilder {
 	 * @param id         The ID of the default referenced value.
 	 * @param required   If {@code true}, members of the taxon are expected to have this chromosome.
 	 */
-	void setDefaultChromosome(IChromosome<ResourceLocation> chromosome, ResourceLocation id, boolean required);
+	void setDefaultChromosome(IChromosome<Identifier> chromosome, Identifier id, boolean required);
 }

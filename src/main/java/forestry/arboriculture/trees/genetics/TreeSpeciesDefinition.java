@@ -9,7 +9,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.IForestryApi;
 import forestry.api.core.HumidityType;
@@ -52,7 +52,7 @@ public record TreeSpeciesDefinition(
 	TemperatureType temperature,
 	HumidityType humidity,
 	float rarity,
-	Map<ResourceLocation, AlleleOverride<?>> genome
+	Map<Identifier, AlleleOverride<?>> genome
 ) implements ISpeciesDefinition {
 	@Nullable
 	private static Codec<TreeSpeciesDefinition> codec;
@@ -88,7 +88,7 @@ public record TreeSpeciesDefinition(
 	}
 
 	private static Codec<TreeSpeciesDefinition> buildCodec() {
-		Codec<Map<ResourceLocation, AlleleOverride<?>>> genomeCodec = GenomeCodecs.overrideMapCodec(karyotype());
+		Codec<Map<Identifier, AlleleOverride<?>>> genomeCodec = GenomeCodecs.overrideMapCodec(karyotype());
 		return RecordCodecBuilder.create(instance -> instance.group(
 			SpeciesCore.MAP_CODEC.forGetter(TreeSpeciesDefinition::core),
 			Codec.FLOAT.optionalFieldOf("rarity", 0.0f).forGetter(TreeSpeciesDefinition::rarity),
@@ -100,7 +100,7 @@ public record TreeSpeciesDefinition(
 	}
 
 	private static StreamCodec<RegistryFriendlyByteBuf, TreeSpeciesDefinition> buildStreamCodec() {
-		StreamCodec<RegistryFriendlyByteBuf, Map<ResourceLocation, AlleleOverride<?>>> genomeStreamCodec = GenomeCodecs.overrideMapStreamCodec(karyotype());
+		StreamCodec<RegistryFriendlyByteBuf, Map<Identifier, AlleleOverride<?>>> genomeStreamCodec = GenomeCodecs.overrideMapStreamCodec(karyotype());
 		return StreamCodec.of(
 			(buf, def) -> {
 				SpeciesCore.STREAM_CODEC.encode(buf, def.core());
@@ -110,7 +110,7 @@ public record TreeSpeciesDefinition(
 			buf -> {
 				SpeciesCore core = SpeciesCore.STREAM_CODEC.decode(buf);
 				float rarity = buf.readFloat();
-				Map<ResourceLocation, AlleleOverride<?>> genome = genomeStreamCodec.decode(buf);
+				Map<Identifier, AlleleOverride<?>> genome = genomeStreamCodec.decode(buf);
 				return new TreeSpeciesDefinition(core.genus(), core.species(), core.dominant(), core.glint(), core.secret(),
 					core.complexity(), core.authority(), core.escritoireColor(), core.temperature(), core.humidity(),
 					rarity, genome);

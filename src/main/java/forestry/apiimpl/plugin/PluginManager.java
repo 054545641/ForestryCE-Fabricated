@@ -31,7 +31,7 @@ import forestry.core.engine.genetics.PollenManager;
 import forestry.core.content.sorting.FilterManager;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.*;
 import forestry.api.modules.IForestryModule;
@@ -49,7 +49,7 @@ public class PluginManager {
 	// The plugins that ship base Forestry's own content. Listed rather than derived from the namespace
 	// because forestry:kubejs shares that namespace and must keep running after them, as it did when
 	// this was a single DefaultForestryPlugin moved to the front.
-	private static final Set<ResourceLocation> BASE_PLUGIN_IDS = Set.of(
+	private static final Set<Identifier> BASE_PLUGIN_IDS = Set.of(
 		ForestryConstants.forestry("default"),
 		ForestryModuleIds.APICULTURE,
 		ForestryModuleIds.ARBORICULTURE,
@@ -92,7 +92,7 @@ public class PluginManager {
 		int errorCount = errors.size();
 		Short2ObjectOpenHashMap<IError> byNumericId = new Short2ObjectOpenHashMap<>(errorCount);
 		Object2ShortOpenHashMap<IError> numericIdLookup = new Object2ShortOpenHashMap<>(errorCount);
-		ImmutableMap.Builder<ResourceLocation, IError> byId = ImmutableMap.builderWithExpectedSize(errorCount);
+		ImmutableMap.Builder<Identifier, IError> byId = ImmutableMap.builderWithExpectedSize(errorCount);
 
 		for (int i = 0; i < errors.size(); i++) {
 			IError error = errors.get(i);
@@ -104,7 +104,7 @@ public class PluginManager {
 		((ForestryApiImpl) IForestryApi.INSTANCE).setErrorManager(new ErrorManager(byNumericId, numericIdLookup, byId.build()));
 	}
 
-	// Runs after all items are registered so that electron tubes and circuit boards are available.
+	// Runs after default item components bind, and rebuilds the manager on reload.
 	public static void registerCircuits() {
 		CircuitRegistration registration = new CircuitRegistration();
 
@@ -159,10 +159,10 @@ public class PluginManager {
 		((forestry.core.engine.genetics.ForestryFlowerTypeManager) IForestryApi.INSTANCE.getFlowerTypeManager())
 				.setCodeFlowerTypes(registration.getFlowerTypes());
 
-		ImmutableMap<ResourceLocation, ISpeciesType<?, ?>> speciesTypes = registration.buildSpeciesTypes();
+		ImmutableMap<Identifier, ISpeciesType<?, ?>> speciesTypes = registration.buildSpeciesTypes();
 		ImmutableMap<String, ITaxon> taxa = registration.buildTaxa();
 
-		Forestry.LOGGER.debug("Registered {} species types: {}", speciesTypes.size(), Arrays.toString(speciesTypes.keySet().toArray(new ResourceLocation[0])));
+		Forestry.LOGGER.debug("Registered {} species types: {}", speciesTypes.size(), Arrays.toString(speciesTypes.keySet().toArray(new Identifier[0])));
 
 		ForestryApiImpl api = (ForestryApiImpl) IForestryApi.INSTANCE;
 		GeneticManager geneticManager = new GeneticManager(taxa, speciesTypes);
@@ -170,18 +170,18 @@ public class PluginManager {
 		api.setFilterManager(new FilterManager(registration.getFilterRuleTypes()));
 
 		// Register SPECIES for each type
-		LinkedHashMap<ISpeciesType<?, ?>, ImmutableMap<ResourceLocation, ?>> allSpecies = new LinkedHashMap<>(speciesTypes.size());
+		LinkedHashMap<ISpeciesType<?, ?>, ImmutableMap<Identifier, ?>> allSpecies = new LinkedHashMap<>(speciesTypes.size());
 
 		// go through species builders and build each species
 		for (ISpeciesType<?, ?> speciesType : speciesTypes.values()) {
-			ImmutableMap<ResourceLocation, ?> species = speciesType.handleSpeciesRegistration(LOADED_PLUGINS);
+			ImmutableMap<Identifier, ?> species = speciesType.handleSpeciesRegistration(LOADED_PLUGINS);
 
 			allSpecies.put(speciesType, species);
 
 			Forestry.LOGGER.debug("Registered {} species for species type {}", species.size(), speciesType.id());
 		}
 
-		for (Map.Entry<ISpeciesType<?, ?>, ImmutableMap<ResourceLocation, ?>> entry : allSpecies.entrySet()) {
+		for (Map.Entry<ISpeciesType<?, ?>, ImmutableMap<Identifier, ?>> entry : allSpecies.entrySet()) {
 			ISpeciesType<?, ?> speciesType = entry.getKey();
 
 			// Data-driven species types (e.g. bees) are legitimately empty here; their species map
@@ -191,9 +191,9 @@ public class PluginManager {
 	}
 
 	public static void registerPollen() {
-		HashMap<ResourceLocation, IPollenType<?>> pollenTypes = new HashMap<>();
+		HashMap<Identifier, IPollenType<?>> pollenTypes = new HashMap<>();
 		IPollenRegistration registration = pollen -> {
-			ResourceLocation id = pollen.id();
+			Identifier id = pollen.id();
 			if (pollenTypes.containsKey(id)) {
 				throw new IllegalStateException("A pollen type was already registered with ID " + pollen + ": " + pollenTypes.get(id));
 			} else {
@@ -225,10 +225,10 @@ public class PluginManager {
 		// id-keyed: resolving a species happens at render time by id (ButterflyClientManager#getTextures falls back
 		// to the default naming convention, computed from the id alone, for any id with no explicit registration),
 		// so the (datapack-driven) species list is not needed to build this map.
-		Map<ResourceLocation, Pair<ResourceLocation, ResourceLocation>> butterflyTextures = new HashMap<>(registration.getButterflyTextures());
+		Map<Identifier, Pair<Identifier, Identifier>> butterflyTextures = new HashMap<>(registration.getButterflyTextures());
 		((ForestryClientApiImpl) IForestryClientApi.INSTANCE).setButterflyManager(new ButterflyClientManager(butterflyTextures));
 
-		HashMap<ResourceLocation, IAnalyzerPlugin<?, ?>> analyzerPluginsById = registration.getAnalyzerPlugins();
+		HashMap<Identifier, IAnalyzerPlugin<?, ?>> analyzerPluginsById = registration.getAnalyzerPlugins();
 		IdentityHashMap<ISpeciesType<?, ?>, IAnalyzerPlugin<?, ?>> analyzerPlugins = new IdentityHashMap<>(analyzerPluginsById.size());
 		for (ISpeciesType<?, ?> type : IForestryApi.INSTANCE.getGeneticManager().getSpeciesTypes()) {
 			IAnalyzerPlugin<?, ?> plugin = analyzerPluginsById.get(type.id());

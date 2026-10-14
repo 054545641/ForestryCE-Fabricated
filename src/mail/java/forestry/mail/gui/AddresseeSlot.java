@@ -1,13 +1,13 @@
 package forestry.mail.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.renderer.RenderPipelines;
 import forestry.api.client.ForestrySprites;
 import forestry.api.core.tooltips.ToolTip;
 import forestry.api.mail.IPostalCarrier;
 import forestry.core.platform.gui.widgets.Widget;
 import forestry.core.platform.gui.widgets.WidgetManager;
 import forestry.core.platform.util.SoundUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class AddresseeSlot extends Widget {
 	private final LetterMenu menu;
@@ -20,11 +20,9 @@ public class AddresseeSlot extends Widget {
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int startX, int startY) {
+	public void draw(GuiGraphicsExtractor graphics, int startX, int startY) {
 		IPostalCarrier carrier = this.menu.getCarrier();
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0F);
-		RenderSystem.setShaderTexture(0, ForestrySprites.TEXTURE_ATLAS);
-		graphics.blit(startX + this.xPos, startY + this.yPos, 0, 32, 32, carrier.getSprite());
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, carrier.getSprite(), startX + this.xPos, startY + this.yPos, 32, 32);
 	}
 
 	@Override

@@ -12,8 +12,8 @@ public class ForestryFenceBlock extends FenceBlock implements IWoodTyped {
 	private final boolean fireproof;
 	private final IWoodType woodType;
 
-	public ForestryFenceBlock(boolean fireproof, IWoodType woodType) {
-		super(ForestryPlanksBlock.createWoodProperties(woodType));
+	public ForestryFenceBlock(Properties properties, boolean fireproof, IWoodType woodType) {
+		super(ForestryPlanksBlock.createWoodProperties(woodType, properties));
 		this.fireproof = fireproof;
 		this.woodType = woodType;
 	}

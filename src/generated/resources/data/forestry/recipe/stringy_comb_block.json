@@ -3,16 +3,13 @@
   "category": "building",
   "group": "combs",
   "key": {
-    "#": {
-      "item": "forestry:stringy_comb"
-    }
+    "#": "forestry:stringy_comb"
   },
   "pattern": [
     "##",
     "##"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:stringy_comb_block"
   }
 }

@@ -9,7 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -63,12 +63,12 @@ public abstract class ContainerForestry extends AbstractContainerMenu {
 	}
 
 	@Override
-	public void clicked(int slotId, int button, ClickType clickTypeIn, Player player) {
+	public void clicked(int slotId, int button, ContainerInput clickTypeIn, Player player) {
 		if (!canAccess(player)) {
 			return;
 		}
 
-		if (clickTypeIn == ClickType.SWAP && button >= 0 && button < 9) {
+		if (clickTypeIn == ContainerInput.SWAP && button >= 0 && button < 9) {
 			// hotkey used to move item from slot to hotbar
 			int hotbarSlotIndex = PLAYER_HOTBAR_OFFSET + button;
 			Slot hotbarSlot = getSlot(hotbarSlotIndex);

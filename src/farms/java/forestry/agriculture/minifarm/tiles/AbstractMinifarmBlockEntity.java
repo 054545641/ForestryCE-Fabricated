@@ -1,5 +1,6 @@
 package forestry.agriculture.minifarm.tiles;
 
+import forestry.core.platform.fluids.FluidHelper;
 import com.google.common.base.Preconditions;
 import forestry.api.IForestryApi;
 import forestry.api.core.climate.IClimateProvider;
@@ -31,9 +32,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -42,7 +46,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -64,7 +69,7 @@ public abstract class AbstractMinifarmBlockEntity extends TilePowered implements
 	@Nullable
 	private Vec3i area;
 
-	protected AbstractMinifarmBlockEntity(BlockEntityType type, BlockPos pos, BlockState state, ResourceLocation farmTypeId) {
+	protected AbstractMinifarmBlockEntity(BlockEntityType type, BlockPos pos, BlockState state, Identifier farmTypeId) {
 		super(type, pos, state, 150, 1500);
 
 		this.properties = Preconditions.checkNotNull(IForestryApi.INSTANCE.getFarmingManager().getFarmType(farmTypeId));
@@ -109,19 +114,29 @@ public abstract class AbstractMinifarmBlockEntity extends TilePowered implements
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
-		super.saveAdditional(data, registries);
-        this.manager.write(data, registries);
-        this.ownerHandler.write(data, registries);
-		data.putBoolean("manual", this.manual);
+	protected CycleResult completeWorkCycle() {
+		return deferWorldWork(this.manager::doWork);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag data, HolderLookup.Provider registries) {
-		super.loadAdditional(data, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag data = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
+        this.manager.write(output);
+        this.ownerHandler.write(data, registries);
+		data.putBoolean("manual", this.manual);
+		ValueIOUtil.mergeInto(output, data);
+	}
+
+	@Override
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag data = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
         this.manager.read(data, registries);
         this.ownerHandler.read(data, registries);
-		setManual(data.getBoolean("manual"));
+		setManual(data.getBooleanOr("manual", false));
 	}
 
 	@Override
@@ -195,13 +210,13 @@ public abstract class AbstractMinifarmBlockEntity extends TilePowered implements
 
 	@Override
 	public boolean hasLiquid(FluidStack liquid) {
-		FluidStack drained = this.manager.getResourceTank().drainInternal(liquid, IFluidHandler.FluidAction.SIMULATE);
+		FluidStack drained = FluidHelper.simulateDrain(this.manager.getResourceTank().internal(), liquid);
 		return FluidStack.matches(liquid, drained);
 	}
 
 	@Override
 	public void removeLiquid(FluidStack liquid) {
-        this.manager.getResourceTank().drain(liquid.getAmount(), IFluidHandler.FluidAction.EXECUTE);
+        FluidHelper.drain(this.manager.getResourceTank().internal(), liquid.getAmount());
 	}
 
 	@Override
@@ -276,7 +291,11 @@ public abstract class AbstractMinifarmBlockEntity extends TilePowered implements
 	@Override
 	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
 		CompoundTag data = super.getUpdateTag(registries);
-        this.manager.write(data, registries);
+		try (var problems = new net.minecraft.util.ProblemReporter.ScopedCollector(com.mojang.logging.LogUtils.getLogger())) {
+			var output = net.minecraft.world.level.storage.TagValueOutput.createWithContext(problems, registries);
+			this.manager.write(output);
+			data.merge(output.buildResult());
+		}
 		return data;
 	}
 
@@ -305,7 +324,7 @@ public abstract class AbstractMinifarmBlockEntity extends TilePowered implements
 	}
 
 	@Nullable
-	public IFluidHandler getFluidHandler(@Nullable Direction facing) {
+	public ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction facing) {
 		return getTankManager();
 	}
 

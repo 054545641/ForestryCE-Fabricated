@@ -4,12 +4,8 @@
   "group": "wooden_door",
   "key": {
     "#": [
-      {
-        "item": "forestry:camelthorn_planks"
-      },
-      {
-        "item": "forestry:camelthorn_fireproof_planks"
-      }
+      "forestry:camelthorn_planks",
+      "forestry:camelthorn_fireproof_planks"
     ]
   },
   "pattern": [

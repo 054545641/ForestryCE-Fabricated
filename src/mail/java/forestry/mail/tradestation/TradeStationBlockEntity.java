@@ -24,6 +24,9 @@ import forestry.mail.network.packets.PacketTraderAddressResponse;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
@@ -61,22 +64,27 @@ public class TradeStationBlockEntity extends TileBase implements IOwnedTile {
 
 	/* SAVING & LOADING */
 	@Override
-	public void saveAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.saveAdditional(compoundNBT, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag compoundNBT = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
 
 		CompoundTag nbt = new CompoundTag();
         this.address.write(nbt, registries);
 		compoundNBT.put("address", nbt);
 
         this.ownerHandler.write(compoundNBT, registries);
+		ValueIOUtil.mergeInto(output, compoundNBT);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.loadAdditional(compoundNBT, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compoundNBT = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
 
 		if (compoundNBT.contains("address")) {
-            this.address = new MailAddress(compoundNBT.getCompound("address"));
+            this.address = new MailAddress(compoundNBT.getCompoundOrEmpty("address"));
 		}
         this.ownerHandler.read(compoundNBT, registries);
 	}
@@ -242,7 +250,7 @@ public class TradeStationBlockEntity extends TileBase implements IOwnedTile {
 			return false;
 		}
 
-		if (!this.level.isClientSide) {
+		if (!this.level.isClientSide()) {
 			ServerLevel world = (ServerLevel) this.level;
 			IErrorLogic errorLogic = getErrorLogic();
 
@@ -269,7 +277,7 @@ public class TradeStationBlockEntity extends TileBase implements IOwnedTile {
 	@Override
 	public IInventoryAdapter getInternalInventory() {
 		// Handle client side
-		if (this.level.isClientSide || !this.address.isValid()) {
+		if (this.level.isClientSide() || !this.address.isValid()) {
 			return super.getInternalInventory();
 		}
 

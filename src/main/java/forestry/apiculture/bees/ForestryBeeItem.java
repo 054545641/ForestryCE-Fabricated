@@ -18,8 +18,8 @@ import net.minecraft.world.item.TooltipFlag;
 import java.util.List;
 
 public class ForestryBeeItem extends ItemGE implements ITintedItem {
-	public ForestryBeeItem(BeeLifeStage type) {
-		super(type != BeeLifeStage.DRONE ? new Item.Properties().stacksTo(1) : new Item.Properties(), type);
+	public ForestryBeeItem(BeeLifeStage type, Properties properties) {
+		super(type != BeeLifeStage.DRONE ? properties.stacksTo(1) : properties, type);
 	}
 
 	@Override

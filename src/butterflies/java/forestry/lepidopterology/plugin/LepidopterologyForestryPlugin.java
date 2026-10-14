@@ -12,7 +12,7 @@ import forestry.api.lepidopterology.genetics.ButterflyLifeStage;
 import forestry.lepidopterology.butterflies.genetics.ButterflySpeciesType;
 import java.util.List;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Items;
 
 import forestry.api.core.Product;
@@ -87,7 +87,7 @@ public class LepidopterologyForestryPlugin implements IForestryPlugin {
 	}
 
 	@Override
-	public ResourceLocation id() {
+	public Identifier id() {
 		return ForestryModuleIds.LEPIDOPTEROLOGY;
 	}
 

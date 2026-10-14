@@ -7,7 +7,7 @@ import forestry.api.agriculture.IFarmHousing;
 import forestry.api.agriculture.IFarmType;
 import forestry.core.engine.circuits.Circuit;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.util.Lazy;
 
 import javax.annotation.Nullable;
@@ -17,7 +17,7 @@ public class MultifarmCircuit extends Circuit implements IFarmCircuit {
 	private final Supplier<IFarmType> farmType;
 	private final boolean manual;
 
-	public MultifarmCircuit(String uid, ResourceLocation farmTypeId, boolean manual) {
+	public MultifarmCircuit(String uid, Identifier farmTypeId, boolean manual) {
 		super(uid);
 		this.farmType = Lazy.of(() -> IForestryApi.INSTANCE.getFarmingManager().getFarmType(farmTypeId));
 		this.manual = manual;

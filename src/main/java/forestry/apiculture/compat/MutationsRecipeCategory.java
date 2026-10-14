@@ -12,9 +12,9 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -27,7 +27,7 @@ public class MutationsRecipeCategory implements IRecipeCategory<MutationDisplay>
 	private static final int SPECIES_SLOT_1_X = 71 + 1;
 	private static final int SPECIES_SLOT_2_X = 125 + 1;
 
-	private final RecipeType<MutationDisplay> type;
+	private final IRecipeType<MutationDisplay> type;
 	private final Component title;
 	private final IDrawable background;
 	private final IDrawable icon;
@@ -38,12 +38,12 @@ public class MutationsRecipeCategory implements IRecipeCategory<MutationDisplay>
 		this.icon = icon;
 
 		this.speciesType = type;
-		this.type = new RecipeType<>(ModUtil.withSuffix(type.id(), "_mutations"), MutationDisplay.class);
+		this.type = IRecipeType.create(ModUtil.withSuffix(type.id(), "_mutations"), MutationDisplay.class);
 		this.title = Component.translatable("for.jei.mutations." + type.id().getNamespace() + '.' + type.id().getPath());
 	}
 
 	@Override
-	public RecipeType<MutationDisplay> getRecipeType() {
+	public IRecipeType<MutationDisplay> getRecipeType() {
 		return this.type;
 	}
 
@@ -106,7 +106,7 @@ public class MutationsRecipeCategory implements IRecipeCategory<MutationDisplay>
 	}
 
 	@Override
-	public void draw(MutationDisplay recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+	public void draw(MutationDisplay recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
 		this.background.draw(graphics);
 
 		JeiUtil.drawCenteredMulti(graphics, recipe.mutation.getFirstParent().getDisplayName(), SPECIES_SLOT_0_X + 9, SPECIES_SLOTS_Y + 22, 0xffffffff);

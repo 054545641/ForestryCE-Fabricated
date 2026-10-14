@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_slab",
   "key": {
-    "#": {
-      "item": "forestry:pewen_planks"
-    }
+    "#": "forestry:pewen_planks"
   },
   "pattern": [
     "###"

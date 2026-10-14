@@ -1,5 +1,6 @@
 package forestry.api.core.machines;
 
+import java.util.Optional;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
@@ -7,9 +8,9 @@ import net.neoforged.neoforge.fluids.FluidStack;
 
 public interface IFermenterRecipe extends IForestryRecipe {
 	/**
-	 * @return ItemStack representing the input resource.
+	 * @return The required item resource, or an empty optional for fluid-only recipes
 	 */
-	Ingredient getInputItem();
+	Optional<Ingredient> getInputItem();
 
 	/**
 	 * @return FluidStack representing the input fluid resource.

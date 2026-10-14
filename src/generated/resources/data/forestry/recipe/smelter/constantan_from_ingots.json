@@ -20,22 +20,16 @@
   "inputs": [
     {
       "count": 1,
-      "ingredient": {
-        "tag": "c:ingots/copper"
-      }
+      "ingredient": "#c:ingots/copper"
     },
     {
       "count": 1,
-      "ingredient": {
-        "tag": "c:ingots/nickel"
-      }
+      "ingredient": "#c:ingots/nickel"
     }
   ],
   "output": {
     "count": 2,
-    "ingredient": {
-      "tag": "c:ingots/constantan"
-    }
+    "ingredient": "#c:ingots/constantan"
   },
   "processingTime": 40
 }

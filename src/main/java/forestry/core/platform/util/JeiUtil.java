@@ -23,10 +23,10 @@ import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -82,7 +82,7 @@ public class JeiUtil {
 	}
 
 	public static void addDescription(IRecipeRegistration registry, Item item) {
-		ResourceLocation registryName = ModUtil.getRegistryName(item);
+		Identifier registryName = ModUtil.getRegistryName(item);
 		String resourcePath = registryName.getPath();
 		addDescription(registry, item, resourcePath);
 	}
@@ -97,6 +97,7 @@ public class JeiUtil {
 		for (int y = 0; y < height; ++y) {
 			for (int x = 0; x < width; ++x) {
 				IRecipeSlotBuilder slot = builder.addSlot(role, xOffset + x * slotSpacing, yOffset + y * slotSpacing);
+				slot.setSlotName("forestry_crafting_" + (y * width + x));
 				craftingSlots.add(slot);
 			}
 		}
@@ -104,20 +105,39 @@ public class JeiUtil {
 	}
 
 	public static void setCraftingItems(List<IRecipeSlotBuilder> craftingSlots, CraftingRecipe craftingGridRecipe, ICraftingGridHelper craftingGridHelper) {
-		int width = 0;
-		int height = 0;
-		if (craftingGridRecipe instanceof ShapedRecipe shapedRecipe) {
-			width = shapedRecipe.getWidth();
-			height = shapedRecipe.getHeight();
+		var context = net.minecraft.world.item.crafting.display.SlotDisplayContext.fromLevel(Minecraft.getInstance().level);
+		for (var display : craftingGridRecipe.display()) {
+			if (display instanceof net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay shaped) {
+				craftingGridHelper.setInputs(craftingSlots, VanillaTypes.ITEM_STACK,
+					shaped.ingredients().stream().map(slot -> slot.resolveForStacks(context)).toList(), shaped.width(), shaped.height());
+				return;
+			} else if (display instanceof net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay shapeless) {
+				craftingGridHelper.setInputs(craftingSlots, VanillaTypes.ITEM_STACK,
+					shapeless.ingredients().stream().map(slot -> slot.resolveForStacks(context)).toList(), 0, 0);
+				return;
+			}
 		}
-		setCraftingItems(craftingSlots, craftingGridRecipe.getIngredients(), width, height, craftingGridHelper);
+		throw new IllegalArgumentException("Unsupported crafting display: " + craftingGridRecipe);
+	}
+
+	public static List<ItemStack> ingredientStacks(Ingredient ingredient) {
+		return ingredient.display().resolveForStacks(net.minecraft.world.item.crafting.display.SlotDisplayContext.fromLevel(Minecraft.getInstance().level));
 	}
 
 	public static void setCraftingItems(List<IRecipeSlotBuilder> craftingSlots, List<Ingredient> ingredients, int width, int height, ICraftingGridHelper craftingGridHelper) {
-		List<List<ItemStack>> itemStacks = ingredients.stream()
-			.map(ingredient -> List.of(ingredient.getItems()))
-			.toList();
-		craftingGridHelper.setInputs(craftingSlots, VanillaTypes.ITEM_STACK, itemStacks, width, height);
+		craftingGridHelper.setInputs(craftingSlots, VanillaTypes.ITEM_STACK,
+			ingredients.stream().map(JeiUtil::ingredientStacks).toList(), width, height);
+	}
+
+	/** Only the ghost grid belongs in the transfer packet, not tanks, boxes or plans. */
+	public static NonNullList<ItemStack> getCraftingItems(IRecipeSlotsView recipeSlots) {
+		NonNullList<ItemStack> result = NonNullList.withSize(9, ItemStack.EMPTY);
+		for (int i = 0; i < 9; i++) {
+			String name = "forestry_crafting_" + i;
+			var slot = recipeSlots.getSlotViews().stream().filter(view -> view.getSlotName().filter(name::equals).isPresent()).findFirst().orElseThrow();
+			result.set(i, slot.getDisplayedItemStack().map(stack -> stack.copyWithCount(1)).orElse(ItemStack.EMPTY));
+		}
+		return result;
 	}
 
 	public static NonNullList<ItemStack> getFirstItemStacks(IRecipeSlotsView recipeSlots) {
@@ -136,7 +156,7 @@ public class JeiUtil {
 		return result;
 	}
 
-	public static <S extends ISpecies<?>> void registerItemSubtypes(ISubtypeRegistration registry, IChromosome<ResourceLocation> species, ISpeciesType<S, ?> type) {
+	public static <S extends ISpecies<?>> void registerItemSubtypes(ISubtypeRegistration registry, IChromosome<Identifier> species, ISpeciesType<S, ?> type) {
 		ISubtypeInterpreter<ItemStack> interpreter = new ISubtypeInterpreter<>() {
 			@Override
 			public Object getSubtypeData(ItemStack stack, UidContext context) {
@@ -144,11 +164,6 @@ public class JeiUtil {
 				return individual != null ? individual.getGenome().<S>resolveActive(species).getBinomial() : null;
 			}
 
-			@Override
-			public String getLegacyStringSubtypeInfo(ItemStack stack, UidContext context) {
-				Object data = getSubtypeData(stack, context);
-				return data == null ? "" : data.toString();
-			}
 		};
 
 		for (ILifeStage stage : type.getLifeStages()) {
@@ -157,7 +172,7 @@ public class JeiUtil {
 	}
 
 	// From JEI Bees
-	public static void drawCenteredMulti(GuiGraphics graphics, Component component, float x, float y, int color) {
+	public static void drawCenteredMulti(GuiGraphicsExtractor graphics, Component component, float x, float y, int color) {
 		Font font = Minecraft.getInstance().font;
 		String[] split = component.getString().split(" ");
 
@@ -167,10 +182,10 @@ public class JeiUtil {
 		}
 	}
 
-	private static void drawCentered(GuiGraphics graphics, Font font, String line, float x, float y, int color) {
+	private static void drawCentered(GuiGraphicsExtractor graphics, Font font, String line, float x, float y, int color) {
 		int width = font.width(line);
 
-		graphics.drawString(font, line, x - (width / 2f), y, color, false);
+		graphics.text(font, line, Math.round(x - width / 2f), Math.round(y), color | 0xff000000, false);
 	}
 	// End of JEI Bees
 

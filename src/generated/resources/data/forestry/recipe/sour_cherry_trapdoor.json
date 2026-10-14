@@ -4,12 +4,8 @@
   "group": "wooden_trapdoor",
   "key": {
     "#": [
-      {
-        "item": "forestry:sour_cherry_planks"
-      },
-      {
-        "item": "forestry:sour_cherry_fireproof_planks"
-      }
+      "forestry:sour_cherry_planks",
+      "forestry:sour_cherry_fireproof_planks"
     ]
   },
   "pattern": [

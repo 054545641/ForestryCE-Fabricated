@@ -8,7 +8,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.IFluidTank;
+import forestry.core.platform.fluids.StandardTank;
 
 import javax.annotation.Nullable;
 
@@ -53,7 +53,7 @@ public abstract class ContainerLiquidTanks<T extends BlockEntity & ILiquidTankTi
 
 	@Nullable
 	@Override
-	public IFluidTank getTank(int slot) {
+	public StandardTank getTank(int slot) {
 		return this.tile.getTankManager().getTank(slot);
 	}
 }

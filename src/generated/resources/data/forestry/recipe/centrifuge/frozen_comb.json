@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/frozen_comb",
-  "input": {
-    "item": "forestry:frozen_comb"
-  },
+  "input": "forestry:frozen_comb",
   "products": [
     {
       "chance": 0.8,

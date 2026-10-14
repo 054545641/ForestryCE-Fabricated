@@ -1,19 +1,14 @@
 {
   "type": "forestry:carpenter",
-  "box": {
-    "item": "forestry:crate"
-  },
+  "box": "forestry:crate",
   "id": "forestry:carpenter/crates/pack/minecraft/grass_block",
   "liquid": {
     "amount": 100,
     "id": "minecraft:water"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "item": "minecraft:grass_block"
-      }
+      "#": "minecraft:grass_block"
     },
     "pattern": [
       "###",
@@ -21,7 +16,6 @@
       "###"
     ],
     "result": {
-      "count": 1,
       "id": "forestry:crated_grass_block"
     }
   },

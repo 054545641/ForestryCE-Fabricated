@@ -6,9 +6,10 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeMap;
 
 import forestry.Forestry;
 import forestry.api.IForestryApi;
@@ -29,23 +30,27 @@ public final class GeneticsReloadHandler {
 
 	// must run after every species rebuild, MutationManager is keyed by species identity
 	public static void rebuildMutations(RecipeManager recipeManager) {
+		rebuildMutations(recipeManager.recipeMap());
+	}
+
+	public static void rebuildMutations(RecipeMap recipeManager) {
 		for (ISpeciesType<?, ?> type : IForestryApi.INSTANCE.getGeneticManager().getSpeciesTypes()) {
 			rebuildOne(type, recipeManager);
 		}
 	}
 
-	private static <S extends ISpecies<?>> void rebuildOne(ISpeciesType<S, ?> type, RecipeManager rm) {
+	private static <S extends ISpecies<?>> void rebuildOne(ISpeciesType<S, ?> type, RecipeMap rm) {
 		FeatureRecipeType<MutationRecipe> featureType = GeneticsRecipeTypes.forType(type.id());
 		if (featureType == null) {
 			// third-party species types have no mutation recipe type
 			return;
 		}
-		Map<ResourceLocation, S> lookup = new HashMap<>();
+		Map<Identifier, S> lookup = new HashMap<>();
 		for (S species : type.getAllSpecies()) {
 			lookup.put(species.id(), species);
 		}
 		ImmutableList.Builder<IMutation<S>> builder = ImmutableList.builder();
-		for (RecipeHolder<MutationRecipe> holder : rm.getAllRecipesFor(featureType.type())) {
+		for (RecipeHolder<MutationRecipe> holder : rm.byType(featureType.type())) {
 			Mutation<S> mutation = holder.value().toMutation(type, lookup::get);
 			if (mutation != null) {
 				builder.add(mutation);

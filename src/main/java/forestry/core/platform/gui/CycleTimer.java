@@ -1,6 +1,6 @@
 package forestry.core.platform.gui;
 
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -26,7 +26,7 @@ public class CycleTimer {
 	}
 
 	public void onDraw() {
-		if (!Screen.hasShiftDown()) {
+		if (!Minecraft.getInstance().hasShiftDown()) {
 			if (this.pausedDuration > 0L) {
 				this.startTime += this.pausedDuration;
 				this.pausedDuration = 0L;

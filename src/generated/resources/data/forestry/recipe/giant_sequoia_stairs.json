@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_stairs",
   "key": {
-    "#": {
-      "item": "forestry:giant_sequoia_planks"
-    }
+    "#": "forestry:giant_sequoia_planks"
   },
   "pattern": [
     "#  ",

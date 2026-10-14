@@ -8,12 +8,8 @@
   "recipe": {
     "category": "building",
     "key": {
-      "#": {
-        "item": "forestry:refractory_wax"
-      },
-      "X": {
-        "item": "forestry:ginkgo_wood"
-      }
+      "#": "forestry:refractory_wax",
+      "X": "forestry:ginkgo_wood"
     },
     "pattern": [
       "   ",

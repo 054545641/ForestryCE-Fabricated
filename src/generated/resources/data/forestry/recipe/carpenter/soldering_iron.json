@@ -1,6 +1,5 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/soldering_iron",
   "liquid": {
     "amount": 1000,
@@ -9,12 +8,8 @@
   "recipe": {
     "category": "equipment",
     "key": {
-      "#": {
-        "tag": "c:ingots/iron"
-      },
-      "B": {
-        "tag": "c:ingots/bronze"
-      }
+      "#": "#c:ingots/iron",
+      "B": "#c:ingots/bronze"
     },
     "pattern": [
       " # ",
@@ -22,7 +17,6 @@
       "  B"
     ],
     "result": {
-      "count": 1,
       "id": "forestry:soldering_iron"
     }
   },

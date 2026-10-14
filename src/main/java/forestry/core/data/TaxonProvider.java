@@ -15,7 +15,7 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.ForestryConstants;
 import forestry.api.IForestryApi;
@@ -41,7 +41,7 @@ public class TaxonProvider implements DataProvider {
 	private static final List<TaxonDefinition> SEEDED = new ArrayList<>();
 
 	private final PackOutput.PathProvider path;
-	private final Map<ResourceLocation, TaxonDefinition> pending = new LinkedHashMap<>();
+	private final Map<Identifier, TaxonDefinition> pending = new LinkedHashMap<>();
 
 	public TaxonProvider(PackOutput output) {
 		this.path = output.createPathProvider(PackOutput.Target.DATA_PACK, "taxon");
@@ -61,7 +61,7 @@ public class TaxonProvider implements DataProvider {
 	}
 
 	protected void add(TaxonDefinition def) {
-		this.pending.put(ResourceLocation.fromNamespaceAndPath(ForestryConstants.MOD_ID, def.name()), def);
+		this.pending.put(Identifier.fromNamespaceAndPath(ForestryConstants.MOD_ID, def.name()), def);
 	}
 
 	// Converts a live taxon into its serializable definition. Reference-chromosome defaults are stored by id only
@@ -75,7 +75,7 @@ public class TaxonProvider implements DataProvider {
 		}
 
 		// Sorted by chromosome id so the generated JSON is deterministic (taxon.alleles() is an IdentityHashMap).
-		Map<ResourceLocation, Allele<?>> alleles = new TreeMap<>(Comparator.comparing(ResourceLocation::toString));
+		Map<Identifier, Allele<?>> alleles = new TreeMap<>(Comparator.comparing(Identifier::toString));
 		for (Map.Entry<IChromosome<?>, ITaxon.TaxonAllele> entry : defaults.entrySet()) {
 			IChromosome<?> chromosome = entry.getKey();
 			ITaxon.TaxonAllele taxonAllele = entry.getValue();
@@ -86,7 +86,7 @@ public class TaxonProvider implements DataProvider {
 		}
 
 		ISpeciesType<?, ?> type = findType(defaults.keySet().iterator().next());
-		ResourceLocation typeId = type == null ? null : type.id();
+		Identifier typeId = type == null ? null : type.id();
 		return new TaxonDefinition(parent, taxon.name(), taxon.rank(), typeId, alleles);
 	}
 

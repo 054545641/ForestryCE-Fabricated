@@ -3,9 +3,7 @@
   "category": "building",
   "group": "bark",
   "key": {
-    "#": {
-      "item": "forestry:poplar_fireproof_log"
-    }
+    "#": "forestry:poplar_fireproof_log"
   },
   "pattern": [
     "##",

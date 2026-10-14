@@ -14,7 +14,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 
@@ -75,7 +75,7 @@ public record ButterflySpeciesDefinition(
 	Optional<TagKey<Biome>> spawnBiomes,
 	List<IProduct> products,
 	List<IProduct> caterpillarProducts,
-	Map<ResourceLocation, AlleleOverride<?>> genome
+	Map<Identifier, AlleleOverride<?>> genome
 ) implements ISpeciesDefinition {
 	@Nullable
 	private static Codec<ButterflySpeciesDefinition> codec;
@@ -114,7 +114,7 @@ public record ButterflySpeciesDefinition(
 	private static final StreamCodec<RegistryFriendlyByteBuf, List<IProduct>> PRODUCTS_STREAM_CODEC = IProduct.LIST_STREAM_CODEC;
 
 	private static Codec<ButterflySpeciesDefinition> buildCodec() {
-		Codec<Map<ResourceLocation, AlleleOverride<?>>> genomeCodec = GenomeCodecs.overrideMapCodec(karyotype());
+		Codec<Map<Identifier, AlleleOverride<?>>> genomeCodec = GenomeCodecs.overrideMapCodec(karyotype());
 		return RecordCodecBuilder.create(instance -> instance.group(
 			SpeciesCore.MAP_CODEC.forGetter(ButterflySpeciesDefinition::core),
 			Codec.BOOL.optionalFieldOf("nocturnal", false).forGetter(ButterflySpeciesDefinition::nocturnal),
@@ -133,9 +133,9 @@ public record ButterflySpeciesDefinition(
 	}
 
 	private static StreamCodec<RegistryFriendlyByteBuf, ButterflySpeciesDefinition> buildStreamCodec() {
-		StreamCodec<RegistryFriendlyByteBuf, Map<ResourceLocation, AlleleOverride<?>>> genomeStreamCodec = GenomeCodecs.overrideMapStreamCodec(karyotype());
+		StreamCodec<RegistryFriendlyByteBuf, Map<Identifier, AlleleOverride<?>>> genomeStreamCodec = GenomeCodecs.overrideMapStreamCodec(karyotype());
 		StreamCodec<ByteBuf, Optional<TagKey<Biome>>> spawnBiomesStreamCodec = ByteBufCodecs.optional(
-			ResourceLocation.STREAM_CODEC.map(location -> TagKey.create(Registries.BIOME, location), TagKey::location));
+			Identifier.STREAM_CODEC.map(location -> TagKey.create(Registries.BIOME, location), TagKey::location));
 		return StreamCodec.of(
 			(buf, def) -> {
 				SpeciesCore.STREAM_CODEC.encode(buf, def.core());
@@ -159,7 +159,7 @@ public record ButterflySpeciesDefinition(
 				Optional<TagKey<Biome>> spawnBiomes = spawnBiomesStreamCodec.decode(buf);
 				List<IProduct> products = PRODUCTS_STREAM_CODEC.decode(buf);
 				List<IProduct> caterpillarProducts = PRODUCTS_STREAM_CODEC.decode(buf);
-				Map<ResourceLocation, AlleleOverride<?>> genome = genomeStreamCodec.decode(buf);
+				Map<Identifier, AlleleOverride<?>> genome = genomeStreamCodec.decode(buf);
 				return new ButterflySpeciesDefinition(core.genus(), core.species(), core.dominant(), core.glint(), core.secret(),
 					core.complexity(), core.authority(), core.escritoireColor(), core.temperature(), core.humidity(),
 					nocturnal, moth, rarity, flightDistance, serumColor, spawnBiomes, products, caterpillarProducts, genome);

@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/poplar_planks"
-  }
+  "parent": "forestry:block/poplar_hanging_sign_rot_0"
 }

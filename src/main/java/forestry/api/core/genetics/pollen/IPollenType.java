@@ -2,7 +2,7 @@ package forestry.api.core.genetics.pollen;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 
 import javax.annotation.Nullable;
@@ -15,7 +15,7 @@ public interface IPollenType<P> {
 	/**
 	 * @return The unique ID of this pollen type.
 	 */
-	ResourceLocation id();
+	Identifier id();
 
 	/**
 	 * Used to determine whether a block can be pollinated or have pollen of this type.

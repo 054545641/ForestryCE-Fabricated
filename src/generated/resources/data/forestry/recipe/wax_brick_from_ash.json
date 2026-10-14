@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "#": {
-      "tag": "c:dusts/ash"
-    },
-    "X": {
-      "item": "forestry:beeswax"
-    }
+    "#": "#c:dusts/ash",
+    "X": "forestry:beeswax"
   },
   "pattern": [
     "#X",

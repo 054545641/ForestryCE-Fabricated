@@ -8,11 +8,8 @@ import forestry.core.engine.genetics.EffectData;
 import forestry.core.platform.util.VecUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.Cow;
-import net.minecraft.world.entity.animal.MushroomCow;
+import net.minecraft.world.entity.animal.cow.Cow;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -61,7 +58,7 @@ public class FungificationBeeEffect extends ThrottledBeeEffect {
 		Vec3i halfArea = new Vec3i(area.getX() / 2, area.getY() / 2, area.getZ() / 2);
 
 		for (int attempt = 0; attempt < MAX_BLOCK_FIND_TRIES; ++attempt) {
-			BlockPos pos = VecUtil.getRandomPositionInArea(world.random, area).subtract(halfArea).offset(housingCoordinates);
+			BlockPos pos = VecUtil.getRandomPositionInArea(world.getRandom(), area).subtract(halfArea).offset(housingCoordinates);
 			if (world.hasChunkAt(pos)) {
 				BlockState blockState = world.getBlockState(pos);
 
@@ -77,7 +74,7 @@ public class FungificationBeeEffect extends ThrottledBeeEffect {
 	private static void doEntityEffect(IGenome genome, IBeeHousing housing) {
 		List<Cow> cows = ThrottledBeeEffect.getEntitiesInRange(genome, housing, Cow.class);
 		for (Cow cow : cows) {
-			if (convertCowToMooshroom(cow)) {
+			if (BeeEffectEntities.convertCow(cow)) {
 				return;
 			}
 		}
@@ -95,24 +92,9 @@ public class FungificationBeeEffect extends ThrottledBeeEffect {
 	private static boolean growGiantMushroom(ServerLevel world, BlockState blockState, BlockPos pos) {
 		Block block = blockState.getBlock();
 		if (block instanceof MushroomBlock mushroom) {
-			mushroom.growMushroom(world, pos, blockState, world.random);
-			return true;
+			return mushroom.growMushroom(world, pos, blockState, world.getRandom());
 		}
 		return false;
 	}
 
-	private static boolean convertCowToMooshroom(Cow cow) {
-		if (cow instanceof MushroomCow) {
-			return false;
-		}
-		Level world = cow.level();
-		cow.discard();
-		MushroomCow mooshroom = new MushroomCow(EntityType.MOOSHROOM, world);
-		mooshroom.moveTo(cow.getX(), cow.getY(), cow.getZ(), cow.getYRot(), cow.getXRot());
-		mooshroom.setHealth(cow.getHealth());
-		mooshroom.yBodyRot = cow.yBodyRot;
-		world.addFreshEntity(mooshroom);
-		world.addParticle(ParticleTypes.EXPLOSION, cow.getX(), cow.getY() + cow.getBbHeight() / 2.0F, cow.getZ(), 0.0D, 0.0D, 0.0D);
-		return true;
-	}
 }

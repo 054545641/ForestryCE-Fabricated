@@ -7,7 +7,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -26,7 +26,7 @@ import forestry.core.content.machines.recipes.SqueezerRecipe;
 public class SqueezerRecipeCodecTest {
 	private static SqueezerRecipe sample() {
 		return new SqueezerRecipe(
-			ResourceLocation.fromNamespaceAndPath("forestry", "test_squeeze"),
+			Identifier.fromNamespaceAndPath("forestry", "test_squeeze"),
 			20,
 			List.of(Ingredient.of(Items.APPLE)),
 			FluidProduct.of(Fluids.WATER, 1000),

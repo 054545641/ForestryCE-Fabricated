@@ -28,7 +28,7 @@ public final class MultiblockTicker {
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public static <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level) {
-		return (BlockEntityTicker<T>) (level.isClientSide ? CLIENT : SERVER);
+		return (BlockEntityTicker<T>) (level.isClientSide() ? CLIENT : SERVER);
 	}
 
 	@Nullable

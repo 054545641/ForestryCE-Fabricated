@@ -5,7 +5,7 @@ import forestry.core.content.energy.tiles.BiogasEngineBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 
 import java.util.Optional;
 
@@ -24,7 +24,7 @@ public class InventoryEngineBiogas extends InventoryAdapterTile<BiogasEngineBloc
 	@Override
 	public boolean canSlotAccept(int slotIndex, ItemStack stack) {
 		if (slotIndex == SLOT_CAN) {
-			Optional<FluidStack> fluid = FluidUtil.getFluidContained(stack);
+			Optional<FluidStack> fluid = java.util.Optional.of(FluidUtil.getFirstStackContained(stack)).filter(fluidStack -> !fluidStack.isEmpty());
 			return fluid.map(f -> this.tile.getTankManager().canFillFluidType(f)).orElse(false);
 		}
 

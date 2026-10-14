@@ -13,7 +13,7 @@ import java.util.Map;
 import net.minecraft.core.Vec3i;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -43,7 +43,7 @@ import forestry.api.core.genetics.alleles.IChromosome;
  *
  * <p>The NEW-API dumper (post-refactor) MUST reproduce {@link #canonical} byte-for-byte: float -&gt; Float.toString,
  * int -&gt; Integer.toString, boolean -&gt; Boolean.toString, enum -&gt; name(), Vec3i -&gt; "x,y,z", reference value
- * -&gt; its ResourceLocation; each rendered as {@code <value>:<dominant>}.
+ * -&gt; its Identifier; each rendered as {@code <value>:<dominant>}.
  */
 @GameTestHolder(ForestryConstants.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -90,9 +90,9 @@ public class GenomeBaselineTest {
 		List<ISpeciesType<?, ?>> types = new ArrayList<>(IForestryApi.INSTANCE.getGeneticManager().getSpeciesTypes());
 
 		for (ISpeciesType<?, ?> type : types) {
-			ResourceLocation typeId = type.id();
+			Identifier typeId = type.id();
 
-			for (ResourceLocation speciesId : type.getAllSpeciesIds()) {
+			for (Identifier speciesId : type.getAllSpeciesIds()) {
 				ISpecies<?> species = type.getSpecies(speciesId);
 				IGenome genome = species.getDefaultGenome();
 
@@ -112,7 +112,7 @@ public class GenomeBaselineTest {
 
 	/**
 	 * Canonical, representation-agnostic rendering of an allele as {@code <value>:<dominant>}.
-	 * Reproduces the pre-refactor rendering exactly: reference values render as their {@link ResourceLocation};
+	 * Reproduces the pre-refactor rendering exactly: reference values render as their {@link Identifier};
 	 * float/int/boolean via their {@code toString}; enums via {@code name()}; {@link Vec3i} as {@code "x,y,z"}.
 	 */
 	private static String canonical(Allele<?> allele) {

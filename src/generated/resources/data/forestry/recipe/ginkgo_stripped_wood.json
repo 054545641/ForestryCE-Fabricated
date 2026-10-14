@@ -3,9 +3,7 @@
   "category": "building",
   "group": "bark",
   "key": {
-    "#": {
-      "item": "forestry:ginkgo_stripped_log"
-    }
+    "#": "forestry:ginkgo_stripped_log"
   },
   "pattern": [
     "##",

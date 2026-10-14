@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/amber_sapling",
-  "input": {
-    "item": "forestry:amber_sapling_fossil"
-  },
+  "input": "forestry:amber_sapling_fossil",
   "products": [
     {
       "chance": 0.25,

@@ -6,7 +6,7 @@ import forestry.core.platform.util.SlotUtil;
 import forestry.core.content.machines.tiles.TileFabricator;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeMap;
 
 public class InventoryFabricator extends InventoryAdapterTile<TileFabricator> {
 	public static final short SLOT_METAL = 0;
@@ -22,7 +22,7 @@ public class InventoryFabricator extends InventoryAdapterTile<TileFabricator> {
 
 	@Override
 	public boolean canSlotAccept(int slotIndex, ItemStack stack) {
-		RecipeManager recipeManager = this.tile.getLevel().getRecipeManager();
+		RecipeMap recipeManager = RecipeUtils.getRecipeMap(this.tile.getLevel());
 
 		if (slotIndex == SLOT_METAL) {
 			return RecipeUtils.getFabricatorMeltingRecipe(recipeManager, stack) != null;

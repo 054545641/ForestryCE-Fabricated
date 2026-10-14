@@ -1,20 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "item": "minecraft:cut_sandstone"
-    },
-    "T": {
-      "tag": "c:gears/tin"
-    }
+    "#": "minecraft:cut_sandstone",
+    "T": "#c:gears/tin"
   },
   "pattern": [
     " # ",
     "TTT"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:cut_sandstone_farm_gearbox"
   }
 }

@@ -3,16 +3,11 @@
   "category": "redstone",
   "ingredients": [
     [
-      {
-        "item": "forestry:wenge_planks"
-      },
-      {
-        "item": "forestry:wenge_fireproof_planks"
-      }
+      "forestry:wenge_planks",
+      "forestry:wenge_fireproof_planks"
     ]
   ],
   "result": {
-    "count": 1,
     "id": "forestry:wenge_button"
   }
 }

@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "forestry:item/peat_engine",
+    "model": {
+      "type": "forestry:machine",
+      "kind": "peat_engine"
+    }
+  }
+}

@@ -13,14 +13,17 @@ import forestry.core.platform.item.FruitItemType;
 import forestry.core.platform.util.SpeciesUtil;
 import forestry.core.platform.registration.FeatureItem;
 import forestry.core.content.backpacks.features.CrateItems;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
-import thedarkcolour.modkit.data.MKItemModelProvider;
+import net.minecraft.resources.Identifier;
+import forestry.core.data.models.ModelAsset;
+import forestry.core.data.models.ModelAssets;
 
 import java.util.Set;
 
 public class ForestryItemModels {
-	public static void addModels(MKItemModelProvider models) {
+	public static final Set<Identifier> VANILLA_SAPLINGS = Set.of(ForestryTreeSpecies.OAK, ForestryTreeSpecies.DARK_OAK,
+		ForestryTreeSpecies.BIRCH, ForestryTreeSpecies.ACACIA_VANILLA, ForestryTreeSpecies.SPRUCE,
+		ForestryTreeSpecies.JUNGLE, ForestryTreeSpecies.CHERRY_VANILLA);
+	public static void addModels(ModelAssets models) {
 		models.generic2d(CoreItems.AMBER);
 		models.generic2d(ApicultureItems.AMBER_DRONE);
 		models.generic2d(ArboricultureItems.AMBER_SAPLING_FOSSIL);
@@ -147,23 +150,13 @@ public class ForestryItemModels {
 		models.generic2d(CoreItems.SWORD_KIT.get());
 		models.generic2d(CoreItems.HOE_KIT.get());
 
-		Set<ResourceLocation> vanillaIds = Set.of(
-			ForestryTreeSpecies.OAK,
-			ForestryTreeSpecies.DARK_OAK,
-			ForestryTreeSpecies.BIRCH,
-			ForestryTreeSpecies.ACACIA_VANILLA,
-			ForestryTreeSpecies.SPRUCE,
-			ForestryTreeSpecies.JUNGLE,
-			ForestryTreeSpecies.CHERRY_VANILLA
-		);
-
 		// Saplings
 		for (ITreeSpecies species : SpeciesUtil.getAllTreeSpecies()) {
-			if (vanillaIds.contains(species.id())) continue;
+			if (VANILLA_SAPLINGS.contains(species.id())) continue;
 
 			// Sapling assets are named "<id>_sapling" (e.g. ipe_sapling).
 			String name = species.id().getPath() + "_sapling";
-			models.cross("block/" + name, models.modLoc("item/" + name));
+			models.cross("block/" + name, models.modLoc("block/saplings/" + name));
 			models.generic2d(models.modLoc(name));
 		}
 	}
@@ -171,8 +164,8 @@ public class ForestryItemModels {
 	/**
 	 * Builds a layered `item/generated` model referencing the given textures in order.
 	 */
-	public static void layered(MKItemModelProvider models, FeatureItem<?> feature, String... textures) {
-		var builder = models.getBuilder(feature.id().getPath()).parent(new ModelFile.UncheckedModelFile("item/generated"));
+	public static void layered(ModelAssets models, FeatureItem<?> feature, String... textures) {
+		var builder = models.getBuilder(feature.id().getPath()).parent(new ModelAsset("item/generated"));
 		for (int i = 0; i < textures.length; i++) {
 			builder.texture("layer" + i, models.modLoc(textures[i]));
 		}

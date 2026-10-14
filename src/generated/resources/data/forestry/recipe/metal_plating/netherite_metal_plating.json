@@ -8,9 +8,7 @@
   "recipe": {
     "category": "building",
     "key": {
-      "#": {
-        "item": "minecraft:netherite_ingot"
-      }
+      "#": "minecraft:netherite_ingot"
     },
     "pattern": [
       "###",

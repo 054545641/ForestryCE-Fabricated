@@ -10,8 +10,8 @@ import net.minecraft.world.item.ItemStack;
 import javax.annotation.Nullable;
 
 public class CatalogItem extends WithScreenItem {
-	public CatalogItem() {
-		super(new Item.Properties());
+	public CatalogItem(Properties properties) {
+		super(properties);
 	}
 
 	@Nullable

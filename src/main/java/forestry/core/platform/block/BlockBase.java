@@ -1,19 +1,15 @@
 package forestry.core.platform.block;
 
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+
 import forestry.api.agriculture.HorizontalDirection;
-import forestry.core.engine.circuits.ISocketable;
 import forestry.core.platform.tile.TileBase;
-import forestry.core.platform.tile.TileForestry;
 import forestry.core.platform.tile.TileUtil;
-import forestry.core.platform.util.InventoryUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Container;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -34,7 +30,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 
 import javax.annotation.Nullable;
 
@@ -83,7 +79,7 @@ public class BlockBase<P extends Enum<P> & IBlockType> extends BlockForestry imp
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> actualType) {
 		if (actualType == this.blockType.getMachineProperties().getTeType()) {
 			//noinspection unchecked
-			return (BlockEntityTicker<T>) (level.isClientSide ? this.blockType.getMachineProperties().getClientTicker() : this.blockType.getMachineProperties().getServerTicker());
+			return (BlockEntityTicker<T>) (level.isClientSide() ? this.blockType.getMachineProperties().getClientTicker() : this.blockType.getMachineProperties().getServerTicker());
 		} else {
 			return null;
 		}
@@ -106,7 +102,7 @@ public class BlockBase<P extends Enum<P> & IBlockType> extends BlockForestry imp
 			return InteractionResult.PASS;
 		}
 		if (TileUtil.isUsableByPlayer(playerIn, tile)) {
-			if (!worldIn.isClientSide) {
+			if (!worldIn.isClientSide()) {
 				ServerPlayer sPlayer = (ServerPlayer) playerIn;
 				tile.openGui(sPlayer, InteractionHand.MAIN_HAND, pos);
 			}
@@ -115,13 +111,18 @@ public class BlockBase<P extends Enum<P> & IBlockType> extends BlockForestry imp
 	}
 
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
-		if (!playerIn.isShiftKeyDown() && FluidUtil.interactWithFluidHandler(playerIn, hand, worldIn, pos, hit.getDirection())) {
-			return ItemInteractionResult.sidedSuccess(worldIn.isClientSide);
+	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
+		if (!playerIn.isShiftKeyDown()) {
+			try (var tx = Transaction.openRoot()) {
+				if (FluidUtil.interactWithFluidHandler(playerIn, hand, worldIn, pos, hit.getDirection(), tx)) {
+					if (!worldIn.isClientSide()) tx.commit();
+					return worldIn.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
+				}
+			}
 		}
 		return useWithoutItem(state, worldIn, pos, playerIn, hit).consumesAction()
-			? ItemInteractionResult.sidedSuccess(worldIn.isClientSide)
-			: ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			? (worldIn.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME)
+			: InteractionResult.TRY_WITH_EMPTY_HAND;
 	}
 
 	@Nullable
@@ -131,22 +132,9 @@ public class BlockBase<P extends Enum<P> & IBlockType> extends BlockForestry imp
 	}
 
 	@Override
-	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-		if (!state.is(newState.getBlock())) {
-			BlockEntity tile = TileUtil.getTile(level, pos);
-			if (tile instanceof Container inventory) {
-				Containers.dropContents(level, pos, inventory);
-			}
-			if (tile instanceof TileForestry forestry) {
-				forestry.onDropContents((ServerLevel) level);
-			}
-			if (tile instanceof ISocketable socketable) {
-				InventoryUtil.dropSockets(socketable, level, pos);
-			}
-		}
-
-		// Remove tile entity after emptying out its contents
-		super.onRemove(state, level, pos, newState, isMoving);
+	protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+		level.updateNeighbourForOutputSignal(pos, this);
+		super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
 	}
 
 	@Override

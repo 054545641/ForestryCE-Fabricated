@@ -1,21 +1,15 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "item": "minecraft:paper"
-    },
-    "X": {
-      "tag": "c:ingots/tin"
-    },
-    "Z": [
-      {
-        "tag": "forestry:drop_honey"
-      },
-      {
-        "item": "minecraft:slime_ball"
-      }
-    ]
+    "#": "minecraft:paper",
+    "X": "#c:ingots/tin",
+    "Z": {
+      "neoforge:ingredient_type": "neoforge:compound",
+      "children": [
+        "#forestry:drop_honey",
+        "minecraft:slime_ball"
+      ]
+    }
   },
   "pattern": [
     "XXX",

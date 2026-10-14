@@ -1,5 +1,8 @@
 package forestry.core.content.energy.tiles;
 
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import forestry.core.platform.util.InventoryData;
 import forestry.api.IForestryApi;
 import forestry.api.core.ForestryError;
 import forestry.api.core.circuits.ForestryCircuitSocketTypes;
@@ -17,7 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -31,8 +34,21 @@ import net.neoforged.api.distmarker.OnlyIn;
 import javax.annotation.Nullable;
 import forestry.api.ForestryDataMaps;
 import forestry.api.core.machines.fuels.PeatEngineFuel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public class PeatEngineBlockEntity extends EngineBlockEntity implements WorldlyContainer, ISocketable, IEngineUpgradeable {
+	private record FuelState(ItemStack fuel, float burnTime, int totalBurnTime, int ashProduction) {}
+	@Override protected Object captureFuelState() { return new FuelState(this.fuel.copy(), this.burnTime, this.totalBurnTime, this.ashProduction); }
+	@Override protected void restoreFuelState(Object value) {
+		var state = (FuelState) value;
+		this.fuel = state.fuel();
+		this.burnTime = state.burnTime();
+		this.totalBurnTime = state.totalBurnTime();
+		this.ashProduction = state.ashProduction();
+	}
+
 	private ItemStack fuel = ItemStack.EMPTY;
 	private float burnTime;
 	private int totalBurnTime;
@@ -96,18 +112,22 @@ public class PeatEngineBlockEntity extends EngineBlockEntity implements WorldlyC
 	}
 
 	@Override
-	public void burn() {
+	public void burnFuel() {
 
         this.currentOutput = 0;
 
 		if (this.burnTime > 0) {
+			int output = (int) (determineFuelValue(this.fuel) * this.outputMultCap);
+			int ash = (int) (this.outputMultCap + 0.5f);
+			if (isRedstoneActivated() && this.energyStorage.getMaxEnergyStored() - this.energyStorage.getEnergyStored() < output) return;
+			if (this.ashProduction + ash >= this.ashForItem && getFreeWasteSlot() < 0) return;
             this.burnTime -= this.burnRate;
-			addAsh((int) (this.outputMultCap + 0.5f));
+			addAsh(ash);
 
 			if (isRedstoneActivated()) {
-                this.currentOutput = (int) (determineFuelValue(this.fuel) * this.outputMultCap);
+                this.currentOutput = output;
                 this.energyStorage.generateEnergy(this.currentOutput);
-                this.level.updateNeighbourForOutputSignal(this.worldPosition, getBlockState().getBlock());    //TODO - I thuink
+                    //TODO - I thuink
 			}
 		} else if (isRedstoneActivated()) {
 			int fuelSlot = getFuelSlot();
@@ -119,7 +139,8 @@ public class PeatEngineBlockEntity extends EngineBlockEntity implements WorldlyC
                 this.burnTime = this.totalBurnTime = determineBurnDuration(fuelStack);
 				if (this.burnTime > 0 && !fuelStack.isEmpty()) {
                     this.fuel = fuelStack.copy();
-					removeItem(fuelSlot, 1);
+					getTransferHandler().extract(fuelSlot, ItemResource.of(fuelStack), 1,
+						Transaction.getCurrentOpenedTransaction());
 				}
 			}
 		}
@@ -186,23 +207,17 @@ public class PeatEngineBlockEntity extends EngineBlockEntity implements WorldlyC
 		// If we have reached the necessary amount, we need to add ash
 		int wasteSlot = getFreeWasteSlot();
 		if (wasteSlot >= 0) {
-			IInventoryAdapter inventory = getInternalInventory();
-			ItemStack wasteStack = inventory.getItem(wasteSlot);
-			if (wasteStack.isEmpty()) {
-				inventory.setItem(wasteSlot, CoreItems.ASH.stack());
-			} else {
-				wasteStack.grow(1);
-			}
+			getTransferHandler().insert(wasteSlot, ItemResource.of(CoreItems.ASH.stack()), 1,
+				Transaction.getCurrentOpenedTransaction());
+			this.ashProduction -= this.ashForItem;
 		}
-		// Reset
-        this.ashProduction = 0;
 	}
 
 	/**
 	 * Returns the fuel value (power per cycle) an item of the passed ItemStack provides
 	 */
 	private static int determineFuelValue(ItemStack fuel) {
-		PeatEngineFuel peatFuel = fuel.getItemHolder().getData(ForestryDataMaps.PEAT_FUELS);
+		PeatEngineFuel peatFuel = fuel.typeHolder().getData(ForestryDataMaps.PEAT_FUELS);
 		return peatFuel != null ? peatFuel.powerPerCycle() : 0;
 	}
 
@@ -210,7 +225,7 @@ public class PeatEngineBlockEntity extends EngineBlockEntity implements WorldlyC
 	 * Returns the fuel value (power per cycle) an item of the passed ItemStack provides
 	 */
 	private static int determineBurnDuration(ItemStack fuel) {
-		PeatEngineFuel peatFuel = fuel.getItemHolder().getData(ForestryDataMaps.PEAT_FUELS);
+		PeatEngineFuel peatFuel = fuel.typeHolder().getData(ForestryDataMaps.PEAT_FUELS);
 		return peatFuel != null ? peatFuel.burnDuration() : 0;
 	}
 
@@ -242,20 +257,19 @@ public class PeatEngineBlockEntity extends EngineBlockEntity implements WorldlyC
 
 	// / LOADING AND SAVING
 	@Override
-	public void loadAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.loadAdditional(compoundNBT, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compoundNBT = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
 
         this.sockets.read(compoundNBT, registries);
 
-		if (compoundNBT.contains("EngineFuelItemStack")) {
-			CompoundTag fuelItemNbt = compoundNBT.getCompound("EngineFuelItemStack");
-            this.fuel = ItemStack.parse(registries, fuelItemNbt).orElse(ItemStack.EMPTY);
-		}
+		this.fuel = InventoryData.readStack(compoundNBT.getCompoundOrEmpty("EngineFuelItemStack"), registries);
 
-        this.burnTime = compoundNBT.getFloat("EngineBurnTime");
-        this.totalBurnTime = compoundNBT.getInt("EngineTotalTime");
+        this.burnTime = compoundNBT.getFloatOr("EngineBurnTime", 0.0f);
+        this.totalBurnTime = compoundNBT.getIntOr("EngineTotalTime", 0);
 		if (compoundNBT.contains("AshProduction")) {
-            this.ashProduction = compoundNBT.getInt("AshProduction");
+            this.ashProduction = compoundNBT.getIntOr("AshProduction", 0);
 		}
 
 		ItemStack chip = this.sockets.getItem(0);
@@ -269,18 +283,13 @@ public class PeatEngineBlockEntity extends EngineBlockEntity implements WorldlyC
 
 
 	@Override
-	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-		super.saveAdditional(nbt, registries);
-
-        this.sockets.write(nbt, registries);
-
-		if (!this.fuel.isEmpty()) {
-			nbt.put("EngineFuelItemStack", this.fuel.save(registries, new CompoundTag()));
-		}
-
-		nbt.putFloat("EngineBurnTime", this.burnTime);
-		nbt.putInt("EngineTotalTime", this.totalBurnTime);
-		nbt.putInt("AshProduction", this.ashProduction);
+	protected void saveAdditional(ValueOutput output) {
+		super.saveAdditional(output);
+		this.sockets.write(output);
+		output.store("EngineFuelItemStack", ItemStack.OPTIONAL_CODEC, this.fuel);
+		output.putFloat("EngineBurnTime", this.burnTime);
+		output.putInt("EngineTotalTime", this.totalBurnTime);
+		output.putInt("AshProduction", this.ashProduction);
 	}
 
 	/* NETWORK */
@@ -357,7 +366,7 @@ public class PeatEngineBlockEntity extends EngineBlockEntity implements WorldlyC
 	}
 
 	@Override
-	public ResourceLocation getSocketType() {
+	public Identifier getSocketType() {
 		return ForestryCircuitSocketTypes.ENGINE;
 	}
 

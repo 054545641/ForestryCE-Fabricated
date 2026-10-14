@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/crates/unpack/minecraft/stone",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:crated_stone"
-      }
+      "forestry:crated_stone"
     ],
     "result": {
       "count": 9,

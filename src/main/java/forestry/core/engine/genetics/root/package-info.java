@@ -1,4 +1,5 @@
-@javax.annotation.ParametersAreNonnullByDefault
 @forestry.core.platform.util.FieldsAreNonnullByDefault
-@net.minecraft.MethodsReturnNonnullByDefault
+@NullMarked
 package forestry.core.engine.genetics.root;
+
+import org.jspecify.annotations.NullMarked;

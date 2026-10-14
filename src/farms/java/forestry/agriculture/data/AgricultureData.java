@@ -22,11 +22,11 @@ public class AgricultureData extends ContentJarData {
 	@Override
 	protected void addProviders(JarScope jar) {
 		jar.helper().createTags(Registries.BLOCK, AgricultureBlockTagsProvider::addTags);
-		jar.helper().createRecipes(AgricultureRecipeProvider::addRecipes);
+		jar.helper().createForestryRecipes(AgricultureRecipeProvider::addRecipes);
 
 		jar.addServer(new JarLootTableProvider(jar.output(), jar.lookup(), AgricultureBlockLootTables::new));
-		jar.addServer(new AgricultureAdvancementProvider(jar.output(), jar.lookup(), jar.existingFileHelper()));
+		jar.addServer(new AgricultureAdvancementProvider(jar.output(), jar.lookup()));
 		jar.addServer(new AgricultureDataMapProvider(jar.output(), jar.lookup()));
-		jar.addClient(new AgricultureBlockStateProvider(jar.output(), jar.existingFileHelper()));
+		jar.addClient(new AgricultureBlockStateProvider(jar.output()));
 	}
 }

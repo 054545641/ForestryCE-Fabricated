@@ -1,5 +1,7 @@
 package forestry.agriculture.multifarm.multiblock;
 
+import net.minecraft.world.level.storage.ValueOutput;
+
 import forestry.api.core.INbtReadable;
 import forestry.api.core.INbtWritable;
 import forestry.core.platform.network.IStreamable;
@@ -53,7 +55,11 @@ public class FarmFertilizerManager implements INbtWritable, INbtReadable, IStrea
 
 	@Override
 	public void read(CompoundTag data, HolderLookup.Provider registries) {
-        this.storedFertilizer = data.getInt("StoredFertilizer");
+        this.storedFertilizer = data.getIntOr("StoredFertilizer", 0);
+	}
+
+	public void write(ValueOutput output) {
+		output.putInt("StoredFertilizer", this.storedFertilizer);
 	}
 
 	@Override

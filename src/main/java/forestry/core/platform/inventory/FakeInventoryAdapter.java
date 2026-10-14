@@ -1,6 +1,12 @@
 package forestry.core.platform.inventory;
 
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.minecraft.world.level.storage.ValueOutput;
+
 import forestry.api.core.IInventoryAdapter;
+import net.minecraft.world.entity.ContainerUser;
 import forestry.core.platform.config.Constants;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Direction;
@@ -10,6 +16,11 @@ import net.minecraft.world.item.ItemStack;
 
 public enum FakeInventoryAdapter implements IInventoryAdapter {
 	INSTANCE;
+
+	@Override
+	public ResourceHandler<ItemResource> getTransferHandler() {
+		return VanillaContainerWrapper.of(this);
+	}
 
 	@Override
 	public boolean isEmpty() {
@@ -80,11 +91,11 @@ public enum FakeInventoryAdapter implements IInventoryAdapter {
 	}
 
 	@Override
-	public void startOpen(Player player) {
+	public void startOpen(ContainerUser user) {
 	}
 
 	@Override
-	public void stopOpen(Player player) {
+	public void stopOpen(ContainerUser user) {
 	}
 
 	@Override
@@ -99,6 +110,10 @@ public enum FakeInventoryAdapter implements IInventoryAdapter {
 	@Override
 	public CompoundTag write(CompoundTag compoundNBT, HolderLookup.Provider registries) {
 		return compoundNBT;
+	}
+
+	@Override
+	public void write(ValueOutput output) {
 	}
 
 	@Override

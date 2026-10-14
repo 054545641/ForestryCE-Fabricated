@@ -30,8 +30,8 @@ import net.minecraft.world.level.block.state.BlockState;
 public class ItemButterflyGE extends ItemGE implements ITintedItem {
 	public static final String NBT_AGE = "Age";
 
-	public ItemButterflyGE(ButterflyLifeStage stage) {
-		super(new Properties(), stage);
+	public ItemButterflyGE(ButterflyLifeStage stage, Properties properties) {
+		super(properties, stage);
 	}
 
 	@Override
@@ -50,10 +50,10 @@ public class ItemButterflyGE extends ItemGE implements ITintedItem {
 			return false;
 		}
 		Level level = entityItem.level();
-		if (level.isClientSide || entityItem.tickCount < 80) {
+		if (level.isClientSide() || entityItem.tickCount < 80) {
 			return false;
 		}
-		if (level.random.nextInt(24) != 0) {
+		if (level.getRandom().nextInt(24) != 0) {
 			return false;
 		}
 
@@ -66,11 +66,15 @@ public class ItemButterflyGE extends ItemGE implements ITintedItem {
 			return false;
 		}
 
-		EntityUtil.spawnEntity(entityItem.level(), EntityButterfly.create(LepidopterologyEntities.BUTTERFLY.entityType(), entityItem.level(), butterfly, entityItem.blockPosition()), entityItem.getX(), entityItem.getY(), entityItem.getZ());
-		if (!entityItem.getItem().isEmpty()) {
-			entityItem.getItem().shrink(1);
+		if (EntityUtil.spawnEntity(entityItem.level(), EntityButterfly.create(LepidopterologyEntities.BUTTERFLY.entityType(), entityItem.level(), butterfly, entityItem.blockPosition()), entityItem.getX(), entityItem.getY(), entityItem.getZ()) == null) {
+			return false;
+		}
+		ItemStack remainder = entityItem.getItem().copy();
+		remainder.shrink(1);
+		if (remainder.isEmpty()) {
+			entityItem.discard();
 		} else {
-			entityItem.remove(Entity.RemovalReason.DISCARDED);
+			entityItem.setItem(remainder);
 		}
 		return true;
 	}
@@ -80,7 +84,7 @@ public class ItemButterflyGE extends ItemGE implements ITintedItem {
 		Level level = context.getLevel();
 		Player player = context.getPlayer();
 		BlockPos pos = context.getClickedPos();
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return InteractionResult.PASS;
 		}
 
@@ -134,7 +138,7 @@ public class ItemButterflyGE extends ItemGE implements ITintedItem {
 		if (tagCompound == null) {
 			return 0;
 		}
-		return Mth.clamp(tagCompound.getInt(NBT_AGE), 0, 2);
+		return Mth.clamp(tagCompound.getIntOr(NBT_AGE, 0), 0, 2);
 	}
 
 	@Override

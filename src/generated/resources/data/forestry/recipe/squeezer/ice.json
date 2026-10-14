@@ -9,21 +9,11 @@
     }
   },
   "resources": [
-    {
-      "item": "minecraft:snowball"
-    },
-    {
-      "item": "forestry:ice_shard"
-    },
-    {
-      "item": "forestry:ice_shard"
-    },
-    {
-      "item": "forestry:ice_shard"
-    },
-    {
-      "item": "forestry:ice_shard"
-    }
+    "minecraft:snowball",
+    "forestry:ice_shard",
+    "forestry:ice_shard",
+    "forestry:ice_shard",
+    "forestry:ice_shard"
   ],
   "time": 10
 }

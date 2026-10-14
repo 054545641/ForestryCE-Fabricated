@@ -1,5 +1,6 @@
 package forestry.agriculture.multifarm.multiblock;
 
+
 import forestry.api.IForestryApi;
 import forestry.api.agriculture.IFarmHousing;
 import forestry.api.agriculture.IFarmLogic;
@@ -18,7 +19,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -70,10 +71,10 @@ public abstract class InventoryPlantation<H extends ILiquidTankTile & IFarmHousi
 			return acceptsAsFertilizer(stack);
 		} else if (SlotUtil.isSlotInRange(slotIndex, this.config.germlingsStart, this.config.germlingsCount)) {
 			return acceptsAsSeedling(stack);
-		} else if (SlotUtil.isSlotInRange(slotIndex, this.config.resourcesStart, this.config.productionCount)) {
+		} else if (SlotUtil.isSlotInRange(slotIndex, this.config.resourcesStart, this.config.resourcesCount)) {
 			return acceptsAsResource(stack);
 		} else if (SlotUtil.isSlotInRange(slotIndex, this.config.canStart, this.config.canCount)) {
-			Optional<FluidStack> fluid = FluidUtil.getFluidContained(stack);
+			Optional<FluidStack> fluid = Optional.of(FluidUtil.getFirstStackContained(stack)).filter(contents -> !contents.isEmpty());
 			return fluid.map(f -> this.housing.getTankManager().canFillFluidType(f)).orElse(false);
 		}
 		return false;

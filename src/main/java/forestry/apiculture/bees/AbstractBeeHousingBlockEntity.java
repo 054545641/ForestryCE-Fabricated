@@ -27,6 +27,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public abstract class AbstractBeeHousingBlockEntity extends TileBase implements IBeeHousing, IOwnedTile, IClimateProvider, IGuiBeeHousingDelegate, IStreamableGui {
 	private final String hintKey;
@@ -61,15 +64,21 @@ public abstract class AbstractBeeHousingBlockEntity extends TileBase implements 
 
 	/* LOADING & SAVING */
 	@Override
-	public void saveAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.saveAdditional(compoundNBT, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag compoundNBT = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
         this.beeLogic.write(compoundNBT, registries);
         this.ownerHandler.write(compoundNBT, registries);
+
+		ValueIOUtil.mergeInto(output, compoundNBT);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.loadAdditional(compoundNBT, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compoundNBT = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
         this.beeLogic.read(compoundNBT, registries);
         this.ownerHandler.read(compoundNBT, registries);
 	}
@@ -84,8 +93,10 @@ public abstract class AbstractBeeHousingBlockEntity extends TileBase implements 
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
-		super.handleUpdateTag(tag, registries);
+	public void handleUpdateTag(ValueInput input) {
+		CompoundTag tag = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.handleUpdateTag(input);
         this.beeLogic.read(tag, registries);
         this.ownerHandler.read(tag, registries);
 	}
@@ -124,8 +135,8 @@ public abstract class AbstractBeeHousingBlockEntity extends TileBase implements 
 		double fxY = yCoord + 0.25F;
 		double fxZ = zCoord + 0.5F;
 		float distanceFromCenter = 0.6F;
-		float leftRightSpreadFromCenter = distanceFromCenter * (world.random.nextFloat() - 0.5F);
-		float upSpread = world.random.nextFloat() * 6F / 16F;
+		float leftRightSpreadFromCenter = distanceFromCenter * (world.getRandom().nextFloat() - 0.5F);
+		float upSpread = world.getRandom().nextFloat() * 6F / 16F;
 		fxY += upSpread;
 
 		ParticleRender.addEntityHoneyDustFX(world, fxX - distanceFromCenter, fxY, fxZ + leftRightSpreadFromCenter);

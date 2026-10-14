@@ -9,7 +9,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.Tags;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
+import net.minecraft.core.HolderGetter;
 
 public enum EnumStampDefinition implements TwoTintItem.ITwoTintItemSubtype {
 	P_1("1n", 1, ForestryTags.Items.GEMS_APATITE, TextColor.fromRgb(0x4a8ca7), TextColor.fromRgb(0xffffff)),
@@ -26,18 +27,18 @@ public enum EnumStampDefinition implements TwoTintItem.ITwoTintItemSubtype {
 	private final String name;
 	private final int primaryColor;
 	private final int secondaryColor;
-	private final Supplier<Ingredient> craftingIngredient;
+	private final Function<HolderGetter<Item>, Ingredient> craftingIngredient;
 	private final int postage;
 
 	EnumStampDefinition(String name, int postage, TagKey<Item> crafting, TextColor primaryColor, TextColor secondaryColor) {
-		this(name, postage, () -> Ingredient.of(crafting), primaryColor, secondaryColor);
+		this(name, postage, items -> Ingredient.of(items.getOrThrow(crafting)), primaryColor, secondaryColor);
 	}
 
 	EnumStampDefinition(String name, int postage, Item crafting, TextColor primaryColor, TextColor secondaryColor) {
-		this(name, postage, () -> Ingredient.of(crafting), primaryColor, secondaryColor);
+		this(name, postage, items -> Ingredient.of(crafting), primaryColor, secondaryColor);
 	}
 
-	EnumStampDefinition(String name, int postage, Supplier<Ingredient> crafting, TextColor primaryColor, TextColor secondaryColor) {
+	EnumStampDefinition(String name, int postage, Function<HolderGetter<Item>, Ingredient> crafting, TextColor primaryColor, TextColor secondaryColor) {
 		this.name = name;
 		this.primaryColor = primaryColor.getValue();
 		this.secondaryColor = secondaryColor.getValue();
@@ -50,7 +51,11 @@ public enum EnumStampDefinition implements TwoTintItem.ITwoTintItemSubtype {
 	}
 
 	public Ingredient getCraftingIngredient() {
-		return this.craftingIngredient.get();
+		return getCraftingIngredient(net.minecraft.core.registries.BuiltInRegistries.ITEM);
+	}
+
+	public Ingredient getCraftingIngredient(HolderGetter<Item> items) {
+		return this.craftingIngredient.apply(items);
 	}
 
 	@Override

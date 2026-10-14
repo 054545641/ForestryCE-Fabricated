@@ -1,34 +1,37 @@
 package forestry.core.content.escritoire;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import forestry.core.platform.config.Constants;
 import forestry.core.platform.gui.widgets.GameTokenWidget;
 import forestry.core.platform.gui.widgets.ProbeButton;
 import forestry.core.platform.gui.widgets.Widget;
 import forestry.core.platform.render.ColourProperties;
-import forestry.core.content.escritoire.EscritoireGame;
-import forestry.core.content.escritoire.EscritoireTextSource;
-import forestry.core.content.escritoire.TileEscritoire;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.util.FormattedCharSequence;
 import forestry.core.platform.gui.GuiForestry;
 import forestry.core.platform.gui.GuiUtil;
 
+import java.util.List;
+
 public class GuiEscritoire extends GuiForestry<ContainerEscritoire> {
+	private static final int NOTES_X = 170;
+	private static final int NOTES_Y = 23;
+	private static final int NOTES_WIDTH = 46;
+	private static final int NOTES_HEIGHT = 49;
 	private final ItemStack LEVEL_ITEM = new ItemStack(Items.PAPER);
 	private final EscritoireTextSource textSource = new EscritoireTextSource();
 	private final TileEscritoire tile;
+	private int noteScroll;
+	private String lastNote = "";
 
 	public GuiEscritoire(ContainerEscritoire container, Inventory inv, Component title) {
-		super(Constants.TEXTURE_PATH_GUI + "/escritoire.png", container, inv, title);
+		super(Constants.TEXTURE_PATH_GUI + "/escritoire.png", container, inv, title, 228, 235);
 
 		this.tile = container.getTile();
-		this.imageWidth = 228;
-		this.imageHeight = 235;
 
 		this.widgetManager.add(new ProbeButton(this, this.widgetManager, 14, 16));
 
@@ -72,29 +75,75 @@ public class GuiEscritoire extends GuiForestry<ContainerEscritoire> {
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseY, int mouseX) {
-		super.renderBg(graphics, partialTicks, mouseY, mouseX);
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 
 		for (int i = 0; i <= this.tile.getGame().getBountyLevel() / 4; i++) {
 			GuiUtil.drawItemStack(graphics, this, this.LEVEL_ITEM, this.leftPos + 170 + i * 8, this.topPos + 7);
 		}
 
-        this.textLayout.startPage(graphics);
-		{
-			PoseStack stack = graphics.pose();
-			stack.scale(0.5F, 0.5F, 0.5F);
-			stack.translate(this.leftPos + 170, this.topPos + 10, 0.0);
-
-            this.textLayout.newLine();
-            this.textLayout.newLine();
-			Component attemptNoString = Component.translatable("for.gui.escritoire.attempt.number", EscritoireGame.BOUNTY_MAX - this.tile.getGame().getBountyLevel())
-				.withStyle(ChatFormatting.UNDERLINE, ChatFormatting.ITALIC);
-            this.textLayout.drawLine(graphics, attemptNoString, 170, ColourProperties.INSTANCE.get("gui.mail.lettertext"));
-            this.textLayout.newLine();
-			Component escritoireText = this.textSource.getText(this.tile.getGame());
-            this.textLayout.drawSplitLine(graphics, escritoireText, 170, 90, ColourProperties.INSTANCE.get("gui.mail.lettertext"));
+		List<FormattedCharSequence> lines = noteLines();
+		int visible = visibleNoteLines();
+		int x = this.leftPos + NOTES_X;
+		int y = this.topPos + NOTES_Y;
+		int color = 0xFF000000 | ColourProperties.INSTANCE.get("gui.mail.lettertext");
+		// Keep the native font size: shrinking Chinese glyphs loses entire strokes.
+		for (int row = 0; row < visible && this.noteScroll + row < lines.size(); row++) {
+			graphics.text(this.font, lines.get(this.noteScroll + row), x, y + row * (this.font.lineHeight + 1), color, false);
 		}
-        this.textLayout.endPage(graphics);
+		if (lines.size() > visible) {
+			int thumbHeight = Math.max(6, NOTES_HEIGHT * visible / lines.size());
+			int thumbY = y + (NOTES_HEIGHT - thumbHeight) * this.noteScroll / (lines.size() - visible);
+			graphics.fill(x + NOTES_WIDTH + 1, y, x + NOTES_WIDTH + 3, y + NOTES_HEIGHT, 0xFF282020);
+			graphics.fill(x + NOTES_WIDTH + 1, thumbY, x + NOTES_WIDTH + 3, thumbY + thumbHeight, color);
+		}
+	}
+
+	private Component note() {
+		return Component.empty()
+			.append(Component.translatable("for.gui.escritoire.attempt.number", EscritoireGame.BOUNTY_MAX - this.tile.getGame().getBountyLevel()).withStyle(ChatFormatting.UNDERLINE))
+			.append("\n").append(this.textSource.getText(this.tile.getGame()));
+	}
+
+	private List<FormattedCharSequence> noteLines() {
+		Component note = note();
+		if (!note.getString().equals(this.lastNote)) {
+			this.lastNote = note.getString();
+			this.noteScroll = 0;
+		}
+		var lines = this.font.split(note, NOTES_WIDTH);
+		this.noteScroll = Math.min(this.noteScroll, Math.max(0, lines.size() - visibleNoteLines()));
+		return lines;
+	}
+
+	private int visibleNoteLines() {
+		return Math.max(1, (NOTES_HEIGHT + 1) / (this.font.lineHeight + 1));
+	}
+
+	private boolean isOverNotes(double mouseX, double mouseY) {
+		return mouseX >= this.leftPos + NOTES_X && mouseX < this.leftPos + NOTES_X + NOTES_WIDTH + 3
+			&& mouseY >= this.topPos + NOTES_Y && mouseY < this.topPos + NOTES_Y + NOTES_HEIGHT;
+	}
+
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if (isOverNotes(mouseX, mouseY) && scrollY != 0) {
+			int maxScroll = Math.max(0, noteLines().size() - visibleNoteLines());
+			if (maxScroll > 0) {
+				this.noteScroll = Math.clamp(this.noteScroll - (int) Math.signum(scrollY), 0, maxScroll);
+				return true;
+			}
+		}
+		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+	}
+
+	@Override
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
+		if (isOverNotes(mouseX, mouseY)) {
+			// The full note remains readable at a comfortable width without covering inventory slots permanently.
+			graphics.setTooltipForNextFrame(this.font.split(note(), Math.min(200, this.width - 20)), mouseX, mouseY);
+		}
 	}
 
 	@Override

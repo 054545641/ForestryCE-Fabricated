@@ -25,7 +25,7 @@ public class GroundHivePlacement implements IHivePlacement {
 	public BlockPos getPosForHive(WorldGenLevel level, RandomSource random, int posX, int posZ) {
 		// get to the ground
 		int groundY = level.getHeight(getHeightmapType(), posX, posZ);
-		int minBuildHeight = level.getMinBuildHeight();
+		int minBuildHeight = level.getMinY();
 		if (groundY == minBuildHeight) {
 			return null;
 		}

@@ -39,7 +39,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -66,48 +66,48 @@ public class TreeSpeciesType extends SpeciesType<ITreeSpecies, ITree> implements
 
 	// Reference-value registries backing the fruits and tree_effect chromosomes.
 	@Nullable
-	private ImmutableMap<ResourceLocation, IFruit> fruits;
+	private ImmutableMap<Identifier, IFruit> fruits;
 	@Nullable
-	private ImmutableMap<ResourceLocation, ITreeEffect> treeEffects;
+	private ImmutableMap<Identifier, ITreeEffect> treeEffects;
 
 	// Code-side per-species block/worldgen bindings, keyed by species id. Captured from the DefaultTreeSpecies builders
 	// at plugin registration (below); merged into runtime TreeSpecies by TreeSpeciesProjector. Never null after
 	// handleSpeciesRegistration. Volatile: written on the registration thread, read from the reload/sync projection path.
-	private volatile ImmutableMap<ResourceLocation, TreeBlockBindings> bindings = ImmutableMap.of();
+	private volatile ImmutableMap<Identifier, TreeBlockBindings> bindings = ImmutableMap.of();
 
 	public TreeSpeciesType(IKaryotype karyotype, ISpeciesTypeBuilder builder) {
 		super(ForestrySpeciesTypes.TREE, karyotype, builder);
 	}
 
 	@Override
-	public IFruit getFruit(ResourceLocation id) {
+	public IFruit getFruit(Identifier id) {
 		return getMapValue(this.fruits, id, "fruit");
 	}
 
 	@Nullable
-	public TreeBlockBindings getBindings(ResourceLocation id) {
+	public TreeBlockBindings getBindings(Identifier id) {
 		return this.bindings.get(id);
 	}
 
 	@Nullable
 	@Override
-	public IFruit getFruitSafe(ResourceLocation id) {
+	public IFruit getFruitSafe(Identifier id) {
 		return getMapValueSafe(this.fruits, id);
 	}
 
 	@Override
-	public ITreeEffect getTreeEffect(ResourceLocation id) {
+	public ITreeEffect getTreeEffect(Identifier id) {
 		return getMapValue(this.treeEffects, id, "tree effect");
 	}
 
 	@Override
-	public void setSpecies(ImmutableMap<ResourceLocation, ITreeSpecies> allSpecies) {
+	public void setSpecies(ImmutableMap<Identifier, ITreeSpecies> allSpecies) {
 		super.setSpecies(allSpecies);
 		rebuildVanillaMembership(allSpecies);
 		rebuildLeafTypes(allSpecies);
 	}
 
-	private void rebuildVanillaMembership(ImmutableMap<ResourceLocation, ITreeSpecies> allSpecies) {
+	private void rebuildVanillaMembership(ImmutableMap<Identifier, ITreeSpecies> allSpecies) {
 		this.vanillaIndividuals.clear();
 		this.vanillaItems.clear();
 		for (ITreeSpecies entry : allSpecies.values()) {
@@ -121,7 +121,7 @@ public class TreeSpeciesType extends SpeciesType<ITreeSpecies, ITree> implements
 		}
 	}
 
-	private void rebuildLeafTypes(ImmutableMap<ResourceLocation, ITreeSpecies> allSpecies) {
+	private void rebuildLeafTypes(ImmutableMap<Identifier, ITreeSpecies> allSpecies) {
 		// Fail-soft fallback for a leaf type whose species a datapack removed: use the default species so
 		// ForestryLeafType#getIndividual() stays non-null whenever any species are loaded (its block-color/name/item
 		// consumers deref it unguarded). Resolved via the map directly (not getDefaultSpecies(), which throws when the
@@ -143,7 +143,7 @@ public class TreeSpeciesType extends SpeciesType<ITreeSpecies, ITree> implements
 	}
 
 	@Override
-	public ImmutableMap<ResourceLocation, ITreeSpecies> handleSpeciesRegistration(List<IForestryPlugin> plugins) {
+	public ImmutableMap<Identifier, ITreeSpecies> handleSpeciesRegistration(List<IForestryPlugin> plugins) {
 		ArboricultureRegistration registration = new ArboricultureRegistration(this);
 
 		for (IForestryPlugin plugin : plugins) {
@@ -155,12 +155,12 @@ public class TreeSpeciesType extends SpeciesType<ITreeSpecies, ITree> implements
 		this.fruits = registration.getFruits();
 
 		// capture the code-side block/worldgen bindings from the registered builders
-		ImmutableMap.Builder<ResourceLocation, TreeBlockBindings> bindings = ImmutableMap.builder();
+		ImmutableMap.Builder<Identifier, TreeBlockBindings> bindings = ImmutableMap.builder();
 		registration.forEachSpeciesBuilder((id, builder) -> bindings.put(id, new TreeBlockBindings(
 			builder.getGenerator(),
 			builder.getVanillaLeafStates(),
 			builder.getVanillaSaplingItems(),
-			builder.getDecorativeLeaves()
+			builder.getDecorativeLeavesTemplate()
 		)));
 		this.bindings = bindings.build();
 
@@ -266,7 +266,7 @@ public class TreeSpeciesType extends SpeciesType<ITreeSpecies, ITree> implements
 
 	@Override
 	public String getBreedingTrackerFile(@Nullable GameProfile profile) {
-		return "ArboristTracker." + (profile == null ? "common" : profile.getId());
+		return "ArboristTracker." + (profile == null ? "common" : profile.id());
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package forestry.api.core.genetics;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Collection;
@@ -54,7 +54,7 @@ public interface IBreedingTracker {
 	/**
 	 * @return A collection that contains the IDs of all discovered species.
 	 */
-	Collection<ResourceLocation> getDiscoveredSpecies();
+	Collection<Identifier> getDiscoveredSpecies();
 
 	/**
 	 * Register a successfully researched mutation.

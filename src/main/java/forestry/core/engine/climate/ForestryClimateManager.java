@@ -70,7 +70,7 @@ public class ForestryClimateManager implements IClimateManager {
 		this.humidities.clear();
 
 		// check biome tags. if no temperature/humidity tags are found, then calculate based on temperature/downfall
-		registry.holders().forEach(holder -> {
+		registry.listElements().forEach(holder -> {
 			boolean hasTemperatureTag = false;
 			boolean hasHumidityTag = false;
 

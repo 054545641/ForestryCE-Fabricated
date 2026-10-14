@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/parched_comb",
-  "input": {
-    "item": "forestry:parched_comb"
-  },
+  "input": "forestry:parched_comb",
   "products": [
     {
       "chance": 1.0,

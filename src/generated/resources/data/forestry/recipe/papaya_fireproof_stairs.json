@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_stairs",
   "key": {
-    "#": {
-      "item": "forestry:papaya_fireproof_planks"
-    }
+    "#": "forestry:papaya_fireproof_planks"
   },
   "pattern": [
     "#  ",

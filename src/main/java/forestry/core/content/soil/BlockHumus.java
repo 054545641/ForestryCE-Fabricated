@@ -33,7 +33,7 @@ public class BlockHumus extends Block {
 
 	@Override
 	protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-		if (level.isClientSide || level.random.nextInt(140) != 0) {
+		if (level.isClientSide() || level.getRandom().nextInt(140) != 0) {
 			return;
 		}
 

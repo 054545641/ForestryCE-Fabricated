@@ -61,12 +61,12 @@ public class EscritoireGame implements INbtWritable, INbtReadable, IStreamable {
 
 	@Override
 	public void read(CompoundTag nbt, HolderLookup.Provider registries) {
-        this.bountyLevel = nbt.getInt("bountyLevel");
-        this.lastUpdate = nbt.getLong("lastUpdate");
+        this.bountyLevel = nbt.getIntOr("bountyLevel", 0);
+        this.lastUpdate = nbt.getLongOr("lastUpdate", 0L);
         this.gameBoard = new EscritoireGameBoard(nbt);
 
 		if (nbt.contains("Status")) {
-			int statusOrdinal = nbt.getInt("Status");
+			int statusOrdinal = nbt.getIntOr("Status", 0);
             this.status = Status.values()[statusOrdinal];
 		}
 

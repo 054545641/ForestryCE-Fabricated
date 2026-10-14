@@ -34,7 +34,7 @@ public record PacketPOBoxInfoResponse(int playerLetters, int tradeLetters,
 	public static void handle(PacketPOBoxInfoResponse msg, Player player) {
 		POBoxInfo poBox = new POBoxInfo(msg.playerLetters, msg.tradeLetters);
 		if (player.equals(Minecraft.getInstance().player) && ForestryConfig.CLIENT.mailAlertsEnabled.get()) {
-			MailboxInfoToast.addOrUpdate(Minecraft.getInstance().getToasts(), poBox, msg.silent);
+			MailboxInfoToast.addOrUpdate(Minecraft.getInstance().gui.toastManager(), poBox, msg.silent);
 		}
 	}
 }

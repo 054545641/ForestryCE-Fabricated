@@ -15,7 +15,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.Bee;
+import net.minecraft.world.entity.animal.bee.Bee;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -26,9 +26,9 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
-public class ItemScoop extends TieredItem {
-	public ItemScoop(int durability) {
-		super(Tiers.WOOD, new Item.Properties().durability(durability));
+public class ItemScoop extends forestry.core.platform.item.ItemForestry {
+	public ItemScoop(int durability, Properties properties) {
+		super(properties.durability(durability));
 	}
 
 	@Override
@@ -41,14 +41,13 @@ public class ItemScoop extends TieredItem {
 	}
 
 	@Override
-	public boolean hurtEnemy(ItemStack stack, LivingEntity entity, LivingEntity player) {
+	public void hurtEnemy(ItemStack stack, LivingEntity entity, LivingEntity player) {
 		stack.hurtAndBreak(2, player, EquipmentSlot.MAINHAND);
-		return true;
 	}
 
 	@Override
 	public boolean mineBlock(ItemStack stack, Level world, BlockState blockState, BlockPos pos, LivingEntity player) {
-		if (!world.isClientSide && blockState.getDestroySpeed(world, pos) != 0.0F) {
+		if (!world.isClientSide() && blockState.getDestroySpeed(world, pos) != 0.0F) {
 			stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 		}
 
@@ -67,7 +66,7 @@ public class ItemScoop extends TieredItem {
 				interactionTarget.setRemoved(Entity.RemovalReason.DISCARDED);
 				stack.hurtAndBreak(1, player, usedHand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
 			}
-			return InteractionResult.sidedSuccess(level.isClientSide);
+			return (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
 		}
 		return InteractionResult.PASS;
 	}

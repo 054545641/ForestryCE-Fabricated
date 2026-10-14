@@ -54,7 +54,7 @@ public final class LevelStructureView implements StructureView {
 
 		BlockState state = this.level.getBlockState(blockPos);
 		boolean isWoodenSlab = state.is(BlockTags.WOODEN_SLABS);
-		boolean isSolidRender = state.isSolidRender(this.level, blockPos);
+		boolean isSolidRender = state.isSolidRender();
 
 		return new CellSample(isComponent, be, isWoodenSlab, isSolidRender, componentTypeId);
 	}

@@ -8,7 +8,7 @@ import forestry.core.content.machines.features.FactoryMenuTypes;
 import forestry.core.content.machines.gui.ContainerFabricator;
 import forestry.core.content.machines.network.packets.PacketRecipeTransferRequest;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import net.minecraft.core.NonNullList;
@@ -32,7 +32,7 @@ public class FabricatorRecipeTransferHandler implements IRecipeTransferHandler<C
 	}
 
 	@Override
-	public RecipeType<IFabricatorRecipe> getRecipeType() {
+	public IRecipeType<IFabricatorRecipe> getRecipeType() {
 		return ForestryRecipeType.FABRICATOR;
 	}
 
@@ -41,7 +41,7 @@ public class FabricatorRecipeTransferHandler implements IRecipeTransferHandler<C
 	public IRecipeTransferError transferRecipe(ContainerFabricator container, IFabricatorRecipe recipe, IRecipeSlotsView recipeSlots, Player player, boolean maxTransfer, boolean doTransfer) {
 		if (doTransfer) {
 			Container craftingInventory = container.getTile().getCraftingInventory();
-			NonNullList<ItemStack> items = JeiUtil.getFirstItemStacks(recipeSlots);
+			NonNullList<ItemStack> items = JeiUtil.getCraftingItems(recipeSlots);
 			for (int i = 0; i < items.size(); i++) {
 				craftingInventory.setItem(i, items.get(i));
 			}

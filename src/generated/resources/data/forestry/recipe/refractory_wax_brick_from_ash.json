@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "#": {
-      "tag": "c:dusts/ash"
-    },
-    "X": {
-      "item": "forestry:refractory_wax"
-    }
+    "#": "#c:dusts/ash",
+    "X": "forestry:refractory_wax"
   },
   "pattern": [
     "#X",

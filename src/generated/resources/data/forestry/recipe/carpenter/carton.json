@@ -1,17 +1,13 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/carton",
   "liquid": {
     "amount": 1000,
     "id": "minecraft:water"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "item": "forestry:wood_pulp"
-      }
+      "#": "forestry:wood_pulp"
     },
     "pattern": [
       " # ",

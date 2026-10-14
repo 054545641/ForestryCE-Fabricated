@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_sign_rot_0",
+  "textures": {
+    "all": "forestry:entity/signs/giganteum",
+    "particle": "forestry:block/giant_sequoia_planks"
+  }
+}

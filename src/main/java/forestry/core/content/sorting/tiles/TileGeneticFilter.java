@@ -27,12 +27,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import forestry.core.platform.inventory.InventoryTransferView;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public class TileGeneticFilter extends TileForestry implements IStreamableGui {
 	private static final int TRANSFER_DELAY = 5;
@@ -48,17 +54,23 @@ public class TileGeneticFilter extends TileForestry implements IStreamableGui {
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
-		super.saveAdditional(data, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag data = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
 
 		data.put("Logic", this.logic.write(new CompoundTag(), registries));
+	
+		ValueIOUtil.mergeInto(output, data);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag data, HolderLookup.Provider registries) {
-		super.loadAdditional(data, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag data = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
 
-        this.logic.read(data.getCompound("Logic"), registries);
+        this.logic.read(data.getCompoundOrEmpty("Logic"), registries);
 	}
 
 	@Override
@@ -84,7 +96,7 @@ public class TileGeneticFilter extends TileForestry implements IStreamableGui {
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state) {
 		if (updateOnInterval(TRANSFER_DELAY)) {
-			for (Direction facing : Direction.VALUES) {
+			for (Direction facing : Direction.values()) {
 				ItemStack stack = getItem(facing.get3DDataValue());
 				if (stack.isEmpty()) {
 					continue;
@@ -110,21 +122,15 @@ public class TileGeneticFilter extends TileForestry implements IStreamableGui {
 	}
 
 	private ItemStack transferItem(ItemStack itemStack, Direction facing) {
-		IItemHandler itemHandler = this.inventoryCache.getAdjacentInventory(facing);
-		if (itemHandler == null) {
-			return ItemStack.EMPTY;
+		var target = this.inventoryCache.getAdjacentInventory(facing);
+		if (target == null) return ItemStack.EMPTY;
+		int slot = facing.get3DDataValue();
+		var source = new InventoryTransferView(getTransferHandler(), 1, i -> slot, (i, r) -> false, (i, r) -> true);
+		try (var tx = Transaction.openRoot()) {
+			int moved = ResourceHandlerUtil.moveStacking(source, target, r -> true, itemStack.getCount(), tx);
+			tx.commit();
+			return itemStack.copyWithCount(moved);
 		}
-		ItemStack transferredStack = ItemHandlerHelper.insertItemStacked(itemHandler, itemStack.copy(), true);
-		if (transferredStack.getCount() == itemStack.getCount()) {
-			return ItemStack.EMPTY;
-		}
-		transferredStack = ItemHandlerHelper.insertItemStacked(itemHandler, itemStack.copy(), false);
-		if (transferredStack.isEmpty()) {
-			return itemStack;
-		}
-		ItemStack copy = itemStack.copy();
-		copy.setCount(itemStack.getCount() - transferredStack.getCount());
-		return copy;
 	}
 
 	public List<Direction> getValidDirections(ItemStack stack, Direction from) {
@@ -137,7 +143,7 @@ public class TileGeneticFilter extends TileForestry implements IStreamableGui {
 		FilterData filterData = new FilterData(individual, stage);
 		List<Direction> validFacings = new ArrayList<>();
 
-		for (Direction facing : Direction.VALUES) {
+		for (Direction facing : Direction.values()) {
 			if (facing == from) {
 				continue;
 			}
@@ -164,9 +170,9 @@ public class TileGeneticFilter extends TileForestry implements IStreamableGui {
 	}
 
 	@Nullable
-	public IItemHandler getItemHandler(@Nullable Direction facing) {
+	public ResourceHandler<ItemResource> getItemHandler(@Nullable Direction facing) {
 		if (facing != null) {
-			return new ItemHandlerFilter(this, facing);
+			return new ItemHandlerFilter(getTransferHandler(), stack -> getValidDirections(stack, facing));
 		}
 		return null;
 	}

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.mojang.datafixers.util.Pair;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import forestry.api.arboriculture.ForestryTreeSpecies;
@@ -17,11 +17,11 @@ import forestry.api.client.arboriculture.ILeafTint;
 import forestry.api.client.arboriculture.ITreeClientManager;
 
 public class TreeClientManager implements ITreeClientManager {
-	private final Map<ResourceLocation, ILeafSprite> sprites;
-	private final Map<ResourceLocation, ILeafTint> tints;
-	private final Map<ResourceLocation, Pair<ResourceLocation, ResourceLocation>> models;
+	private final Map<Identifier, ILeafSprite> sprites;
+	private final Map<Identifier, ILeafTint> tints;
+	private final Map<Identifier, Pair<Identifier, Identifier>> models;
 
-	public TreeClientManager(Map<ResourceLocation, ILeafSprite> sprites, Map<ResourceLocation, ILeafTint> tints, Map<ResourceLocation, Pair<ResourceLocation, ResourceLocation>> models) {
+	public TreeClientManager(Map<Identifier, ILeafSprite> sprites, Map<Identifier, ILeafTint> tints, Map<Identifier, Pair<Identifier, Identifier>> models) {
 		this.sprites = sprites;
 		this.tints = tints;
 		this.models = models;
@@ -50,23 +50,23 @@ public class TreeClientManager implements ITreeClientManager {
 	}
 
 	@Override
-	public Pair<ResourceLocation, ResourceLocation> getSaplingModels(ITreeSpecies species) {
-		Pair<ResourceLocation, ResourceLocation> pair = this.models.get(species.id());
+	public Pair<Identifier, Identifier> getSaplingModels(ITreeSpecies species) {
+		Pair<Identifier, Identifier> pair = this.models.get(species.id());
 		return pair != null ? pair : getDefaultSaplingModels();
 	}
 
 	@Override
-	public Pair<ResourceLocation, ResourceLocation> getDefaultSaplingModels() {
-		Pair<ResourceLocation, ResourceLocation> oak = this.models.get(ForestryTreeSpecies.OAK);
+	public Pair<Identifier, Identifier> getDefaultSaplingModels() {
+		Pair<Identifier, Identifier> oak = this.models.get(ForestryTreeSpecies.OAK);
 		if (oak != null) {
 			return oak;
 		}
 		// last-resort literal fallback so bake never NPEs before any species/models are registered
-		return Pair.of(ResourceLocation.fromNamespaceAndPath("forestry", "block/oak_sapling"), ResourceLocation.fromNamespaceAndPath("forestry", "item/oak_sapling"));
+		return Pair.of(Identifier.fromNamespaceAndPath("forestry", "block/oak_sapling"), Identifier.fromNamespaceAndPath("forestry", "item/oak_sapling"));
 	}
 
 	@Override
-	public Collection<Pair<ResourceLocation, ResourceLocation>> getAllSaplingModels() {
+	public Collection<Pair<Identifier, Identifier>> getAllSaplingModels() {
 		return Collections.unmodifiableCollection(this.models.values());
 	}
 }

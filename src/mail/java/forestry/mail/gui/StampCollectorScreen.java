@@ -10,10 +10,8 @@ public class StampCollectorScreen extends GuiForestry<StampCollectorMenu> {
 	private final StampCollectorBlockEntity tile;
 
 	public StampCollectorScreen(StampCollectorMenu container, Inventory inv, Component title) {
-		super(Constants.TEXTURE_PATH_GUI + "/stamp_collector.png", container, inv, title);
+		super(Constants.TEXTURE_PATH_GUI + "/stamp_collector.png", container, inv, title, 176, 193);
 		this.tile = container.getTile();
-		this.imageWidth = 176;
-		this.imageHeight = 193;
 	}
 
 	@Override

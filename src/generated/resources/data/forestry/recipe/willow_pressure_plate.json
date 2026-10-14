@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:willow_planks"
-      },
-      {
-        "item": "forestry:willow_fireproof_planks"
-      }
+      "forestry:willow_planks",
+      "forestry:willow_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:willow_pressure_plate"
   }
 }

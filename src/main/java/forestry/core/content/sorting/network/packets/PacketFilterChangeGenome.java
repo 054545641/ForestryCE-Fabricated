@@ -19,7 +19,7 @@ public record PacketFilterChangeGenome(BlockPos pos, Direction facing, short ind
 	public static void handle(PacketFilterChangeGenome msg, ServerPlayer player) {
 		TileUtil.getInterface(player.level(), msg.pos(), ForestryCapabilities.FILTER_LOGIC, null).ifPresent(logic -> {
 			if (logic.setGenomeFilter(msg.facing(), msg.index(), msg.active(), msg.species())) {
-				logic.getNetworkHandler().sendToPlayers(logic, player.serverLevel(), player);
+				logic.getNetworkHandler().sendToPlayers(logic, player.level(), player);
 			}
 		});
 	}
@@ -36,7 +36,7 @@ public record PacketFilterChangeGenome(BlockPos pos, Direction facing, short ind
 		buffer.writeBoolean(msg.active);
 		if (msg.species != null) {
 			buffer.writeBoolean(true);
-			buffer.writeResourceLocation(msg.species.id());
+			buffer.writeIdentifier(msg.species.id());
 		} else {
 			buffer.writeBoolean(false);
 		}
@@ -47,7 +47,7 @@ public record PacketFilterChangeGenome(BlockPos pos, Direction facing, short ind
 		Direction facing = NetworkUtil.readDirection(buffer);
 		short index = buffer.readShort();
 		boolean active = buffer.readBoolean();
-		ISpecies<?> allele = buffer.readBoolean() ? SpeciesUtil.getAnySpecies(buffer.readResourceLocation()) : null;
+		ISpecies<?> allele = buffer.readBoolean() ? SpeciesUtil.getAnySpecies(buffer.readIdentifier()) : null;
 
 		return new PacketFilterChangeGenome(pos, facing, index, active, allele);
 	}

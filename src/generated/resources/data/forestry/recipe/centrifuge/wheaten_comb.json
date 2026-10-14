@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/wheaten_comb",
-  "input": {
-    "item": "forestry:wheaten_comb"
-  },
+  "input": "forestry:wheaten_comb",
   "products": [
     {
       "chance": 0.2,

@@ -2,7 +2,7 @@ package forestry.core.data.builder;
 
 import forestry.core.content.machines.recipes.SqueezerContainerRecipe;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public class SqueezerContainerRecipeBuilder {
@@ -31,7 +31,7 @@ public class SqueezerContainerRecipeBuilder {
 		return this;
 	}
 
-	public void build(RecipeOutput output, ResourceLocation id) {
-		output.accept(id, new SqueezerContainerRecipe(id, this.emptyContainer, this.processingTime, this.remnants, this.remnantsChance), null);
+	public void build(RecipeOutput output, Identifier id) {
+		output.accept(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id), new SqueezerContainerRecipe(id, this.emptyContainer, this.processingTime, this.remnants, this.remnantsChance), null);
 	}
 }

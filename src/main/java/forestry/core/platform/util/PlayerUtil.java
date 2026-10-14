@@ -15,20 +15,20 @@ public abstract class PlayerUtil {
 	private static final UUID emptyUUID = new UUID(0, 0);
 
 	public static boolean isSameGameProfile(GameProfile player1, GameProfile player2) {
-		UUID id1 = player1.getId();
-		UUID id2 = player2.getId();
+		UUID id1 = player1.id();
+		UUID id2 = player2.id();
 		if (id1 != null && id2 != null && !id1.equals(emptyUUID) && !id2.equals(emptyUUID)) {
 			return id1.equals(id2);
 		}
 
-		return player1.getName() != null && player1.getName().equals(player2.getName());
+		return player1.name() != null && player1.name().equals(player2.name());
 	}
 
 	public static String getOwnerName(@Nullable GameProfile profile) {
 		if (profile == null) {
 			return Component.translatable("for.gui.derelict").getString();
 		} else {
-			return profile.getName();
+			return profile.name();
 		}
 	}
 
@@ -39,7 +39,7 @@ public abstract class PlayerUtil {
 	 */
 	@Nullable
 	public static Player getPlayer(Level world, @Nullable GameProfile profile) {
-		if (profile == null || profile.getName() == null) {
+		if (profile == null || profile.name() == null) {
 			if (world instanceof ServerLevel) {
 				return FakePlayerFactory.getMinecraft((ServerLevel) world);
 			} else {
@@ -47,7 +47,7 @@ public abstract class PlayerUtil {
 			}
 		}
 
-		Player player = world.getPlayerByUUID(profile.getId());
+		Player player = world.getPlayerByUUID(profile.id());
 		if (player == null && world instanceof ServerLevel) {
 			player = FakePlayerFactory.get((ServerLevel) world, profile);
 		}
@@ -60,7 +60,7 @@ public abstract class PlayerUtil {
 	 */
 	@Nullable
 	public static Player getFakePlayer(Level world, @Nullable GameProfile profile) {
-		if (profile == null || profile.getName() == null) {
+		if (profile == null || profile.name() == null) {
 			if (world instanceof ServerLevel) {
 				return FakePlayerFactory.getMinecraft((ServerLevel) world);
 			} else {

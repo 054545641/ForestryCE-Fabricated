@@ -23,7 +23,6 @@
       "translate": "advancements.forestry.get_engine.description"
     },
     "icon": {
-      "count": 1,
       "id": "forestry:biogas_engine"
     },
     "title": {

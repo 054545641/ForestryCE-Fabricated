@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "#": {
-      "tag": "c:sawdust"
-    },
-    "X": {
-      "item": "forestry:beeswax"
-    }
+    "#": "#c:sawdust",
+    "X": "forestry:beeswax"
   },
   "pattern": [
     "#X",

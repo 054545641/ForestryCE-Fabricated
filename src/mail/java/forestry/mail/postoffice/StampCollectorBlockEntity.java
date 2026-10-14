@@ -30,30 +30,17 @@ public class StampCollectorBlockEntity extends TileBase implements Container {
 			return;
 		}
 
-		IInventoryAdapter inventory = getInternalInventory();
-		ItemStack filter = inventory.getItem(StampCollectorInventory.SLOT_FILTER);
-		ItemStack stamp;
-
-		if (filter.isEmpty()) {
-			stamp = PostOffice.getOrCreate((ServerLevel) level).getAnyStamp(1);
-		} else if (PostageUtil.isStamp(filter)) {
-			// The filter names one stamp item rather than a postage value, so two stamps worth the
-			// same are no longer interchangeable here
-			stamp = PostOffice.getOrCreate((ServerLevel) level).getAnyStamp(filter.getItem(), 1);
-		} else {
-			return;
-		}
-
-		if (stamp.isEmpty()) {
-			return;
-		}
-
-		// Store it.
-		boolean stowed = InventoryUtil.stowInInventory(stamp, inventory, true, StampCollectorInventory.SLOT_BUFFER_1, StampCollectorInventory.SLOT_BUFFER_COUNT);
-		if (!stowed) {
-			// getAnyStamp already removed the stamp from the vault; a full buffer must bank it back
-			// instead of destroying it
-			PostOffice.getOrCreate((ServerLevel) level).collectPostage(NonNullList.of(ItemStack.EMPTY, stamp));
+		try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+			var office = PostOffice.getOrCreate((ServerLevel) level);
+			var inventory = getInternalInventory();
+			ItemStack filter = inventory.getItem(StampCollectorInventory.SLOT_FILTER);
+			ItemStack stamp;
+			if (filter.isEmpty()) stamp = office.getAnyStamp(1);
+			else if (PostageUtil.isStamp(filter)) stamp = office.getAnyStamp(filter.getItem(), 1);
+			else return;
+			if (stamp.isEmpty()) return;
+			if (!InventoryUtil.tryAddStack(inventory, stamp, StampCollectorInventory.SLOT_BUFFER_1, StampCollectorInventory.SLOT_BUFFER_COUNT, true)) return;
+			tx.commit();
 		}
 	}
 

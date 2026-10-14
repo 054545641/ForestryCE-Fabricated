@@ -9,8 +9,8 @@ went inactive after the 1.13+ flattening.
 ### Reporting Bugs
 Please make sure the bug has not already been reported by [searching the issues](https://github.com/ForestryMC/ForestryMC/issues?q=is%3Aissue).
 
-For crashes, you must post a link to the full crash report.  
-[gist.github.com](https://gist.github.com) is a good place to upload them.  
+For crashes, you must post a link to the full crash report.
+[gist.github.com](https://gist.github.com) is a good place to upload them.
 Full crash reports are located in [the minecraft data folder](http://hopper.minecraft.net/help/finding-minecraft-data-folder/), in "crash-reports".
 
 Thank you for reporting bugs!
@@ -22,10 +22,14 @@ that you can use to quickly check for missing translations in your language.
 Refer to the translation guide [HERE](https://github.com/thedarkcolour/ForestryCE/blob/1.20.1/src/main/resources/assets/forestry/lang/README.md).
 
 ### Building
-To build a mod JAR, open a command line and type "gradlew build".
-The finished JAR will be under `./build/libs`.
+This branch builds a NeoForge 26.2 preview with Java 25. Run `gradlew build` for the four Forestry JARs in `build/26.2/libs`.
+JEI 30.39.0.233 and Curios 16.0.0+26.2 adapters are included; both mods remain optional at runtime.
+Patchouli and KubeJS/Rhino integrations await compatible 26.2 artifacts.
+G2 is accepted under the revised scope: these unavailable integrations are temporarily closed as externally unverifiable,
+and production builds and release JARs do not require them. The existing alpha version label is retained.
+See the [G2 acceptance report](docs/porting/g2-acceptance.zh-CN.md) for the verified baseline and conditions for reopening those integrations.
 
-Windows users can follow the [local NeoForge 1.21.1 setup guide](docs/local-development.zh-CN.md)
+Windows users can follow the [local NeoForge 26.2 setup guide](docs/local-development.zh-CN.md)
 to install a project-local JDK and use `gradlew-local.bat` for builds and client runs.
 
 ### Contributing Code

@@ -1,20 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "item": "minecraft:chiseled_sandstone"
-    },
-    "T": {
-      "tag": "c:gears/tin"
-    }
+    "#": "minecraft:chiseled_sandstone",
+    "T": "#c:gears/tin"
   },
   "pattern": [
     " # ",
     "TTT"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:chiseled_sandstone_farm_gearbox"
   }
 }

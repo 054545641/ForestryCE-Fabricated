@@ -3,7 +3,7 @@ package forestry.core.platform.util;
 import forestry.core.platform.gui.slots.SlotForestry;
 import forestry.core.platform.gui.slots.WorktableSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -15,7 +15,7 @@ public abstract class SlotUtil {
 		return slotIndex >= start && slotIndex < start + count;
 	}
 
-	public static ItemStack slotClickPhantom(SlotForestry slot, int mouseButton, ClickType clickTypeIn, Player player) {
+	public static ItemStack slotClickPhantom(SlotForestry slot, int mouseButton, ContainerInput clickTypeIn, Player player) {
 		ItemStack stack = ItemStack.EMPTY;
 
 		ItemStack stackSlot = slot.getItem();
@@ -103,13 +103,13 @@ public abstract class SlotUtil {
 		}
 	}
 
-	private static void adjustPhantomSlot(SlotForestry slot, int mouseButton, ClickType clickTypeIn) {
+	private static void adjustPhantomSlot(SlotForestry slot, int mouseButton, ContainerInput clickTypeIn) {
 		if (!slot.canAdjustPhantom()) {
 			return;
 		}
 		ItemStack stackSlot = slot.getItem();
 		int stackSize;
-		if (clickTypeIn == ClickType.QUICK_MOVE) {
+		if (clickTypeIn == ContainerInput.QUICK_MOVE) {
 			stackSize = mouseButton == 0 ? (stackSlot.getCount() + 1) / 2 : stackSlot.getCount() * 2;
 		} else {
 			stackSize = mouseButton == 0 ? stackSlot.getCount() - 1 : stackSlot.getCount() + 1;

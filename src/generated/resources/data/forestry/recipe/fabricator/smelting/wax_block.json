@@ -6,7 +6,5 @@
     "amount": 1000,
     "id": "forestry:wax"
   },
-  "resource": {
-    "item": "forestry:wax_block"
-  }
+  "resource": "forestry:wax_block"
 }

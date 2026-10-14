@@ -1,6 +1,6 @@
 package forestry.core.data.recipe;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.ForestryConstants;
 
@@ -18,7 +18,7 @@ public final class RecipeIds {
 	 * @param path The path segments, joined by a slash
 	 * @return The forestry id the recipe is written under
 	 */
-	public static ResourceLocation id(String... path) {
+	public static Identifier id(String... path) {
 		return ForestryConstants.forestry(String.join("/", path));
 	}
 }

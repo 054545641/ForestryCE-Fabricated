@@ -10,13 +10,13 @@ public class InventoryRainmaker extends InventoryAdapterTile<TileMillRainmaker> 
 	private static final int SLOT_SUBSTRATE = 0;
 
 	public InventoryRainmaker(TileMillRainmaker tile) {
-		super(tile, 1, "items");
+		super(tile, 1, "items", 1);
 	}
 
 	@Override
 	public boolean canSlotAccept(int slotIndex, ItemStack stack) {
 		if (slotIndex == SLOT_SUBSTRATE) {
-			RainmakerSubstrate substrate = stack.getItemHolder().getData(ForestryDataMaps.RAINMAKER_FUELS);
+			RainmakerSubstrate substrate = stack.typeHolder().getData(ForestryDataMaps.RAINMAKER_FUELS);
 			if (substrate != null && this.tile.charge == 0 && this.tile.progress == 0) {
 				if (this.tile.getLevel().isRaining() && substrate.reverse()) {
 					return true;
@@ -29,13 +29,4 @@ public class InventoryRainmaker extends InventoryAdapterTile<TileMillRainmaker> 
 		return false;
 	}
 
-	@Override
-	public void setItem(int slotIndex, ItemStack itemStack) {
-		if (slotIndex == SLOT_SUBSTRATE) {
-			RainmakerSubstrate substrate = itemStack.getItemHolder().getData(ForestryDataMaps.RAINMAKER_FUELS);
-			if (substrate != null) {
-                this.tile.addCharge(substrate);
-			}
-		}
-	}
 }

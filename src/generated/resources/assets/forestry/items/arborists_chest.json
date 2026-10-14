@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "forestry:item/arborists_chest",
+    "model": {
+      "type": "forestry:machine",
+      "kind": "arborists_chest"
+    }
+  }
+}

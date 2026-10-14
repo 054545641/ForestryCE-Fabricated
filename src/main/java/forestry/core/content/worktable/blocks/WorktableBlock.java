@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import java.util.List;
 
-public class WorktableBlock extends BlockBase<WorktableBlockType> {
+public class WorktableBlock extends BlockBase<WorktableBlockType> implements forestry.core.platform.block.IBlockTooltip {
 	public WorktableBlock(BlockBehaviour.Properties properties, WorktableBlockType blockType) {
 		super(properties.sound(SoundType.WOOD), blockType);
 	}

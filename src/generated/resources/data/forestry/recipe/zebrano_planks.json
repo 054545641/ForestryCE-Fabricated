@@ -1,10 +1,9 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "building",
+  "group": "planks",
   "ingredients": [
-    {
-      "tag": "forestry:zebrano_logs"
-    }
+    "#forestry:zebrano_logs"
   ],
   "result": {
     "count": 4,

@@ -90,7 +90,6 @@ public class ApicultureCreativeTab {
 		ApicultureItems.PROPOLIS.getItems().forEach(items::accept);
 		ApicultureItems.POLLEN_CLUSTER.getItems().forEach(items::accept);
 		items.accept(ApicultureItems.ROYAL_JELLY);
-		items.accept(ApicultureItems.EXPERIENCE_DROP);
 		items.accept(ApicultureItems.AMBER_DRONE);
 
 		SpeciesUtil.addTypeToCreativeTab(items, ForestrySpeciesTypes.BEE);

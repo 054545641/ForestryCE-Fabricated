@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/amber_drone",
-  "input": {
-    "item": "forestry:amber_drone_fossil"
-  },
+  "input": "forestry:amber_drone_fossil",
   "products": [
     {
       "chance": 0.25,

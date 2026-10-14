@@ -1,24 +1,19 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/letter_pulp",
   "liquid": {
     "amount": 250,
     "id": "minecraft:water"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "item": "forestry:wood_pulp"
-      }
+      "#": "forestry:wood_pulp"
     },
     "pattern": [
       "###",
       "###"
     ],
     "result": {
-      "count": 1,
       "id": "forestry:letter_empty_fresh"
     }
   },

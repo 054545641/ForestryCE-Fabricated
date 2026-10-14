@@ -1,6 +1,6 @@
 package forestry.core.platform.gui.buttons;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface IButtonTextureSet {
 	int getX();
@@ -11,5 +11,5 @@ public interface IButtonTextureSet {
 
 	int getWidth();
 
-	ResourceLocation getTexture();
+	Identifier getTexture();
 }

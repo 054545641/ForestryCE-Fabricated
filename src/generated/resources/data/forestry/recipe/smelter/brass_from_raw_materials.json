@@ -20,22 +20,16 @@
   "inputs": [
     {
       "count": 1,
-      "ingredient": {
-        "tag": "c:raw_materials/copper"
-      }
+      "ingredient": "#c:raw_materials/copper"
     },
     {
       "count": 1,
-      "ingredient": {
-        "tag": "c:raw_materials/zinc"
-      }
+      "ingredient": "#c:raw_materials/zinc"
     }
   ],
   "output": {
     "count": 2,
-    "ingredient": {
-      "tag": "c:ingots/brass"
-    }
+    "ingredient": "#c:ingots/brass"
   },
   "processingTime": 40
 }

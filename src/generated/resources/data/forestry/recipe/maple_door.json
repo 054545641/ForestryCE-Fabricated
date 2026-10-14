@@ -4,12 +4,8 @@
   "group": "wooden_door",
   "key": {
     "#": [
-      {
-        "item": "forestry:maple_planks"
-      },
-      {
-        "item": "forestry:maple_fireproof_planks"
-      }
+      "forestry:maple_planks",
+      "forestry:maple_fireproof_planks"
     ]
   },
   "pattern": [

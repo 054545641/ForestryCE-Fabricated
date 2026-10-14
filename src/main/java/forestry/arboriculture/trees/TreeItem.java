@@ -15,7 +15,7 @@ import forestry.core.platform.util.BlockUtil;
 import forestry.core.platform.util.SpeciesUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -31,8 +31,8 @@ import net.minecraft.world.phys.HitResult;
 import javax.annotation.Nullable;
 
 public class TreeItem extends ItemGE implements IVariableFermentable, ITintedItem {
-	public TreeItem(TreeLifeStage type) {
-		super(new Item.Properties(), type);
+	public TreeItem(TreeLifeStage type, Properties properties) {
+		super(properties, type);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class TreeItem extends ItemGE implements IVariableFermentable, ITintedIte
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
+	public InteractionResult use(Level worldIn, Player playerIn, InteractionHand handIn) {
 		BlockHitResult traceResult = getPlayerPOVHitResult(worldIn, playerIn, ClipContext.Fluid.ANY);
 		ItemStack stack = playerIn.getItemInHand(handIn);
 
@@ -71,20 +71,20 @@ public class TreeItem extends ItemGE implements IVariableFermentable, ITintedIte
 			}
 		}
 
-		return InteractionResultHolder.pass(stack);
+		return InteractionResult.PASS;
 	}
 
-	private static InteractionResultHolder<ItemStack> onItemRightClickPollen(ItemStack stack, Level level, Player player, BlockPos pos, ITree pollen) {
+	private static InteractionResult onItemRightClickPollen(ItemStack stack, Level level, Player player, BlockPos pos, ITree pollen) {
 		if (!TreeUtil.canMate(TreeUtil.getTreeSafe(level, pos), pollen)) {
-			return InteractionResultHolder.pass(stack);
+			return InteractionResult.PASS;
 		}
 
 		LeavesBlockEntity leaves = TreeUtil.getOrCreateLeaves(level, pos, true);
 		if (leaves == null || !TreeUtil.canMate(leaves.getTree(), pollen)) {
-			return InteractionResultHolder.pass(stack);
+			return InteractionResult.PASS;
 		}
 
-		if (!level.isClientSide) {
+		if (!level.isClientSide()) {
 			leaves.setMate(pollen);
 
 			BlockUtil.sendDestroyEffects(level, pos, level.getBlockState(pos));
@@ -93,19 +93,19 @@ public class TreeItem extends ItemGE implements IVariableFermentable, ITintedIte
 				stack.shrink(1);
 			}
 
-			return InteractionResultHolder.consume(stack);
+			return InteractionResult.CONSUME;
 		}
 
-		return InteractionResultHolder.success(stack);
+		return InteractionResult.SUCCESS;
 	}
 
-	private static InteractionResultHolder<ItemStack> onItemRightClickSapling(ItemStack stack, Level worldIn, Player player, BlockPos pos, ITree tree, BlockPlaceContext context) {
+	private static InteractionResult onItemRightClickSapling(ItemStack stack, Level worldIn, Player player, BlockPos pos, ITree tree, BlockPlaceContext context) {
 		// x, y, z are the coordinates of the block "hit", can thus either be the soil or tall grass, etc.
 		BlockState hitBlock = worldIn.getBlockState(pos);
 		if (!hitBlock.canBeReplaced(context)) {
 			pos = context.getClickedPos();
 			if (!worldIn.getBlockState(pos).canBeReplaced(context)) {
-				return InteractionResultHolder.pass(stack);
+				return InteractionResult.PASS;
 			}
 		}
 
@@ -114,10 +114,10 @@ public class TreeItem extends ItemGE implements IVariableFermentable, ITintedIte
 				if (!player.isCreative()) {
 					stack.shrink(1);
 				}
-				return InteractionResultHolder.success(stack);
+				return InteractionResult.SUCCESS;
 			}
 		}
-		return InteractionResultHolder.pass(stack);
+		return InteractionResult.PASS;
 	}
 
 	@Override
@@ -130,7 +130,7 @@ public class TreeItem extends ItemGE implements IVariableFermentable, ITintedIte
 	}
 
 	@Override
-	public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
+	public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType, net.minecraft.world.level.block.entity.FuelValues fuelValues) {
 		return 100;
 	}
 }

@@ -12,9 +12,9 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -30,7 +30,7 @@ public class ProductsRecipeCategory implements IRecipeCategory<ProductRecipe> {
 
 	private final IDrawable icon;
 	private final IDrawable background;
-	private final RecipeType<ProductRecipe> type;
+	private final IRecipeType<ProductRecipe> type;
 	private final Component title;
 	final ISpeciesType<? extends ISpecies<?>, ?> speciesType;
 
@@ -39,12 +39,12 @@ public class ProductsRecipeCategory implements IRecipeCategory<ProductRecipe> {
 		this.icon = icon;
 
 		this.speciesType = type;
-		this.type = new RecipeType<>(ModUtil.withSuffix(type.id(), "_products"), ProductRecipe.class);
+		this.type = IRecipeType.create(ModUtil.withSuffix(type.id(), "_products"), ProductRecipe.class);
 		this.title = Component.translatable("for.jei.products." + type.id().getNamespace() + '.' + type.id().getPath());
 	}
 
 	@Override
-	public RecipeType<ProductRecipe> getRecipeType() {
+	public IRecipeType<ProductRecipe> getRecipeType() {
 		return this.type;
 	}
 
@@ -121,7 +121,7 @@ public class ProductsRecipeCategory implements IRecipeCategory<ProductRecipe> {
 	}
 
 	@Override
-	public void draw(ProductRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+	public void draw(ProductRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
 		this.background.draw(graphics);
 		JeiUtil.drawCenteredMulti(graphics, recipe.species.getDisplayName(), SPECIES_SLOT_X + 9, SPECIES_SLOT_Y + 22, 0xffffff);
 	}

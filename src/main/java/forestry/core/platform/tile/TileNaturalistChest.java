@@ -6,7 +6,7 @@ import forestry.core.platform.gui.ContainerNaturalistInventory;
 import forestry.core.platform.inventory.InventoryNaturalistChest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -25,14 +25,14 @@ public abstract class TileNaturalistChest extends TileBase {
 	private static final float lidAngleVariationPerTick = 0.1F;
 	public static final VoxelShape CHEST_SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
 
-	private final ResourceLocation speciesTypeId;
+	private final Identifier speciesTypeId;
 	@Nullable
 	private ISpeciesType<?, ?> speciesType;
 	public float lidAngle;
 	public float prevLidAngle;
 	private int numPlayersUsing;
 
-	public TileNaturalistChest(BlockEntityType type, BlockPos pos, BlockState state, ResourceLocation speciesTypeId) {
+	public TileNaturalistChest(BlockEntityType type, BlockPos pos, BlockState state, Identifier speciesTypeId) {
 		super(type, pos, state);
 		this.speciesTypeId = speciesTypeId;
 		setInternalInventory(new InventoryNaturalistChest(this));
@@ -74,7 +74,7 @@ public abstract class TileNaturalistChest extends TileBase {
 	}
 
 	private void playLidSound(Level level, SoundEvent sound) {
-		level.playSound(null, getBlockPos(), sound, SoundSource.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);
+		level.playSound(null, getBlockPos(), sound, SoundSource.BLOCKS, 0.5F, this.level.getRandom().nextFloat() * 0.1F + 0.9F);
 	}
 
 	@Override

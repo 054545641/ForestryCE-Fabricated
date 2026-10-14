@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import static net.minecraft.advancements.critereon.ItemPredicate.Builder.item;
+import static net.minecraft.advancements.predicates.ItemPredicate.Builder.item;
 import static net.minecraft.world.level.storage.loot.predicates.MatchTool.toolMatches;
 
 /**
@@ -33,10 +33,10 @@ public class ForestryLootModifierProvider extends GlobalLootModifierProvider {
 	protected void start() {
 		for (Map.Entry<ResourceKey<LootTable>, Collection<LootTableHelper.Entry>> mapEntry : LootTableHelper.getInstance().entries.asMap().entrySet()) {
 			List<String> extensions = mapEntry.getValue().stream().map(entry -> entry.extension).toList();
-			add(mapEntry.getKey().location().getPath(), new ConditionLootModifier(mapEntry.getKey().location(), extensions));
+			add(mapEntry.getKey().identifier().getPath(), new ConditionLootModifier(mapEntry.getKey().identifier(), extensions));
 		}
 		add("grafter", new GrafterLootModifier(new LootItemCondition[]{
-			toolMatches(item().of(ArboricultureItems.GRAFTER.item())).or(toolMatches(item().of(ArboricultureItems.PROVEN_GRAFTER.item()))).build()
+			toolMatches(item().of(this.registries.lookupOrThrow(net.minecraft.core.registries.Registries.ITEM), ArboricultureItems.GRAFTER.item())).or(toolMatches(item().of(this.registries.lookupOrThrow(net.minecraft.core.registries.Registries.ITEM), ArboricultureItems.PROVEN_GRAFTER.item()))).build()
 		}));
 	}
 }

@@ -9,14 +9,14 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import forestry.api.core.genetics.ISpeciesType;
 import forestry.api.core.genetics.alleles.IChromosome;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 public class ChromosomeArgument implements ISpeciesArgumentType<IChromosome<?>> {
 	private final ISpeciesType<?, ?> type;
-	private final HashMap<ResourceLocation, IChromosome<?>> chromosomes;
+	private final HashMap<Identifier, IChromosome<?>> chromosomes;
 
 	public ChromosomeArgument(ISpeciesType<?, ?> type) {
 		this.type = type;
@@ -36,7 +36,7 @@ public class ChromosomeArgument implements ISpeciesArgumentType<IChromosome<?>> 
 
 	@Override
 	public IChromosome<?> parse(StringReader reader) throws CommandSyntaxException {
-		ResourceLocation id = ResourceLocation.read(reader);
+		Identifier id = Identifier.read(reader);
 		IChromosome<?> chromosome = this.chromosomes.get(id);
 
 		if (chromosome == null) {
@@ -48,6 +48,6 @@ public class ChromosomeArgument implements ISpeciesArgumentType<IChromosome<?>> 
 
 	@Override
 	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-		return SharedSuggestionProvider.suggest(this.chromosomes.keySet().stream().map(ResourceLocation::toString), builder);
+		return SharedSuggestionProvider.suggest(this.chromosomes.keySet().stream().map(Identifier::toString), builder);
 	}
 }

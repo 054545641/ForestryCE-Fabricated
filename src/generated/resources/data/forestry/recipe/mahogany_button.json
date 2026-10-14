@@ -3,16 +3,11 @@
   "category": "redstone",
   "ingredients": [
     [
-      {
-        "item": "forestry:mahogany_planks"
-      },
-      {
-        "item": "forestry:mahogany_fireproof_planks"
-      }
+      "forestry:mahogany_planks",
+      "forestry:mahogany_fireproof_planks"
     ]
   ],
   "result": {
-    "count": 1,
     "id": "forestry:mahogany_button"
   }
 }

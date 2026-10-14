@@ -3,7 +3,7 @@ package forestry.arboriculture.client;
 import forestry.api.client.arboriculture.ILeafTint;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import org.jetbrains.annotations.Nullable;
 
 // Based on the block color for Oak, Jungle, Dark Oak, and Acacia leaves

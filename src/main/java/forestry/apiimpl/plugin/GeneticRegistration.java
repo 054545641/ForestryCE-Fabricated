@@ -14,7 +14,7 @@ import forestry.api.plugin.ISpeciesTypeBuilder;
 import forestry.api.plugin.ISpeciesTypeFactory;
 import forestry.api.plugin.ITaxonBuilder;
 import forestry.core.engine.genetics.Taxon;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -29,18 +29,18 @@ public final class GeneticRegistration implements IGeneticRegistration {
 	// Name of taxon with missing parent -> Action
 	private final HashMap<String, Consumer<ITaxonBuilder>> unknownActions = new HashMap<>();
 	// Species type builders
-	private final ModifiableRegistrar<ResourceLocation, ISpeciesTypeBuilder, SpeciesTypeBuilder> speciesTypes = new ModifiableRegistrar<>(ISpeciesTypeBuilder.class);
+	private final ModifiableRegistrar<Identifier, ISpeciesTypeBuilder, SpeciesTypeBuilder> speciesTypes = new ModifiableRegistrar<>(ISpeciesTypeBuilder.class);
 	// Filter rule types used by IFilterRegistry
 	private final ArrayList<IFilterRuleType> ruleTypes = new ArrayList<>();
 	// Flower types. Shared by bees and butterflies, so genetics owns them rather than apiculture
-	private final Registrar<ResourceLocation, IFlowerType, IFlowerType> flowerTypes = new Registrar<>(IFlowerType.class);
+	private final Registrar<Identifier, IFlowerType, IFlowerType> flowerTypes = new Registrar<>(IFlowerType.class);
 
 	@Override
-	public void registerFlowerType(ResourceLocation id, IFlowerType type) {
+	public void registerFlowerType(Identifier id, IFlowerType type) {
 		this.flowerTypes.create(id, type);
 	}
 
-	public ImmutableMap<ResourceLocation, IFlowerType> getFlowerTypes() {
+	public ImmutableMap<Identifier, IFlowerType> getFlowerTypes() {
 		return this.flowerTypes.build();
 	}
 
@@ -82,16 +82,16 @@ public final class GeneticRegistration implements IGeneticRegistration {
 	}
 
 	@Override
-	public ISpeciesTypeBuilder registerSpeciesType(ResourceLocation id, ISpeciesTypeFactory factory) {
+	public ISpeciesTypeBuilder registerSpeciesType(Identifier id, ISpeciesTypeFactory factory) {
 		return this.speciesTypes.create(id, new SpeciesTypeBuilder(factory));
 	}
 
 	@Override
-	public void modifySpeciesType(ResourceLocation id, Consumer<ISpeciesTypeBuilder> action) {
+	public void modifySpeciesType(Identifier id, Consumer<ISpeciesTypeBuilder> action) {
 		this.speciesTypes.modify(id, action);
 	}
 
-	public ImmutableMap<ResourceLocation, ISpeciesType<?, ?>> buildSpeciesTypes() {
+	public ImmutableMap<Identifier, ISpeciesType<?, ?>> buildSpeciesTypes() {
 		return this.speciesTypes.build((id, builder) -> builder.build(id));
 	}
 
@@ -242,7 +242,7 @@ public final class GeneticRegistration implements IGeneticRegistration {
 		}
 
 		@Override
-		public void setDefaultChromosome(IChromosome<ResourceLocation> chromosome, ResourceLocation id, boolean required) {
+		public void setDefaultChromosome(IChromosome<Identifier> chromosome, Identifier id, boolean required) {
 			this.alleles.put(chromosome, ITaxon.TaxonAllele.reference(id, required));
 		}
 

@@ -1,3 +1,4 @@
-@javax.annotation.ParametersAreNonnullByDefault
-@net.minecraft.MethodsReturnNonnullByDefault
+@NullMarked
 package forestry.api.client;
+
+import org.jspecify.annotations.NullMarked;

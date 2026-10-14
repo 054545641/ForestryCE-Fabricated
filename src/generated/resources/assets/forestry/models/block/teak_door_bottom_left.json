@@ -1,5 +1,6 @@
 {
   "parent": "minecraft:block/door_bottom_left",
+  "render_type": "cutout",
   "textures": {
     "bottom": "forestry:block/teak_door_bottom",
     "top": "forestry:block/teak_door_top"

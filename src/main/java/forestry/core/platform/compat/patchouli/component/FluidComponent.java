@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.InventoryMenu;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -41,15 +41,15 @@ public class FluidComponent implements ICustomComponent {
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, IComponentRenderContext context, float pticks, int mouseX, int mouseY) {
+	public void render(GuiGraphicsExtractor graphics, IComponentRenderContext context, float pticks, int mouseX, int mouseY) {
 		PoseStack stack = graphics.pose();
 		stack.pushPose();
 		IClientFluidTypeExtensions fluidAttributes = IClientFluidTypeExtensions.of(this.fluidStack.getFluid());
-		ResourceLocation fluidStill = fluidAttributes.getStillTexture(this.fluidStack);
+		Identifier fluidStill = fluidAttributes.getStillTexture(this.fluidStack);
 		if (fluidStill != null) {
 			TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(fluidStill);
-			ResourceLocation spriteLocation = sprite.contents().name();
-			ResourceLocation fluidTexture = ResourceLocation.fromNamespaceAndPath(spriteLocation.getNamespace(), "textures/" + spriteLocation.getPath() + ".png");
+			Identifier spriteLocation = sprite.contents().name();
+			Identifier fluidTexture = Identifier.fromNamespaceAndPath(spriteLocation.getNamespace(), "textures/" + spriteLocation.getPath() + ".png");
 			setGLColorFromInt(fluidAttributes.getTintColor(this.fluidStack));
 
 			// MatrixStack transform, int x, int y, float u, float v, int width, int height, int ?, int ?
@@ -73,7 +73,7 @@ public class FluidComponent implements ICustomComponent {
 
 		try {
 			// the fluid is absent when the processor found no recipe to show
-			ResourceLocation id = ResourceLocation.parse(lookup.apply(this.fluid).asString());
+			Identifier id = Identifier.parse(lookup.apply(this.fluid).asString());
 			this.fluidStack = new FluidStack(BuiltInRegistries.FLUID.get(id), mb);
 		} catch (Exception e) {
 			this.fluidStack = FluidStack.EMPTY;

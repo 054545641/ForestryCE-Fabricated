@@ -11,6 +11,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -33,19 +36,23 @@ public class TileCocoon extends BlockEntity {
 
 	/* SAVING & LOADING */
 	@Override
-	public void loadAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.loadAdditional(compoundNBT, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compoundNBT = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
 
 		if (compoundNBT.contains("Caterpillar")) {
-            this.caterpillar = SpeciesUtil.deserializeIndividual(SpeciesUtil.BUTTERFLY_TYPE.get(), compoundNBT.getCompound("Caterpillar"));
+            this.caterpillar = SpeciesUtil.deserializeIndividual(SpeciesUtil.BUTTERFLY_TYPE.get(), compoundNBT.getCompoundOrEmpty("Caterpillar"));
 		}
-		this.maturationTime = compoundNBT.getInt("CATMAT");
-		this.isSolid = compoundNBT.getBoolean("isSolid");
+		this.maturationTime = compoundNBT.getIntOr("CATMAT", 0);
+		this.isSolid = compoundNBT.getBooleanOr("isSolid", false);
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.saveAdditional(compoundNBT, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag compoundNBT = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
 
 		Tag tag = SpeciesUtil.serializeIndividual(this.caterpillar);
 		if (tag != null) {
@@ -54,10 +61,12 @@ public class TileCocoon extends BlockEntity {
 
 		compoundNBT.putInt("CATMAT", this.maturationTime);
 		compoundNBT.putBoolean("isSolid", this.isSolid);
+		ValueIOUtil.mergeInto(output, compoundNBT);
 	}
 
 	public void onBlockTick() {
         this.maturationTime++;
+		setChanged();
 
 		IGenome caterpillarGenome = this.caterpillar.getGenome();
 		int caterpillarMatureTime = Math
@@ -91,6 +100,7 @@ public class TileCocoon extends BlockEntity {
 
 	public void setCaterpillar(IButterfly caterpillar) {
 		this.caterpillar = caterpillar;
+		setChanged();
 	}
 
 	public List<ItemStack> getCocoonDrops() {

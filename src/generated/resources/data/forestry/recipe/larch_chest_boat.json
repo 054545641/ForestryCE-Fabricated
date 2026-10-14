@@ -1,16 +1,10 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "item": "forestry:larch_boat"
-    },
-    {
-      "tag": "c:chests/wooden"
-    }
+    "forestry:larch_boat",
+    "#c:chests/wooden"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:larch_chest_boat"
   }
 }

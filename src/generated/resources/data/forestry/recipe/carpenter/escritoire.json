@@ -1,17 +1,13 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/escritoire",
   "liquid": {
     "amount": 500,
     "id": "forestry:seed_oil"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "tag": "minecraft:planks"
-      }
+      "#": "#minecraft:planks"
     },
     "pattern": [
       "#  ",
@@ -19,7 +15,6 @@
       "# #"
     ],
     "result": {
-      "count": 1,
       "id": "forestry:escritoire"
     }
   },

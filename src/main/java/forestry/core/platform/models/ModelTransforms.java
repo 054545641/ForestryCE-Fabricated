@@ -1,15 +1,12 @@
 package forestry.core.platform.models;
 
-import net.minecraft.client.renderer.block.model.ItemTransform;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.resources.model.cuboid.ItemTransform;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
 import org.joml.Vector3f;
 
 /**
  * Shared item-transform tables for Forestry's baked models.
  */
-@OnlyIn(Dist.CLIENT)
 public class ModelTransforms {
 	// copied from "minecraft:block/block.json" model
 	public static final ItemTransforms BLOCK = new ItemTransforms(
@@ -20,7 +17,8 @@ public class ModelTransforms {
 		ItemTransform.NO_TRANSFORM,
 		new ItemTransform(new Vector3f(30, 225, 0), new Vector3f(0, 0, 0), new Vector3f(0.625f, 0.625f, 0.625f)),
 		new ItemTransform(new Vector3f(0, 0, 0), new Vector3f(0, 3 / 16f, 0), new Vector3f(0.25f, 0.25f, 0.25f)),
-		new ItemTransform(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(0.5f, 0.5f, 0.5f))
+		new ItemTransform(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(0.5f, 0.5f, 0.5f)),
+		ItemTransform.NO_TRANSFORM
 	);
 
 	private ModelTransforms() {}

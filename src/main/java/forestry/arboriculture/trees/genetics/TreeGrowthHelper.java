@@ -116,7 +116,7 @@ public class TreeGrowthHelper {
 		ITree tree = sapling.getTree();
 		// Compare species by value, not reference: Allele is a non-interned record (allele-foundation), so two
 		// genomes of the same species hold distinct Allele instances and `==` is always false. getActiveValue
-		// returns the species ResourceLocation, which compares correctly by value.
+		// returns the species Identifier, which compares correctly by value.
 		return tree != null && tree.getGenome().getActiveValue(TreeChromosomes.SPECIES).equals(genome.getActiveValue(TreeChromosomes.SPECIES));
 	}
 }

@@ -24,12 +24,12 @@ public interface ISpeciesArgumentType<A> extends ArgumentType<A> {
 
 		@Override
 		public void serializeToNetwork(Serializer.Template template, FriendlyByteBuf buffer) {
-			buffer.writeResourceLocation(template.type.id());
+			buffer.writeIdentifier(template.type.id());
 		}
 
 		@Override
 		public Serializer<A>.Template deserializeFromNetwork(FriendlyByteBuf buffer) {
-			return new Template(IForestryApi.INSTANCE.getGeneticManager().getSpeciesType(buffer.readResourceLocation()));
+			return new Template(IForestryApi.INSTANCE.getGeneticManager().getSpeciesType(buffer.readIdentifier()));
 		}
 
 		@Override

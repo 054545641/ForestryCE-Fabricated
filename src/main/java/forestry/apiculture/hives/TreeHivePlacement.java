@@ -41,7 +41,7 @@ public enum TreeHivePlacement implements IHivePlacement {
 		// get top leaf block
 		int height = chunk.getHeight(Heightmap.Types.WORLD_SURFACE, posX & 0xFF, posZ & 0xFF) - 1;
 
-		if (height <= chunk.getMinBuildHeight()) {
+		if (height <= chunk.getMinY()) {
 			return null;
 		}
 

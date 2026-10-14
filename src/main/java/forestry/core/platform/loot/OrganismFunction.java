@@ -6,11 +6,10 @@ import forestry.api.IForestryApi;
 import forestry.api.core.genetics.ILifeStage;
 import forestry.api.core.genetics.ISpecies;
 import forestry.api.core.genetics.ISpeciesType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import java.util.List;
@@ -21,15 +20,15 @@ import java.util.List;
 public class OrganismFunction extends LootItemConditionalFunction {
 	public static final MapCodec<OrganismFunction> CODEC = RecordCodecBuilder.mapCodec(instance -> commonFields(instance)
 		.and(instance.group(
-			ResourceLocation.CODEC.fieldOf("type_id").forGetter(function -> function.typeId),
-			ResourceLocation.CODEC.fieldOf("species_id").forGetter(function -> function.speciesId)
+			Identifier.CODEC.fieldOf("type_id").forGetter(function -> function.typeId),
+			Identifier.CODEC.fieldOf("species_id").forGetter(function -> function.speciesId)
 		))
 		.apply(instance, OrganismFunction::new));
 
-	private final ResourceLocation typeId;
-	private final ResourceLocation speciesId;
+	private final Identifier typeId;
+	private final Identifier speciesId;
 
-	private OrganismFunction(List<LootItemCondition> conditions, ResourceLocation typeId, ResourceLocation speciesId) {
+	private OrganismFunction(List<LootItemCondition> conditions, Identifier typeId, Identifier speciesId) {
 		super(conditions);
 		this.typeId = typeId;
 		this.speciesId = speciesId;
@@ -39,7 +38,7 @@ public class OrganismFunction extends LootItemConditionalFunction {
 		return fromId(type.id(), species.id());
 	}
 
-	public static LootItemConditionalFunction.Builder<?> fromId(ResourceLocation typeId, ResourceLocation speciesId) {
+	public static LootItemConditionalFunction.Builder<?> fromId(Identifier typeId, Identifier speciesId) {
 		return simpleBuilder(conditions -> new OrganismFunction(conditions, typeId, speciesId));
 	}
 
@@ -57,7 +56,7 @@ public class OrganismFunction extends LootItemConditionalFunction {
 	}
 
 	@Override
-	public LootItemFunctionType getType() {
+	public MapCodec<? extends LootItemConditionalFunction> codec() {
 		return CoreLootFunctions.ORGANISM.get();
 	}
 }

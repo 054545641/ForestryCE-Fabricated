@@ -4,7 +4,7 @@ import forestry.api.client.IClientModuleHandler;
 import forestry.core.features.CoreItems;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
+import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 public class CuriosClientHandler implements IClientModuleHandler {
 	@Override
@@ -13,6 +13,6 @@ public class CuriosClientHandler implements IClientModuleHandler {
 	}
 
 	private static void clientSetup(FMLClientSetupEvent event) {
-		CuriosRendererRegistry.register(CoreItems.SPECTACLES.item(), SpectaclesCurioRenderer::new);
+		ICurioRenderer.register(CoreItems.SPECTACLES.item(), SpectaclesCurioRenderer::new);
 	}
 }

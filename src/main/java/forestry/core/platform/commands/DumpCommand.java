@@ -27,7 +27,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
@@ -65,22 +65,22 @@ public class DumpCommand {
 	}
 
 	private static int climates(CommandContext<CommandSourceStack> ctx) {
-		List<Holder.Reference<Biome>> biomes = ctx.getSource().getLevel().registryAccess().registryOrThrow(Registries.BIOME).holders()
+		List<Holder.Reference<Biome>> biomes = ctx.getSource().getLevel().registryAccess().lookupOrThrow(Registries.BIOME).listElements()
 			.toList();
 		Forestry.LOGGER.debug("Listing Forestry climates for {} biomes", biomes.size());
 
-		Table<HumidityType, TemperatureType, List<ResourceLocation>> climates = createClimatesTable(ctx);
+		Table<HumidityType, TemperatureType, List<Identifier>> climates = createClimatesTable(ctx);
 
 		for (TemperatureType temperature : TemperatureType.VALUES) {
 			for (HumidityType humidity : HumidityType.VALUES) {
-				List<ResourceLocation> climateList = climates.get(humidity, temperature);
+				List<Identifier> climateList = climates.get(humidity, temperature);
 
 				if (climateList == null || climateList.isEmpty()) {
 					Forestry.LOGGER.error("No biomes found with climate ({} / {})", temperature, humidity);
 				} else {
 					Forestry.LOGGER.debug("Found {} biomes with climate ({} / {}): ", climateList.size(), temperature, humidity);
 
-					for (ResourceLocation biomeId : climateList) {
+					for (Identifier biomeId : climateList) {
 						Forestry.LOGGER.debug("  > {}", biomeId);
 					}
 				}
@@ -91,20 +91,20 @@ public class DumpCommand {
 		return 1;
 	}
 
-	private static Table<HumidityType, TemperatureType, List<ResourceLocation>> createClimatesTable(CommandContext<CommandSourceStack> ctx) {
-		List<Holder.Reference<Biome>> biomes = ctx.getSource().getLevel().registryAccess().registryOrThrow(Registries.BIOME).holders().toList();
-		Table<HumidityType, TemperatureType, List<ResourceLocation>> climates = HashBasedTable.create(HumidityType.VALUES.size(), TemperatureType.VALUES.size());
+	private static Table<HumidityType, TemperatureType, List<Identifier>> createClimatesTable(CommandContext<CommandSourceStack> ctx) {
+		List<Holder.Reference<Biome>> biomes = ctx.getSource().getLevel().registryAccess().lookupOrThrow(Registries.BIOME).listElements().toList();
+		Table<HumidityType, TemperatureType, List<Identifier>> climates = HashBasedTable.create(HumidityType.VALUES.size(), TemperatureType.VALUES.size());
 		IClimateManager manager = IForestryApi.INSTANCE.getClimateManager();
 
 		for (Holder.Reference<Biome> biome : biomes) {
 			HumidityType humidity = manager.getHumidity(biome);
 			TemperatureType temperature = manager.getTemperature(biome);
 
-			List<ResourceLocation> climateList = climates.get(humidity, temperature);
+			List<Identifier> climateList = climates.get(humidity, temperature);
 			if (climateList == null) {
 				climates.put(humidity, temperature, climateList = new ArrayList<>());
 			}
-			climateList.add(biome.key().location());
+			climateList.add(biome.key().identifier());
 		}
 		return climates;
 	}
@@ -128,16 +128,16 @@ public class DumpCommand {
 			Predicate<ItemStack> filter = backpack.get().getDefinition().getFilter();
 			ArrayList<Item> allowedItems = new ArrayList<>();
 
-			for (Item item : ctx.getSource().registryAccess().registryOrThrow(Registries.ITEM)) {
+			for (Item item : ctx.getSource().registryAccess().lookupOrThrow(Registries.ITEM)) {
 				if (filter.test(new ItemStack(item))) {
 					allowedItems.add(item);
 				}
 			}
 
-			Forestry.LOGGER.debug("The backpack definition {} allows {} items:", backpack.item().builtInRegistryHolder().key().location(), allowedItems.size());
+			Forestry.LOGGER.debug("The backpack definition {} allows {} items:", backpack.item().builtInRegistryHolder().key().identifier(), allowedItems.size());
 
 			for (Item allowedItem : allowedItems) {
-				Forestry.LOGGER.debug("  > {}", allowedItem.builtInRegistryHolder().key().location());
+				Forestry.LOGGER.debug("  > {}", allowedItem.builtInRegistryHolder().key().identifier());
 			}
 		}
 
@@ -147,7 +147,7 @@ public class DumpCommand {
 	private static int beeSpecies(CommandContext<CommandSourceStack> ctx) {
 		IBeeSpeciesType beeType = SpeciesUtil.BEE_TYPE.get();
 		List<IBeeSpecies> allSpecies = beeType.getAllSpecies();
-		Table<HumidityType, TemperatureType, List<ResourceLocation>> climatesTable = createClimatesTable(ctx);
+		Table<HumidityType, TemperatureType, List<Identifier>> climatesTable = createClimatesTable(ctx);
 
 		try {
 			Forestry.LOGGER.debug("Listing properties of all {} bee species", allSpecies.size());
@@ -174,7 +174,7 @@ public class DumpCommand {
 				Forestry.LOGGER.debug("    Cave-dwelling: {}", GeneticsUtil.getActiveName(defaultGenome, BeeChromosomes.CAVE_DWELLING).getString());
 				Forestry.LOGGER.debug("    Flower Type: {}", GeneticsUtil.getActiveName(defaultGenome, BeeChromosomes.FLOWER_TYPE).getString());
 
-				List<ResourceLocation> suitableBiomes = new ArrayList<>();
+				List<Identifier> suitableBiomes = new ArrayList<>();
 				ToleranceType temperatureTolerance = defaultGenome.getActiveValue(BeeChromosomes.TEMPERATURE_TOLERANCE);
 				ToleranceType humidityTolerance = defaultGenome.getActiveValue(BeeChromosomes.HUMIDITY_TOLERANCE);
 
@@ -183,7 +183,7 @@ public class DumpCommand {
 
 				for (int t = temperature.down(temperatureTolerance.down).ordinal(); t <= maxTemperature; t++) {
 					for (int h = humidity.down(humidityTolerance.down).ordinal(); h <= maxHumidity; h++) {
-						List<ResourceLocation> validBiomes = climatesTable.get(HumidityType.VALUES.get(h), TemperatureType.VALUES.get(t));
+						List<Identifier> validBiomes = climatesTable.get(HumidityType.VALUES.get(h), TemperatureType.VALUES.get(t));
 
 						if (validBiomes != null) {
 							suitableBiomes.addAll(validBiomes);
@@ -193,7 +193,7 @@ public class DumpCommand {
 
 				Forestry.LOGGER.debug("  Found {} Suitable Biomes:", suitableBiomes.size());
 
-				for (ResourceLocation biome : suitableBiomes) {
+				for (Identifier biome : suitableBiomes) {
 					Forestry.LOGGER.debug("    {}", biome);
 				}
 			}

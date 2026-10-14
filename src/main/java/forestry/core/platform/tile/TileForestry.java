@@ -1,6 +1,11 @@
 package forestry.core.platform.tile;
 
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import forestry.api.core.ITransactionalContainer;
+
 import forestry.api.core.IFilterSlotDelegate;
+import net.minecraft.world.entity.ContainerUser;
 import com.google.common.base.Preconditions;
 import forestry.api.core.IErrorLogic;
 import forestry.api.core.IErrorLogicSource;
@@ -26,16 +31,16 @@ import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
-import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
+import forestry.core.platform.inventory.InventoryTransferView;
 
 import javax.annotation.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
-public abstract class TileForestry extends BlockEntity implements IStreamable, IErrorLogicSource, WorldlyContainer, IFilterSlotDelegate, ITitled, ILocationProvider, MenuProvider {
+public abstract class TileForestry extends DropAwareBlockEntity implements ITransactionalContainer, IStreamable, IErrorLogicSource, WorldlyContainer, IFilterSlotDelegate, ITitled, ILocationProvider, MenuProvider {
 	private final ErrorLogic errorHandler = new ErrorLogic();
 	private final AdjacentTileCache tileCache = new AdjacentTileCache(this);
 
@@ -83,20 +88,22 @@ public abstract class TileForestry extends BlockEntity implements IStreamable, I
 
 	// / SAVING & LOADING
 	@Override
-	public void loadAdditional(CompoundTag data, HolderLookup.Provider registries) {
-		super.loadAdditional(data, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag data = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
         this.inventory.read(data, registries);
 	}
 
 	@Deprecated(forRemoval = true)
 	public void load(CompoundTag data) {
-		loadAdditional(data, getRegistries());
+		ValueIOUtil.readTag(data, getRegistries(), this::loadCustomOnly);
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag data, HolderLookup.Provider registries) {
-		super.saveAdditional(data, registries);
-        this.inventory.write(data, registries);
+	protected void saveAdditional(ValueOutput output) {
+		super.saveAdditional(output);
+		this.inventory.write(output);
 	}
 
 	@Nullable
@@ -112,9 +119,15 @@ public abstract class TileForestry extends BlockEntity implements IStreamable, I
 	}
 
 	@Override
-	public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
-		super.handleUpdateTag(tag, registries);
+	public void handleUpdateTag(ValueInput input) {
+		CompoundTag tag = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
 		NBTUtilForestry.readStreamableFromNbt(this, tag, registries);
+	}
+
+	@Override
+	public void onDataPacket(net.minecraft.network.Connection connection, ValueInput input) {
+		handleUpdateTag(input);
 	}
 
 	/* INetworkedEntity */
@@ -133,6 +146,14 @@ public abstract class TileForestry extends BlockEntity implements IStreamable, I
 
 	protected HolderLookup.Provider getRegistries() {
 		return this.level != null ? this.level.registryAccess() : RegistryAccess.EMPTY;
+	}
+
+	@Override
+	protected void dropAdditionalContents(ServerLevel level) {
+		onDropContents(level);
+		if (this instanceof forestry.core.engine.circuits.ISocketable socketable) {
+			forestry.core.platform.util.InventoryUtil.dropSockets(socketable, level, getBlockPos());
+		}
 	}
 
 	// serverside only, called when the block is destroyed and its inventory is spilled into the world
@@ -160,6 +181,11 @@ public abstract class TileForestry extends BlockEntity implements IStreamable, I
 	}
 
 	/* INVENTORY BASICS */
+	@Override
+	public ResourceHandler<ItemResource> getTransferHandler() {
+		return getInternalInventory().getTransferHandler();
+	}
+
 	public IInventoryAdapter getInternalInventory() {
 		return this.inventory;
 	}
@@ -167,6 +193,7 @@ public abstract class TileForestry extends BlockEntity implements IStreamable, I
 	protected final void setInternalInventory(IInventoryAdapter inv) {
 		Preconditions.checkNotNull(inv);
 		this.inventory = inv;
+		if (inv instanceof forestry.core.platform.inventory.InventoryAdapter adapter) adapter.setInventoryOwner(this::setChanged);
 	}
 
 	/* ISidedInventory */
@@ -207,13 +234,13 @@ public abstract class TileForestry extends BlockEntity implements IStreamable, I
 	}
 
 	@Override
-	public final void startOpen(Player player) {
-		getInternalInventory().startOpen(player);
+	public final void startOpen(ContainerUser user) {
+		getInternalInventory().startOpen(user);
 	}
 
 	@Override
-	public final void stopOpen(Player player) {
-		getInternalInventory().stopOpen(player);
+	public final void stopOpen(ContainerUser user) {
+		getInternalInventory().stopOpen(user);
 	}
 
 	@Override
@@ -256,11 +283,8 @@ public abstract class TileForestry extends BlockEntity implements IStreamable, I
 	}
 
 	@Nullable
-	public IItemHandler getItemHandler(@Nullable Direction facing) {
-		if (facing != null) {
-			return new SidedInvWrapper(getInternalInventory(), facing);
-		}
-		return new InvWrapper(getInternalInventory());
+	public ResourceHandler<ItemResource> getItemHandler(@Nullable Direction facing) {
+		return this.remove ? null : InventoryTransferView.automation(getInternalInventory(), facing);
 	}
 
 	@Override

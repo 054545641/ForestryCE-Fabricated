@@ -13,13 +13,17 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
+import forestry.core.platform.util.SavedDataMigration;
 import forestry.mail.letters.LetterUtils;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,36 +42,22 @@ public class PostOffice extends SavedData implements IPostOffice {
 	};
 
 	private final Object2IntOpenHashMap<Item> collectedStamps = new Object2IntOpenHashMap<>();
+	private final PostageLedger postageJournal = new PostageLedger(this.collectedStamps, this::setDirty);
+	private int deliveryDepth;
 
 	public PostOffice() {
 	}
 
 	public PostOffice(CompoundTag tag) {
-		if (tag.contains(KEY_COLLECTED, Tag.TAG_COMPOUND)) {
-			readCollected(tag.getCompound(KEY_COLLECTED));
+		if (tag.contains(KEY_COLLECTED)) {
+			readCollected(tag.getCompound(KEY_COLLECTED).orElseThrow(() -> new IllegalArgumentException("Invalid collected stamps")));
 		} else {
 			readLegacy(tag);
 		}
 	}
 
 	private void readCollected(CompoundTag collected) {
-		for (String key : collected.getAllKeys()) {
-			int count = collected.getInt(key);
-			if (count <= 0) {
-				continue;
-			}
-
-			ResourceLocation id = ResourceLocation.tryParse(key);
-			Item item = id == null ? Items.AIR : BuiltInRegistries.ITEM.get(id);
-
-			// Nothing can be handed back for an item that no longer exists, so drop it loudly
-			if (item == Items.AIR) {
-				Forestry.LOGGER.warn("Post office dropped {} collected stamp(s) of unknown item {}", count, key);
-				continue;
-			}
-
-			this.collectedStamps.put(item, count);
-		}
+		this.postageJournal.readCollected(collected, (key, count) -> Forestry.LOGGER.warn("Post office dropped {} collected stamp(s) of unknown item {}", count, key));
 	}
 
 	// Saves from before the postage data map keyed an array by EnumPostage.ordinal(), so CPS1 through
@@ -76,13 +66,13 @@ public class PostOffice extends SavedData implements IPostOffice {
 		EnumStampDefinition[] byLegacyIndex = EnumStampDefinition.VALUES;
 
 		for (int i = 1; i <= byLegacyIndex.length; i++) {
-			int count = tag.getInt(KEY_LEGACY + i);
+			int count = tag.getIntOr(KEY_LEGACY + i, 0);
 			if (count > 0) {
 				this.collectedStamps.put(MailItems.STAMPS.item(byLegacyIndex[i - 1]), count);
 			}
 		}
 
-		int dropped = tag.getInt(KEY_LEGACY + "0") + tag.getInt(KEY_LEGACY + (byLegacyIndex.length + 1));
+		int dropped = tag.getIntOr(KEY_LEGACY + "0", 0) + tag.getIntOr(KEY_LEGACY + (byLegacyIndex.length + 1), 0);
 		if (dropped > 0) {
 			Forestry.LOGGER.warn("Post office dropped {} collected stamp(s) from a denomination that never had an item", dropped);
 		}
@@ -92,17 +82,8 @@ public class PostOffice extends SavedData implements IPostOffice {
 		setDirty();
 	}
 
-	@Override
 	public CompoundTag save(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		CompoundTag collected = new CompoundTag();
-
-		for (Object2IntMap.Entry<Item> entry : this.collectedStamps.object2IntEntrySet()) {
-			if (entry.getIntValue() > 0) {
-				collected.putInt(BuiltInRegistries.ITEM.getKey(entry.getKey()).toString(), entry.getIntValue());
-			}
-		}
-
-		compoundNBT.put(KEY_COLLECTED, collected);
+		compoundNBT.put(KEY_COLLECTED, this.postageJournal.writeCollected());
 		return compoundNBT;
 	}
 
@@ -124,77 +105,59 @@ public class PostOffice extends SavedData implements IPostOffice {
 
 	@Override
 	public ItemStack getAnyStamp(Item stamp, int max) {
-		int available = this.collectedStamps.getInt(stamp);
-		int collected = Math.min(max, available);
-
-		if (collected <= 0) {
-			return ItemStack.EMPTY;
+		int collected = Math.min(Math.max(0, max), this.collectedStamps.getInt(stamp));
+		if (collected == 0) return ItemStack.EMPTY;
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			this.postageJournal.updateSnapshots(tx);
+			int remaining = this.collectedStamps.getInt(stamp) - collected;
+			if (remaining == 0) this.collectedStamps.removeInt(stamp);
+			else this.collectedStamps.put(stamp, remaining);
+			tx.commit();
+			return new ItemStack(stamp, collected);
 		}
-
-		if (collected == available) {
-			this.collectedStamps.removeInt(stamp);
-		} else {
-			this.collectedStamps.put(stamp, available - collected);
-		}
-
-		// The stamp collector is the only caller, and it marks nothing dirty of its own
-		setDirty();
-		return new ItemStack(stamp, collected);
 	}
 
 	@Override
 	public void collectPostage(NonNullList<ItemStack> stamps) {
-		for (ItemStack stamp : stamps) {
-			if (stamp == null || !PostageUtil.isStamp(stamp)) {
-				continue;
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			for (ItemStack stamp : stamps) {
+				if (stamp.isEmpty() || !PostageUtil.isStamp(stamp)) continue;
+				int updated = Math.addExact(this.collectedStamps.getInt(stamp.getItem()), stamp.getCount());
+				this.postageJournal.updateSnapshots(tx);
+				this.collectedStamps.put(stamp.getItem(), updated);
 			}
-
-			this.collectedStamps.addTo(stamp.getItem(), stamp.getCount());
+			tx.commit();
 		}
-
-		setDirty();
 	}
 
 	// / DELIVERY
 	@Override
-	public IPostalState lodgeLetter(ServerLevel world, ItemStack itemstack, boolean doLodge) {
-		ILetter letter = LetterUtils.getLetter(itemstack);
-		if (letter == null) {
-			return EnumDeliveryState.NOT_MAILABLE;
+	public IPostalState lodgeLetter(ServerLevel world, ItemStack itemstack, TransactionContext transaction) {
+		// Returned/forwarded trade mail must not recurse indefinitely through trader addresses.
+		if (this.deliveryDepth >= 32) return EnumDeliveryState.NOT_MAILABLE;
+		this.deliveryDepth++;
+		try {
+			return PostalTransactions.attempt(transaction, true, tx -> {
+				ItemStack single = itemstack.copyWithCount(1);
+				ILetter letter = LetterUtils.getLetter(single);
+				if (letter == null) return EnumDeliveryState.NOT_MAILABLE;
+				if (letter.isProcessed()) return EnumDeliveryState.ALREADY_MAILED;
+				if (!letter.isPostPaid()) return EnumDeliveryState.NOT_POSTPAID;
+				if (!letter.isMailable() || letter.getRecipient() == null || !letter.getRecipient().isValid()) return EnumDeliveryState.NOT_MAILABLE;
+				IMailAddress address = letter.getRecipient();
+				IPostalState state = address.getCarrier().deliverLetter(world, this, address, single, tx);
+				if (!state.isOk()) return state;
+				collectPostage(letter.getPostage());
+				return EnumDeliveryState.OK;
+			});
+		} finally {
+			this.deliveryDepth--;
 		}
-
-		if (letter.isProcessed()) {
-			return EnumDeliveryState.ALREADY_MAILED;
-		}
-
-		if (!letter.isPostPaid()) {
-			return EnumDeliveryState.NOT_POSTPAID;
-		}
-
-		if (!letter.isMailable()) {
-			return EnumDeliveryState.NOT_MAILABLE;
-		}
-
-		IPostalState state = EnumDeliveryState.NOT_MAILABLE;
-		IMailAddress address = letter.getRecipient();
-		if (address != null) {
-			IPostalCarrier carrier = address.getCarrier();
-			state = carrier.deliverLetter(world, this, address, itemstack, doLodge);
-		}
-
-		if (!state.isOk()) {
-			return state;
-		}
-
-		collectPostage(letter.getPostage());
-
-		setDirty();
-		return EnumDeliveryState.OK;
-
 	}
 
 	public static PostOffice getOrCreate(ServerLevel level) {
-		SavedData.Factory<PostOffice> factory = new SavedData.Factory<>(PostOffice::new, (tag, registries) -> new PostOffice(tag));
-		return level.getDataStorage().computeIfAbsent(factory, PostOffice.SAVE_NAME);
+		SavedDataType<PostOffice> type = new SavedDataType<>(Identifier.parse("forestry:mail/post_office"), PostOffice::new,
+			CompoundTag.CODEC.xmap(PostOffice::new, data -> data.save(new CompoundTag(), level.registryAccess())));
+		return SavedDataMigration.getOrCreate(level, type, SAVE_NAME, PostOffice::new);
 	}
 }

@@ -1,5 +1,0 @@
-{
-  "parent": "neoforge:item/bucket",
-  "fluid": "forestry:honey",
-  "loader": "neoforge:fluid_container"
-}

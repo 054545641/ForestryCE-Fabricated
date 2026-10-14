@@ -8,7 +8,5 @@
   "id": "forestry:fermenter/potato",
   "modifier": 1.0,
   "output": "forestry:biomass",
-  "resource": {
-    "tag": "c:crops/potato"
-  }
+  "resource": "#c:crops/potato"
 }

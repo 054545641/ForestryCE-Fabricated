@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Style;
 import java.util.function.Predicate;
 
 public class CommandHelpers {
-	public static final Predicate<CommandSourceStack> ADMIN = sender -> sender.hasPermission(2);
+	public static final Predicate<CommandSourceStack> ADMIN = net.minecraft.commands.Commands.hasPermission(net.minecraft.commands.Commands.LEVEL_GAMEMASTERS);
 
 	public static void sendLocalizedChatMessage(CommandSourceStack sender, String locTag, Object... args) {
 		sender.sendSuccess(() -> Component.translatable(locTag, args), false);

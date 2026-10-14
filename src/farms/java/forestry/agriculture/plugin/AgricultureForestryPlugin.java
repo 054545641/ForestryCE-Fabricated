@@ -10,7 +10,7 @@ import forestry.api.plugin.IFarmingRegistration;
 import forestry.api.plugin.IForestryPlugin;
 import forestry.core.content.resources.EnumElectronTube;
 import forestry.core.features.CoreItems;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Base Forestry's farming registrations. Split out of {@code forestry.core.plugin.DefaultForestryPlugin}
@@ -46,7 +46,7 @@ public class AgricultureForestryPlugin implements IForestryPlugin {
 		registerFarmCircuit(circuits, EnumElectronTube.LAPIS, ForestryFarmTypes.COCOA, true);
 	}
 
-	private static void registerFarmCircuit(ICircuitRegistration circuits, EnumElectronTube tube, ResourceLocation typeId, boolean manual) {
+	private static void registerFarmCircuit(ICircuitRegistration circuits, EnumElectronTube tube, Identifier typeId, boolean manual) {
 		String id = manual ? "farm.manual." + typeId.getPath() : "farm.managed." + typeId.getPath();
 		circuits.registerCircuit(manual ? ForestryCircuitLayouts.MANUAL_FARM : ForestryCircuitLayouts.MANAGED_FARM, CoreItems.ELECTRON_TUBES.stack(tube, 1), new MultifarmCircuit(id, typeId, manual));
 	}
@@ -57,7 +57,7 @@ public class AgricultureForestryPlugin implements IForestryPlugin {
 	}
 
 	@Override
-	public ResourceLocation id() {
+	public Identifier id() {
 		return ForestryModuleIds.FARMING;
 	}
 }

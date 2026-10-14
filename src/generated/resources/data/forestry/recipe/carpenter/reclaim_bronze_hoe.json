@@ -1,16 +1,11 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/reclaim_bronze_hoe",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:broken_survivalists_hoe"
-      }
+      "forestry:broken_survivalists_hoe"
     ],
     "result": {
-      "count": 1,
       "id": "forestry:bronze_ingot"
     }
   },

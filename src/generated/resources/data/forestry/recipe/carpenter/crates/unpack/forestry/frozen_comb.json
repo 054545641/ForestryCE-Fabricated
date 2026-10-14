@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/crates/unpack/forestry/frozen_comb",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:crated_frozen_comb"
-      }
+      "forestry:crated_frozen_comb"
     ],
     "result": {
       "count": 9,

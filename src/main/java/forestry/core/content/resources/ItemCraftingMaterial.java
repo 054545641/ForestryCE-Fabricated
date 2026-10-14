@@ -7,8 +7,8 @@ import forestry.core.platform.item.ItemForestry;
 public class ItemCraftingMaterial extends ItemForestry {
 	private final EnumCraftingMaterial type;
 
-	public ItemCraftingMaterial(EnumCraftingMaterial type) {
-		super(new Item.Properties());
+	public ItemCraftingMaterial(EnumCraftingMaterial type, Properties properties) {
+		super(properties);
 		this.type = type;
 	}
 

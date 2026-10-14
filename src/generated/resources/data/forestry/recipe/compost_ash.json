@@ -1,13 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "item": "minecraft:dirt"
-    },
-    "X": {
-      "tag": "c:dusts/ash"
-    }
+    "#": "minecraft:dirt",
+    "X": "#c:dusts/ash"
   },
   "pattern": [
     " X ",
@@ -15,7 +10,6 @@
     " X "
   ],
   "result": {
-    "count": 1,
     "id": "forestry:compost"
   }
 }

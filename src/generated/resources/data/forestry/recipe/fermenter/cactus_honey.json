@@ -8,7 +8,5 @@
   "id": "forestry:fermenter/cactus_honey",
   "modifier": 1.5,
   "output": "forestry:biomass",
-  "resource": {
-    "item": "minecraft:cactus"
-  }
+  "resource": "minecraft:cactus"
 }

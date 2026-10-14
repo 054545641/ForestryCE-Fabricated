@@ -3,7 +3,7 @@ package forestry.apiculture.bees.genetics;
 import java.util.List;
 
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import forestry.api.apiculture.genetics.IBeeSpecies;
@@ -25,7 +25,7 @@ public class DefinitionBeeSpeciesBuilder
 	@Override public int getBody() { return def.body(); }
 	@Override public int getStripes() { return def.stripes(); }
 	@Override public int getOutline() { return def.outline(); }
-	@Override public ResourceLocation getJubilance() { return def.jubilance(); }
+	@Override public Identifier getJubilance() { return def.jubilance(); }
 
 	@Override public IBeeSpeciesBuilder addProduct(IProduct product) { throw new UnsupportedOperationException(READ_ONLY_MESSAGE); }
 	@Override public IBeeSpeciesBuilder addProduct(ItemStack stack, float chance) { throw new UnsupportedOperationException(READ_ONLY_MESSAGE); }
@@ -34,5 +34,5 @@ public class DefinitionBeeSpeciesBuilder
 	@Override public IBeeSpeciesBuilder setBody(TextColor color) { throw new UnsupportedOperationException(READ_ONLY_MESSAGE); }
 	@Override public IBeeSpeciesBuilder setStripes(TextColor color) { throw new UnsupportedOperationException(READ_ONLY_MESSAGE); }
 	@Override public IBeeSpeciesBuilder setOutline(TextColor color) { throw new UnsupportedOperationException(READ_ONLY_MESSAGE); }
-	@Override public IBeeSpeciesBuilder setJubilance(ResourceLocation id) { throw new UnsupportedOperationException(READ_ONLY_MESSAGE); }
+	@Override public IBeeSpeciesBuilder setJubilance(Identifier id) { throw new UnsupportedOperationException(READ_ONLY_MESSAGE); }
 }

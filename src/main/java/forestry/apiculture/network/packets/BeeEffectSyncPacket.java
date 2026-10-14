@@ -8,7 +8,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 import forestry.api.apiculture.genetics.IBeeEffect;
@@ -27,9 +27,9 @@ import forestry.apiculture.network.ApiculturePacketIds;
  * read the JSON), so no per-primitive stream codecs are needed; sync happens only on login/reload, so the NBT-based
  * encoding is not a hot path.
  */
-public record BeeEffectSyncPacket(Map<ResourceLocation, IBeeEffect> effects) implements CustomPacketPayload {
-	private static final StreamCodec<RegistryFriendlyByteBuf, Map<ResourceLocation, IBeeEffect>> STREAM_CODEC =
-		ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, ByteBufCodecs.fromCodecWithRegistries(IBeeEffect.CODEC));
+public record BeeEffectSyncPacket(Map<Identifier, IBeeEffect> effects) implements CustomPacketPayload {
+	private static final StreamCodec<RegistryFriendlyByteBuf, Map<Identifier, IBeeEffect>> STREAM_CODEC =
+		ByteBufCodecs.map(HashMap::new, Identifier.STREAM_CODEC, ByteBufCodecs.fromCodecWithRegistries(IBeeEffect.CODEC));
 
 	@Override
 	public Type<? extends CustomPacketPayload> type() {

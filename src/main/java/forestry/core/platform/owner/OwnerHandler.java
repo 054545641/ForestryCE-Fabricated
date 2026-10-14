@@ -5,6 +5,7 @@ import forestry.api.core.INbtReadable;
 import forestry.api.core.INbtWritable;
 import forestry.core.platform.network.IStreamable;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 
@@ -32,9 +33,9 @@ public class OwnerHandler implements IOwnerHandler, IStreamable, INbtWritable, I
 			data.writeBoolean(false);
 		} else {
 			data.writeBoolean(true);
-			data.writeLong(this.owner.getId().getMostSignificantBits());
-			data.writeLong(this.owner.getId().getLeastSignificantBits());
-			data.writeUtf(this.owner.getName());
+			data.writeLong(this.owner.id().getMostSignificantBits());
+			data.writeLong(this.owner.id().getLeastSignificantBits());
+			data.writeUtf(this.owner.name());
 		}
 	}
 
@@ -43,24 +44,28 @@ public class OwnerHandler implements IOwnerHandler, IStreamable, INbtWritable, I
 		if (data.readBoolean()) {
 			GameProfile owner = new GameProfile(new UUID(data.readLong(), data.readLong()), data.readUtf());
 			setOwner(owner);
+		} else {
+			this.owner = null;
 		}
 	}
 
 	@Override
 	public void read(CompoundTag data, HolderLookup.Provider registries) {
 		if (data.contains("owner_name")) {
-			UUID id = data.hasUUID("owner_uuid") ? data.getUUID("owner_uuid") : null;
-			setOwner(new GameProfile(id, data.getString("owner_name")));
+			UUID id = data.getIntArray("owner_uuid").filter(arr -> arr.length == 4).map(UUIDUtil::uuidFromIntArray).orElse(net.minecraft.util.Util.NIL_UUID);
+			setOwner(new GameProfile(id, data.getStringOr("owner_name", "")));
+		} else {
+			this.owner = null;
 		}
 	}
 
 	@Override
 	public CompoundTag write(CompoundTag data, HolderLookup.Provider registries) {
 		if (this.owner != null) {
-			if (this.owner.getId() != null) {
-				data.putUUID("owner_uuid", this.owner.getId());
+			if (this.owner.id() != null) {
+				data.putIntArray("owner_uuid", UUIDUtil.uuidToIntArray(this.owner.id()));
 			}
-			data.putString("owner_name", this.owner.getName());
+			data.putString("owner_name", this.owner.name());
 		}
 		return data;
 	}

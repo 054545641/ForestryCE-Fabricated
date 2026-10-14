@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:larch_planks"
-      },
-      {
-        "item": "forestry:larch_fireproof_planks"
-      }
+      "forestry:larch_planks",
+      "forestry:larch_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:larch_pressure_plate"
   }
 }

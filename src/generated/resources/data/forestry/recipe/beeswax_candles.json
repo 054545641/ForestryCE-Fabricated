@@ -1,20 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "^": {
-      "item": "forestry:beeswax"
-    },
-    "|": {
-      "tag": "c:strings"
-    }
+    "^": "forestry:beeswax",
+    "|": "#c:strings"
   },
   "pattern": [
     " | ",
     " ^ "
   ],
   "result": {
-    "count": 1,
     "id": "minecraft:candle"
   }
 }

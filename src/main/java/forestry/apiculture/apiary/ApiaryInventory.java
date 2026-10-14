@@ -8,7 +8,7 @@ import forestry.api.core.genetics.IIndividual;
 import forestry.api.core.genetics.capability.IIndividualHandlerItem;
 import forestry.apiculture.bees.BeeHousingInventory;
 import forestry.core.platform.util.SlotUtil;
-import net.minecraft.util.Tuple;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -39,14 +39,14 @@ public class ApiaryInventory extends BeeHousingInventory implements IBeeHousingI
 			super.canPlaceItem(slotIndex, itemStack);
 	}
 
-	public Collection<Tuple<IHiveFrame, ItemStack>> getFrames() {
-		Collection<Tuple<IHiveFrame, ItemStack>> hiveFrames = new ArrayList<>(SLOT_FRAMES_COUNT);
+	public Collection<Pair<IHiveFrame, ItemStack>> getFrames() {
+		Collection<Pair<IHiveFrame, ItemStack>> hiveFrames = new ArrayList<>(SLOT_FRAMES_COUNT);
 
 		for (int i = SLOT_FRAMES_1; i < SLOT_FRAMES_1 + SLOT_FRAMES_COUNT; i++) {
 			ItemStack stackInSlot = getItem(i);
 			Item itemInSlot = stackInSlot.getItem();
 			if (itemInSlot instanceof IHiveFrame frame) {
-				hiveFrames.add(new Tuple<>(frame, stackInSlot.copy()));
+				hiveFrames.add(new Pair<>(frame, stackInSlot.copy()));
 			}
 		}
 

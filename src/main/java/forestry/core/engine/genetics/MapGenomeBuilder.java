@@ -3,7 +3,7 @@ package forestry.core.engine.genetics;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.core.genetics.IGenome;
 import forestry.api.core.genetics.alleles.Allele;
@@ -13,7 +13,7 @@ import forestry.api.plugin.IGenomeBuilder;
 
 // records each side separately so a one-sided genome closure generates a one-sided override
 public class MapGenomeBuilder implements IGenomeBuilder {
-	public final Map<ResourceLocation, AlleleOverride<?>> overrides = new LinkedHashMap<>();
+	public final Map<Identifier, AlleleOverride<?>> overrides = new LinkedHashMap<>();
 
 	@Override
 	public <V> void set(IChromosome<V> chromosome, Allele<V> allele) {
@@ -21,7 +21,7 @@ public class MapGenomeBuilder implements IGenomeBuilder {
 	}
 
 	@Override
-	public void set(IChromosome<ResourceLocation> chromosome, ResourceLocation id) {
+	public void set(IChromosome<Identifier> chromosome, Identifier id) {
 		this.overrides.put(chromosome.id(), AlleleOverride.both(Allele.reference(id)));
 	}
 

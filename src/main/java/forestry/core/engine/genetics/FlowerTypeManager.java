@@ -2,7 +2,7 @@ package forestry.core.engine.genetics;
 
 import java.util.Map;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.IForestryApi;
 import forestry.api.apiculture.IFlowerType;
@@ -15,7 +15,7 @@ public class FlowerTypeManager extends DefinitionManager<IFlowerType> {
 	}
 
 	// datapack definitions replace code definitions with the same ID
-	public static void rebuild(Map<ResourceLocation, IFlowerType> dataDefinitions) {
+	public static void rebuild(Map<Identifier, IFlowerType> dataDefinitions) {
 		((ForestryFlowerTypeManager) IForestryApi.INSTANCE.getFlowerTypeManager()).rebuild(dataDefinitions);
 	}
 }

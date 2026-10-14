@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/dogwood_planks"
-  }
+  "parent": "forestry:block/dogwood_hanging_sign_rot_0"
 }

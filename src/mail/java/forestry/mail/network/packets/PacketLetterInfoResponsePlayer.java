@@ -19,8 +19,8 @@ public record PacketLetterInfoResponsePlayer(IMailAddress address) implements Cu
 
 	public static void encode(RegistryFriendlyByteBuf buffer, PacketLetterInfoResponsePlayer msg) {
 		GameProfile profile = msg.address.getPlayerProfile();
-		buffer.writeUUID(profile.getId());
-		buffer.writeUtf(profile.getName());
+		buffer.writeUUID(profile.id());
+		buffer.writeUtf(profile.name());
 	}
 
 	public static PacketLetterInfoResponsePlayer decode(RegistryFriendlyByteBuf buffer) {

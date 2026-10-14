@@ -4,7 +4,7 @@ import forestry.api.apiculture.IBeeHousing;
 import forestry.api.core.genetics.IGenome;
 import forestry.api.core.genetics.ILifeStage;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +24,7 @@ public interface IBeeClientManager {
 	 * @param speciesId The id of the bee species to retrieve the model for.
 	 * @return The model location for the given species and life stage.
 	 */
-	ResourceLocation getModelLocation(ILifeStage stage, ResourceLocation speciesId);
+	Identifier getModelLocation(ILifeStage stage, Identifier speciesId);
 
 	/**
 	 * Retrieves the default model location used to display bees of the given life stage when no custom model is
@@ -33,7 +33,7 @@ public interface IBeeClientManager {
 	 * @param stage The life stage to retrieve the default bee model for.
 	 * @return The default model location for the given life stage.
 	 */
-	ResourceLocation getDefaultModelLocation(ILifeStage stage);
+	Identifier getDefaultModelLocation(ILifeStage stage);
 
 	/**
 	 * Retrieves every distinct model location used to display bees with the given life stage, including the
@@ -44,7 +44,7 @@ public interface IBeeClientManager {
 	 * @param stage The life stage to retrieve bee model locations for.
 	 * @return All distinct model locations for the given life stage. (Ex. all drone models)
 	 */
-	Collection<ResourceLocation> getAllModelLocations(ILifeStage stage);
+	Collection<Identifier> getAllModelLocations(ILifeStage stage);
 
 	/**
 	 * Spawns the ambient particles for a bee working in a hive or apiary. Client-side only.

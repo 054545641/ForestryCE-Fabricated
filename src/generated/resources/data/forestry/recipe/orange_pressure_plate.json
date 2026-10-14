@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:orange_planks"
-      },
-      {
-        "item": "forestry:orange_fireproof_planks"
-      }
+      "forestry:orange_planks",
+      "forestry:orange_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:orange_pressure_plate"
   }
 }

@@ -3,7 +3,7 @@ package forestry.arboriculture.fruit;
 import forestry.api.core.IProduct;
 import forestry.api.core.genetics.IGenome;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockGetter;
 
 import java.util.List;
@@ -15,9 +15,9 @@ public class RipeningFruit extends Fruit {
 	private final int diffR;
 	private final int diffG;
 	private final int diffB;
-	private final ResourceLocation sprite;
+	private final Identifier sprite;
 
-	public RipeningFruit(boolean dominant, int ripeningPeriod, ResourceLocation sprite, int ripe, int callow, List<IProduct> products) {
+	public RipeningFruit(boolean dominant, int ripeningPeriod, Identifier sprite, int ripe, int callow, List<IProduct> products) {
 		super(dominant, ripeningPeriod, products);
 		this.sprite = sprite;
 
@@ -60,12 +60,12 @@ public class RipeningFruit extends Fruit {
 	}
 
 	@Override
-	public ResourceLocation getSprite(IGenome genome, BlockGetter world, BlockPos pos, int ripeningTime) {
+	public Identifier getSprite(IGenome genome, BlockGetter world, BlockPos pos, int ripeningTime) {
 		return this.sprite;
 	}
 
 	@Override
-	public ResourceLocation getDecorativeSprite() {
+	public Identifier getDecorativeSprite() {
 		return this.sprite;
 	}
 

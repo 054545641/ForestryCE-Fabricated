@@ -14,7 +14,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.IForestryApi;
 import forestry.api.core.genetics.ISpeciesType;
@@ -43,7 +43,7 @@ import forestry.api.core.genetics.alleles.IKaryotype;
  * </ul>
  */
 public record TaxonDefinition(@Nullable String parent, String name, @Nullable TaxonomicRank rank,
-							  @Nullable ResourceLocation type, Map<ResourceLocation, Allele<?>> alleles) {
+							  @Nullable Identifier type, Map<Identifier, Allele<?>> alleles) {
 	/** Convenience form for a structural taxon (no explicit rank, no default alleles) — used by add-ons and tests. */
 	public TaxonDefinition(@Nullable String parent, String name) {
 		this(parent, name, null, null, Map.of());
@@ -52,14 +52,14 @@ public record TaxonDefinition(@Nullable String parent, String name, @Nullable Ta
 	// Intermediate form holding the still-raw (karyotype-dependent) alleles as a Dynamic, so the alleles field can be
 	// decoded against the karyotype named by the sibling `type` field. See CODEC.
 	private record Unresolved(Optional<String> parent, String name, Optional<TaxonomicRank> rank,
-							  Optional<ResourceLocation> type, Optional<Dynamic<?>> alleles) {
+							  Optional<Identifier> type, Optional<Dynamic<?>> alleles) {
 	}
 
 	private static final Codec<Unresolved> UNRESOLVED_CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		Codec.STRING.optionalFieldOf("parent").forGetter(Unresolved::parent),
 		Codec.STRING.fieldOf("name").forGetter(Unresolved::name),
 		TaxonomicRank.CODEC.optionalFieldOf("rank").forGetter(Unresolved::rank),
-		ResourceLocation.CODEC.optionalFieldOf("type").forGetter(Unresolved::type),
+		Identifier.CODEC.optionalFieldOf("type").forGetter(Unresolved::type),
 		Codec.PASSTHROUGH.optionalFieldOf("alleles").forGetter(Unresolved::alleles)
 	).apply(instance, Unresolved::new));
 
@@ -73,7 +73,7 @@ public record TaxonDefinition(@Nullable String parent, String name, @Nullable Ta
 	private static DataResult<TaxonDefinition> resolve(Unresolved u) {
 		String parent = u.parent.orElse(null);
 		TaxonomicRank rank = u.rank.orElse(null);
-		ResourceLocation type = u.type.orElse(null);
+		Identifier type = u.type.orElse(null);
 		Optional<Dynamic<?>> rawAlleles = u.alleles;
 
 		if (rawAlleles.isEmpty()) {
@@ -106,7 +106,7 @@ public record TaxonDefinition(@Nullable String parent, String name, @Nullable Ta
 	}
 
 	@Nullable
-	private static IKaryotype karyotypeFor(@Nullable ResourceLocation typeId) {
+	private static IKaryotype karyotypeFor(@Nullable Identifier typeId) {
 		if (typeId == null) {
 			return null;
 		}
@@ -118,7 +118,7 @@ public record TaxonDefinition(@Nullable String parent, String name, @Nullable Ta
 		buf.writeNullable(def.parent, FriendlyByteBuf::writeUtf);
 		buf.writeUtf(def.name);
 		buf.writeNullable(def.rank, (b, rank) -> TaxonomicRank.STREAM_CODEC.encode((RegistryFriendlyByteBuf) b, rank));
-		buf.writeNullable(def.type, FriendlyByteBuf::writeResourceLocation);
+		buf.writeNullable(def.type, FriendlyByteBuf::writeIdentifier);
 		if (def.type != null && !def.alleles.isEmpty()) {
 			buf.writeBoolean(true);
 			IKaryotype karyotype = karyotypeFor(def.type);
@@ -135,8 +135,8 @@ public record TaxonDefinition(@Nullable String parent, String name, @Nullable Ta
 		String parent = buf.readNullable(FriendlyByteBuf::readUtf);
 		String name = buf.readUtf();
 		TaxonomicRank rank = buf.readNullable(b -> TaxonomicRank.STREAM_CODEC.decode((RegistryFriendlyByteBuf) b));
-		ResourceLocation type = buf.readNullable(FriendlyByteBuf::readResourceLocation);
-		Map<ResourceLocation, Allele<?>> alleles = Map.of();
+		Identifier type = buf.readNullable(FriendlyByteBuf::readIdentifier);
+		Map<Identifier, Allele<?>> alleles = Map.of();
 		if (buf.readBoolean()) {
 			IKaryotype karyotype = karyotypeFor(type);
 			if (karyotype == null) {

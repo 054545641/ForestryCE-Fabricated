@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_attached_hanging_sign_rot_1",
+  "textures": {
+    "all": "forestry:entity/signs/hanging/mahogany",
+    "particle": "forestry:block/stripped_mahogany_log"
+  }
+}

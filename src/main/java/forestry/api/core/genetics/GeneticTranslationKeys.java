@@ -1,6 +1,6 @@
 package forestry.api.core.genetics;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Builds the translation keys used for genetic objects: species of a species type, and alleles of a
@@ -25,7 +25,7 @@ public final class GeneticTranslationKeys {
 	 * @param objectId The ID of the object. An example would be the ID of the species.
 	 * @return The translation key.
 	 */
-	public static String createTranslationKey(String type, ResourceLocation typeId, ResourceLocation objectId) {
+	public static String createTranslationKey(String type, Identifier typeId, Identifier objectId) {
 		String typeNamespace = typeId.getNamespace();
 		StringBuilder translationKey = new StringBuilder(type);
 		if (!type.isEmpty()) {

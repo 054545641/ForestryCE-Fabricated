@@ -106,7 +106,7 @@ public final class VecUtil {
 			int zDiameter = maxZ - minZ;
 			this.maxSpiralLayers = Math.max(xDiameter, zDiameter) / 2;
 			this.spiralLayer = 1;
-			this.minWorldHeight = level.getMinBuildHeight();
+			this.minWorldHeight = level.getMinY();
 		}
 
 		@Override

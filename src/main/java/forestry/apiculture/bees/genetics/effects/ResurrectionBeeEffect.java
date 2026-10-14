@@ -1,7 +1,6 @@
 package forestry.apiculture.bees.genetics.effects;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.mojang.serialization.Codec;
@@ -10,12 +9,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
-import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 
@@ -23,8 +19,6 @@ import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.genetics.IBeeEffect;
 import forestry.api.core.genetics.IEffectData;
 import forestry.api.core.genetics.IGenome;
-import forestry.core.platform.util.EntityUtil;
-import forestry.core.platform.util.ItemStackUtil;
 
 /**
  * The {@code forestry:resurrect} primitive: finds mob drops on the floor and resurrects them into their creature
@@ -65,7 +59,7 @@ public class ResurrectionBeeEffect extends ThrottledBeeEffect {
 			return storedData;
 		}
 
-		Collections.shuffle(this.resurrectables);
+		net.minecraft.util.Util.shuffle(this.resurrectables, housing.getLevel().getRandom());
 
 		for (ItemEntity entity : entities) {
 			if (resurrectEntity(entity)) {
@@ -77,47 +71,33 @@ public class ResurrectionBeeEffect extends ThrottledBeeEffect {
 	}
 
 	private boolean resurrectEntity(ItemEntity entity) {
-		if (!entity.isAlive()) {
-			return false;
-		}
-
-		ItemStack contained = entity.getItem();
 		for (Resurrectable entry : this.resurrectables) {
-			if (entry.matches(contained)) {
-				if (entry.spawnAndTransform(entity)) {
-					contained.shrink(1);
-
-					if (contained.getCount() <= 0) {
-						entity.discard();
-					}
-				}
-
+			if (BeeEffectEntities.resurrect(entity, entry.item(), entry.entity())) {
 				return true;
 			}
 		}
-
 		return false;
 	}
 
 	public static List<Resurrectable> getReanimationList() {
 		List<Resurrectable> list = new ArrayList<>();
-		list.add(new Resurrectable(Items.BONE, EntityType.SKELETON));
-		list.add(new Resurrectable(Items.ARROW, EntityType.SKELETON));
-		list.add(new Resurrectable(Items.ROTTEN_FLESH, EntityType.ZOMBIE));
-		list.add(new Resurrectable(Items.BLAZE_ROD, EntityType.BLAZE));
+		list.add(new Resurrectable(Items.BONE, EntityTypes.SKELETON));
+		list.add(new Resurrectable(Items.ARROW, EntityTypes.SKELETON));
+		list.add(new Resurrectable(Items.ROTTEN_FLESH, EntityTypes.ZOMBIE));
+		list.add(new Resurrectable(Items.BLAZE_ROD, EntityTypes.BLAZE));
 		return list;
 	}
 
 	public static List<Resurrectable> getResurrectionList() {
 		List<Resurrectable> list = new ArrayList<>();
-		list.add(new Resurrectable(Items.GUNPOWDER, EntityType.CREEPER));
-		list.add(new Resurrectable(Items.ENDER_PEARL, EntityType.ENDERMAN));
-		list.add(new Resurrectable(Items.STRING, EntityType.SPIDER));
-		list.add(new Resurrectable(Items.SPIDER_EYE, EntityType.SPIDER));
-		list.add(new Resurrectable(Items.STRING, EntityType.CAVE_SPIDER));
-		list.add(new Resurrectable(Items.SPIDER_EYE, EntityType.CAVE_SPIDER));
-		list.add(new Resurrectable(Items.GHAST_TEAR, EntityType.GHAST));
-		list.add(new Resurrectable(Blocks.DRAGON_EGG.asItem(), EntityType.ENDER_DRAGON));
+		list.add(new Resurrectable(Items.GUNPOWDER, EntityTypes.CREEPER));
+		list.add(new Resurrectable(Items.ENDER_PEARL, EntityTypes.ENDERMAN));
+		list.add(new Resurrectable(Items.STRING, EntityTypes.SPIDER));
+		list.add(new Resurrectable(Items.SPIDER_EYE, EntityTypes.SPIDER));
+		list.add(new Resurrectable(Items.STRING, EntityTypes.CAVE_SPIDER));
+		list.add(new Resurrectable(Items.SPIDER_EYE, EntityTypes.CAVE_SPIDER));
+		list.add(new Resurrectable(Items.GHAST_TEAR, EntityTypes.GHAST));
+		list.add(new Resurrectable(Blocks.DRAGON_EGG.asItem(), EntityTypes.ENDER_DRAGON));
 		return list;
 	}
 
@@ -131,23 +111,5 @@ public class ResurrectionBeeEffect extends ThrottledBeeEffect {
 			BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entity").forGetter(Resurrectable::entity)
 		).apply(inst, Resurrectable::new));
 
-		private boolean matches(ItemStack stack) {
-			return ItemStackUtil.isIdenticalItem(new ItemStack(this.item), stack);
-		}
-
-		private boolean spawnAndTransform(ItemEntity at) {
-			// Entries are always mobs (see the built-in lists); EntityUtil#spawnEntity requires EntityType<? extends Mob>.
-			@SuppressWarnings("unchecked")
-			EntityType<? extends Mob> mobType = (EntityType<? extends Mob>) this.entity;
-			Mob spawned = EntityUtil.spawnEntity(at.level(), mobType, at.getX(), at.getY(), at.getZ());
-			if (spawned == null) {
-				return false;
-			}
-			// Resurrected dragons patrol rather than hover in place (preserves the historical dragon-egg behaviour).
-			if (spawned instanceof EnderDragon dragon) {
-				dragon.getPhaseManager().setPhase(EnderDragonPhase.HOLDING_PATTERN);
-			}
-			return true;
-		}
 	}
 }

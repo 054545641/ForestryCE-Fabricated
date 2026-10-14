@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/willow_planks"
-  }
+  "parent": "forestry:block/willow_hanging_sign_rot_0"
 }

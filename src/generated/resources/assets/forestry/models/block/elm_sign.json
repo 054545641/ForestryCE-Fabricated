@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/elm_planks"
-  }
+  "parent": "forestry:block/elm_sign_rot_0"
 }

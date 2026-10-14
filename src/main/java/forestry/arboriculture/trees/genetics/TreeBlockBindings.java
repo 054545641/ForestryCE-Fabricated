@@ -3,7 +3,8 @@ package forestry.arboriculture.trees.genetics;
 import java.util.List;
 
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
+import javax.annotation.Nullable;
 import net.minecraft.world.level.block.state.BlockState;
 
 import forestry.api.arboriculture.ITreeGenerator;
@@ -19,6 +20,6 @@ public record TreeBlockBindings(
 	ITreeGenerator generator,
 	List<BlockState> vanillaLeafStates,
 	List<Item> vanillaSaplingItems,
-	ItemStack decorativeLeaves
+	@Nullable ItemStackTemplate decorativeLeaves
 ) {
 }

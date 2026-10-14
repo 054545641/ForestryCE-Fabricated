@@ -1,10 +1,7 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "forestry:waxstone"
-  },
+  "ingredient": "forestry:waxstone",
   "result": {
-    "count": 1,
     "id": "forestry:chiseled_waxstone"
   }
 }

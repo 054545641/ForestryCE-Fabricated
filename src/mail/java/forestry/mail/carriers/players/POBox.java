@@ -22,12 +22,14 @@ import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class POBox implements Container, IWatchable, INbtReadable, INbtWritable {
+public class POBox implements forestry.api.core.ITransactionalContainer, IWatchable, INbtReadable, INbtWritable {
 	public static final short SLOT_SIZE = 84;
 
 	@Nullable
 	private IMailAddress address;
 	private final InventoryAdapter letters = new InventoryAdapter(SLOT_SIZE, "Letters").disableAutomation();
+
+	{ this.letters.setInventoryOwner(this::setDirty); }
 
 	private final Set<Watcher> updateWatchers = new HashSet<>();
 
@@ -46,7 +48,7 @@ public class POBox implements Container, IWatchable, INbtReadable, INbtWritable 
 	@Override
 	public void read(CompoundTag tag, HolderLookup.Provider registries) {
 		if (tag.contains("address")) {
-			this.address = new MailAddress(tag.getCompound("address"));
+			this.address = new MailAddress(tag.getCompoundOrEmpty("address"));
 		}
 
 		this.letters.read(tag, registries);
@@ -63,19 +65,22 @@ public class POBox implements Container, IWatchable, INbtReadable, INbtWritable 
 		return compoundNBT;
 	}
 
-	public boolean storeLetter(ItemStack stack) {
-		ILetter letter = LetterUtils.getLetter(stack);
+	public boolean storeLetter(ItemStack stack, net.neoforged.neoforge.transfer.transaction.TransactionContext transaction) {
+		ItemStack delivered = stack.copyWithCount(1);
+		ILetter letter = LetterUtils.getLetter(delivered);
 		Preconditions.checkNotNull(letter, "Letter stack must be a valid letter");
-
-		// Mark letter as processed
 		letter.setProcessed(true);
 		letter.invalidatePostage();
-		LetterUtils.setLetterData(stack, letter);
-
-		this.setDirty();
-
-		return InventoryUtil.tryAddStack(this.letters, stack, true);
+		LetterUtils.setLetterData(delivered, letter);
+		try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.open(transaction)) {
+			if (!InventoryUtil.tryAddStack(this.letters, delivered, true)) return false;
+			tx.commit();
+			return true;
+		}
 	}
+
+	@Override
+	public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> getTransferHandler() { return this.letters.getTransferHandler(); }
 
 	public POBoxInfo getPOBoxInfo() {
 		int playerLetters = 0;
@@ -105,7 +110,6 @@ public class POBox implements Container, IWatchable, INbtReadable, INbtWritable 
 	@Override
 	public void setDirty() {
 		this.updateWatchers.forEach(Watcher::onWatchableUpdate);
-		this.letters.setChanged();
 	}
 
 	@Override
@@ -120,8 +124,8 @@ public class POBox implements Container, IWatchable, INbtReadable, INbtWritable 
 
 	@Override
 	public void setItem(int var1, ItemStack var2) {
-		this.setDirty();
 		this.letters.setItem(var1, var2);
+		this.setDirty();
 	}
 
 	@Override
@@ -136,12 +140,16 @@ public class POBox implements Container, IWatchable, INbtReadable, INbtWritable 
 
 	@Override
 	public ItemStack removeItem(int var1, int var2) {
-		return this.letters.removeItem(var1, var2);
+		ItemStack removed = this.letters.removeItem(var1, var2);
+		if (!removed.isEmpty()) setDirty();
+		return removed;
 	}
 
 	@Override
 	public ItemStack removeItemNoUpdate(int index) {
-		return this.letters.removeItemNoUpdate(index);
+		ItemStack removed = this.letters.removeItemNoUpdate(index);
+		if (!removed.isEmpty()) setDirty();
+		return removed;
 	}
 
 	@Override
@@ -150,8 +158,7 @@ public class POBox implements Container, IWatchable, INbtReadable, INbtWritable 
 	}
 
 	@Override
-	public void setChanged() {
-	}
+	public void setChanged() { setDirty(); }
 
 	@Override
 	public boolean stillValid(Player var1) {
@@ -164,6 +171,5 @@ public class POBox implements Container, IWatchable, INbtReadable, INbtWritable 
 	}
 
 	@Override
-	public void clearContent() {
-	}
+	public void clearContent() { this.letters.clearContent(); setDirty(); }
 }

@@ -5,7 +5,7 @@ import net.minecraft.world.item.ItemStack;
 /**
  * Gives an item the ability to be colored.
  * <p>
- * <b>NOTE:</b> Items are NOT automatically registered to be tinted. You will have to register in {@code RegisterColorHandlersEvent.Item} yourself.
+ * <b>NOTE:</b> Items are NOT automatically registered to be tinted. The item definition must reference a registered {@code ItemTintSource} that reads this interface.
  */
 public interface ITintedItem {
 	/**

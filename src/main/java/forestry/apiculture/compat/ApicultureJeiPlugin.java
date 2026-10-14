@@ -22,7 +22,7 @@ import mezz.jei.api.ingredients.subtypes.UidContext;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -30,17 +30,19 @@ import java.util.List;
 
 @JeiPlugin
 public class ApicultureJeiPlugin implements IModPlugin {
-	static final ResourceLocation BACKGROUND = ForestryConstants.forestry("textures/gui/jei/recipes.png");
+	static final Identifier BACKGROUND = ForestryConstants.forestry("textures/gui/jei/recipes.png");
 	static final List<ProductsRecipeCategory> productsCategories = new ArrayList<>();
 	static final List<MutationsRecipeCategory> mutationsCategories = new ArrayList<>();
 
 	@Override
-	public ResourceLocation getPluginUid() {
+	public Identifier getPluginUid() {
 		return ForestryModuleIds.APICULTURE;
 	}
 
 	@Override
 	public void registerCategories(IRecipeCategoryRegistration registration) {
+		productsCategories.clear();
+		mutationsCategories.clear();
 		IGuiHelper helper = registration.getJeiHelpers().getGuiHelper();
 		IDrawable productsBackground = helper.createDrawable(BACKGROUND, 0, 61 + 30, 162, 61);
 		IDrawable mutationsBackground = helper.createDrawable(BACKGROUND, 0, 30, 162, 61);
@@ -71,10 +73,6 @@ public class ApicultureJeiPlugin implements IModPlugin {
 				return CreativeHiveFrameItem.hasForceMutations(stack);
 			}
 
-			@Override
-			public String getLegacyStringSubtypeInfo(ItemStack stack, UidContext context) {
-				return String.valueOf(CreativeHiveFrameItem.hasForceMutations(stack));
-			}
 		});
 	}
 

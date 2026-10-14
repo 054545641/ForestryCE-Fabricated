@@ -15,15 +15,15 @@ public class ForestryFenceGateBlock extends FenceGateBlock implements IWoodTyped
 	private final boolean fireproof;
 	private final IWoodType woodType;
 
-	public ForestryFenceGateBlock(boolean fireproof, IWoodType woodType) {
-		super(createBlockProperties(fireproof, woodType), woodType.getFenceGateOpenSound(), woodType.getFenceGateCloseSound());
+	public ForestryFenceGateBlock(Properties properties, boolean fireproof, IWoodType woodType) {
+		super(createBlockProperties(fireproof, woodType, properties), woodType.getFenceGateOpenSound(), woodType.getFenceGateCloseSound());
 		this.fireproof = fireproof;
 		this.woodType = woodType;
 	}
 
-	private static Properties createBlockProperties(boolean fireproof, IWoodType woodType) {
+	private static Properties createBlockProperties(boolean fireproof, IWoodType woodType, Properties properties) {
 		// todo add mapColor
-		var props = Block.Properties.of()
+		var props = properties
 			.forceSolidOn()
 			.strength(woodType.getHardness(), woodType.getHardness() * 1.5F)
 			.instrument(NoteBlockInstrument.BASS)

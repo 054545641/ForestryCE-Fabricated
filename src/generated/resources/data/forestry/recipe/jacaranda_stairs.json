@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_stairs",
   "key": {
-    "#": {
-      "item": "forestry:jacaranda_planks"
-    }
+    "#": "forestry:jacaranda_planks"
   },
   "pattern": [
     "#  ",

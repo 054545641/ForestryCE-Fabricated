@@ -128,35 +128,8 @@ public abstract class ItemStackUtil {
 		return false;
 	}
 
-	public static int[] createConsume(List<Ingredient> set, Container inventory, boolean craftingTools) {
-		return createConsume(set, inventory.getContainerSize(), inventory::getItem, craftingTools);
-	}
-
-	public static int[] createConsume(List<Ingredient> set, int stockCount, IntFunction<ItemStack> stock, boolean craftingTools) {
-		//A array that contains the amount of items that is needed from this stack
-		int[] reqAmounts = new int[stockCount];
-		int found = 0;
-		for (Ingredient ing : set) {
-			if (ing.isEmpty()) {
-				found++;
-				continue;
-			}
-			for (int i = 0; i < reqAmounts.length; i++) {
-				ItemStack offer = stock.apply(i);
-
-				if (offer.getCount() > reqAmounts[i] && ing.test(offer)) {
-					reqAmounts[i] = reqAmounts[i] + 1;
-					found++;
-					break;
-				}
-			}
-		}
-		if (found < set.size()) {
-			return EMPTY_CONSUME;
-		}
-
-		return reqAmounts;
-	}
+	public static int[] createConsume(List<Ingredient> set, Container inventory, boolean craftingTools) { return InventoryCrafting.createConsume(set, inventory, craftingTools); }
+	public static int[] createConsume(List<Ingredient> set, int count, IntFunction<ItemStack> stock, boolean craftingTools) { return InventoryCrafting.createConsume(set, count, stock, craftingTools); }
 
 	/**
 	 * Counts how many full sets are contained in the passed stock
@@ -223,52 +196,9 @@ public abstract class ItemStackUtil {
 	/**
 	 * Compare two item stacks for crafting equivalency without oreDictionary or craftingTools
 	 */
-	public static boolean isCraftingEquivalent(ItemStack base, ItemStack comparison) {
-		if (base.isEmpty() || comparison.isEmpty()) {
-			return false;
-		}
-
-		if (base.getItem() != comparison.getItem()) {
-			return false;
-		}
-
-		CustomData baseData = base.get(DataComponents.CUSTOM_DATA);
-		if (baseData == null || baseData.isEmpty()) {
-			return true;
-		}
-		CustomData comparisonData = comparison.get(DataComponents.CUSTOM_DATA);
-		return baseData.equals(comparisonData);
-	}
-
-	/**
-	 * Compare two item stacks for crafting equivalency.
-	 */
-	public static boolean isCraftingEquivalent(ItemStack base, ItemStack comparison, boolean craftingTools) {
-		if (base.isEmpty() || comparison.isEmpty()) {
-			return false;
-		}
-
-		if (craftingTools && isCraftingToolEquivalent(base, comparison)) {
-			return true;
-		}
-
-		return isCraftingEquivalent(base, comparison);
-	}
-
-	public static boolean isCraftingToolEquivalent(ItemStack base, ItemStack comparison) {
-		if (base.isEmpty() || comparison.isEmpty()) {
-			return false;
-		}
-
-		Item baseItem = base.getItem();
-
-		if (baseItem != comparison.getItem()) {
-			return false;
-		}
-
-		CustomData baseData = base.get(DataComponents.CUSTOM_DATA);
-		return baseData == null || baseData.isEmpty();
-	}
+	public static boolean isCraftingEquivalent(ItemStack base, ItemStack comparison) { return InventoryCrafting.isCraftingEquivalent(base, comparison); }
+	public static boolean isCraftingEquivalent(ItemStack base, ItemStack comparison, boolean craftingTools) { return InventoryCrafting.isCraftingEquivalent(base, comparison, craftingTools); }
+	public static boolean isCraftingToolEquivalent(ItemStack base, ItemStack comparison) { return InventoryCrafting.isCraftingToolEquivalent(base, comparison); }
 
 	public static void dropItemStackAsEntity(ItemStack items, Level world, double x, double y, double z) {
 		dropItemStackAsEntity(items, world, x, y, z, 10);
@@ -279,14 +209,14 @@ public abstract class ItemStackUtil {
 	}
 
 	public static void dropItemStackAsEntity(ItemStack items, Level world, double x, double y, double z, int delayForPickup) {
-		if (items.isEmpty() || world.isClientSide) {
+		if (items.isEmpty() || world.isClientSide()) {
 			return;
 		}
 
 		float f1 = 0.4F;
-		double d = (world.random.nextFloat() * f1 + (1.0F - f1)) * 0.5D;
-		double d1 = (world.random.nextFloat() * f1 + (1.0F - f1)) * 0.5D;
-		double d2 = (world.random.nextFloat() * f1 + (1.0F - f1)) * 0.5D;
+		double d = (world.getRandom().nextFloat() * f1 + (1.0F - f1)) * 0.5D;
+		double d1 = (world.getRandom().nextFloat() * f1 + (1.0F - f1)) * 0.5D;
+		double d2 = (world.getRandom().nextFloat() * f1 + (1.0F - f1)) * 0.5D;
 		ItemEntity entityitem = new ItemEntity(world, x + d, y + d1, z + d2, items);
 		entityitem.setPickUpDelay(delayForPickup);
 

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -62,7 +62,7 @@ public class SpeciesReloadTest {
 	 */
 	@GameTest(template = "empty")
 	public static void rebuildFromLoadedDefinitionsProducesFullSet(GameTestHelper helper) {
-		Map<ResourceLocation, BeeSpeciesDefinition> defs = BeeSpeciesManager.INSTANCE.getDefinitions();
+		Map<Identifier, BeeSpeciesDefinition> defs = BeeSpeciesManager.INSTANCE.getDefinitions();
 		if (defs.size() < EXPECTED_BUILTIN_COUNT) {
 			helper.fail("BeeSpeciesManager only holds " + defs.size() + " definitions (expected at least "
 				+ EXPECTED_BUILTIN_COUNT + "); the bee_species datapack JSON was not loaded at server start");

@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/ender_pearl",
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "item": "forestry:pulsating_mesh"
-      }
+      "#": "forestry:pulsating_mesh"
     },
     "pattern": [
       " # ",
@@ -15,7 +11,6 @@
       " # "
     ],
     "result": {
-      "count": 1,
       "id": "minecraft:ender_pearl"
     }
   },

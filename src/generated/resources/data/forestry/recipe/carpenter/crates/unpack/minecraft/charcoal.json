@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/crates/unpack/minecraft/charcoal",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:crated_charcoal"
-      }
+      "forestry:crated_charcoal"
     ],
     "result": {
       "count": 9,

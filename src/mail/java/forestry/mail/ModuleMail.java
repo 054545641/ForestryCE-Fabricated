@@ -18,7 +18,7 @@ import forestry.mail.features.MailBlockEntities;
 import forestry.mail.network.packets.*;
 import forestry.modules.BlankForestryModule;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -35,7 +35,7 @@ import forestry.mail.letters.MailAddress;
 @ForestryModule
 public class ModuleMail extends BlankForestryModule {
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return ForestryModuleIds.MAIL;
 	}
 
@@ -47,7 +47,7 @@ public class ModuleMail extends BlankForestryModule {
 	}
 
 	private static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, MailBlockEntities.MAILBOX.tileType(), (tile, side) -> tile.getAutomatedMailHandler());
+		event.registerBlockEntity(Capabilities.Item.BLOCK, MailBlockEntities.MAILBOX.tileType(), (tile, side) -> tile.getAutomatedMailHandler());
 	}
 
 	private static void registerDataMaps(RegisterDataMapTypesEvent event) {
@@ -56,7 +56,7 @@ public class ModuleMail extends BlankForestryModule {
 
 	public static void handlePlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
 		Player player = event.getEntity();
-		if (player.level().isClientSide) {
+		if (player.level().isClientSide()) {
 			return;
 		}
 

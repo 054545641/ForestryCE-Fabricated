@@ -7,11 +7,8 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-import thedarkcolour.modkit.data.DataHelper;
-import thedarkcolour.modkit.data.ProviderRegistrar;
 
 /**
  * The pieces a content jar registers its providers from, assembled by {@link ContentJarData}. Every
@@ -25,10 +22,10 @@ import thedarkcolour.modkit.data.ProviderRegistrar;
 public final class JarScope {
 	private final GatherDataEvent event;
 	private final PackOutput output;
-	private final DataHelper helper;
+	private final ScopedDataHelper helper;
 	private final ProviderRegistrar registrar;
 
-	JarScope(GatherDataEvent event, PackOutput output, DataHelper helper, ProviderRegistrar registrar) {
+	JarScope(GatherDataEvent event, PackOutput output, ScopedDataHelper helper, ProviderRegistrar registrar) {
 		this.event = event;
 		this.output = output;
 		this.helper = helper;
@@ -41,7 +38,7 @@ public final class JarScope {
 	 * @param provider The provider to attach
 	 */
 	public void addServer(DataProvider provider) {
-		this.registrar.addProvider(this.event.getGenerator(), this.event.includeServer(), provider);
+		this.registrar.addProvider(this.event.getGenerator(), true, provider);
 	}
 
 	/**
@@ -50,7 +47,7 @@ public final class JarScope {
 	 * @param provider The provider to attach
 	 */
 	public void addClient(DataProvider provider) {
-		this.registrar.addProvider(this.event.getGenerator(), this.event.includeClient(), provider);
+		this.registrar.addProvider(this.event.getGenerator(), true, provider);
 	}
 
 	/**
@@ -63,7 +60,7 @@ public final class JarScope {
 	/**
 	 * @return The helper the ModKit-backed providers are created through
 	 */
-	public DataHelper helper() {
+	public ScopedDataHelper helper() {
 		return this.helper;
 	}
 
@@ -74,10 +71,4 @@ public final class JarScope {
 		return this.event.getLookupProvider();
 	}
 
-	/**
-	 * @return The helper a model provider checks referenced files against
-	 */
-	public ExistingFileHelper existingFileHelper() {
-		return this.event.getExistingFileHelper();
-	}
 }

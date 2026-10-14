@@ -13,31 +13,27 @@ import forestry.core.platform.models.baker.ModelBakerModel;
 import forestry.core.platform.util.ResourceUtil;
 import forestry.core.platform.util.SpeciesUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 import java.util.Objects;
 
-@OnlyIn(Dist.CLIENT)
 public class DefaultLeavesModel extends ModelBlockCached<DefaultLeavesBlock, DefaultLeavesModel.Key> {
 	public DefaultLeavesModel() {
 		super(DefaultLeavesBlock.class);
 	}
 
 	public static final class Key {
-		public final ResourceLocation speciesId;
+		public final Identifier speciesId;
 		public final boolean fancy;
 		private final int hashCode;
 
-		public Key(ResourceLocation speciesId, boolean fancy) {
+		public Key(Identifier speciesId, boolean fancy) {
 			this.speciesId = speciesId;
 			this.fancy = fancy;
 			this.hashCode = Objects.hash(speciesId, fancy);
@@ -49,7 +45,7 @@ public class DefaultLeavesModel extends ModelBlockCached<DefaultLeavesBlock, Def
 				return false;
 			} else {
 				// species IDs are passed around so == is fine
-				return otherKey.speciesId == this.speciesId && otherKey.fancy == this.fancy;
+				return otherKey.speciesId.equals(this.speciesId) && otherKey.fancy == this.fancy;
 			}
 		}
 
@@ -64,14 +60,14 @@ public class DefaultLeavesModel extends ModelBlockCached<DefaultLeavesBlock, Def
 		Block block = Block.byItem(stack.getItem());
 		Preconditions.checkArgument(block instanceof DefaultLeavesBlock, "ItemStack must be for default leaves.");
 		DefaultLeavesBlock bBlock = (DefaultLeavesBlock) block;
-		return new Key(bBlock.getSpeciesId(), Minecraft.useFancyGraphics());
+		return new Key(bBlock.getSpeciesId(), Minecraft.getInstance().options.cutoutLeaves().get());
 	}
 
 	@Override
 	protected DefaultLeavesModel.Key getWorldKey(BlockState state, ModelData extraData) {
 		if (state.getBlock() instanceof DefaultLeavesBlock block) {
-			ResourceLocation treeDefinition = block.getSpeciesId();
-			return new DefaultLeavesModel.Key(treeDefinition, Minecraft.useFancyGraphics());
+			Identifier treeDefinition = block.getSpeciesId();
+			return new DefaultLeavesModel.Key(treeDefinition, Minecraft.getInstance().options.cutoutLeaves().get());
 		} else {
 			throw new IllegalArgumentException("state must be for default leaves.");
 		}
@@ -79,7 +75,7 @@ public class DefaultLeavesModel extends ModelBlockCached<DefaultLeavesBlock, Def
 
 	@Override
 	protected void bakeBlock(DefaultLeavesBlock block, ModelData extraData, Key key, ModelBaker baker, boolean inventory) {
-		ResourceLocation speciesId = key.speciesId;
+		Identifier speciesId = key.speciesId;
 
 		// Resolve fail-soft: a datapack may have removed this species while its leaf block is still placed, so use
 		// getSpeciesSafe (not the throwing getTreeSpecies) and fall back to the default species.
@@ -93,8 +89,8 @@ public class DefaultLeavesModel extends ModelBlockCached<DefaultLeavesBlock, Def
 			leafSpriteProvider = IForestryClientApi.INSTANCE.getTreeManager().getLeafSprite(species);
 		}
 
-		ResourceLocation leafSpriteLocation = leafSpriteProvider.get(false, key.fancy);
-		TextureAtlasSprite leafSprite = ResourceUtil.getBlockSprite(leafSpriteLocation);
+		Identifier leafSpriteLocation = leafSpriteProvider.get(false, key.fancy);
+		TextureAtlasSprite leafSprite = getSprite(leafSpriteLocation);
 
 		// Render the plain leaf block.
 		baker.addBlockModel(leafSprite, AbstractLeavesBlock.FOLIAGE_COLOR_INDEX);
@@ -104,21 +100,5 @@ public class DefaultLeavesModel extends ModelBlockCached<DefaultLeavesBlock, Def
 	}
 
 
-	@Override
-	protected BakedModel bakeModel(BlockState state, Key key, DefaultLeavesBlock block, ModelData extraData) {
-		ModelBaker baker = new ModelBaker();
 
-		bakeBlock(block, extraData, key, baker, false);
-
-		// return the local, not the field: another worker thread may overwrite blockModel mid-bake
-		ModelBakerModel model = baker.bake(false);
-		onCreateModel(model);
-		this.blockModel = model;
-		return model;
-	}
-
-	@Override
-	public ItemTransforms getTransforms() {
-		return ModelTransforms.BLOCK;
-	}
 }

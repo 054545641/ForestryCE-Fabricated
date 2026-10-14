@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "#": {
-      "tag": "c:ingots/bronze"
-    },
-    "X": {
-      "tag": "c:rods/wooden"
-    }
+    "#": "#c:ingots/bronze",
+    "X": "#c:rods/wooden"
   },
   "pattern": [
     " # ",
@@ -15,7 +11,6 @@
     " X "
   ],
   "result": {
-    "count": 1,
     "id": "forestry:survivalists_sword"
   }
 }

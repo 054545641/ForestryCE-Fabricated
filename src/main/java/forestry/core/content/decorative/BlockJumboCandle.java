@@ -13,7 +13,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -61,7 +61,7 @@ public class BlockJumboCandle extends Block {
 	}
 
 	@Override
-	protected BlockState updateShape(BlockState state, Direction direction, BlockState neighbourState, LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
+	protected BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pos, Direction direction, BlockPos neighbourPos, BlockState neighbourState, net.minecraft.util.RandomSource random) {
 		BlockState newState;
 
 		// Reads the tag rather than the block, so candles of different colours stack
@@ -87,7 +87,7 @@ public class BlockJumboCandle extends Block {
 
 		boolean hasFluid = !fluidState.isEmpty();
 		boolean isLava = fluidState.is(FluidTags.LAVA);
-		boolean isSolid = aboveState.isSolidRender(level, pos.above());
+		boolean isSolid = aboveState.isSolidRender();
 
 		if (state.getValue(LIT)) {
 			if ((hasFluid && !isLava) || isSolid) {
@@ -110,7 +110,19 @@ public class BlockJumboCandle extends Block {
 		if (!state.getValue(LIT)) return;
 		if (state.getValue(SHAPE) == CandleShape.BOTTOM || state.getValue(SHAPE) == CandleShape.MIDDLE) return;
 
-		addParticlesAndSound(level, pos.getCenter().add(0, 0.6875f, 0), random, this.flame);
+		addParticlesAndSound(level, net.minecraft.world.phys.Vec3.atCenterOf(pos).add(0, 0.6875f, 0), random, this.flame);
+	}
+
+	@Override
+	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+		if (state.getValue(LIT) && player.getMainHandItem().isEmpty()) {
+			if (!level.isClientSide()) {
+				level.setBlock(pos, state.setValue(LIT, false), 3);
+				level.playSound(null, pos, SoundEvents.CANDLE_EXTINGUISH, SoundSource.BLOCKS, 1, 1);
+			}
+			return InteractionResult.SUCCESS;
+		}
+		return InteractionResult.PASS;
 	}
 
 	// Lifted from the vanilla candle code
@@ -125,43 +137,35 @@ public class BlockJumboCandle extends Block {
 		level.addParticle(flame, offset.x, offset.y, offset.z, 0.0, 0.0, 0.0);
 	}
 
-	/**
-	 * Deviation from 1.20.1: Block#use became useItemOn, which returns an ItemInteractionResult and runs
-	 * for an empty hand too. Both branches stay here rather than moving the empty-handed one to
-	 * useWithoutItem, which would also fire while the player holds an unrelated item.
-	 */
+	// Item ignition and empty-hand extinguishing use separate native interaction entries.
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (!state.getValue(LIT)
 			&& state.getValue(SHAPE) != CandleShape.BOTTOM
 			&& state.getValue(SHAPE) != CandleShape.MIDDLE
 			&& !player.isShiftKeyDown()
-			&& !level.getBlockState(pos.above()).isSolidRender(level, pos.above())) {
+			&& !level.getBlockState(pos.above()).isSolidRender()) {
 
 			if (stack.is(Items.FLINT_AND_STEEL)) {
-				if (!level.isClientSide) {
+				if (!level.isClientSide()) {
 					level.setBlock(pos, state.setValue(LIT, true), 3);
-					stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+					stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
 				}
 				level.playSound(null, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS);
-				return ItemInteractionResult.sidedSuccess(level.isClientSide);
+				return (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
 			} else if (stack.is(Items.FIRE_CHARGE)) {
-				if (!level.isClientSide) {
+				if (!level.isClientSide()) {
 					level.setBlock(pos, state.setValue(LIT, true), 3);
 					if (!player.isCreative()) {
 						stack.shrink(1);
 					}
 				}
 				level.playSound(null, pos, SoundEvents.FIRECHARGE_USE, SoundSource.BLOCKS);
-				return ItemInteractionResult.sidedSuccess(level.isClientSide);
+				return (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
 			}
-		} else if (state.getValue(LIT) && stack.isEmpty()) {
-			level.setBlock(pos, state.setValue(LIT, false), 3);
-			level.playSound(null, pos, SoundEvents.CANDLE_EXTINGUISH, SoundSource.BLOCKS, 1.0F, 1.0F);
-			return ItemInteractionResult.sidedSuccess(level.isClientSide);
 		}
 
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.TRY_WITH_EMPTY_HAND;
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import forestry.arboriculture.trees.genetics.TreeSpeciesType;
 import java.util.List;
 
 import forestry.core.platform.item.FruitItemType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 
@@ -65,11 +65,11 @@ public class ArboricultureForestryPlugin implements IForestryPlugin {
 	public void registerArboriculture(IArboricultureRegistration arboriculture) {
 		DefaultTreeSpecies.register(arboriculture);
 
-		ResourceLocation pomes = ForestryConstants.forestry("block/leaves/fruits.pomes");
-		ResourceLocation nuts = ForestryConstants.forestry("block/leaves/fruits.nuts");
-		ResourceLocation berries = ForestryConstants.forestry("block/leaves/fruits.berries");
-		ResourceLocation citrus = ForestryConstants.forestry("block/leaves/fruits.citrus");
-		ResourceLocation plums = ForestryConstants.forestry("block/leaves/fruits.plums");
+		Identifier pomes = ForestryConstants.forestry("block/leaves/fruits.pomes");
+		Identifier nuts = ForestryConstants.forestry("block/leaves/fruits.nuts");
+		Identifier berries = ForestryConstants.forestry("block/leaves/fruits.berries");
+		Identifier citrus = ForestryConstants.forestry("block/leaves/fruits.citrus");
+		Identifier plums = ForestryConstants.forestry("block/leaves/fruits.plums");
 
 		arboriculture.registerFruit(ForestryFruits.NONE, new DummyFruit(false));
 		arboriculture.registerFruit(ForestryFruits.APPLE, new RipeningFruit(false, 10, pomes, 0xFF1C2B, 0xe3f49c, List.of(Product.of(Items.APPLE))));
@@ -108,7 +108,7 @@ public class ArboricultureForestryPlugin implements IForestryPlugin {
 	}
 
 	@Override
-	public ResourceLocation id() {
+	public Identifier id() {
 		return ForestryModuleIds.ARBORICULTURE;
 	}
 

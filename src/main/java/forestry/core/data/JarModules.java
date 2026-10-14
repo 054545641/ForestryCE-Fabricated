@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -28,11 +28,11 @@ public final class JarModules {
 	 * @return Every id those modules registered, in any registry
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static Set<ResourceLocation> ownedIds(Set<ResourceLocation> moduleIds) {
-		Set<ResourceLocation> ids = new HashSet<>();
-		Set<ResourceLocation> registered = new HashSet<>();
+	public static Set<Identifier> ownedIds(Set<Identifier> moduleIds) {
+		Set<Identifier> ids = new HashSet<>();
+		Set<Identifier> registered = new HashSet<>();
 		for (ModFeatureRegistry modRegistry : ModFeatureRegistry.getRegistries().values()) {
-			for (Map.Entry<ResourceLocation, FeatureRegistry> module : modRegistry.getModules().entrySet()) {
+			for (Map.Entry<Identifier, FeatureRegistry> module : modRegistry.getModules().entrySet()) {
 				if (!moduleIds.contains(module.getKey())) {
 					continue;
 				}
@@ -48,7 +48,7 @@ public final class JarModules {
 		// a jar's generation to less than it owns. Checked one module at a time, since the others in the
 		// same set would cover for it
 		if (!registered.containsAll(moduleIds)) {
-			Set<ResourceLocation> silent = new TreeSet<>(moduleIds);
+			Set<Identifier> silent = new TreeSet<>(moduleIds);
 			silent.removeAll(registered);
 			throw new IllegalStateException("No registered ids for modules: " + silent);
 		}

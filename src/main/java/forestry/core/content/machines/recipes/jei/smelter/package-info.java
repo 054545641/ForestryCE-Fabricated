@@ -1,9 +1,7 @@
-@ParametersAreNonnullByDefault
-@FieldsAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NullMarked
 package forestry.core.content.machines.recipes.jei.smelter;
 
-import forestry.core.platform.util.FieldsAreNonnullByDefault;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import forestry.core.platform.util.FieldsAreNonnullByDefault;
+

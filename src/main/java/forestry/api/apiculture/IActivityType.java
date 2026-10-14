@@ -2,9 +2,7 @@ package forestry.api.apiculture;
 
 import forestry.api.core.IError;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.level.Level;
 
 /**
  * Used to define the active hours of a bee.
@@ -25,7 +23,7 @@ public interface IActivityType {
 	/**
 	 * Determines whether this bee can be active and work at the current time of day.
 	 *
-	 * @param gameTime The number of ticks spent in the current level. See {@link LevelData#getGameTime}.
+	 * @param gameTime The number of ticks spent in the current level.
 	 * @param dayTime  The time of day of the current level, can be above 24000. See {@link IActivityType#getBeeDayTime}.
 	 * @param pos      The hive position. It can be used for randomness, like how flowers are offset based on position.
 	 * @return {@code true} if this bee should be able to work, {@code false} if this bee should be asleep.
@@ -37,7 +35,7 @@ public interface IActivityType {
 	 * Gets the error to display in GUIs for when this bee is inactive. This method is only called when
 	 * {@link #isActive} returns false for the given parameters, so no need to duplicate your time checks.
 	 *
-	 * @param gameTime The number of ticks spent in the current level. See {@link LevelData#getGameTime}.
+	 * @param gameTime The number of ticks spent in the current level.
 	 * @param dayTime  The time of day of the current level, can be above 24000. See {@link IActivityType#getBeeDayTime}.
 	 * @param pos      The hive position. It can be used for randomness, like how flowers are offset based on position.
 	 * @return A descriptive error indicating that the time of day is wrong for this bee.
@@ -62,13 +60,11 @@ public interface IActivityType {
 	 * @param level The level to query time for.
 	 * @return The time of day used to determine bee activity
 	 */
-	static long getBeeDayTime(LevelAccessor level) {
-		DimensionType dimension = level.dimensionType();
-
-		if (!dimension.hasSkyLight()) {
+	static long getBeeDayTime(Level level) {
+		if (!level.dimensionType().hasSkyLight()) {
 			return NIGHT_TIME;
 		}
-		// Level.getDayTime is the overworld time in every dimension, so it ignores a fixed time
-		return dimension.fixedTime().orElseGet(() -> level.getLevelData().getDayTime());
+		// The default clock respects dimensions with a fixed time, like the Twilight Forest
+		return level.getDefaultClockTime();
 	}
 }

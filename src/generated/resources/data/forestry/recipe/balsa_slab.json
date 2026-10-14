@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_slab",
   "key": {
-    "#": {
-      "item": "forestry:balsa_planks"
-    }
+    "#": "forestry:balsa_planks"
   },
   "pattern": [
     "###"

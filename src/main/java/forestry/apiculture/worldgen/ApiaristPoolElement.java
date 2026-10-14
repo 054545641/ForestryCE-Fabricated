@@ -29,7 +29,7 @@ import forestry.core.platform.tile.TileUtil;
 import forestry.core.platform.util.SpeciesUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
@@ -56,7 +56,7 @@ public class ApiaristPoolElement extends SinglePoolElement {
 		return instance.group(templateCodec(), processorsCodec(), projectionCodec(), overrideLiquidSettingsCodec()).apply(instance, ApiaristPoolElement::new);
 	});
 
-	public ApiaristPoolElement(Either<ResourceLocation, StructureTemplate> template, Holder<StructureProcessorList> processors, StructureTemplatePool.Projection projection, Optional<LiquidSettings> overrideLiquidSettings) {
+	public ApiaristPoolElement(Either<Identifier, StructureTemplate> template, Holder<StructureProcessorList> processors, StructureTemplatePool.Projection projection, Optional<LiquidSettings> overrideLiquidSettings) {
 		super(template, processors, projection, overrideLiquidSettings);
 	}
 
@@ -64,8 +64,8 @@ public class ApiaristPoolElement extends SinglePoolElement {
 	public void handleDataMarker(LevelAccessor level, StructureTemplate.StructureBlockInfo info, BlockPos pos, Rotation rotation, RandomSource random, BoundingBox box) {
 		// yes this is nullable, shut up intellij
 		if (info.nbt() != null) {
-			if (StructureMode.valueOf(info.nbt().getString("mode")) == StructureMode.DATA) {
-				String marker = info.nbt().getString("metadata");
+			if (StructureMode.valueOf(info.nbt().getStringOr("mode", "")) == StructureMode.DATA) {
+				String marker = info.nbt().getStringOr("metadata", "");
 
 				if ("apiary".equals(marker)) {
 					replaceWithApiary(level, info, random);

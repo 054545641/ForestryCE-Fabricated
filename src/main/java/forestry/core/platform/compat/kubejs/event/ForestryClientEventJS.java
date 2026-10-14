@@ -5,7 +5,7 @@ import forestry.api.client.arboriculture.ILeafSprite;
 import forestry.api.client.arboriculture.ILeafTint;
 import forestry.api.client.plugin.IClientRegistration;
 import forestry.api.core.genetics.ILifeStage;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ForestryClientEventJS implements KubeEvent {
 	private final IClientRegistration wrapped;
@@ -14,27 +14,27 @@ public class ForestryClientEventJS implements KubeEvent {
 		this.wrapped = wrapped;
 	}
 
-	public void setDefaultBeeModel(ILifeStage stage, ResourceLocation modelLocation) {
+	public void setDefaultBeeModel(ILifeStage stage, Identifier modelLocation) {
 		this.wrapped.setDefaultBeeModel(stage, modelLocation);
 	}
 
-	public void setCustomBeeModel(ResourceLocation speciesId, ILifeStage stage, ResourceLocation model) {
+	public void setCustomBeeModel(Identifier speciesId, ILifeStage stage, Identifier model) {
 		this.wrapped.setCustomBeeModel(speciesId, stage, model);
 	}
 
-	public void setSaplingModel(ResourceLocation speciesId, ResourceLocation blockModel, ResourceLocation itemModel) {
+	public void setSaplingModel(Identifier speciesId, Identifier blockModel, Identifier itemModel) {
 		this.wrapped.setSaplingModel(speciesId, blockModel, itemModel);
 	}
 
-	public void setLeafSprite(ResourceLocation speciesId, ILeafSprite sprite) {
+	public void setLeafSprite(Identifier speciesId, ILeafSprite sprite) {
 		this.wrapped.setLeafSprite(speciesId, sprite);
 	}
 
-	public void setLeafTint(ResourceLocation speciesId, ILeafTint tint) {
+	public void setLeafTint(Identifier speciesId, ILeafTint tint) {
 		this.wrapped.setLeafTint(speciesId, tint);
 	}
 
-	public void setButterflySprites(ResourceLocation speciesId, ResourceLocation itemTexture, ResourceLocation entityTexture) {
+	public void setButterflySprites(Identifier speciesId, Identifier itemTexture, Identifier entityTexture) {
 		this.wrapped.setButterflySprites(speciesId, itemTexture, entityTexture);
 	}
 }

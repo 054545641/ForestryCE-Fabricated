@@ -6,7 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -35,8 +35,8 @@ public class CreativeHiveFrameItem extends ItemForestry implements IHiveFrame {
 	 */
 	public static final String NBT_FORCED_MUTATION = "forced_mutation";
 
-	public CreativeHiveFrameItem() {
-		super(new Item.Properties().rarity(Rarity.EPIC));
+	public CreativeHiveFrameItem(Properties properties) {
+		super(properties.rarity(Rarity.EPIC));
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class CreativeHiveFrameItem extends ItemForestry implements IHiveFrame {
 		tooltip.add(Component.translatable("item.forestry.bee.modifier.production", Modifier.PRODUCTION));
 		tooltip.add(Component.translatable("item.forestry.bee.modifier.genetic.decay", Modifier.GENETIC_DECAY));
 
-		ResourceLocation forced = getForcedMutation(stack);
+		Identifier forced = getForcedMutation(stack);
 		if (forced != null) {
 			tooltip.add(Component.literal("Forces mutation: " + forced).withStyle(ChatFormatting.LIGHT_PURPLE));
 		} else if (hasForceMutations(stack)) {
@@ -63,7 +63,7 @@ public class CreativeHiveFrameItem extends ItemForestry implements IHiveFrame {
 
 	@Override
 	public IBeeModifier getBeeModifier(ItemStack frame) {
-		ResourceLocation forced = getForcedMutation(frame);
+		Identifier forced = getForcedMutation(frame);
 		if (forced != null) {
 			return new Modifier(forced);
 		}
@@ -77,16 +77,16 @@ public class CreativeHiveFrameItem extends ItemForestry implements IHiveFrame {
 
 	/** @return the result-species id this frame forces (see {@link #NBT_FORCED_MUTATION}), or {@code null} if none. */
 	@Nullable
-	public static ResourceLocation getForcedMutation(ItemStack stack) {
+	public static Identifier getForcedMutation(ItemStack stack) {
 		CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
 		if (customData == null || !customData.contains(NBT_FORCED_MUTATION)) {
 			return null;
 		}
-		return ResourceLocation.tryParse(customData.copyTag().getString(NBT_FORCED_MUTATION));
+		return Identifier.tryParse(customData.copyTag().getStringOr(NBT_FORCED_MUTATION, ""));
 	}
 
 	/** Writes the forced result species onto the frame (see {@link #NBT_FORCED_MUTATION}). */
-	public static void setForcedMutation(ItemStack stack, ResourceLocation result) {
+	public static void setForcedMutation(ItemStack stack, Identifier result) {
 		CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
 		tag.putString(NBT_FORCED_MUTATION, result.toString());
 		stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
@@ -102,7 +102,7 @@ public class CreativeHiveFrameItem extends ItemForestry implements IHiveFrame {
 	 *     deterministic for a multi-result pair.</li>
 	 * </ul>
 	 */
-	private record Modifier(boolean forceAny, @Nullable ResourceLocation forcedResult) implements IBeeModifier {
+	private record Modifier(boolean forceAny, @Nullable Identifier forcedResult) implements IBeeModifier {
 		static final float PRODUCTION = 10000f;
 		static final float POLLINATION = 100f;
 		static final float MUTATION = 100f;
@@ -111,7 +111,7 @@ public class CreativeHiveFrameItem extends ItemForestry implements IHiveFrame {
 		static final Modifier BASE = new Modifier(false, null);
 		static final Modifier FORCE_ANY = new Modifier(true, null);
 
-		Modifier(ResourceLocation forcedResult) {
+		Modifier(Identifier forcedResult) {
 			this(true, forcedResult);
 		}
 

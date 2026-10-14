@@ -3,11 +3,9 @@ package forestry.core.content.backpacks.items;
 import forestry.core.platform.item.ItemForestry;
 import forestry.core.platform.item.ITintedItem;
 import forestry.core.platform.util.ItemStackUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -19,7 +17,8 @@ import java.util.function.Supplier;
 public class ItemCrated extends ItemForestry implements ITintedItem {
 	private final Supplier<ItemStack> contained;
 
-	public ItemCrated(Supplier<ItemStack> contained) {
+	public ItemCrated(Supplier<ItemStack> contained, Properties properties) {
+		super(properties);
 		this.contained = contained;
 	}
 
@@ -28,12 +27,12 @@ public class ItemCrated extends ItemForestry implements ITintedItem {
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
+	public InteractionResult use(Level worldIn, Player playerIn, InteractionHand handIn) {
 		ItemStack heldItem = playerIn.getItemInHand(handIn);
-		if (!worldIn.isClientSide) {
+		if (!worldIn.isClientSide()) {
 			ItemStack contained = this.contained.get();
 			if (contained.isEmpty() || heldItem.isEmpty()) {
-				return InteractionResultHolder.pass(heldItem);
+				return InteractionResult.PASS;
 			}
 
 			heldItem.shrink(1);
@@ -42,7 +41,7 @@ public class ItemCrated extends ItemForestry implements ITintedItem {
 			dropStack.setCount(9);
 			ItemStackUtil.dropItemStackAsEntity(dropStack, worldIn, playerIn.getX() - playerIn.getBbWidth() / 2f, playerIn.getY(), playerIn.getZ() - playerIn.getBbWidth() / 2f, 40);
 		}
-		return InteractionResultHolder.success(heldItem);
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override
@@ -59,13 +58,13 @@ public class ItemCrated extends ItemForestry implements ITintedItem {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public int getColorFromItemStack(ItemStack stack, int renderPass) {
-		ItemColors colors = Minecraft.getInstance().getItemColors();
 		ItemStack contained = this.contained.get();
 
 		if (contained.isEmpty() || renderPass == 0) {
 			return -1;
 		}
 
-		return colors.getColor(contained, renderPass - 1);
+		return contained.getItem() instanceof ITintedItem tinted ? tinted.getColorFromItemStack(contained, renderPass - 1)
+			: contained.is(net.minecraft.world.item.Items.GRASS_BLOCK) ? net.minecraft.world.level.GrassColor.getDefaultColor() : -1;
 	}
 }

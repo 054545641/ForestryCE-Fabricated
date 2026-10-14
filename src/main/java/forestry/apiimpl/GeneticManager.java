@@ -10,7 +10,7 @@ import forestry.core.features.CoreDataComponents;
 import forestry.core.engine.genetics.Taxon;
 import forestry.core.engine.genetics.TaxonDefinition;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
@@ -33,9 +33,9 @@ public class GeneticManager implements IGeneticManager {
 	// The live taxa (code builtins + datapack taxa), rebuilt on every datapack (re)load before species are projected.
 	// Volatile: written on the reload game executor / network thread, read wherever getTaxon is called.
 	private volatile ImmutableMap<String, ITaxon> taxa;
-	private final ImmutableMap<ResourceLocation, ISpeciesType<?, ?>> speciesTypes;
+	private final ImmutableMap<Identifier, ISpeciesType<?, ?>> speciesTypes;
 
-	public GeneticManager(ImmutableMap<String, ITaxon> taxa, ImmutableMap<ResourceLocation, ISpeciesType<?, ?>> speciesTypes) {
+	public GeneticManager(ImmutableMap<String, ITaxon> taxa, ImmutableMap<Identifier, ISpeciesType<?, ?>> speciesTypes) {
 		this.baseTaxa = taxa;
 		this.taxa = taxa;
 		this.speciesTypes = speciesTypes;
@@ -129,7 +129,7 @@ public class GeneticManager implements IGeneticManager {
 			return result;
 		}
 		IKaryotype karyotype = type.getKaryotype();
-		for (Map.Entry<ResourceLocation, Allele<?>> entry : def.alleles().entrySet()) {
+		for (Map.Entry<Identifier, Allele<?>> entry : def.alleles().entrySet()) {
 			IChromosome<?> chromosome = karyotype.getChromosome(entry.getKey());
 			if (chromosome == null) {
 				Forestry.LOGGER.warn("Taxon '{}' default allele skipped: unknown chromosome '{}' for type '{}'", def.name(), entry.getKey(), def.type());
@@ -137,7 +137,7 @@ public class GeneticManager implements IGeneticManager {
 			}
 			Allele<?> allele = entry.getValue();
 			if (chromosome.resolver() != null) {
-				result.put(chromosome, ITaxon.TaxonAllele.reference((ResourceLocation) allele.value(), true));
+				result.put(chromosome, ITaxon.TaxonAllele.reference((Identifier) allele.value(), true));
 			} else {
 				result.put(chromosome, ITaxon.TaxonAllele.data(allele, true));
 			}
@@ -166,7 +166,7 @@ public class GeneticManager implements IGeneticManager {
 	}
 
 	@Override
-	public ISpeciesType<?, ?> getSpeciesType(ResourceLocation speciesTypeId) {
+	public ISpeciesType<?, ?> getSpeciesType(Identifier speciesTypeId) {
 		ISpeciesType<?, ?> type = this.speciesTypes.get(speciesTypeId);
 		if (type == null) {
 			throw new IllegalStateException("No species type was registered with ID: " + speciesTypeId);
@@ -176,7 +176,7 @@ public class GeneticManager implements IGeneticManager {
 
 	@Nullable
 	@Override
-	public ISpeciesType<?, ?> getSpeciesTypeSafe(ResourceLocation speciesTypeId) {
+	public ISpeciesType<?, ?> getSpeciesTypeSafe(Identifier speciesTypeId) {
 		return this.speciesTypes.get(speciesTypeId);
 	}
 

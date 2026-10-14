@@ -9,13 +9,10 @@
     }
   },
   "remnant": {
-    "count": 1,
     "id": "minecraft:sponge"
   },
   "resources": [
-    {
-      "item": "forestry:spongy_comb"
-    }
+    "forestry:spongy_comb"
   ],
   "time": 10
 }

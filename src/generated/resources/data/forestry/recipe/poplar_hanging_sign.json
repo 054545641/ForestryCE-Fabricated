@@ -1,18 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "#": [
-      {
-        "item": "forestry:poplar_stripped_log"
-      },
-      {
-        "item": "forestry:poplar_fireproof_stripped_log"
-      }
+      "forestry:poplar_stripped_log",
+      "forestry:poplar_fireproof_stripped_log"
     ],
-    "X": {
-      "item": "minecraft:chain"
-    }
+    "X": "minecraft:iron_chain"
   },
   "pattern": [
     "X X",
@@ -20,7 +13,6 @@
     "###"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:poplar_hanging_sign"
   }
 }

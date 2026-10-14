@@ -3,7 +3,9 @@ package forestry.core.platform.util;
 import com.mojang.authlib.GameProfile;
 import forestry.core.platform.network.IStreamable;
 import io.netty.buffer.Unpooled;
-import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.util.Util;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
@@ -14,6 +16,7 @@ import net.minecraft.world.item.component.CustomData;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class NBTUtilForestry {
@@ -26,12 +29,15 @@ public abstract class NBTUtilForestry {
 
 	public static CompoundTag writeStreamableToNbt(IStreamable streamable, CompoundTag nbt, RegistryAccess registries) {
 		RegistryFriendlyByteBuf data = new RegistryFriendlyByteBuf(Unpooled.buffer(), registries, ConnectionType.NEOFORGE);
-		streamable.writeData(data);
-
-		byte[] bytes = new byte[data.readableBytes()];
-		data.getBytes(0, bytes);
-		nbt.putByteArray("dataBytes", bytes);
-		return nbt;
+		try {
+			streamable.writeData(data);
+			byte[] bytes = new byte[data.readableBytes()];
+			data.getBytes(data.readerIndex(), bytes);
+			nbt.putByteArray("dataBytes", bytes);
+			return nbt;
+		} finally {
+			data.release();
+		}
 	}
 
 	public static void readStreamableFromNbt(IStreamable streamable, CompoundTag nbt, HolderLookup.Provider registries) {
@@ -39,11 +45,22 @@ public abstract class NBTUtilForestry {
 	}
 
 	public static void readStreamableFromNbt(IStreamable streamable, CompoundTag nbt, RegistryAccess registries) {
-		if (nbt.contains("dataBytes")) {
-			byte[] bytes = nbt.getByteArray("dataBytes");
+		nbt.getByteArray("dataBytes").ifPresent(bytes -> {
 			RegistryFriendlyByteBuf data = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(bytes), registries, ConnectionType.NEOFORGE);
-			streamable.readData(data);
-		}
+			try {
+				streamable.readData(data);
+			} finally {
+				data.release();
+			}
+		});
+	}
+
+	public static void putBlockPos(CompoundTag nbt, String key, BlockPos pos) {
+		nbt.putIntArray(key, new int[]{pos.getX(), pos.getY(), pos.getZ()});
+	}
+
+	public static Optional<BlockPos> getBlockPos(CompoundTag nbt, String key) {
+		return nbt.getIntArray(key).flatMap(arr -> arr.length == 3 ? Optional.of(new BlockPos(arr[0], arr[1], arr[2])) : Optional.empty());
 	}
 
 	@Nullable
@@ -52,8 +69,8 @@ public abstract class NBTUtilForestry {
 			return null;
 		}
 
-		UUID id = nbt.hasUUID(GAME_PROFILE_ID) ? nbt.getUUID(GAME_PROFILE_ID) : null;
-		String name = nbt.contains(GAME_PROFILE_NAME) ? nbt.getString(GAME_PROFILE_NAME) : null;
+		UUID id = nbt.getIntArray(GAME_PROFILE_ID).filter(arr -> arr.length == 4).map(UUIDUtil::uuidFromIntArray).orElse(null);
+		String name = nbt.getString(GAME_PROFILE_NAME).orElse(null);
 		if (id == null && (name == null || name.isEmpty())) {
 			return null;
 		}
@@ -63,11 +80,11 @@ public abstract class NBTUtilForestry {
 	}
 
 	public static CompoundTag writeGameProfile(CompoundTag nbt, GameProfile profile) {
-		if (profile.getId() != null) {
-			nbt.putUUID(GAME_PROFILE_ID, profile.getId());
+		if (profile.id() != null) {
+			nbt.putIntArray(GAME_PROFILE_ID, UUIDUtil.uuidToIntArray(profile.id()));
 		}
-		if (profile.getName() != null) {
-			nbt.putString(GAME_PROFILE_NAME, profile.getName());
+		if (profile.name() != null) {
+			nbt.putString(GAME_PROFILE_NAME, profile.name());
 		}
 		return nbt;
 	}

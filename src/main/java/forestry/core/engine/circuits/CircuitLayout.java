@@ -3,13 +3,13 @@ package forestry.core.engine.circuits;
 import forestry.api.core.circuits.ICircuitLayout;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class CircuitLayout implements ICircuitLayout {
 	private final String uid;
-	private final ResourceLocation socketType;
+	private final Identifier socketType;
 
-	public CircuitLayout(String uid, ResourceLocation socketType) {
+	public CircuitLayout(String uid, Identifier socketType) {
 		this.uid = uid;
 		this.socketType = socketType;
 	}
@@ -30,7 +30,7 @@ public class CircuitLayout implements ICircuitLayout {
 	}
 
 	@Override
-	public ResourceLocation getSocketType() {
+	public Identifier getSocketType() {
 		return this.socketType;
 	}
 }

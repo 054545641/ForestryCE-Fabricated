@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_sign_rot_3",
+  "textures": {
+    "all": "forestry:entity/signs/hill_cherry",
+    "particle": "forestry:block/sour_cherry_planks"
+  }
+}

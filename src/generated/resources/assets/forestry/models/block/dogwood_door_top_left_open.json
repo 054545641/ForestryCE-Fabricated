@@ -1,5 +1,6 @@
 {
   "parent": "minecraft:block/door_top_left_open",
+  "render_type": "cutout",
   "textures": {
     "bottom": "forestry:block/dogwood_door_bottom",
     "top": "forestry:block/dogwood_door_top"

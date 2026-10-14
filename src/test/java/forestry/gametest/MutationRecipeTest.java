@@ -20,7 +20,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
@@ -316,7 +316,7 @@ public class MutationRecipeTest {
 	}
 
 	@Nullable
-	private static <S extends forestry.api.core.genetics.ISpecies<?>> IMutation<S> findMutation(List<IMutation<S>> mutations, ResourceLocation resultId) {
+	private static <S extends forestry.api.core.genetics.ISpecies<?>> IMutation<S> findMutation(List<IMutation<S>> mutations, Identifier resultId) {
 		for (IMutation<S> mutation : mutations) {
 			if (mutation.getResult().id().equals(resultId)) {
 				return mutation;

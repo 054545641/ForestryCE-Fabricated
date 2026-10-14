@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/kaolin_comb",
-  "input": {
-    "item": "forestry:kaolin_comb"
-  },
+  "input": "forestry:kaolin_comb",
   "products": [
     {
       "chance": 1.0,

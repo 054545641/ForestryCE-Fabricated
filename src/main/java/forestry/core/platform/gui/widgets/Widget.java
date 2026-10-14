@@ -2,7 +2,7 @@ package forestry.core.platform.gui.widgets;
 
 import forestry.api.core.tooltips.IToolTipProvider;
 import forestry.api.core.tooltips.ToolTip;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import javax.annotation.Nullable;
 
@@ -38,7 +38,7 @@ public abstract class Widget implements IToolTipProvider {
 		return this.yPos;
 	}
 
-	public abstract void draw(GuiGraphics graphics, int startX, int startY);
+	public abstract void draw(GuiGraphicsExtractor graphics, int startX, int startY);
 
 	public void update(int mouseX, int mouseY) {
 	}

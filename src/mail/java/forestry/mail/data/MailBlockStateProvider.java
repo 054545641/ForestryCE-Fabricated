@@ -2,8 +2,7 @@ package forestry.mail.data;
 
 import net.minecraft.data.PackOutput;
 
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import forestry.core.data.models.BlockAssetsProvider;
 
 import forestry.api.ForestryConstants;
 import forestry.core.data.models.ForestryBlockStateProvider;
@@ -14,9 +13,9 @@ import forestry.mail.features.MailBlocks;
  * Generates the blockstates and block models for the mail jar. All three machines are horizontal-facing
  * cubes, and their item models stay hand-authored for the custom display transforms.
  */
-public class MailBlockStateProvider extends BlockStateProvider {
-	public MailBlockStateProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
-		super(output, ForestryConstants.MOD_ID, existingFileHelper);
+public class MailBlockStateProvider extends BlockAssetsProvider {
+	public MailBlockStateProvider(PackOutput output) {
+		super(output);
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import forestry.api.client.ForestrySprites;
 import forestry.api.core.genetics.filter.FilterData;
 import forestry.api.core.genetics.filter.IFilterRule;
 import forestry.api.core.genetics.filter.IFilterRuleType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.HashSet;
@@ -42,13 +42,13 @@ public enum DefaultFilterRuleType implements IFilterRuleType {
 	private final String id;
 	private final Set<IFilterRule> logic;
 	private final boolean isContainer;
-	private final ResourceLocation sprite;
+	private final Identifier sprite;
 
-	DefaultFilterRuleType(ResourceLocation sprite) {
+	DefaultFilterRuleType(Identifier sprite) {
 		this(true, sprite);
 	}
 
-	DefaultFilterRuleType(boolean isContainer, ResourceLocation sprite) {
+	DefaultFilterRuleType(boolean isContainer, Identifier sprite) {
 		this.sprite = sprite;
 		this.id = "forestry.default." + name().toLowerCase(Locale.ENGLISH);
 		this.logic = new HashSet<>();
@@ -79,7 +79,7 @@ public enum DefaultFilterRuleType implements IFilterRuleType {
 	}
 
 	@Override
-	public ResourceLocation getSprite() {
+	public Identifier getSprite() {
 		return this.sprite;
 	}
 

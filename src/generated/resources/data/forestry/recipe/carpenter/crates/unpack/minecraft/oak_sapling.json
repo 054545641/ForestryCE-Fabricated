@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/crates/unpack/minecraft/oak_sapling",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:crated_oak_sapling"
-      }
+      "forestry:crated_oak_sapling"
     ],
     "result": {
       "count": 9,

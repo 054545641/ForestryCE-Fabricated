@@ -4,7 +4,7 @@ import forestry.api.arboriculture.IWoodType;
 import forestry.api.arboriculture.genetics.IFruit;
 import forestry.api.arboriculture.genetics.ITreeEffect;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -22,7 +22,7 @@ public interface IArboricultureRegistration {
 	 * @param escritoireColor The primary color of this tree species. Used for pollen colors and tree leaf tinting.
 	 * @param woodType        The wood type of this tree species.
 	 */
-	ITreeSpeciesBuilder registerSpecies(ResourceLocation id, String genus, String species, boolean dominant, TextColor escritoireColor, IWoodType woodType);
+	ITreeSpeciesBuilder registerSpecies(Identifier id, String genus, String species, boolean dominant, TextColor escritoireColor, IWoodType woodType);
 
 	/**
 	 * Register a new type of fruit.
@@ -30,7 +30,7 @@ public interface IArboricultureRegistration {
 	 * @param id    The unique ID of this fruit. See {@link forestry.api.arboriculture.ForestryFruits} for defaults.
 	 * @param fruit The fruit object to be wrapped in an allele for use in a tree genome.
 	 */
-	void registerFruit(ResourceLocation id, IFruit fruit);
+	void registerFruit(Identifier id, IFruit fruit);
 
 	/**
 	 * Registers a tree effect. There are no tree effects in base Forestry.
@@ -38,7 +38,7 @@ public interface IArboricultureRegistration {
 	 * @param id     The unique ID of this tree effect.
 	 * @param effect The effect object to be wrapped in an allele for use in a tree genome.
 	 */
-	void registerTreeEffect(ResourceLocation id, ITreeEffect effect);
+	void registerTreeEffect(Identifier id, ITreeEffect effect);
 
 	/**
 	 * Registers a block to be waxable with Refractory Wax. In base Forestry, all planks are registered

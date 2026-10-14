@@ -1,54 +1,36 @@
 package forestry.core.content.machines.recipes;
 
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.minecraft.world.SimpleContainer;
+
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
 
 public class BottlerRecipe {
 	@Nullable
 	public static BottlerRecipe createEmptyingRecipe(ItemStack filled) {
-		ItemStack empty = filled.copy();
-		empty.setCount(1);
-		Optional<IFluidHandlerItem> fluidHandlerCap = FluidUtil.getFluidHandler(empty);
-
-		if (fluidHandlerCap.isEmpty()) {
-			return null;
-		}
-
-		IFluidHandlerItem fluidHandler = fluidHandlerCap.orElseThrow();
-
-		FluidStack drained = fluidHandler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE);
-		if (!drained.isEmpty() && drained.getAmount() > 0) {
-			return new BottlerRecipe(fluidHandler.getContainer(), drained, filled, false);
-		}
-
-		return null;
+		if (filled.isEmpty()) return null;
+		var inventory = new SimpleContainer(filled.copyWithCount(1));
+		var handler = ItemAccess.forHandlerIndexStrict(
+			VanillaContainerWrapper.of(inventory), 0).getCapability(Capabilities.Fluid.ITEM);
+		if (handler == null) return null;
+		FluidStack drained = forestry.core.platform.fluids.FluidHelper.drain(handler, Integer.MAX_VALUE);
+		return drained.isEmpty() ? null : new BottlerRecipe(inventory.getItem(0).copy(), drained, filled.copyWithCount(1), false);
 	}
 
 	@Nullable
-	public static BottlerRecipe createFillingRecipe(Fluid res, ItemStack empty) {
-		ItemStack filled = empty.copy();
-		filled.setCount(1);
-
-		Optional<IFluidHandlerItem> fluidHandlerCap = FluidUtil.getFluidHandler(filled);
-		if (fluidHandlerCap.isEmpty()) {
-			return null;
-		}
-
-		IFluidHandlerItem fluidHandler = fluidHandlerCap.orElseThrow();
-
-		int fillAmount = fluidHandler.fill(new FluidStack(res, Integer.MAX_VALUE), IFluidHandler.FluidAction.EXECUTE);
-		if (fillAmount > 0) {
-			return new BottlerRecipe(empty, new FluidStack(res, fillAmount), fluidHandler.getContainer(), true);
-		}
-
-		return null;
+	public static BottlerRecipe createFillingRecipe(FluidStack fluid, ItemStack empty) {
+		if (empty.isEmpty() || fluid.isEmpty()) return null;
+		var inventory = new SimpleContainer(empty.copyWithCount(1));
+		var handler = ItemAccess.forHandlerIndexStrict(
+			VanillaContainerWrapper.of(inventory), 0).getCapability(Capabilities.Fluid.ITEM);
+		if (handler == null) return null;
+		int amount = forestry.core.platform.fluids.FluidHelper.fill(handler, fluid.copyWithAmount(Integer.MAX_VALUE));
+		return amount == 0 ? null : new BottlerRecipe(empty.copyWithCount(1), fluid.copyWithAmount(amount), inventory.getItem(0).copy(), true);
 	}
 
 	public final FluidStack fluid;
@@ -64,10 +46,10 @@ public class BottlerRecipe {
 	}
 
 	public boolean matchEmpty(ItemStack emptyCan, FluidStack resource) {
-		return !emptyCan.isEmpty() && ItemStack.isSameItem(emptyCan, this.inputStack) && FluidStack.isSameFluidSameComponents(resource, this.fluid) && this.fillRecipe;
+		return !emptyCan.isEmpty() && ItemStack.isSameItemSameComponents(emptyCan, this.inputStack) && FluidStack.isSameFluidSameComponents(resource, this.fluid) && this.fillRecipe;
 	}
 
 	public boolean matchFilled(ItemStack filledCan) {
-		return !this.outputStack.isEmpty() && !this.fillRecipe && ItemStack.isSameItem(this.outputStack, filledCan);
+		return !this.outputStack.isEmpty() && !this.fillRecipe && ItemStack.isSameItemSameComponents(this.outputStack, filledCan);
 	}
 }

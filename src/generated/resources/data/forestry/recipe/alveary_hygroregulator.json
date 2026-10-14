@@ -3,15 +3,9 @@
   "category": "building",
   "group": "alveary",
   "key": {
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "X": {
-      "item": "forestry:alveary_block"
-    }
+    "G": "#c:glass_blocks/colorless",
+    "I": "#c:ingots/iron",
+    "X": "forestry:alveary_block"
   },
   "pattern": [
     "GIG",
@@ -19,7 +13,6 @@
     "GIG"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:alveary_hygroregulator"
   }
 }

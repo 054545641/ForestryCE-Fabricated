@@ -1,48 +1,39 @@
 package forestry.core.platform.fluids;
 
-import forestry.core.platform.util.ItemStackUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.fluids.FluidActionResult;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
 
-//TODO: Fix isFillable's
 public final class FluidHelper {
-
 	private FluidHelper() {
 	}
 
-	public static boolean areFluidStacksEqual(@Nullable FluidStack fluidStack1, @Nullable FluidStack fluidStack2) {
-		if (fluidStack1 == null) {
-			return fluidStack2 == null;
-		} else {
-			return FluidStack.matches(fluidStack1, fluidStack2);
-		}
+	public static boolean areFluidStacksEqual(@Nullable FluidStack first, @Nullable FluidStack second) {
+		return first == null ? second == null : second != null && FluidStack.matches(first, second);
 	}
 
 	public static boolean canAcceptFluid(Level world, BlockPos pos, Direction facing, FluidStack fluid, boolean checkSpace) {
-		Optional<IFluidHandler> capability = FluidUtil.getFluidHandler(world, pos, facing);
-		return capability.filter((handler) -> {
-				for (int tank = 0; tank < handler.getTanks(); tank++) {
-					int amountFilled = handler.fill(fluid, IFluidHandler.FluidAction.SIMULATE);
-					if (amountFilled > 0 && (!checkSpace || amountFilled >= fluid.getAmount())) {
-						return true;
-					}
-				}
-				return false;
-			})
-			.isPresent();
+		var handler = world.getCapability(Capabilities.Fluid.BLOCK, pos, facing);
+		if (handler == null || fluid.isEmpty()) return false;
+		int inserted = simulateFill(handler, fluid);
+		return inserted > 0 && (!checkSpace || inserted == fluid.getAmount());
 	}
 
 	public static boolean canAcceptFluid(Level world, BlockPos pos, Direction facing, FluidStack fluid) {
@@ -53,283 +44,195 @@ public final class FluidHelper {
 		SUCCESS, INVALID_INPUT, NO_FLUID, NO_SPACE, NO_SPACE_FLUID
 	}
 
-	public static FillStatus fillContainers(IFluidHandler fluidHandler, Container inv, int inputSlot, int outputSlot, Fluid fluidToFill, boolean doFill) {
-		return fillContainers(fluidHandler, inv, inputSlot, outputSlot, fluidToFill, getEmptyContainer(inv.getItem(inputSlot)), doFill);
+	public static FillStatus fillContainers(ResourceHandler<FluidResource> fluids, Container inventory, int input, int output, Fluid fluid, boolean execute) {
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			FillStatus result = fillContainers(fluids, inventory, input, output, fluid, tx);
+			if (execute && result == FillStatus.SUCCESS) tx.commit();
+			return result;
+		}
 	}
 
-	public static FillStatus fillContainers(IFluidHandler fluidHandler, Container inv, int inputSlot, int outputSlot, Fluid fluidToFill, ItemStack emptyStack, boolean doFill) {
-		ItemStack input = inv.getItem(inputSlot);
-		if (input.isEmpty()) {
-			return FillStatus.INVALID_INPUT;
-		}
-		ItemStack output = inv.getItem(outputSlot);
-
-		ItemStack filled = input.copy();
-		filled.setCount(1);
-
-		if (emptyStack.isEmpty()) {
-			emptyStack = filled;
-		}
-
-		Optional<IFluidHandlerItem> fluidFilledHandlerCap = FluidUtil.getFluidHandler(filled);
-		Optional<IFluidHandlerItem> fluidEmptyHandlerCap = FluidUtil.getFluidHandler(emptyStack);
-		if (fluidFilledHandlerCap.isEmpty() || fluidEmptyHandlerCap.isEmpty()) {
-			return FillStatus.INVALID_INPUT;
-		}
-
-		IFluidHandlerItem fluidFilledHandler = fluidFilledHandlerCap.orElseThrow();
-		IFluidHandlerItem fluidEmptyHandler = fluidEmptyHandlerCap.orElseThrow();
-
-		int containerEmptyCapacity = fluidEmptyHandler.fill(new FluidStack(fluidToFill, Integer.MAX_VALUE), IFluidHandler.FluidAction.SIMULATE);
-		int containerCapacity = fluidFilledHandler.fill(new FluidStack(fluidToFill, Integer.MAX_VALUE), IFluidHandler.FluidAction.SIMULATE);
-		if (containerCapacity <= 0 && containerEmptyCapacity <= 0) {
-			return FillStatus.INVALID_INPUT;
-		}
-
-		FluidStack canDrain = fluidHandler.drain(new FluidStack(fluidToFill, containerCapacity), IFluidHandler.FluidAction.SIMULATE);
-		if (canDrain.isEmpty()) {
-			return FillStatus.NO_FLUID;
-		}
-
-		if (fluidFilledHandler.fill(canDrain, IFluidHandler.FluidAction.EXECUTE) <= 0) {
-			return FillStatus.NO_FLUID; // standard containers will not fill if there isn't enough fluid
-		}
-
-		FluidStack fluidInContainer = fluidFilledHandler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
-		if (fluidInContainer.isEmpty()) {
-			return FillStatus.INVALID_INPUT;
-		}
-
-		filled = fluidFilledHandler.getContainer();
-
-		boolean moveToOutput = fluidInContainer.getAmount() >= containerCapacity;
-		if (moveToOutput) {
-			if (!output.isEmpty() && (output.getCount() >= output.getMaxStackSize() || !ItemStackUtil.areItemStacksEqualIgnoreCount(filled, output))) {
-				return FillStatus.NO_SPACE;
-			}
-		} else {
-			if (input.getCount() > 1) {
-				return FillStatus.NO_SPACE;
-			}
-		}
-
-		if (doFill) {
-			fluidHandler.drain(canDrain, IFluidHandler.FluidAction.EXECUTE);
-			if (moveToOutput) {
-				if (output.isEmpty()) {
-					inv.setItem(outputSlot, filled);
-				} else {
-					output.grow(1);
+	public static FillStatus fillContainers(ResourceHandler<FluidResource> fluids, Container inventory, int input, int output, Fluid fluid, TransactionContext parent) {
+		ItemStack original = inventory.getItem(input).copy();
+		if (original.isEmpty()) return FillStatus.INVALID_INPUT;
+		SimpleContainer working = new SimpleContainer(original.copyWithCount(1));
+		var container = containerHandler(working);
+		if (container == null) return FillStatus.INVALID_INPUT;
+		try (var tx = Transaction.open(parent)) {
+			boolean hasFluid = false;
+			boolean acceptsFluid = false;
+			for (int index = 0; index < fluids.size(); index++) {
+				var resource = fluids.getResource(index);
+				if (resource.isEmpty() || !resource.is(fluid)) continue;
+				hasFluid = true;
+				try (var probe = Transaction.open(tx)) {
+					if (container.insert(resource, Integer.MAX_VALUE, probe) == 0) continue;
 				}
-				inv.removeItem(inputSlot, 1);
-			} else {
-				inv.setItem(inputSlot, filled);
+				acceptsFluid = true;
+				int moved = ResourceHandlerUtil.move(fluids, container, resource::equals, Integer.MAX_VALUE, tx);
+				if (moved == 0) continue;
+				boolean full;
+				try (var probe = Transaction.open(tx)) {
+					var updated = containerHandler(working);
+					full = updated == null || updated.insert(resource, Integer.MAX_VALUE, probe) == 0;
+				}
+				FillStatus result = replaceContainer(inventory, input, full ? output : input, original, working.getItem(0), tx);
+				if (result == FillStatus.SUCCESS) tx.commit();
+				return result;
 			}
+			return hasFluid && !acceptsFluid ? FillStatus.INVALID_INPUT : FillStatus.NO_FLUID;
 		}
+	}
 
+	public static boolean drainContainers(ResourceHandler<FluidResource> fluids, Container inventory, int input) {
+		return drainContainers(fluids, inventory, input, input, true) == FillStatus.SUCCESS;
+	}
+
+	public static FillStatus drainContainers(ResourceHandler<FluidResource> fluids, Container inventory, int input, int output, boolean execute) {
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			FillStatus result = drainContainers(fluids, inventory, input, output, tx);
+			if (execute && result == FillStatus.SUCCESS) tx.commit();
+			return result;
+		}
+	}
+
+	public static FillStatus drainContainers(ResourceHandler<FluidResource> fluids, Container inventory, int input, int output, TransactionContext parent) {
+		ItemStack original = inventory.getItem(input).copy();
+		if (original.isEmpty()) return FillStatus.INVALID_INPUT;
+		SimpleContainer working = new SimpleContainer(original.copyWithCount(1));
+		var container = containerHandler(working);
+		if (container == null || ResourceHandlerUtil.isEmpty(container)) return FillStatus.INVALID_INPUT;
+		try (var tx = Transaction.open(parent)) {
+			int moved = ResourceHandlerUtil.move(container, fluids, resource -> true, FluidType.BUCKET_VOLUME, tx);
+			if (moved == 0) return FillStatus.NO_SPACE_FLUID;
+			var remainder = containerHandler(working);
+			boolean empty = remainder == null || ResourceHandlerUtil.isEmpty(remainder);
+			FillStatus result = replaceContainer(inventory, input, empty ? output : input, original, working.getItem(0), tx);
+			if (result == FillStatus.SUCCESS) tx.commit();
+			return result;
+		}
+	}
+
+	private static FillStatus replaceContainer(Container inventory, int input, int output, ItemStack original, ItemStack result, TransactionContext tx) {
+		var items = forestry.core.platform.inventory.InventoryTransferView.internal(inventory);
+		if (!ItemStack.matches(original, inventory.getItem(input))) return FillStatus.INVALID_INPUT;
+		if (items.extract(input, ItemResource.of(original), 1, tx) != 1) return FillStatus.INVALID_INPUT;
+		if (!result.isEmpty() && items.insert(output, ItemResource.of(result), 1, tx) != 1) return FillStatus.NO_SPACE;
 		return FillStatus.SUCCESS;
 	}
 
-	public static boolean drainContainers(IFluidHandler fluidHandler, Container inv, int inputSlot) {
-		ItemStack input = inv.getItem(inputSlot);
-		if (input.isEmpty()) {
-			return false;
-		}
-
-		FluidActionResult fluidActionSimulated = FluidUtil.tryEmptyContainer(input, fluidHandler, FluidType.BUCKET_VOLUME, null, false);
-		if (!fluidActionSimulated.isSuccess()) {
-			return false;
-		}
-
-		ItemStack drainedItemSimulated = fluidActionSimulated.getResult();
-		if (input.getCount() == 1 || drainedItemSimulated.isEmpty()) {
-			FluidActionResult fluidActionResult = FluidUtil.tryEmptyContainer(input, fluidHandler, FluidType.BUCKET_VOLUME, null, true);
-			if (fluidActionResult.isSuccess()) {
-				ItemStack drainedItem = fluidActionResult.getResult();
-				if (!drainedItem.isEmpty()) {
-					inv.setItem(inputSlot, drainedItem);
-				} else {
-					inv.removeItem(inputSlot, 1);
-				}
-				return true;
-			}
-		}
-
-		return false;
+	@Nullable
+	private static ResourceHandler<FluidResource> containerHandler(SimpleContainer inventory) {
+		return ItemAccess.forHandlerIndexStrict(VanillaContainerWrapper.of(inventory), 0).getCapability(Capabilities.Fluid.ITEM);
 	}
 
-	public static FillStatus drainContainers(IFluidHandler fluidHandler, Container inv, int inputSlot, int outputSlot, boolean doDrain) {
-		ItemStack input = inv.getItem(inputSlot);
-		if (input.isEmpty()) {
-			return FillStatus.INVALID_INPUT;
-		}
-		ItemStack outputStack = inv.getItem(outputSlot);
-
-		//Only needed so we can test if the container can be filled
-		FluidStack content = FluidUtil.getFluidContained(input).orElse(FluidStack.EMPTY);
-		FluidActionResult drainedResultSimulated = FluidUtil.tryEmptyContainer(input, fluidHandler, FluidType.BUCKET_VOLUME, null, false);
-		if (!drainedResultSimulated.isSuccess()) {
-			return FillStatus.INVALID_INPUT;
-		}
-
-		ItemStack drainedItemSimulated = drainedResultSimulated.getResult();
-
-		if (outputStack.isEmpty() || drainedItemSimulated.isEmpty() || ItemStackUtil.isIdenticalItem(outputStack, drainedItemSimulated) && outputStack.getCount() + drainedItemSimulated.getCount() < outputStack.getMaxStackSize()) {
-			if (doDrain) {
-				FluidActionResult drainedResult = FluidUtil.tryEmptyContainer(input, fluidHandler, FluidType.BUCKET_VOLUME, null, true);
-				if (drainedResult.isSuccess()) {
-					ItemStack drainedItem = drainedResult.getResult();
-					if (!drainedItem.isEmpty()) {
-						ItemStack newStack = drainedItem.copy();
-						if (!outputStack.isEmpty()) {
-							newStack.grow(outputStack.getCount());
-						}
-						if (!isFillableContainer(newStack, content) || isFillableContainerAndEmpty(newStack, content)) {
-							inv.setItem(outputSlot, newStack);
-							inv.removeItem(inputSlot, 1);
-						}
-						if (isDrainableContainer(newStack) && !isEmpty(newStack)) {
-							inv.setItem(inputSlot, newStack);
-						}
-					} else {
-						inv.removeItem(inputSlot, 1);
-					}
-					return FillStatus.SUCCESS;
-				}
-			}
-			return FillStatus.SUCCESS;
-		}
-
-		return FillStatus.NO_SPACE;
+	@Nullable
+	private static ResourceHandler<FluidResource> getFluidHandler(ItemStack stack) {
+		if (stack.isEmpty()) return null;
+		return containerHandler(new SimpleContainer(stack.copyWithCount(1)));
 	}
 
 	public static boolean isFillableContainer(ItemStack container, FluidStack content) {
-		Optional<IFluidHandlerItem> fluidHandlerCap = FluidUtil.getFluidHandler(container);
-		if (fluidHandlerCap.isEmpty()) {
-			return false;
-		}
-
-		return fluidHandlerCap.filter(handler -> handler.fill(content.copyWithAmount(1), IFluidHandler.FluidAction.SIMULATE) > 0).isPresent();
+		var handler = getFluidHandler(container);
+		return handler != null && !content.isEmpty() && simulateFill(handler, content.copyWithAmount(Integer.MAX_VALUE)) > 0;
 	}
 
 	public static boolean isFillableContainerAndEmpty(ItemStack container, FluidStack content) {
-		Optional<IFluidHandlerItem> fluidHandlerCap = FluidUtil.getFluidHandler(container);
-		if (fluidHandlerCap.isEmpty()) {
-			return false;
-		}
-
-		return fluidHandlerCap.filter(handler -> handler.fill(content.copyWithAmount(1), IFluidHandler.FluidAction.SIMULATE) > 0 && handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE).isEmpty()).isPresent();
+		return isEmpty(container) && isFillableContainer(container, content);
 	}
 
-	public static ItemStack getEmptyContainer(ItemStack container) {
-		ItemStack empty = container.copy();
-		empty.setCount(1);
-		Optional<IFluidHandlerItem> fluidHandlerCap = FluidUtil.getFluidHandler(empty);
-		if (fluidHandlerCap.isEmpty()) {
-			return ItemStack.EMPTY;
+	public static ItemStack getEmptyContainer(ItemStack stack) {
+		if (stack.isEmpty()) return ItemStack.EMPTY;
+		SimpleContainer inventory = new SimpleContainer(stack.copyWithCount(1));
+		var handler = containerHandler(inventory);
+		if (handler == null) return ItemStack.EMPTY;
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			for (int index = 0; index < handler.size(); index++) {
+				var resource = handler.getResource(index);
+				if (!resource.isEmpty() && handler.extract(index, resource, Integer.MAX_VALUE, tx) == 0) return ItemStack.EMPTY;
+			}
+			tx.commit();
 		}
-
-		return fluidHandlerCap.filter(fluidHandler -> fluidHandler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE) != null).isPresent() ? empty : ItemStack.EMPTY;
+		return inventory.getItem(0).copy();
 	}
 
 	public static boolean isFillableContainerWithRoom(ItemStack container) {
-		Optional<IFluidHandlerItem> fluidHandlerCap = FluidUtil.getFluidHandler(container);
-		return fluidHandlerCap.isPresent();
-		/*if (!fluidHandlerCap.isPresent()) {
-			return false;
+		var handler = getFluidHandler(container);
+		if (handler == null) return false;
+		for (int index = 0; index < handler.size(); index++) {
+			if (handler.getAmountAsLong(index) < handler.getCapacityAsLong(index, handler.getResource(index))) return true;
 		}
-
-		IFluidHandlerItem fluidHandler = fluidHandlerCap.orElse(null);
-
-		IFluidTankProperties[] tankProperties = fluidHandler.getTankProperties();
-		for (IFluidTankProperties properties : tankProperties) {
-			if (properties.canFill() && properties.getCapacity() > 0) {
-				FluidStack contents = properties.getContents();
-				if (contents == null) {
-					return true;
-				} else if (contents.amount < properties.getCapacity()) {
-					return true;
-				}
-			}
-		}
-
-		return false;*/
+		return false;
 	}
 
-	public static boolean isFillableEmptyContainer(ItemStack empty) {
-		Optional<IFluidHandlerItem> fluidHandlerCap = FluidUtil.getFluidHandler(empty);
-		return fluidHandlerCap.isPresent();
-		/*if (!fluidHandlerCap.isPresent()) {
-			return false;
-		}
-
-		IFluidHandlerItem fluidHandler = fluidHandlerCap.orElse(null);
-
-		IFluidTankProperties[] tankProperties = fluidHandler.getTankProperties();
-		for (IFluidTankProperties properties : tankProperties) {
-			if (!properties.canFill()) {
-				return false;
-			}
-
-			FluidStack contents = properties.getContents();
-			if (contents != null && contents.amount > 0) {
-				return false;
-			}
-		}
-
-		return true;*/
+	public static boolean isFillableEmptyContainer(ItemStack container) {
+		return isEmpty(container) && isFillableContainerWithRoom(container);
 	}
 
-	// used by squeezer to check if the item's fluid can be extracted from it
 	public static boolean isDrainableFilledContainer(ItemStack container) {
-		Optional<IFluidHandlerItem> fluidHandlerCap = FluidUtil.getFluidHandler(container);
-		if (fluidHandlerCap.isEmpty()) {
-			return false;
+		var handler = getFluidHandler(container);
+		if (handler == null || ResourceHandlerUtil.isEmpty(handler)) return false;
+		for (int index = 0; index < handler.size(); index++) {
+			var resource = handler.getResource(index);
+			if (resource.isEmpty() || handler.getAmountAsLong(index) < handler.getCapacityAsLong(index, resource)) return false;
 		}
-
-		IFluidHandlerItem fluidHandler = fluidHandlerCap.orElseThrow();
-		int capacity = fluidHandler.getTankCapacity(0);
-
-		if (fluidHandler.getFluidInTank(0).getAmount() == capacity) {
-			return fluidHandler.drain(capacity, IFluidHandler.FluidAction.SIMULATE).getAmount() == capacity;
-		} else {
-			return false;
-		}
+		return !simulateDrain(handler, Integer.MAX_VALUE).isEmpty();
 	}
 
 	public static boolean isDrainableContainer(ItemStack container) {
-		Optional<IFluidHandlerItem> fluidHandlerCap = FluidUtil.getFluidHandler(container);
-		return fluidHandlerCap.isPresent();
-		/*if (!fluidHandlerCap.isPresent()) {
-			return false;
-		}
-
-		IFluidHandlerItem fluidHandler = fluidHandlerCap.orElse(null);
-
-		IFluidTankProperties[] tankProperties = fluidHandler.getTankProperties();
-		for (IFluidTankProperties properties : tankProperties) {
-			if (properties.canDrain()) {
-				return true;
-			}
-		}
-
-		return false;*/
+		var handler = getFluidHandler(container);
+		return handler != null && !simulateDrain(handler, Integer.MAX_VALUE).isEmpty();
 	}
 
 	public static boolean isEmpty(ItemStack container) {
-		Optional<IFluidHandlerItem> fluidHandlerCap = FluidUtil.getFluidHandler(container);
-		if (fluidHandlerCap.isEmpty()) {
-			return false;
-		}
-
-		return fluidHandlerCap.filter(fluidHandler -> {
-			for (int i = 0; i < fluidHandler.getTanks(); i++) {
-				if (!fluidHandler.getFluidInTank(i).isEmpty()) {
-					return false;
-				}
-			}
-			return true;
-		}).isPresent();
+		var handler = getFluidHandler(container);
+		return handler != null && ResourceHandlerUtil.isEmpty(handler);
 	}
 
+	public static int fill(ResourceHandler<FluidResource> handler, FluidStack stack) {
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			int inserted = stack.isEmpty() ? 0 : handler.insert(FluidResource.of(stack), stack.getAmount(), tx);
+			tx.commit();
+			return inserted;
+		}
+	}
+
+	public static int simulateFill(ResourceHandler<FluidResource> handler, FluidStack stack) {
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			return stack.isEmpty() ? 0 : handler.insert(FluidResource.of(stack), stack.getAmount(), tx);
+		}
+	}
+
+	public static FluidStack drain(ResourceHandler<FluidResource> handler, FluidStack stack, TransactionContext tx) {
+		return stack.isEmpty() ? FluidStack.EMPTY : stack.copyWithAmount(handler.extract(FluidResource.of(stack), stack.getAmount(), tx));
+	}
+
+	public static FluidStack drain(ResourceHandler<FluidResource> handler, int amount, TransactionContext tx) {
+		var extracted = ResourceHandlerUtil.extractFirst(handler, resource -> true, amount, tx);
+		return extracted == null ? FluidStack.EMPTY : extracted.resource().toStack(extracted.amount());
+	}
+
+	public static FluidStack drain(ResourceHandler<FluidResource> handler, FluidStack stack) {
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			FluidStack drained = drain(handler, stack, tx);
+			tx.commit();
+			return drained;
+		}
+	}
+
+	public static FluidStack drain(ResourceHandler<FluidResource> handler, int amount) {
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			FluidStack drained = drain(handler, amount, tx);
+			tx.commit();
+			return drained;
+		}
+	}
+
+	public static FluidStack simulateDrain(ResourceHandler<FluidResource> handler, FluidStack stack) {
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) { return drain(handler, stack, tx); }
+	}
+
+	public static FluidStack simulateDrain(ResourceHandler<FluidResource> handler, int amount) {
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) { return drain(handler, amount, tx); }
+	}
 }

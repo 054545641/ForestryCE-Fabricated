@@ -1,18 +1,15 @@
 package forestry.core.platform.gui.buttons;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.renderer.RenderPipelines;
 import forestry.api.ForestryConstants;
 import forestry.core.platform.config.Constants;
-import forestry.core.platform.util.RenderUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
+import net.minecraft.resources.Identifier;
 
 public class GuiBetterButton extends Button {
-	public static final ResourceLocation TEXTURE = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/buttons.png");
+	public static final Identifier TEXTURE = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/buttons.png");
 
 	protected final IButtonTextureSet texture;
 
@@ -22,20 +19,14 @@ public class GuiBetterButton extends Button {
 	}
 
 	@Override
-	public void renderWidget(GuiGraphics graphics, int mX, int mY, float partialTick) {
+	public void extractContents(GuiGraphicsExtractor graphics, int mX, int mY, float partialTick) {
 		int xOffset = this.texture.getX();
 		int yOffset = this.texture.getY();
 		int h = this.height;
 		int w = this.width;
 
 		// VANILLA COPY EXCEPT FOR TEXTURE AND COORDINATES
-		Minecraft minecraft = Minecraft.getInstance();
-		graphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
-		RenderSystem.enableBlend();
-		RenderSystem.enableDepthTest();
-		graphics.blit(TEXTURE, getX(), getY(), xOffset, yOffset + RenderUtil.getYImage(this) * h, w, h);
-		graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
-		int i = getFGColor();
-		this.renderString(graphics, minecraft.font, i | Mth.ceil(this.alpha * 255.0F) << 24);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, getX(), getY(), xOffset, yOffset + (!this.active ? 0 : this.isHoveredOrFocused() ? 2 : 1) * h, w, h, 256, 256, net.minecraft.util.ARGB.white(this.alpha));
+		extractDefaultLabel(graphics.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE));
 	}
 }

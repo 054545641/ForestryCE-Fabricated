@@ -14,18 +14,18 @@ import forestry.api.apiculture.hives.VillageHive;
 import forestry.apiculture.bees.BeeHousingBeekeepingLogic;
 import forestry.apiculture.bees.BeeHousingListener;
 import forestry.apiculture.bees.BeeHousingModifier;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 
 import java.util.List;
 
 public class HiveManager implements IHiveManager {
-	private final ImmutableMap<ResourceLocation, IHive> registry;
+	private final ImmutableMap<Identifier, IHive> registry;
 
 	private final ImmutableList<VillageHive> commonVillageHives;
 	private final ImmutableList<VillageHive> rareVillageHives;
 
-	public HiveManager(ImmutableMap<ResourceLocation, IHive> registry, ImmutableList<VillageHive> commonVillageHives, ImmutableList<VillageHive> rareVillageHives) {
+	public HiveManager(ImmutableMap<Identifier, IHive> registry, ImmutableList<VillageHive> commonVillageHives, ImmutableList<VillageHive> rareVillageHives) {
 		this.registry = registry;
 		this.commonVillageHives = commonVillageHives;
 		this.rareVillageHives = rareVillageHives;
@@ -47,7 +47,7 @@ public class HiveManager implements IHiveManager {
 	}
 
 	@Override
-	public List<IHiveDrop> getDrops(ResourceLocation id) {
+	public List<IHiveDrop> getDrops(Identifier id) {
 		IHive hive = this.registry.get(id);
 		if (hive == null) {
 			return List.of();

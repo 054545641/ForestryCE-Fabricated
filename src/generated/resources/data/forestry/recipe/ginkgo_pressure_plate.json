@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:ginkgo_planks"
-      },
-      {
-        "item": "forestry:ginkgo_fireproof_planks"
-      }
+      "forestry:ginkgo_planks",
+      "forestry:ginkgo_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:ginkgo_pressure_plate"
   }
 }

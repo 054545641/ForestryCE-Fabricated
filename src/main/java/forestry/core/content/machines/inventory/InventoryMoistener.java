@@ -1,5 +1,6 @@
 package forestry.core.content.machines.inventory;
 
+
 import forestry.core.platform.inventory.InventoryAdapterTile;
 import forestry.core.platform.util.RecipeUtils;
 import forestry.core.platform.util.SlotUtil;
@@ -7,7 +8,7 @@ import forestry.core.content.machines.tiles.TileMoistener;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 
 import java.util.Optional;
 import forestry.api.ForestryDataMaps;
@@ -28,15 +29,15 @@ public class InventoryMoistener extends InventoryAdapterTile<TileMoistener> {
 	@Override
 	public boolean canSlotAccept(int slotIndex, ItemStack stack) {
 		if (slotIndex == SLOT_RESOURCE) {
-			return RecipeUtils.getMoistenerRecipe(this.tile.getLevel().getRecipeManager(), stack) != null;
+			return RecipeUtils.getMoistenerRecipe(RecipeUtils.getRecipeMap(this.tile.getLevel()), stack) != null;
 		}
 
 		if (SlotUtil.isSlotInRange(slotIndex, SLOT_STASH_1, SLOT_STASH_COUNT)) {
-			return stack.getItemHolder().getData(ForestryDataMaps.MOISTENER_FUELS) != null;
+			return stack.typeHolder().getData(ForestryDataMaps.MOISTENER_FUELS) != null;
 		}
 
 		if (slotIndex == SLOT_PRODUCT) {
-			Optional<FluidStack> fluidCap = FluidUtil.getFluidContained(stack);
+			Optional<FluidStack> fluidCap = Optional.of(FluidUtil.getFirstStackContained(stack)).filter(fluidStack -> !fluidStack.isEmpty());
 			return fluidCap.map(f -> this.tile.getTankManager().canFillFluidType(f)).orElse(false);    //TODO very common pattern. Create Helper?
 		}
 
@@ -50,7 +51,7 @@ public class InventoryMoistener extends InventoryAdapterTile<TileMoistener> {
 		}
 
 		if (SlotUtil.isSlotInRange(slotIndex, SLOT_STASH_1, SLOT_STASH_COUNT + SLOT_RESERVOIR_COUNT)) {
-			return itemstack.getItemHolder().getData(ForestryDataMaps.MOISTENER_FUELS) == null;
+			return itemstack.typeHolder().getData(ForestryDataMaps.MOISTENER_FUELS) == null;
 		}
 
 		return false;

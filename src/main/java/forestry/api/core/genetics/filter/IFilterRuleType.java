@@ -1,6 +1,6 @@
 package forestry.api.core.genetics.filter;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * A filter rule type is a filter option that can be set in the Genetic Filter block.
@@ -30,5 +30,5 @@ public interface IFilterRuleType extends IFilterRule {
 	/**
 	 * @return The resource location for the sprite used to select this rule type in the Genetic Filter screen.
 	 */
-	ResourceLocation getSprite();
+	Identifier getSprite();
 }

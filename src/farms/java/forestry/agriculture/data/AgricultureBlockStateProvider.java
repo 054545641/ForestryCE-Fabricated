@@ -1,13 +1,12 @@
 package forestry.agriculture.data;
 
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
+import forestry.core.data.models.BlockAssetsProvider;
+import forestry.core.data.models.ModelAsset;
 import net.neoforged.neoforge.client.model.generators.loaders.CompositeModelBuilder;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 import forestry.agriculture.features.MinifarmBlocks;
 import forestry.agriculture.features.MultifarmBlocks;
@@ -28,9 +27,9 @@ import static forestry.core.data.models.ForestryBlockStateProvider.path;
  * of its material carrying a farm overlay, and a planter renders one hand-authored model per planter
  * type.
  */
-public class AgricultureBlockStateProvider extends BlockStateProvider {
-	public AgricultureBlockStateProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
-		super(output, ForestryConstants.MOD_ID, existingFileHelper);
+public class AgricultureBlockStateProvider extends BlockAssetsProvider {
+	public AgricultureBlockStateProvider(PackOutput output) {
+		super(output);
 	}
 
 	@Override
@@ -46,7 +45,7 @@ public class AgricultureBlockStateProvider extends BlockStateProvider {
 		}
 
 		for (MinifarmBlockType planter : MinifarmBlockType.values()) {
-			ModelFile model = models().getExistingFile(modBlock(this, planter.getSerializedName()));
+			ModelAsset model = models().getExistingFile(modBlock(this, planter.getSerializedName()));
 			Block managed = MinifarmBlocks.MANAGED_PLANTER.get(planter).block();
 			Block manual = MinifarmBlocks.MANUAL_PLANTER.get(planter).block();
 
@@ -61,7 +60,7 @@ public class AgricultureBlockStateProvider extends BlockStateProvider {
 	private void singleFarm(MultifarmBlock block) {
 		MultifarmMaterialType material = block.getFarmMaterial();
 		Block base = material.getBase();
-		ResourceLocation texture = modBlock(this, "farm/" + block.getType().getSerializedName());
+		Identifier texture = modBlock(this, "farm/" + block.getType().getSerializedName());
 
 		ForestryBlockStateProvider.singleModelBlock(this, block, farmPillar(path(block), base, texture, texture));
 	}
@@ -78,23 +77,15 @@ public class AgricultureBlockStateProvider extends BlockStateProvider {
 			.modelForState().modelFile(farmPillar(path(block) + "_band", base, modBlock(this, "farm/top"), modBlock(this, "farm/band"))).addModel();
 	}
 
-	private ModelFile farmPillar(String path, Block base, ResourceLocation top, ResourceLocation side) {
-		ModelFile baseModel = file(blockTexture(base));
+	private ModelAsset farmPillar(String path, Block base, Identifier top, Identifier side) {
+		ModelAsset baseModel = file(blockTexture(base));
 
-		return models().getBuilder(path).customLoader(CompositeModelBuilder::begin)
-			.child("base", models().nested()
-				.parent(baseModel)
-				.renderType("solid"))
-			.child("overlay", models().nested()
-				.parent(file(mcBlock(this, "cube_column")))
-				.texture("end", top)
-				.texture("side", side)
-				// should we use cutout_mipped?
-				.renderType("cutout"))
-			.itemRenderOrder("base", "overlay")
-			.end()
-			// reuse the particle
-			.parent(baseModel);
+		ModelAsset overlay = models().withExistingParent(path + "_overlay", mcLoc("block/cube_column"))
+			.texture("end", top).texture("side", side).renderType("cutout");
+		ModelAsset result = models().getBuilder(path).parent(baseModel);
+		new CompositeModelBuilder().child("base", baseModel.getLocation()).child("overlay", overlay.getLocation())
+			.itemRenderOrder("base", "overlay").toJson(result.json);
+		return result;
 	}
 
 	// Every planter type shares one hand-authored block model, and its item renders that model

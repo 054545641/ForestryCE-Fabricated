@@ -1,12 +1,12 @@
 package forestry.core.platform.registration;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public abstract class ModFeature implements IModFeature {
-	protected final ResourceLocation moduleId;
+	protected final Identifier moduleId;
 	protected final String name;
 
-	protected ModFeature(ResourceLocation moduleId, String name) {
+	protected ModFeature(Identifier moduleId, String name) {
 		this.moduleId = moduleId;
 		this.name = name;
 	}
@@ -17,7 +17,7 @@ public abstract class ModFeature implements IModFeature {
 	}
 
 	@Override
-	public ResourceLocation getModuleId() {
+	public Identifier getModuleId() {
 		return this.moduleId;
 	}
 }

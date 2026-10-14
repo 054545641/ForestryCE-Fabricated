@@ -37,7 +37,7 @@ public class MutationConditionDaytime implements IMutationCondition {
 
 	@Override
 	public float modifyChance(Level level, BlockPos pos, IMutation<?> mutation, IGenome genome0, IGenome genome1, IClimateProvider climate, float currentChance) {
-		if (level.isDay() == this.daytime) {
+		if (level.isBrightOutside() == this.daytime) {
 			return currentChance;
 		}
 		return 0f;

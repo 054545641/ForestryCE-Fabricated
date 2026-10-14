@@ -13,13 +13,13 @@ import forestry.arboriculture.charcoal.CharcoalManager;
 import forestry.apiimpl.plugin.Registrar;
 import forestry.apiimpl.plugin.SpeciesRegistration;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ArboricultureRegistration extends SpeciesRegistration<ITreeSpeciesBuilder, ITreeSpecies, TreeSpeciesBuilder> implements IArboricultureRegistration {
-	private final Registrar<ResourceLocation, IFruit, IFruit> fruits = new Registrar<>(IFruit.class);
-	private final Registrar<ResourceLocation, ITreeEffect, ITreeEffect> effects = new Registrar<>(ITreeEffect.class);
+	private final Registrar<Identifier, IFruit, IFruit> fruits = new Registrar<>(IFruit.class);
+	private final Registrar<Identifier, ITreeEffect, ITreeEffect> effects = new Registrar<>(ITreeEffect.class);
 	private final ImmutableMap.Builder<Block, Block> refractoryWaxables = ImmutableMap.builder();
 	private final CharcoalManager charcoalPitWalls = new CharcoalManager();
 
@@ -28,12 +28,12 @@ public class ArboricultureRegistration extends SpeciesRegistration<ITreeSpeciesB
 	}
 
 	@Override
-	protected TreeSpeciesBuilder createSpeciesBuilder(ResourceLocation id, String genus, String species) {
+	protected TreeSpeciesBuilder createSpeciesBuilder(Identifier id, String genus, String species) {
 		return new TreeSpeciesBuilder(id, genus, species);
 	}
 
 	@Override
-	public ITreeSpeciesBuilder registerSpecies(ResourceLocation id, String genus, String species, boolean dominant, TextColor escritoireColor, IWoodType woodType) {
+	public ITreeSpeciesBuilder registerSpecies(Identifier id, String genus, String species, boolean dominant, TextColor escritoireColor, IWoodType woodType) {
 		return register(id, genus, species)
 			.setDominant(dominant)
 			.setEscritoireColor(escritoireColor)
@@ -41,12 +41,12 @@ public class ArboricultureRegistration extends SpeciesRegistration<ITreeSpeciesB
 	}
 
 	@Override
-	public void registerFruit(ResourceLocation id, IFruit fruit) {
+	public void registerFruit(Identifier id, IFruit fruit) {
 		this.fruits.create(id, fruit);
 	}
 
 	@Override
-	public void registerTreeEffect(ResourceLocation id, ITreeEffect effect) {
+	public void registerTreeEffect(Identifier id, ITreeEffect effect) {
 		this.effects.create(id, effect);
 	}
 
@@ -60,11 +60,11 @@ public class ArboricultureRegistration extends SpeciesRegistration<ITreeSpeciesB
 		this.charcoalPitWalls.addWall(state, charcoal);
 	}
 
-	public ImmutableMap<ResourceLocation, IFruit> getFruits() {
+	public ImmutableMap<Identifier, IFruit> getFruits() {
 		return this.fruits.build();
 	}
 
-	public ImmutableMap<ResourceLocation, ITreeEffect> getEffects() {
+	public ImmutableMap<Identifier, ITreeEffect> getEffects() {
 		return this.effects.build();
 	}
 

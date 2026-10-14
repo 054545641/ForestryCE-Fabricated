@@ -5,7 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -15,7 +15,7 @@ public class PipetteContents {
 
 	@Nullable
 	public static PipetteContents create(ItemStack itemStack) {
-		FluidStack contents = FluidUtil.getFluidContained(itemStack).orElse(FluidStack.EMPTY);
+		FluidStack contents = FluidUtil.getFirstStackContained(itemStack);
 		if (contents.isEmpty()) {
 			return null;
 		}

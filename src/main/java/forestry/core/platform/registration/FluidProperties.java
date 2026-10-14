@@ -2,7 +2,7 @@ package forestry.core.platform.registration;
 
 import forestry.core.platform.client.ClientsideCode;
 import forestry.core.platform.item.DrinkProperties;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.data.loading.DatagenModLoader;
@@ -21,7 +21,7 @@ public class FluidProperties {
 	public final boolean spreadsFire;
 	@Nullable
 	public final DrinkProperties properties;
-	public final ResourceLocation[] resources = new ResourceLocation[2];
+	public final Identifier[] resources = new Identifier[2];
 	public final Supplier<Item> bucket;
 
 	public FluidProperties(FeatureFluid.Builder builder) {
@@ -38,8 +38,8 @@ public class FluidProperties {
 		this.bucket = builder.bucket;
 	}
 
-	public static boolean resourceExists(ResourceLocation location) {
-		if (FMLEnvironment.dist == Dist.DEDICATED_SERVER || DatagenModLoader.isRunningDataGen()) {
+	public static boolean resourceExists(Identifier location) {
+		if (FMLEnvironment.getDist() == Dist.DEDICATED_SERVER || DatagenModLoader.isRunningDataGen()) {
 			return true;
 		}
 		return ClientsideCode.getResource(location.withPath(path -> "textures/" + path + ".png")).isPresent();

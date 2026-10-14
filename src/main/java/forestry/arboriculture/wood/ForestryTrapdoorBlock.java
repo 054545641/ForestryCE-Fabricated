@@ -10,8 +10,8 @@ import net.minecraft.world.level.material.MapColor;
 public class ForestryTrapdoorBlock extends TrapDoorBlock implements IWoodTyped {
 	private final ForestryWoodType type;
 
-	public ForestryTrapdoorBlock(ForestryWoodType type) {
-		super(type.getBlockSetType(), Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(3f).noOcclusion().isValidSpawn(BlockUtil.NEVER_SPAWN).ignitedByLava());
+	public ForestryTrapdoorBlock(Properties properties, ForestryWoodType type) {
+		super(type.getBlockSetType(), properties.mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(3f).noOcclusion().isValidSpawn(BlockUtil.NEVER_SPAWN).ignitedByLava());
 
 		this.type = type;
 	}

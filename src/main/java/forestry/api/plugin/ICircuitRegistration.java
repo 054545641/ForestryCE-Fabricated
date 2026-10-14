@@ -1,7 +1,7 @@
 package forestry.api.plugin;
 
 import forestry.api.core.circuits.ICircuit;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -27,5 +27,5 @@ public interface ICircuitRegistration {
 	 * @see forestry.api.core.circuits.ForestryCircuitSocketTypes
 	 * @see forestry.api.core.circuits.ForestryCircuitLayouts
 	 */
-	void registerLayout(String layoutId, ResourceLocation socketType);
+	void registerLayout(String layoutId, Identifier socketType);
 }

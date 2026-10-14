@@ -18,7 +18,8 @@ import forestry.core.platform.item.ItemForestry;
 public class ItemElectronTube extends ItemForestry {
 
 	// The subtype is what the registry keys the item by, nothing here reads it back
-	public ItemElectronTube(EnumElectronTube type) {
+	public ItemElectronTube(EnumElectronTube type, Properties properties) {
+		super(properties);
 	}
 
 	// todo show the combined speed, efficiency and fortune multipliers

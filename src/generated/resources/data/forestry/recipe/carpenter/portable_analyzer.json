@@ -1,6 +1,5 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/portable_analyzer",
   "liquid": {
     "amount": 2000,
@@ -9,18 +8,10 @@
   "recipe": {
     "category": "equipment",
     "key": {
-      "#": {
-        "tag": "c:glass_panes"
-      },
-      "D": {
-        "tag": "c:gems/diamond"
-      },
-      "R": {
-        "tag": "c:dusts/redstone"
-      },
-      "X": {
-        "tag": "c:ingots/tin"
-      }
+      "#": "#c:glass_panes",
+      "D": "#c:gems/diamond",
+      "R": "#c:dusts/redstone",
+      "X": "#c:ingots/tin"
     },
     "pattern": [
       "X#X",
@@ -28,7 +19,6 @@
       "RDR"
     ],
     "result": {
-      "count": 1,
       "id": "forestry:portable_analyzer"
     }
   },

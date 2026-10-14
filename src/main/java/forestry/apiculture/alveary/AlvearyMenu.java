@@ -8,13 +8,13 @@ import forestry.core.platform.gui.ContainerTile;
 import forestry.core.platform.network.packets.PacketGuiStream;
 import forestry.core.platform.tile.TileUtil;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import forestry.apiculture.bees.ContainerBeeHelper;
 
 public class AlvearyMenu extends ContainerTile<AbstractAlvearyBlockEntity> {
-	private static final ResourceLocation OPEN_ALVEARY_UI = ForestryConstants.forestry("get_alveary");
+	private static final Identifier OPEN_ALVEARY_UI = ForestryConstants.forestry("get_alveary");
 
 	public static AlvearyMenu fromNetwork(int windowId, Inventory inv, FriendlyByteBuf data) {
 		AbstractAlvearyBlockEntity tile = TileUtil.getTile(inv.player.level(), data.readBlockPos(), AbstractAlvearyBlockEntity.class);

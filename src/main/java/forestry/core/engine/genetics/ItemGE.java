@@ -42,7 +42,7 @@ public abstract class ItemGE extends ItemForestry implements IIndividualItem {
 	protected final ILifeStage stage;
 
 	protected ItemGE(Item.Properties properties, ILifeStage stage) {
-		super(properties.setNoRepair());
+		super(properties.setNoCombineRepair());
 
 		this.stage = stage;
 	}
@@ -155,7 +155,7 @@ public abstract class ItemGE extends ItemForestry implements IIndividualItem {
 		IIndividual individual = getIndividual(stack);
 		if (individual != null) {
 			if (individual.isAnalyzed()) {
-				if (Screen.hasShiftDown()) {
+				if (net.minecraft.client.Minecraft.getInstance().hasShiftDown()) {
 					((ISpecies<IIndividual>) individual.getSpecies()).addTooltip(individual, tooltip);
 				} else {
 					tooltip.add(Component.translatable("for.gui.tooltip.tmi", "< %s >").withStyle(style -> style.withColor(ChatFormatting.GRAY).withItalic(true)));
@@ -175,7 +175,7 @@ public abstract class ItemGE extends ItemForestry implements IIndividualItem {
 	}
 
 	@Override
-	public String getCreatorModId(ItemStack stack) {
+	public String getCreatorModId(net.minecraft.core.HolderLookup.Provider registries, ItemStack stack) {
 		ISpecies<?> species = getSpecies(stack);
 		return species.id().getNamespace();
 	}

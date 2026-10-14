@@ -1,0 +1,16 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "forestry:item/stamp_5n",
+    "tints": [
+      {
+        "type": "forestry:mail_stamp",
+        "tint_index": 0
+      },
+      {
+        "type": "forestry:mail_stamp",
+        "tint_index": 1
+      }
+    ]
+  }
+}

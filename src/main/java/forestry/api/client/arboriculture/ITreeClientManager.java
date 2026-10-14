@@ -2,7 +2,7 @@ package forestry.api.client.arboriculture;
 
 import com.mojang.datafixers.util.Pair;
 import forestry.api.arboriculture.ITreeSpecies;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -29,13 +29,13 @@ public interface ITreeClientManager {
 	/**
 	 * @return A pair containing locations of the block and item models for this species, in that order.
 	 */
-	Pair<ResourceLocation, ResourceLocation> getSaplingModels(ITreeSpecies species);
+	Pair<Identifier, Identifier> getSaplingModels(ITreeSpecies species);
 
 	/**
 	 * @return The block+item sapling model pair used when a species has no registered pair (defaults to oak's). Never
 	 * requires the species list, so it is safe before/after a datapack species reload.
 	 */
-	Pair<ResourceLocation, ResourceLocation> getDefaultSaplingModels();
+	Pair<Identifier, Identifier> getDefaultSaplingModels();
 
-	Collection<Pair<ResourceLocation, ResourceLocation>> getAllSaplingModels();
+	Collection<Pair<Identifier, Identifier>> getAllSaplingModels();
 }

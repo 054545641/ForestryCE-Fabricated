@@ -8,12 +8,8 @@
   "recipe": {
     "category": "building",
     "key": {
-      "#": {
-        "item": "forestry:refractory_wax"
-      },
-      "X": {
-        "item": "forestry:macrocarpa_planks"
-      }
+      "#": "forestry:refractory_wax",
+      "X": "forestry:macrocarpa_planks"
     },
     "pattern": [
       "XXX",

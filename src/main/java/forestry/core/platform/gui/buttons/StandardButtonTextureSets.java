@@ -1,6 +1,6 @@
 package forestry.core.platform.gui.buttons;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public enum StandardButtonTextureSets implements IButtonTextureSet {
 	LARGE_BUTTON(0, 0, 20, 200),
@@ -46,7 +46,7 @@ public enum StandardButtonTextureSets implements IButtonTextureSet {
 	}
 
 	@Override
-	public ResourceLocation getTexture() {
+	public Identifier getTexture() {
 		return GuiBetterButton.TEXTURE;
 	}
 }

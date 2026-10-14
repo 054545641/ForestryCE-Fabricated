@@ -38,7 +38,7 @@ public class WorktableSlot extends Slot {
 	@Override
 	protected void checkTakeAchievements(ItemStack stack) {
 		if (this.amountCrafted > 0) {
-			stack.onCraftedBy(this.player.level(), this.player, this.amountCrafted);
+			stack.onCraftedBy(this.player, this.amountCrafted);
 			net.neoforged.neoforge.event.EventHooks.firePlayerCraftingEvent(this.player, stack, this.craftMatrix);
 		}
 

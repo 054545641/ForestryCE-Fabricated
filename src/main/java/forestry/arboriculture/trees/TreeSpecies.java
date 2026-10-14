@@ -25,10 +25,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -46,10 +47,11 @@ public class TreeSpecies extends Species<ITreeSpeciesType, ITree> implements ITr
 	private final ITreeGenerator generator;
 	private final List<BlockState> vanillaLeafStates;
 	private final List<Item> vanillaSaplingItems;
-	private final ItemStack decorativeLeaves;
+	@Nullable
+	private final ItemStackTemplate decorativeLeaves;
 	private final float rarity;
 
-	public TreeSpecies(ResourceLocation id, ITreeSpeciesType speciesType, IGenome defaultGenome, ITreeSpeciesBuilder builder) {
+	public TreeSpecies(Identifier id, ITreeSpeciesType speciesType, IGenome defaultGenome, ITreeSpeciesBuilder builder) {
 		super(id, speciesType, defaultGenome, builder);
 
 		this.temperature = builder.getTemperature();
@@ -58,7 +60,7 @@ public class TreeSpecies extends Species<ITreeSpeciesType, ITree> implements ITr
 		this.generator = builder.getGenerator();
 		this.vanillaLeafStates = builder.getVanillaLeafStates();
 		this.vanillaSaplingItems = builder.getVanillaSaplingItems();
-		this.decorativeLeaves = builder.getDecorativeLeaves();
+		this.decorativeLeaves = builder.getDecorativeLeavesTemplate();
 		this.rarity = builder.getRarity();
 	}
 
@@ -69,7 +71,7 @@ public class TreeSpecies extends Species<ITreeSpeciesType, ITree> implements ITr
 
 	@Override
 	public ItemStack getDecorativeLeaves() {
-		return this.decorativeLeaves;
+		return this.decorativeLeaves == null ? ItemStack.EMPTY : this.decorativeLeaves.create();
 	}
 
 	@Override
@@ -182,7 +184,7 @@ public class TreeSpecies extends Species<ITreeSpeciesType, ITree> implements ITr
 	public boolean setLeaves(IGenome genome, LevelAccessor level, BlockPos pos, RandomSource random, boolean convertBlockEntity) {
 		if (convertBlockEntity) {
 			// assume all generated leaves are properly supported
-			BlockState state = LeavesBlock.updateDistance(ArboricultureBlocks.LEAVES.defaultState(), level, pos)
+			BlockState state = forestry.arboriculture.leaves.BlockExtendedLeaves.updateDistance(ArboricultureBlocks.LEAVES.defaultState(), level, pos)
 				.setValue(BlockExtendedLeaves.SUPPORTED, true);
 			boolean wasFruit = isFruitLeaf(level, pos);
 			boolean placed = level.setBlock(pos, state, 19);

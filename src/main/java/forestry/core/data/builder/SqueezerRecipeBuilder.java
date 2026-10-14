@@ -4,7 +4,7 @@ import forestry.api.core.FluidProduct;
 import forestry.api.core.IFluidProduct;
 import forestry.core.content.machines.recipes.SqueezerRecipe;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -49,7 +49,7 @@ public class SqueezerRecipeBuilder {
 		return this;
 	}
 
-	public void build(RecipeOutput output, ResourceLocation id) {
-		output.accept(id, new SqueezerRecipe(id, this.processingTime, this.resources, this.fluidOutput, this.remnants, this.remnantsChance), null);
+	public void build(RecipeOutput output, Identifier id) {
+		output.accept(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id), new SqueezerRecipe(id, this.processingTime, this.resources, this.fluidOutput, this.remnants, this.remnantsChance), null);
 	}
 }

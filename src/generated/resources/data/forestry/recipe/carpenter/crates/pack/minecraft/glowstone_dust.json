@@ -1,19 +1,14 @@
 {
   "type": "forestry:carpenter",
-  "box": {
-    "item": "forestry:crate"
-  },
+  "box": "forestry:crate",
   "id": "forestry:carpenter/crates/pack/minecraft/glowstone_dust",
   "liquid": {
     "amount": 100,
     "id": "minecraft:water"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "tag": "c:dusts/glowstone"
-      }
+      "#": "#c:dusts/glowstone"
     },
     "pattern": [
       "###",
@@ -21,7 +16,6 @@
       "###"
     ],
     "result": {
-      "count": 1,
       "id": "forestry:crated_glowstone"
     }
   },

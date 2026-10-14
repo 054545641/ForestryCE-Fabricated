@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "#": {
-      "item": "minecraft:dirt"
-    },
-    "X": {
-      "item": "forestry:fertilizer"
-    }
+    "#": "minecraft:dirt",
+    "X": "forestry:fertilizer"
   },
   "pattern": [
     "###",

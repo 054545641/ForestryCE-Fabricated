@@ -2,16 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "X": {
-      "item": "forestry:ash_brick"
-    }
+    "X": "forestry:ash_brick"
   },
   "pattern": [
     "XX",
     "XX"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:ash_bricks"
   }
 }

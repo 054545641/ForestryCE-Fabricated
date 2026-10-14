@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:sequoia_planks"
-      },
-      {
-        "item": "forestry:sequoia_fireproof_planks"
-      }
+      "forestry:sequoia_planks",
+      "forestry:sequoia_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:sequoia_pressure_plate"
   }
 }

@@ -8,14 +8,14 @@ import forestry.core.platform.gui.widgets.WidgetManager;
 import forestry.core.platform.gui.widgets.WidgetScrollBar;
 import forestry.core.content.sorting.gui.GuiGeneticFilter;
 import forestry.core.content.sorting.gui.ISelectableProvider;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 
 public class SelectionWidget extends Widget {
-	public static final ResourceLocation TEXTURE = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/filter_selection.png");
+	public static final Identifier TEXTURE = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/filter_selection.png");
 	final WidgetScrollBar scrollBar;
 	@Nullable
 	private SelectionLogic<?> logic;
@@ -47,15 +47,15 @@ public class SelectionWidget extends Widget {
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int startX, int startY) {
+	public void draw(GuiGraphicsExtractor graphics, int startX, int startY) {
 		if (this.logic == null) {
 			return;
 		}
 
-		graphics.blit(TEXTURE, startX + this.xPos, startY + this.yPos, 0, 0, this.width, this.height);
+		graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, TEXTURE, startX + this.xPos, startY + this.yPos, 0, 0, this.width, this.height, 256, 256);
         this.logic.draw(graphics);
 
-		graphics.drawString(this.gui.font(), Component.translatable("for.gui.filter.seletion"), startX + this.xPos + 12, startY + this.yPos + 4, this.manager.gui.getFontColor().get("gui.title"));
+		graphics.text(this.gui.font(), Component.translatable("for.gui.filter.seletion"), startX + this.xPos + 12, startY + this.yPos + 4, 0xFF000000 | (this.manager.gui.getFontColor().get("gui.title")));
 	}
 
 	@Override

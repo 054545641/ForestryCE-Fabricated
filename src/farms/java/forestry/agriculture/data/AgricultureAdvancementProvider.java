@@ -7,17 +7,16 @@ import java.util.function.Consumer;
 
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementType;
-import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.advancements.critereon.ImpossibleTrigger;
-import net.minecraft.advancements.critereon.InventoryChangeTrigger;
-import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
+import net.minecraft.advancements.triggers.ImpossibleTrigger;
+import net.minecraft.advancements.triggers.InventoryChangeTrigger;
+import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 
-import net.neoforged.neoforge.common.data.AdvancementProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.data.advancements.AdvancementProvider;
 
 import forestry.agriculture.features.MinifarmBlocks;
 import forestry.agriculture.features.MultifarmBlocks;
@@ -33,13 +32,13 @@ import forestry.core.data.ForestryAdvancements;
 // Deviation from 1.20.1: 1.20.1 wrote all 57 advancements from one provider. The planters and the
 // multifarm are farms jar content, which core's provider cannot see, so these two write here
 public class AgricultureAdvancementProvider extends AdvancementProvider {
-	public AgricultureAdvancementProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, ExistingFileHelper existingFileHelper) {
-		super(output, registries, existingFileHelper, List.of(new FarmAdvancements()));
+	public AgricultureAdvancementProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+		super(output, registries, List.of(new FarmAdvancements()));
 	}
 
-	private static class FarmAdvancements implements AdvancementProvider.AdvancementGenerator {
+	private static class FarmAdvancements implements net.minecraft.data.advancements.AdvancementSubProvider {
 		@Override
-		public void generate(HolderLookup.Provider registries, Consumer<AdvancementHolder> writer, ExistingFileHelper existingFileHelper) {
+		public void generate(HolderLookup.Provider registries, Consumer<AdvancementHolder> writer) {
 			AdvancementHolder fabricator = ForestryAdvancements.reference("get_fabricator");
 
 			List<Item> planters = new ArrayList<>();
@@ -54,7 +53,7 @@ public class AgricultureAdvancementProvider extends AdvancementProvider {
 			AdvancementHolder farmingSimulator = ForestryAdvancements.add(writer, "farming_simulator",
 				MinifarmBlocks.MANAGED_PLANTER.stack(MinifarmBlockType.ARBORETUM),
 				fabricator,
-				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(planters.toArray(Item[]::new))));
+				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(registries.lookupOrThrow(net.minecraft.core.registries.Registries.ITEM), planters.toArray(Item[]::new))));
 
 			// Feed The World
 			// Granted manually via ContainerFarm

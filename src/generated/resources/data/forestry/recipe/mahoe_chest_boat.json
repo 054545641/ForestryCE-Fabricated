@@ -1,16 +1,10 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "item": "forestry:mahoe_boat"
-    },
-    {
-      "tag": "c:chests/wooden"
-    }
+    "forestry:mahoe_boat",
+    "#c:chests/wooden"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:mahoe_chest_boat"
   }
 }

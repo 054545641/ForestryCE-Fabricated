@@ -51,6 +51,7 @@ public abstract class AbstractLeavesBlock extends BlockExtendedLeaves implements
 
 	public AbstractLeavesBlock(Block.Properties properties) {
 		super(properties
+			.overrideDescription("block.forestry.leaves")
 			.strength(0.2f)
 			.sound(SoundType.GRASS)
 			.randomTicks()
@@ -64,12 +65,7 @@ public abstract class AbstractLeavesBlock extends BlockExtendedLeaves implements
 	protected abstract ITree getTree(BlockGetter world, BlockPos pos);
 
 	@Override
-	public String getDescriptionId() {
-		return "block.forestry.leaves";// Use the same for all leaves, so the default leaves don't have an other name than the pollinated ones
-	}
-
-	@Override
-	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader world, BlockPos pos, Player player) {
+	public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData, Player player) {
 		ITree tree = getTree(world, pos);
 		if (tree == null) {
 			return ItemStack.EMPTY;
@@ -111,8 +107,8 @@ public abstract class AbstractLeavesBlock extends BlockExtendedLeaves implements
 	 * Used for walking through willow leaves.
 	 */
 	@Override
-	public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn) {
-		super.entityInside(state, worldIn, pos, entityIn);
+	public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn, net.minecraft.world.entity.InsideBlockEffectApplier effects, boolean isPrecise) {
+		super.entityInside(state, worldIn, pos, entityIn, effects, isPrecise);
 		Vec3 motion = entityIn.getDeltaMovement();
 		entityIn.setDeltaMovement(motion.x() * 0.4D, motion.y(), motion.z() * 0.4D);
 	}
@@ -148,7 +144,7 @@ public abstract class AbstractLeavesBlock extends BlockExtendedLeaves implements
 		if (context.getOptionalParameter(LootContextParams.THIS_ENTITY) instanceof Player player) {
 			profile = player.getGameProfile();
 		}
-		ItemStack tool = context.getOptionalParameter(LootContextParams.TOOL);
+		net.minecraft.world.item.ItemInstance tool = context.getOptionalParameter(LootContextParams.TOOL);
 		BlockPos pos = BlockUtil.getPos(context);
 		int fortune = 0;
 		if (tool != null) {

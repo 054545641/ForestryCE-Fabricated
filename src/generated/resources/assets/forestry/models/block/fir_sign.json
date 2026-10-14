@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/fir_planks"
-  }
+  "parent": "forestry:block/fir_sign_rot_0"
 }

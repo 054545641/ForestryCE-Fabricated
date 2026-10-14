@@ -1,13 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "item": "forestry:beeswax"
-    },
-    "Y": {
-      "tag": "c:rods/wooden"
-    }
+    "#": "forestry:beeswax",
+    "Y": "#c:rods/wooden"
   },
   "pattern": [
     " # ",

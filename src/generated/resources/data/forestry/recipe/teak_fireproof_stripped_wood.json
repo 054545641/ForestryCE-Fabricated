@@ -3,9 +3,7 @@
   "category": "building",
   "group": "bark",
   "key": {
-    "#": {
-      "item": "forestry:teak_fireproof_stripped_log"
-    }
+    "#": "forestry:teak_fireproof_stripped_log"
   },
   "pattern": [
     "##",

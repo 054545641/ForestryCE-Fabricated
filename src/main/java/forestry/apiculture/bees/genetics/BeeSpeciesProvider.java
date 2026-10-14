@@ -15,7 +15,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.apiculture.genetics.IBeeSpeciesType;
 import forestry.api.plugin.IApicultureRegistration;
@@ -50,16 +50,16 @@ public class BeeSpeciesProvider implements DataProvider {
 		});
 	}
 
-	public static Map<ResourceLocation, BeeSpeciesDefinition> buildDefinitions(IBeeSpeciesType type, Consumer<IApicultureRegistration> species) {
+	public static Map<Identifier, BeeSpeciesDefinition> buildDefinitions(IBeeSpeciesType type, Consumer<IApicultureRegistration> species) {
 		ApicultureRegistration reg = new ApicultureRegistration(type);
 		species.accept(reg);
 
-		Map<ResourceLocation, BeeSpeciesDefinition> definitions = new LinkedHashMap<>();
+		Map<Identifier, BeeSpeciesDefinition> definitions = new LinkedHashMap<>();
 		reg.forEachSpeciesBuilder((id, builder) -> definitions.put(id, buildDefinition(builder)));
 		return definitions;
 	}
 
-	public static Map<ResourceLocation, BeeSpeciesDefinition> buildDefinitions() {
+	public static Map<Identifier, BeeSpeciesDefinition> buildDefinitions() {
 		return buildDefinitions(SpeciesUtil.BEE_TYPE.get(), DefaultBeeSpecies::register);
 	}
 
@@ -93,7 +93,7 @@ public class BeeSpeciesProvider implements DataProvider {
 		);
 	}
 
-	private CompletableFuture<?> saveSpecies(CachedOutput cache, RegistryOps<JsonElement> ops, ResourceLocation id, BeeSpeciesDefinition def) {
+	private CompletableFuture<?> saveSpecies(CachedOutput cache, RegistryOps<JsonElement> ops, Identifier id, BeeSpeciesDefinition def) {
 		JsonElement json = BeeSpeciesDefinition.codec().encodeStart(ops, def).getOrThrow();
 		return DataProvider.saveStable(cache, json, this.pathProvider.json(id));
 	}

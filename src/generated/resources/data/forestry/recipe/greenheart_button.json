@@ -3,16 +3,11 @@
   "category": "redstone",
   "ingredients": [
     [
-      {
-        "item": "forestry:greenheart_planks"
-      },
-      {
-        "item": "forestry:greenheart_fireproof_planks"
-      }
+      "forestry:greenheart_planks",
+      "forestry:greenheart_fireproof_planks"
     ]
   ],
   "result": {
-    "count": 1,
     "id": "forestry:greenheart_button"
   }
 }

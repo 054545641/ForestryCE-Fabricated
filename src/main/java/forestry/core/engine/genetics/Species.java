@@ -7,14 +7,14 @@ import forestry.api.plugin.ISpeciesBuilder;
 import forestry.core.platform.util.GeneticsUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
 public abstract class Species<T extends ISpeciesType<? extends ISpecies<I>, I>, I extends IIndividual> implements ISpecies<I> {
-	protected final ResourceLocation id;
+	protected final Identifier id;
 	protected final T speciesType;
 	protected final IGenome defaultGenome;
 	private int complexity;
@@ -28,7 +28,7 @@ public abstract class Species<T extends ISpeciesType<? extends ISpecies<I>, I>, 
 	protected final String binomial;
 	protected final String translationKey;
 
-	public Species(ResourceLocation id, T speciesType, IGenome defaultGenome, ISpeciesBuilder<T, ?, ?> builder) {
+	public Species(Identifier id, T speciesType, IGenome defaultGenome, ISpeciesBuilder<T, ?, ?> builder) {
 		this.id = id;
 		this.speciesType = speciesType;
 		this.defaultGenome = defaultGenome;
@@ -89,7 +89,7 @@ public abstract class Species<T extends ISpeciesType<? extends ISpecies<I>, I>, 
 	}
 
 	@Override
-	public ResourceLocation id() {
+	public Identifier id() {
 		return this.id;
 	}
 
@@ -145,8 +145,8 @@ public abstract class Species<T extends ISpeciesType<? extends ISpecies<I>, I>, 
 		tooltip.add(Component.literal("<").append(Component.translatable("for.gui.unknown")).append(">").withStyle(ChatFormatting.GRAY));
 	}
 
-	protected <S extends ISpecies<?>> void addHybridTooltip(List<Component> tooltip, IGenome genome, IChromosome<ResourceLocation> species, String hybridKey) {
-		AllelePair<ResourceLocation> speciesPair = genome.getAllelePair(species);
+	protected <S extends ISpecies<?>> void addHybridTooltip(List<Component> tooltip, IGenome genome, IChromosome<Identifier> species, String hybridKey) {
+		AllelePair<Identifier> speciesPair = genome.getAllelePair(species);
 		if (!speciesPair.isSameAlleles()) {
 			S primary = genome.resolveActive(species);
 			S secondary = genome.resolveInactive(species);

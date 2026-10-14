@@ -5,7 +5,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import javax.annotation.Nullable;
 
@@ -14,7 +13,7 @@ import javax.annotation.Nullable;
  * Moves filled container from inputSlot to outputSlot.
  */
 public class ContainerFiller {
-	private final FluidTank fluidTank;
+	private final StandardTank fluidTank;
 	private final int fillingTime;
 	private final Container inventory;
 	private final int inputSlot;
@@ -24,7 +23,7 @@ public class ContainerFiller {
 	private ItemStack usedInput;
 	private int fillingProgress;
 
-	public ContainerFiller(FluidTank fluidTank, int fillingTime, Container inventory, int inputSlot, int outputSlot) {
+	public ContainerFiller(StandardTank fluidTank, int fillingTime, Container inventory, int inputSlot, int outputSlot) {
 		this.fluidTank = fluidTank;
 		this.fillingTime = fillingTime;
 		this.inventory = inventory;

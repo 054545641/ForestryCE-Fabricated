@@ -1,22 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "A": {
-      "type": "neoforge:components",
-      "components": {},
-      "items": "minecraft:air",
-      "strict": true
+      "neoforge:ingredient_type": "forestry:fluid_container",
+      "fluid": {
+        "amount": 1000,
+        "id": "minecraft:milk"
+      },
+      "item": "forestry:refractory_capsule"
     },
-    "B": {
-      "item": "minecraft:sugar"
-    },
-    "C": {
-      "item": "minecraft:wheat"
-    },
-    "E": {
-      "item": "minecraft:egg"
-    }
+    "B": "minecraft:sugar",
+    "C": "minecraft:wheat",
+    "E": "minecraft:egg"
   },
   "pattern": [
     "AAA",
@@ -24,7 +19,6 @@
     "CCC"
   ],
   "result": {
-    "count": 1,
     "id": "minecraft:cake"
   }
 }

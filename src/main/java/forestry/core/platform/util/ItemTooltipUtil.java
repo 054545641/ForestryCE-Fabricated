@@ -14,7 +14,7 @@ import java.util.List;
 public class ItemTooltipUtil {
 	// todo this should probably be removed
 	public static void addInformation(ItemStack stack, List<Component> tooltip) {
-		String translationKey = stack.getDescriptionId();
+		String translationKey = stack.getItem().getDescriptionId();
 		String tooltipKey = translationKey + ".tooltip";
 		if (Translator.canTranslateToLocal(tooltipKey)) {
 			tooltip.add(Component.translatable(tooltipKey).withStyle(ChatFormatting.GRAY));

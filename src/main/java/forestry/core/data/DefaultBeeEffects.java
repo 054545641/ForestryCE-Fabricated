@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.block.Blocks;
@@ -24,12 +24,12 @@ import forestry.apiculture.bees.genetics.effects.TransformBlockBeeEffect;
 import forestry.core.platform.damage.CoreDamageTypes;
 
 public class DefaultBeeEffects {
-	public static Map<ResourceLocation, IBeeEffect> create() {
-		Map<ResourceLocation, IBeeEffect> effects = new LinkedHashMap<>();
+	public static Map<Identifier, IBeeEffect> create() {
+		Map<Identifier, IBeeEffect> effects = new LinkedHashMap<>();
 
 		effects.put(ForestryBeeEffects.BEATIFIC, new PotionBeeEffect(false, MobEffects.REGENERATION, 100));
 		effects.put(ForestryBeeEffects.MIASMIC, new PotionBeeEffect(false, MobEffects.POISON, 600, 100, 0.1f));
-		effects.put(ForestryBeeEffects.DRUNKARD, new PotionBeeEffect(false, MobEffects.CONFUSION, 100));
+		effects.put(ForestryBeeEffects.DRUNKARD, new PotionBeeEffect(false, MobEffects.NAUSEA, 100));
 		effects.put(ForestryBeeEffects.DARKNESS, new PotionBeeEffect(false, MobEffects.DARKNESS, 150));
 		effects.put(ForestryBeeEffects.REANIMATION, new ResurrectionBeeEffect(true, 40, ResurrectionBeeEffect.getReanimationList()));
 		effects.put(ForestryBeeEffects.RESURRECTION, new ResurrectionBeeEffect(true, 40, ResurrectionBeeEffect.getResurrectionList()));

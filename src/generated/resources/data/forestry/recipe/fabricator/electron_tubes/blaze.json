@@ -6,14 +6,9 @@
     "id": "forestry:liquid_glass"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "tag": "c:dusts/redstone"
-      },
-      "X": {
-        "item": "minecraft:blaze_powder"
-      }
+      "#": "#c:dusts/redstone",
+      "X": "minecraft:blaze_powder"
     },
     "pattern": [
       " X ",

@@ -3,7 +3,7 @@ package forestry.api.plugin;
 import forestry.api.lepidopterology.IButterflyCocoon;
 import forestry.api.lepidopterology.IButterflyEffect;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface ILepidopterologyRegistration {
 	/**
@@ -16,9 +16,9 @@ public interface ILepidopterologyRegistration {
 	 * @param serumColor The color of this butterfly's serum.
 	 * @param rarity     The rarity of this species for spawning.
 	 */
-	IButterflySpeciesBuilder registerSpecies(ResourceLocation id, String genus, String species, boolean dominant, TextColor serumColor, float rarity);
+	IButterflySpeciesBuilder registerSpecies(Identifier id, String genus, String species, boolean dominant, TextColor serumColor, float rarity);
 
-	void registerCocoon(ResourceLocation id, IButterflyCocoon cocoon);
+	void registerCocoon(Identifier id, IButterflyCocoon cocoon);
 
-	void registerEffect(ResourceLocation id, IButterflyEffect effect);
+	void registerEffect(Identifier id, IButterflyEffect effect);
 }

@@ -9,7 +9,7 @@ import forestry.mail.inventory.LetterInventory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
@@ -42,8 +42,8 @@ public class LetterItem extends WithScreenItem {
 	private final Size size;
 	private final State state;
 
-	public LetterItem(Size size, State state) {
-		super(new Item.Properties().stacksTo(64));
+	public LetterItem(Size size, State state, Properties properties) {
+		super(properties.stacksTo(64).overrideDescription("item.forestry.letter"));
 		this.size = size;
 		this.state = state;
 	}
@@ -56,19 +56,15 @@ public class LetterItem extends WithScreenItem {
 		return this.state;
 	}
 
-	@Override
-	public String getDescriptionId() {
-		return "item.forestry.letter";
-	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level worldIn, Player player, InteractionHand handIn) {
+	public InteractionResult use(Level worldIn, Player player, InteractionHand handIn) {
 		ItemStack heldItem = player.getItemInHand(handIn);
 		if (heldItem.getCount() == 1) {
 			return super.use(worldIn, player, handIn);
 		} else {
 			player.sendSystemMessage(Component.translatable("for.chat.mail.wrongstacksize"));
-			return InteractionResultHolder.fail(heldItem);
+			return InteractionResult.FAIL;
 		}
 	}
 

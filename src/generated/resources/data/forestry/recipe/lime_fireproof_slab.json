@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_slab",
   "key": {
-    "#": {
-      "item": "forestry:lime_fireproof_planks"
-    }
+    "#": "forestry:lime_fireproof_planks"
   },
   "pattern": [
     "###"

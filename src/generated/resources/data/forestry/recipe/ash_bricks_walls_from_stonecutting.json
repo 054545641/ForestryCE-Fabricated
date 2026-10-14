@@ -1,10 +1,7 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "forestry:ash_bricks"
-  },
+  "ingredient": "forestry:ash_bricks",
   "result": {
-    "count": 1,
     "id": "forestry:ash_brick_wall"
   }
 }

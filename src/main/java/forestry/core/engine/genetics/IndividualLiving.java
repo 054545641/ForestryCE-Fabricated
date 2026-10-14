@@ -84,7 +84,7 @@ public abstract class IndividualLiving<S extends ISpecies<I>, I extends IIndivid
 			ageStep--;
 		}
 		// percentage chance to age again
-		if (level.random.nextFloat() < ageStep) {
+		if (level.getRandom().nextFloat() < ageStep) {
 			decreaseHealth();
 		}
 	}

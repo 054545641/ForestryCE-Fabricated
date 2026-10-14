@@ -83,7 +83,7 @@ public class CoreBlocks {
 	/* Lighting */
 	// Deviation from 1.20.1: block properties now come from the registry's Supplier<Properties> overload
 	// (Properties.copy was renamed ofFullCopy), and block items take a BiFunction<B, Item.Properties, I>.
-	public static final FeatureBlock<ChainBlock, BlockItem> TIN_CHAIN = REGISTRY.block(ChainBlock::new, () -> Properties.ofFullCopy(Blocks.CHAIN), ItemBlockForestry::new, "tin_chain");
+	public static final FeatureBlock<ChainBlock, BlockItem> TIN_CHAIN = REGISTRY.block(ChainBlock::new, () -> Properties.ofFullCopy(Blocks.IRON_CHAIN), ItemBlockForestry::new, "tin_chain");
 	public static final FeatureBlock<LanternBlock, BlockItem> PHOSPHOR_LANTERN = REGISTRY.block(LanternBlock::new, () -> Properties.ofFullCopy(Blocks.SOUL_LANTERN).lightLevel(state -> 13), ItemBlockForestry::new, "phosphor_lantern");
 	// The torch's item is registered separately in CoreItems as a StandingAndWallBlockItem covering both blocks
 	public static final FeatureBlock<BlockWaterloggableTorch, ItemBlockForestry<?>> PHOSPHOR_TORCH = REGISTRY.block(BlockWaterloggableTorch::new, () -> Properties.ofFullCopy(Blocks.SOUL_TORCH).lightLevel(state -> 13), null, "phosphor_torch");
@@ -94,7 +94,7 @@ public class CoreBlocks {
 	// torch properties are otherwise identical to soul torch's, so copying the standing torch reproduces 1.20.1 exactly.
 	public static final FeatureBlock<BlockWaterloggableWallTorch, ItemBlockForestry<?>> PHOSPHOR_WALL_TORCH = REGISTRY.block(BlockWaterloggableWallTorch::new, () -> Properties.ofFullCopy(Blocks.SOUL_TORCH).lightLevel(state -> 13), null, "phosphor_wall_torch");
 
-	public static final FeatureBlockGroup<BlockTesr<NaturalistChestBlockType>, NaturalistChestBlockType> NATURALIST_CHEST = REGISTRY.blockGroup(type -> new BlockTesr<>(type, Properties.of().sound(SoundType.WOOD)), List.of(NaturalistChestBlockType.values())).item(ItemBlockTesr::new).create();
+	public static final FeatureBlockGroup<BlockTesr<NaturalistChestBlockType>, NaturalistChestBlockType> NATURALIST_CHEST = REGISTRY.blockGroup((properties, type) -> new BlockTesr<>(type, properties.sound(SoundType.WOOD)), List.of(NaturalistChestBlockType.values())).item(ItemBlockTesr::new).create();
 
 	/* Decorative stone and brick block sets */
 	// Deviation from 1.20.1: that tree registered all 68 of these by hand and left a "//TODO: Helper method?"
@@ -128,7 +128,7 @@ public class CoreBlocks {
 	// properties in its constructor. The registry owns them here, so the subclass is gone and the group
 	// registers plain Blocks
 	public static final FeatureBlockGroup<Block, BlockTypeMetalPlating> METAL_PLATING = REGISTRY.<Block, BlockTypeMetalPlating>blockGroup((properties, type) -> new Block(properties), List.of(BlockTypeMetalPlating.values()))
-		.blockProperties((properties, type) -> Properties.ofFullCopy(Blocks.WAXED_COPPER_BLOCK).mapColor(type.getMapColor()))
+		.blockProperties((properties, type) -> Properties.ofFullCopy(Blocks.COPPER_BLOCK.waxed().unaffected()).mapColor(type.getMapColor()))
 		.item(ItemBlockForestry::new)
 		.identifier("metal_plating")
 		.create();
@@ -153,8 +153,8 @@ public class CoreBlocks {
 		.identifier("big_candle")
 		.create();
 
-	public static final FeatureBlock<CandleBlock, BlockItem> RAINBOW_CANDLE = REGISTRY.block(CandleBlock::new, () -> Properties.ofFullCopy(Blocks.MAGENTA_CANDLE), ItemBlockForestry::new, "rainbow_candle");
-	public static final FeatureBlock<CandleRefractory, BlockItem> REFRACTORY_CANDLE = REGISTRY.block(CandleRefractory::new, () -> Properties.ofFullCopy(Blocks.RED_CANDLE)
+	public static final FeatureBlock<CandleBlock, BlockItem> RAINBOW_CANDLE = REGISTRY.block(CandleBlock::new, () -> Properties.ofFullCopy(Blocks.DYED_CANDLE.magenta()), ItemBlockForestry::new, "rainbow_candle");
+	public static final FeatureBlock<CandleRefractory, BlockItem> REFRACTORY_CANDLE = REGISTRY.block(CandleRefractory::new, () -> Properties.ofFullCopy(Blocks.DYED_CANDLE.red())
 		.lightLevel(state -> state.getValue(CandleBlock.LIT) ? state.getValue(CandleBlock.CANDLES) * 2 : 0), ItemBlockForestry::new, "refractory_candle");
 	// todo the cake variants are still missing
 

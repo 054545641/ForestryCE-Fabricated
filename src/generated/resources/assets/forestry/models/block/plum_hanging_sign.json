@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/plum_planks"
-  }
+  "parent": "forestry:block/plum_hanging_sign_rot_0"
 }

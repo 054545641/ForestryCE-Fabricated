@@ -13,13 +13,13 @@ import forestry.agriculture.features.MultifarmMenuTypes;
 import forestry.agriculture.multifarm.multiblock.InventoryFarm;
 import forestry.agriculture.multifarm.tiles.TileFarm;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.fluids.IFluidTank;
+import forestry.core.platform.fluids.StandardTank;
 
 public class MultifarmMenu extends ContainerSocketed<TileFarm> implements IContainerTank {
-	private static final ResourceLocation OPEN_FARM_UI = ForestryConstants.forestry("feed_the_world");
+	private static final Identifier OPEN_FARM_UI = ForestryConstants.forestry("feed_the_world");
 
 	public static MultifarmMenu fromNetwork(int windowId, Inventory inv, FriendlyByteBuf data) {
 		TileFarm tile = TileUtil.getTile(inv.player.level(), data.readBlockPos(), TileFarm.class);
@@ -76,7 +76,7 @@ public class MultifarmMenu extends ContainerSocketed<TileFarm> implements IConta
 	}
 
 	@Override
-	public IFluidTank getTank(int slot) {
+	public StandardTank getTank(int slot) {
 		return this.tile.getMultiblockLogic().getController().getTankManager().getTank(slot);
 	}
 }

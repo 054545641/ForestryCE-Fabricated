@@ -8,7 +8,7 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.core.genetics.alleles.Allele;
 import forestry.api.core.genetics.alleles.AlleleOverride;
@@ -31,36 +31,36 @@ public final class GenomeCodecs {
 	/**
 	 * @return A codec for a sparse {@code chromosome id -> allele} map, keyed against the given karyotype
 	 */
-	public static Codec<Map<ResourceLocation, Allele<?>>> alleleMapCodec(IKaryotype karyotype) {
+	public static Codec<Map<Identifier, Allele<?>>> alleleMapCodec(IKaryotype karyotype) {
 		return mapCodec(karyotype, GenomeCodecs::alleleCodec);
 	}
 
 	/**
 	 * @return A stream codec for a sparse {@code chromosome id -> allele} map, keyed against the given karyotype
 	 */
-	public static StreamCodec<RegistryFriendlyByteBuf, Map<ResourceLocation, Allele<?>>> alleleMapStreamCodec(IKaryotype karyotype) {
+	public static StreamCodec<RegistryFriendlyByteBuf, Map<Identifier, Allele<?>>> alleleMapStreamCodec(IKaryotype karyotype) {
 		return mapStreamCodec(karyotype, GenomeCodecs::alleleStreamCodec);
 	}
 
 	/**
 	 * @return A codec for a sparse {@code chromosome id -> override} map, keyed against the given karyotype
 	 */
-	public static Codec<Map<ResourceLocation, AlleleOverride<?>>> overrideMapCodec(IKaryotype karyotype) {
+	public static Codec<Map<Identifier, AlleleOverride<?>>> overrideMapCodec(IKaryotype karyotype) {
 		return mapCodec(karyotype, GenomeCodecs::overrideCodec);
 	}
 
 	/**
 	 * @return A stream codec for a sparse {@code chromosome id -> override} map, keyed against the given karyotype
 	 */
-	public static StreamCodec<RegistryFriendlyByteBuf, Map<ResourceLocation, AlleleOverride<?>>> overrideMapStreamCodec(IKaryotype karyotype) {
+	public static StreamCodec<RegistryFriendlyByteBuf, Map<Identifier, AlleleOverride<?>>> overrideMapStreamCodec(IKaryotype karyotype) {
 		return mapStreamCodec(karyotype, GenomeCodecs::overrideStreamCodec);
 	}
 
-	private static <T> Codec<Map<ResourceLocation, T>> mapCodec(IKaryotype karyotype, Function<IChromosome<?>, Codec<T>> entryCodec) {
+	private static <T> Codec<Map<Identifier, T>> mapCodec(IKaryotype karyotype, Function<IChromosome<?>, Codec<T>> entryCodec) {
 		return Codec.<IChromosome<?>, T>dispatchedMap(karyotype.chromosomeKeyCodec(), entryCodec::apply)
 			.xmap(
 				byChromosome -> {
-					Map<ResourceLocation, T> byId = new LinkedHashMap<>(byChromosome.size());
+					Map<Identifier, T> byId = new LinkedHashMap<>(byChromosome.size());
 					byChromosome.forEach((chromosome, entry) -> byId.put(chromosome.id(), entry));
 					return byId;
 				},
@@ -78,20 +78,20 @@ public final class GenomeCodecs {
 			);
 	}
 
-	private static <T> StreamCodec<RegistryFriendlyByteBuf, Map<ResourceLocation, T>> mapStreamCodec(IKaryotype karyotype, Function<IChromosome<?>, StreamCodec<RegistryFriendlyByteBuf, T>> entryStreamCodec) {
+	private static <T> StreamCodec<RegistryFriendlyByteBuf, Map<Identifier, T>> mapStreamCodec(IKaryotype karyotype, Function<IChromosome<?>, StreamCodec<RegistryFriendlyByteBuf, T>> entryStreamCodec) {
 		return StreamCodec.of(
 			(buf, map) -> {
 				buf.writeVarInt(map.size());
 				map.forEach((id, entry) -> {
-					ResourceLocation.STREAM_CODEC.encode(buf, id);
+					Identifier.STREAM_CODEC.encode(buf, id);
 					entryStreamCodec.apply(chromosome(karyotype, id)).encode(buf, entry);
 				});
 			},
 			buf -> {
 				int size = buf.readVarInt();
-				Map<ResourceLocation, T> map = new LinkedHashMap<>(size);
+				Map<Identifier, T> map = new LinkedHashMap<>(size);
 				for (int i = 0; i < size; i++) {
-					ResourceLocation id = ResourceLocation.STREAM_CODEC.decode(buf);
+					Identifier id = Identifier.STREAM_CODEC.decode(buf);
 					map.put(id, entryStreamCodec.apply(chromosome(karyotype, id)).decode(buf));
 				}
 				return map;
@@ -99,7 +99,7 @@ public final class GenomeCodecs {
 		);
 	}
 
-	private static IChromosome<?> chromosome(IKaryotype karyotype, ResourceLocation id) {
+	private static IChromosome<?> chromosome(IKaryotype karyotype, Identifier id) {
 		IChromosome<?> chromosome = karyotype.getChromosome(id);
 		if (chromosome == null) {
 			throw new IllegalStateException("Unknown chromosome in genome allele map: " + id);

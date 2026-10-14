@@ -1,6 +1,6 @@
 package forestry.core.platform.gui;
 
-import net.neoforged.neoforge.fluids.IFluidTank;
+import forestry.core.platform.fluids.StandardTank;
 
 import javax.annotation.Nullable;
 
@@ -13,5 +13,5 @@ public interface IContainerTank {
 	 * @return The tank in the given slot, or null if the slot holds none
 	 */
 	@Nullable
-	IFluidTank getTank(int slot);
+	StandardTank getTank(int slot);
 }

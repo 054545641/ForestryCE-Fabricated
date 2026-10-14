@@ -21,7 +21,6 @@
       "translate": "advancements.forestry.get_honey.description"
     },
     "icon": {
-      "count": 1,
       "id": "forestry:honey_drop"
     },
     "title": {

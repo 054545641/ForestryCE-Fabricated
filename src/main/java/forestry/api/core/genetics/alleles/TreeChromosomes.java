@@ -6,7 +6,7 @@ import forestry.api.arboriculture.genetics.IFruit;
 import forestry.api.arboriculture.genetics.ITreeEffect;
 import forestry.api.arboriculture.genetics.ITreeSpeciesType;
 import forestry.api.core.genetics.ForestrySpeciesTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -19,7 +19,7 @@ public class TreeChromosomes {
 	/**
 	 * The species of a tree. The genome stores the species' ID.
 	 */
-	public static final IChromosome<ResourceLocation> SPECIES = ChromosomeFactory.referenceChromosome(ForestrySpeciesTypes.TREE, TreeChromosomes::resolveSpeciesOrDefault, ITreeSpecies::isDominant);
+	public static final IChromosome<Identifier> SPECIES = ChromosomeFactory.referenceChromosome(ForestrySpeciesTypes.TREE, TreeChromosomes::resolveSpeciesOrDefault, ITreeSpecies::isDominant);
 
 	/**
 	 * Modifies the height of a tree.
@@ -32,7 +32,7 @@ public class TreeChromosomes {
 	/**
 	 * Determines what fruits are grown on the tree.
 	 */
-	public static final IChromosome<ResourceLocation> FRUIT = ChromosomeFactory.referenceChromosome(forestry("fruits"), id -> TYPE.get().getFruit(id), IFruit::isDominant);
+	public static final IChromosome<Identifier> FRUIT = ChromosomeFactory.referenceChromosome(forestry("fruits"), id -> TYPE.get().getFruit(id), IFruit::isDominant);
 	/**
 	 * Chance for fruit leaves and/or drops.
 	 */
@@ -44,7 +44,7 @@ public class TreeChromosomes {
 	/**
 	 * Unimplemented. All trees added by base Forestry have the "none" tree effect.
 	 */
-	public static final IChromosome<ResourceLocation> EFFECT = ChromosomeFactory.referenceChromosome(forestry("tree_effect"), id -> TYPE.get().getTreeEffect(id), ITreeEffect::isDominant);
+	public static final IChromosome<Identifier> EFFECT = ChromosomeFactory.referenceChromosome(forestry("tree_effect"), id -> TYPE.get().getTreeEffect(id), ITreeEffect::isDominant);
 	/**
 	 * Amount of random ticks which need to elapse before a sapling will grow into a tree.
 	 */
@@ -59,7 +59,7 @@ public class TreeChromosomes {
 	public static final IChromosome<Boolean> FIREPROOF = ButterflyChromosomes.FIREPROOF;
 
 	@ApiStatus.Internal
-	private static ITreeSpecies resolveSpeciesOrDefault(ResourceLocation id) {
+	private static ITreeSpecies resolveSpeciesOrDefault(Identifier id) {
 		ITreeSpeciesType type = TYPE.get();
 		ITreeSpecies species = type.getSpeciesSafe(id);
 		if (species != null) {

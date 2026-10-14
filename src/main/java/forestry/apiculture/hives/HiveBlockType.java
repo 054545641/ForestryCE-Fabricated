@@ -3,7 +3,7 @@ package forestry.apiculture.hives;
 import forestry.api.ForestryConstants;
 import forestry.api.apiculture.ForestryBeeSpecies;
 import forestry.api.core.IBlockSubtype;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Locale;
 
@@ -21,13 +21,13 @@ public enum HiveBlockType implements IBlockSubtype {
 	NETHER(ForestryBeeSpecies.EMBITTERED),
 	SWARM(ForestryConstants.forestry("none"));
 
-	private final ResourceLocation speciesUid;
+	private final Identifier speciesUid;
 
-	HiveBlockType(ResourceLocation speciesUid) {
+	HiveBlockType(Identifier speciesUid) {
 		this.speciesUid = speciesUid;
 	}
 
-	public ResourceLocation getSpeciesId() {
+	public Identifier getSpeciesId() {
 		return this.speciesUid;
 	}
 

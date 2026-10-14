@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/crates/unpack/minecraft/prismarine_bricks",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:crated_prismarine_bricks"
-      }
+      "forestry:crated_prismarine_bricks"
     ],
     "result": {
       "count": 9,

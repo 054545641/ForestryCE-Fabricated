@@ -24,9 +24,14 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
 
 import javax.annotation.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public abstract class EngineBlockEntity extends TileBase implements IActivatable, IStreamableGui {
 	private static final int CANT_SEND_ENERGY_TIME = 20;
@@ -50,12 +55,45 @@ public abstract class EngineBlockEntity extends TileBase implements IActivatable
 	public float progress;
 	protected final ForestryEnergyStorage energyStorage;
 	private final String hintKey;
+	private record BurnState(int heat, int output, Object fuel) {}
+	private final SnapshotJournal<BurnState> burnJournal = new SnapshotJournal<>() {
+		@Override protected BurnState createSnapshot() { return new BurnState(heat, currentOutput, captureFuelState()); }
+		@Override protected void revertToSnapshot(BurnState state) {
+			heat = state.heat(); currentOutput = state.output(); restoreFuelState(state.fuel());
+		}
+		@Override protected void onRootCommit(BurnState previous) {
+			setChanged();
+			if (level != null) level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
+		}
+	};
+	protected Object captureFuelState() { return null; }
+	protected void restoreFuelState(Object state) {}
+
+	/** Fuel reservation, burn progress and generated energy share the caller's transaction. */
+	public final void burn() {
+		try (var transaction = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			this.burnJournal.updateSnapshots(transaction);
+			burnFuel();
+			transaction.commit();
+		}
+	}
+
+	public final void processEngineStep() {
+		try (var transaction = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			this.burnJournal.updateSnapshots(transaction);
+			dissipateHeat();
+			generateHeat();
+			if (mayBurn()) burnFuel();
+			else this.energyStorage.drainEnergy(20);
+			transaction.commit();
+		}
+	}
 
 	protected EngineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, String hintKey, int maxHeat, int maxEnergy) {
 		super(type, pos, state);
 		this.hintKey = hintKey;
 		this.maxHeat = maxHeat;
-		this.energyStorage = new ForestryEnergyStorage(2000, maxEnergy, EnergyTransferMode.EXTRACT);
+		this.energyStorage = EnergyHelper.createStorage(2000, maxEnergy, EnergyTransferMode.EXTRACT, this::setChanged);
 	}
 
 	public String getHintKey() {
@@ -78,7 +116,7 @@ public abstract class EngineBlockEntity extends TileBase implements IActivatable
 		return !this.forceCooldown;
 	}
 
-	protected abstract void burn();
+	protected abstract void burnFuel();
 
 
 	@Override
@@ -149,14 +187,7 @@ public abstract class EngineBlockEntity extends TileBase implements IActivatable
 			setActive(false);
 		}
 
-		dissipateHeat();
-		generateHeat();
-		// Now let's fire up the engine:
-		if (mayBurn()) {
-			burn();
-		} else {
-            this.energyStorage.drainEnergy(20);
-		}
+		processEngineStep();
 	}
 
 	@Override
@@ -171,7 +202,7 @@ public abstract class EngineBlockEntity extends TileBase implements IActivatable
 		}
 		this.active = active;
 
-		if (!this.level.isClientSide) {
+		if (!this.level.isClientSide()) {
 			NetworkUtil.sendNetworkPacket(new PacketActiveUpdate(this), this.worldPosition, this.level);
 		}
 	}
@@ -239,25 +270,31 @@ public abstract class EngineBlockEntity extends TileBase implements IActivatable
 
 	/* SAVING & LOADING */
 	@Override
-	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-		super.loadAdditional(nbt, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag nbt = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
         this.energyStorage.read(nbt, registries);
 
-        this.heat = nbt.getInt("EngineHeat");
+        this.heat = nbt.getIntOr("EngineHeat", 0);
 
-        this.progress = nbt.getFloat("EngineProgress");
-        this.forceCooldown = nbt.getBoolean("ForceCooldown");
+        this.progress = nbt.getFloatOr("EngineProgress", 0.0f);
+        this.forceCooldown = nbt.getBooleanOr("ForceCooldown", false);
 	}
 
 
 	@Override
-	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-		super.saveAdditional(nbt, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag nbt = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
         this.energyStorage.write(nbt, registries);
 
 		nbt.putInt("EngineHeat", this.heat);
 		nbt.putFloat("EngineProgress", this.progress);
 		nbt.putBoolean("ForceCooldown", this.forceCooldown);
+
+		ValueIOUtil.mergeInto(output, nbt);
 	}
 
 	/* NETWORK */
@@ -301,7 +338,7 @@ public abstract class EngineBlockEntity extends TileBase implements IActivatable
 	}
 
 	@Nullable
-	public IEnergyStorage getEnergyHandler(@Nullable Direction side) {
+	public EnergyHandler getEnergyHandler(@Nullable Direction side) {
 		if (this.remove || side != getBlockState().getValue(EngineBlock.VERTICAL_FACING)) {
 			return null;
 		}

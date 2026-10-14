@@ -1,5 +1,6 @@
 package forestry.core.platform.tile;
 
+import forestry.core.platform.util.InventoryData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -15,9 +16,9 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
-import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import forestry.core.platform.inventory.InventoryTransferView;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -73,25 +74,25 @@ public abstract class TileUtil {
 	}
 
 	@Nullable
-	public static IItemHandler getInventoryFromTile(@Nullable BlockEntity tile, @Nullable Direction side) {
+	public static ResourceHandler<ItemResource> getInventoryFromTile(@Nullable BlockEntity tile, @Nullable Direction side) {
 		if (tile == null) {
 			return null;
 		}
 
 		Level level = tile.getLevel();
 		if (level != null) {
-			IItemHandler itemCap = level.getCapability(Capabilities.ItemHandler.BLOCK, tile.getBlockPos(), side);
+			ResourceHandler<ItemResource> itemCap = level.getCapability(Capabilities.Item.BLOCK, tile.getBlockPos(), side);
 			if (itemCap != null) {
 				return itemCap;
 			}
 		}
 
 		if (tile instanceof WorldlyContainer worldly) {
-			return new SidedInvWrapper(worldly, side);
+			return InventoryTransferView.automation(worldly, side);
 		}
 
 		if (tile instanceof Container container) {
-			return new InvWrapper(container);
+			return InventoryTransferView.automation(container, side);
 		}
 
 		return null;
@@ -106,7 +107,7 @@ public abstract class TileUtil {
 
         for (int i = 0; i < offspring.length; i++) {
             if (offspring[i] != null) {
-                CompoundTag products = (CompoundTag) offspring[i].saveOptional(registries);
+                CompoundTag products = InventoryData.writeStack(offspring[i], registries);
                 products.putByte("Slot", (byte) i);
                 listTag.add(products);
             }

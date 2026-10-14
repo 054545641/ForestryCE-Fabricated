@@ -1,7 +1,7 @@
 package forestry.core.platform.util.datastructures;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -18,7 +18,7 @@ public class FluidMap<T> extends StackMap<Fluid, T> {
 
 	@Override
 	protected boolean isValidKey(Object key) {
-		return key instanceof FluidStack || key instanceof Fluid || key instanceof String || key instanceof ResourceLocation;
+		return key instanceof FluidStack || key instanceof Fluid || key instanceof String || key instanceof Identifier;
 	}
 
 	@Override
@@ -30,10 +30,10 @@ public class FluidMap<T> extends StackMap<Fluid, T> {
 			return (Fluid) key;
 		}
 		if (key instanceof String) {
-			return BuiltInRegistries.FLUID.get(ResourceLocation.parse((String) key));
+			return BuiltInRegistries.FLUID.getValue(Identifier.parse((String) key));
 		}
-		if (key instanceof ResourceLocation) {
-			return BuiltInRegistries.FLUID.get((ResourceLocation) key);
+		if (key instanceof Identifier) {
+			return BuiltInRegistries.FLUID.getValue((Identifier) key);
 		}
 		return null;
 	}

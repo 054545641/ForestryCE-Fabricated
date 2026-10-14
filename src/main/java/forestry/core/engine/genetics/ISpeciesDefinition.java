@@ -2,7 +2,7 @@ package forestry.core.engine.genetics;
 
 import java.util.Map;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.core.HumidityType;
 import forestry.api.core.TemperatureType;
@@ -36,7 +36,7 @@ public interface ISpeciesDefinition {
 
 	HumidityType humidity();
 
-	Map<ResourceLocation, AlleleOverride<?>> genome();
+	Map<Identifier, AlleleOverride<?>> genome();
 
 	/**
 	 * @return A {@link SpeciesCore} view of this definition's base fields, used by the definition codecs

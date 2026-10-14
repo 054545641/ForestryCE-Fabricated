@@ -1,52 +1,28 @@
 package forestry.core.platform.fluids;
 
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.DelegatingResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.TransferPreconditions;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
-import javax.annotation.Nonnull;
+import java.util.Objects;
 
-public class DrainOnlyFluidHandlerWrapper implements IFluidHandler {
-	private final IFluidHandler internalFluidHandler;
-
-	public DrainOnlyFluidHandlerWrapper(IFluidHandler internalFluidHandler) {
-		this.internalFluidHandler = internalFluidHandler;
+public class DrainOnlyFluidHandlerWrapper extends DelegatingResourceHandler<FluidResource> {
+	public DrainOnlyFluidHandlerWrapper(ResourceHandler<FluidResource> handler) {
+		super(handler);
 	}
 
 	@Override
-	public int getTanks() {
-		return this.internalFluidHandler.getTanks();
-	}
-
-	@Nonnull
-	@Override
-	public FluidStack getFluidInTank(int tank) {
-		return this.internalFluidHandler.getFluidInTank(tank);
-	}
-
-	@Override
-	public int getTankCapacity(int tank) {
-		return this.internalFluidHandler.getTankCapacity(tank);
-	}
-
-	@Override
-	public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
-		return this.internalFluidHandler.isFluidValid(tank, stack);
-	}
-
-	@Override
-	public int fill(FluidStack resource, FluidAction action) {
+	public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
+		Objects.checkIndex(index, size());
+		TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
 		return 0;
 	}
 
-	@Nonnull
 	@Override
-	public FluidStack drain(FluidStack resource, FluidAction action) {
-		return this.internalFluidHandler.drain(resource, action);
-	}
-
-	@Nonnull
-	@Override
-	public FluidStack drain(int maxDrain, FluidAction action) {
-		return this.internalFluidHandler.drain(maxDrain, action);
+	public int insert(FluidResource resource, int amount, TransactionContext transaction) {
+		TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+		return 0;
 	}
 }

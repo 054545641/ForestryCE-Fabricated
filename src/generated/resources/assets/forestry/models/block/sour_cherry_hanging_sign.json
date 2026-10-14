@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/sour_cherry_planks"
-  }
+  "parent": "forestry:block/sour_cherry_hanging_sign_rot_0"
 }

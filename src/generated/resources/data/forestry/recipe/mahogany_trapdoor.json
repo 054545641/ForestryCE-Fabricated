@@ -4,12 +4,8 @@
   "group": "wooden_trapdoor",
   "key": {
     "#": [
-      {
-        "item": "forestry:mahogany_planks"
-      },
-      {
-        "item": "forestry:mahogany_fireproof_planks"
-      }
+      "forestry:mahogany_planks",
+      "forestry:mahogany_fireproof_planks"
     ]
   },
   "pattern": [

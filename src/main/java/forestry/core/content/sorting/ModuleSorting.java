@@ -13,7 +13,7 @@ import forestry.core.content.sorting.client.SortingClientHandler;
 import forestry.core.content.sorting.network.packets.PacketFilterChangeGenome;
 import forestry.core.content.sorting.network.packets.PacketFilterChangeRule;
 import forestry.core.content.sorting.network.packets.PacketGuiFilterUpdate;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 @ForestryModule
 public class ModuleSorting extends BlankForestryModule {
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return ForestryModuleIds.SORTING;
 	}
 
@@ -41,7 +41,7 @@ public class ModuleSorting extends BlankForestryModule {
 	}
 
 	public static void registerCapabilities(RegisterCapabilitiesEvent consumer) {
-		consumer.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SortingTiles.GENETIC_FILTER.tileType(), (tile, side) -> tile.getItemHandler(side));
+		consumer.registerBlockEntity(Capabilities.Item.BLOCK, SortingTiles.GENETIC_FILTER.tileType(), (tile, side) -> tile.getItemHandler(side));
 		consumer.registerBlockEntity(ForestryCapabilities.FILTER_LOGIC, SortingTiles.GENETIC_FILTER.tileType(), (tile, side) -> tile.getLogic());
 	}
 

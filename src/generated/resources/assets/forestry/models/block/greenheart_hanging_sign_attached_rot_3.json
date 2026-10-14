@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_attached_hanging_sign_rot_3",
+  "textures": {
+    "all": "forestry:entity/signs/hanging/greenheart",
+    "particle": "forestry:block/stripped_greenheart_log"
+  }
+}

@@ -9,8 +9,9 @@ import forestry.api.core.genetics.alleles.AllelePair;
 import forestry.api.core.genetics.alleles.IChromosome;
 import forestry.api.core.genetics.alleles.IKaryotype;
 import forestry.api.plugin.IGenomeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
+import javax.annotation.Nullable;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -20,7 +21,8 @@ public final class Genome implements IGenome {
 	private final IKaryotype karyotype;
 
 	private boolean isDefaultGenome;
-	private boolean hasCachedDefaultGenome;
+	@Nullable
+	private IGenome cachedDefaultGenome;
 
 	public Genome(IKaryotype karyotype, ImmutableMap<IChromosome<?>, AllelePair<?>> chromosomes) {
 		this.karyotype = karyotype;
@@ -34,13 +36,13 @@ public final class Genome implements IGenome {
 			// Fix missing chromosomes for backwards compatibility.
 			AllelePair<?> pair = map.get(chromosome);
 			if (pair == null) {
-				ResourceLocation speciesId;
+				Identifier speciesId;
 				AllelePair<?> speciesPair = map.get(karyotype.getSpeciesChromosome());
 				if (speciesPair == null) {
 					// If the stored species was added/removed, revert to the default species.
 					speciesId = karyotype.getDefaultSpecies();
 				} else {
-					speciesId = (ResourceLocation) speciesPair.active().value();
+					speciesId = (Identifier) speciesPair.active().value();
 				}
 
 				IChromosome.IReferenceResolver<?> speciesResolver = Objects.requireNonNull(karyotype.getSpeciesChromosome().resolver(), "Species chromosome has no resolver");
@@ -71,11 +73,11 @@ public final class Genome implements IGenome {
 
 	@Override
 	public boolean isDefaultGenome() {
-		if (!this.hasCachedDefaultGenome) {
-			Genome defaultGenome = (Genome) this.<ISpecies<?>>getActiveSpecies().getDefaultGenome();
-
+		IGenome defaultGenome = this.<ISpecies<?>>getActiveSpecies().getDefaultGenome();
+		// Species definitions are replaced by datapack reloads and server synchronization.
+		if (this.cachedDefaultGenome != defaultGenome) {
 			this.isDefaultGenome = this == defaultGenome || isSameAlleles(defaultGenome);
-			this.hasCachedDefaultGenome = true;
+			this.cachedDefaultGenome = defaultGenome;
 		}
 
 		return this.isDefaultGenome;
@@ -151,9 +153,9 @@ public final class Genome implements IGenome {
 		}
 
 		@Override
-		public void set(IChromosome<ResourceLocation> chromosome, ResourceLocation id) {
+		public void set(IChromosome<Identifier> chromosome, Identifier id) {
 			IChromosome.IReferenceResolver<?> resolver = Objects.requireNonNull(chromosome.resolver(), () -> "Not a reference chromosome: " + chromosome.id());
-			Allele<ResourceLocation> allele = new Allele<>(id, resolver.isDominant(id));
+			Allele<Identifier> allele = new Allele<>(id, resolver.isDominant(id));
 			this.active.put(chromosome, allele);
 			this.inactive.put(chromosome, allele);
 		}

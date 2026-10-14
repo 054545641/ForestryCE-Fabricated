@@ -9,13 +9,10 @@
     }
   },
   "remnant": {
-    "count": 1,
     "id": "forestry:propolis"
   },
   "resources": [
-    {
-      "item": "forestry:honey_drop"
-    }
+    "forestry:honey_drop"
   ],
   "time": 10
 }

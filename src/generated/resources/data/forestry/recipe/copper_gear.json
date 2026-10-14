@@ -1,13 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "tag": "c:ingots/copper"
-    },
-    "X": {
-      "tag": "c:nuggets/iron"
-    }
+    "#": "#c:ingots/copper",
+    "X": "#c:nuggets/iron"
   },
   "pattern": [
     " # ",
@@ -15,7 +10,6 @@
     " # "
   ],
   "result": {
-    "count": 1,
     "id": "forestry:copper_gear"
   }
 }

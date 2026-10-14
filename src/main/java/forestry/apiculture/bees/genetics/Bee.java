@@ -254,7 +254,7 @@ public class Bee extends IndividualLiving<IBeeSpecies, IBee, IBeeSpeciesType> im
 	// todo this can be optimized in a cache somewhere
 	@Override
 	public List<Holder.Reference<Biome>> getSuitableBiomes(Registry<Biome> registry) {
-		return registry.holders().filter(this::isSuitableBiome).toList();
+		return registry.listElements().filter(this::isSuitableBiome).toList();
 	}
 /*
 	@Override
@@ -326,7 +326,7 @@ public class Bee extends IndividualLiving<IBeeSpecies, IBee, IBeeSpeciesType> im
 
 		// Bee genetic speed * beehousing * beekeeping mode
 		float speed = beeHousingModifier.modifyProductionSpeed(this.genome, this.genome.getActiveValue(BeeChromosomes.SPEED))/* * beeModeModifier.modifyProductionSpeed(genome, 1f)*/;
-		RandomSource rand = level.random;
+		RandomSource rand = level.getRandom();
 
 		// / Primary Products
 		for (var product : primary.getProducts()) {
@@ -371,7 +371,7 @@ public class Bee extends IndividualLiving<IBeeSpecies, IBee, IBeeSpeciesType> im
 		// Fatigued (dead ignoble) queens do not produce princesses.
 		if (!this.pristine) {
 			IBeeModifier beeModifier = IForestryApi.INSTANCE.getHiveManager().createBeeHousingModifier(housing);
-			RandomSource rand = housing.getLevel().random;
+			RandomSource rand = housing.getLevel().getRandom();
 
 			if (checkIgnobleDecay(rand, this.generation, beeModifier.modifyGeneticDecay(this.genome, 1f))) {
 				return null;
@@ -420,7 +420,7 @@ public class Bee extends IndividualLiving<IBeeSpecies, IBee, IBeeSpeciesType> im
 		// drones are always generation 0
 		boolean haploid = generation == 0 && ForestryConfig.SERVER.useHaploidDrones.get();
 
-		return SpeciesUtil.createOffspring(housing.getLevel().random, this.genome, mate, mutator, genome -> {
+		return SpeciesUtil.createOffspring(housing.getLevel().getRandom(), this.genome, mate, mutator, genome -> {
 			//IBeekeepingMode mode = BeeManager.beeRoot.getBeekeepingMode(level);
 			int maxHealth = genome.getActiveValue(BeeChromosomes.LIFESPAN);
 			return new Bee(genome, Optional.empty(), false, maxHealth, maxHealth, this.pristine, generation); /*mode.isOffspringPristine(this)*/
@@ -462,7 +462,7 @@ public class Bee extends IndividualLiving<IBeeSpecies, IBee, IBeeSpeciesType> im
 		int chance = getAdjustedPollination(this.genome, beeModifier);
 
 		Level level = housing.getLevel();
-		RandomSource random = level.random;
+		RandomSource random = level.getRandom();
 
 		if (random.nextInt(100) >= chance) {
 			return null;
@@ -495,7 +495,7 @@ public class Bee extends IndividualLiving<IBeeSpecies, IBee, IBeeSpeciesType> im
 		int chance = getAdjustedPollination(this.genome, beeModifier);
 
 		Level level = housing.getLevel();
-		RandomSource random = level.random;
+		RandomSource random = level.getRandom();
 
 		// Correct speed
 		if (random.nextInt(100) >= chance) {
@@ -528,7 +528,7 @@ public class Bee extends IndividualLiving<IBeeSpecies, IBee, IBeeSpeciesType> im
 		int chance = getAdjustedPollination(this.genome, beeModifier);
 
 		Level level = housing.getLevel();
-		RandomSource random = level.random;
+		RandomSource random = level.getRandom();
 
 		// Correct speed
 		if (random.nextInt(100) >= chance) {

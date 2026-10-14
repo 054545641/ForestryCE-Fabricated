@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_stairs",
   "key": {
-    "#": {
-      "item": "forestry:macrocarpa_fireproof_planks"
-    }
+    "#": "forestry:macrocarpa_fireproof_planks"
   },
   "pattern": [
     "#  ",

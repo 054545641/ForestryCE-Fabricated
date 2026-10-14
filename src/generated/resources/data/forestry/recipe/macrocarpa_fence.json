@@ -3,12 +3,8 @@
   "category": "building",
   "group": "wooden_fence",
   "key": {
-    "#": {
-      "tag": "c:rods/wooden"
-    },
-    "W": {
-      "item": "forestry:macrocarpa_planks"
-    }
+    "#": "#c:rods/wooden",
+    "W": "forestry:macrocarpa_planks"
   },
   "pattern": [
     "W#W",

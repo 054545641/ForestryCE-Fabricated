@@ -10,6 +10,6 @@ public class BlockTesr<P extends Enum<P> & IBlockType> extends BlockBase<P> {
 
 	@Override
 	public RenderShape getRenderShape(BlockState state) {
-		return RenderShape.ENTITYBLOCK_ANIMATED;
+		return RenderShape.INVISIBLE;
 	}
 }

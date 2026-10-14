@@ -23,11 +23,12 @@ public class MailData extends ContentJarData {
 	protected void addProviders(JarScope jar) {
 		jar.helper().createTags(Registries.BLOCK, MailBlockTagsProvider::addTags);
 		jar.helper().createTags(Registries.ITEM, MailItemTagsProvider::addTags);
-		jar.helper().createRecipes(MailRecipeProvider::addRecipes);
-		jar.helper().createItemModels(false, false, false, MailItemModels::addModels);
+		jar.helper().createForestryRecipes(MailRecipeProvider::addRecipes);
+		jar.helper().createForestryItemModels(MailItemModels::addModels);
 
 		jar.addServer(new JarLootTableProvider(jar.output(), jar.lookup(), MailBlockLootTables::new));
 		jar.addServer(new MailDataMapProvider(jar.output(), jar.lookup()));
-		jar.addClient(new MailBlockStateProvider(jar.output(), jar.existingFileHelper()));
+		jar.addClient(new MailBlockStateProvider(jar.output()));
+
 	}
 }

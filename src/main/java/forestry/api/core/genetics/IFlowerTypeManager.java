@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import java.util.Map;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.apiculture.IFlowerType;
 
@@ -22,7 +22,7 @@ public interface IFlowerTypeManager {
 	 * @return The flower type, or null if no flower type was registered with that id
 	 */
 	@Nullable
-	IFlowerType getFlowerType(ResourceLocation id);
+	IFlowerType getFlowerType(Identifier id);
 
 	/**
 	 * Used to get a flower type by its id, falling back to the vanilla flower type.
@@ -30,19 +30,19 @@ public interface IFlowerTypeManager {
 	 * @param id The id of the flower type
 	 * @return The flower type, or the vanilla flower type if none was registered with that id
 	 */
-	IFlowerType getFlowerTypeSafe(ResourceLocation id);
+	IFlowerType getFlowerTypeSafe(Identifier id);
 
 	/**
 	 * Used to get every registered flower type.
 	 *
 	 * @return The flower types, keyed by id
 	 */
-	Map<ResourceLocation, IFlowerType> getAllFlowerTypes();
+	Map<Identifier, IFlowerType> getAllFlowerTypes();
 
 	/**
 	 * Used to install the effective flower types after a datapack load or a server sync.
 	 *
 	 * @param flowerTypes The flower types, keyed by id
 	 */
-	void setFlowerTypes(Map<ResourceLocation, IFlowerType> flowerTypes);
+	void setFlowerTypes(Map<Identifier, IFlowerType> flowerTypes);
 }

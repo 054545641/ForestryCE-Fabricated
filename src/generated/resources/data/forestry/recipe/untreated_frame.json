@@ -1,13 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "tag": "c:rods/wooden"
-    },
-    "S": {
-      "tag": "c:strings"
-    }
+    "#": "#c:rods/wooden",
+    "S": "#c:strings"
   },
   "pattern": [
     "###",
@@ -15,7 +10,6 @@
     "###"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:untreated_frame"
   }
 }

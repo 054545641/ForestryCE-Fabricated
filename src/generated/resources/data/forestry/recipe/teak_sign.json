@@ -1,18 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "P": [
-      {
-        "item": "forestry:teak_planks"
-      },
-      {
-        "item": "forestry:teak_fireproof_planks"
-      }
+      "forestry:teak_planks",
+      "forestry:teak_fireproof_planks"
     ],
-    "S": {
-      "tag": "c:rods/wooden"
-    }
+    "S": "#c:rods/wooden"
   },
   "pattern": [
     "PPP",
@@ -20,7 +13,6 @@
     " S "
   ],
   "result": {
-    "count": 1,
     "id": "forestry:teak_sign"
   }
 }

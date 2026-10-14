@@ -39,7 +39,7 @@ public class BlockBogEarth extends Block {
 
 	@Override
 	protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-		if (level.isClientSide || level.random.nextInt(13) != 0) {
+		if (level.isClientSide() || level.getRandom().nextInt(13) != 0) {
 			return;
 		}
 

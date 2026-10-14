@@ -5,7 +5,7 @@ import forestry.arboriculture.entities.ForestryChestBoat;
 import forestry.core.platform.item.ItemForestry;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.player.Player;
@@ -27,20 +27,20 @@ public class ForestryBoatItem extends ItemForestry {
 	private final ForestryWoodType type;
 	private final boolean hasChest;
 
-	public ForestryBoatItem(ForestryWoodType type, boolean hasChest) {
-		super(new Properties().stacksTo(1));
+	public ForestryBoatItem(ForestryWoodType type, boolean hasChest, Properties properties) {
+		super(properties.stacksTo(1));
 
 		this.type = type;
 		this.hasChest = hasChest;
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
 		HitResult hit = getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY);
 
 		if (hit.getType() == HitResult.Type.MISS) {
-			return InteractionResultHolder.pass(stack);
+			return InteractionResult.PASS;
 		} else {
 			Vec3 view = player.getViewVector(1f);
 			List<Entity> list = level.getEntities(player, player.getBoundingBox().expandTowards(view.scale(5)).inflate(1), ENTITY_PREDICATE);
@@ -52,7 +52,7 @@ public class ForestryBoatItem extends ItemForestry {
 					AABB aabb = entity.getBoundingBox().inflate(entity.getPickRadius());
 
 					if (aabb.contains(vec31)) {
-						return InteractionResultHolder.pass(stack);
+						return InteractionResult.PASS;
 					}
 				}
 			}
@@ -62,10 +62,10 @@ public class ForestryBoatItem extends ItemForestry {
 				boat.setWoodType(this.type);
 				boat.setYRot(player.getYRot());
 				if (!level.noCollision(boat, boat.getBoundingBox())) {
-					return InteractionResultHolder.fail(stack);
+					return InteractionResult.FAIL;
 				} else {
-					if (!level.isClientSide) {
-						level.addFreshEntity(boat);
+					if (!level.isClientSide()) {
+						if (!level.addFreshEntity(boat)) return InteractionResult.FAIL;
 						level.gameEvent(player, GameEvent.ENTITY_PLACE, hit.getLocation());
 						if (!player.getAbilities().instabuild) {
 							stack.shrink(1);
@@ -73,10 +73,10 @@ public class ForestryBoatItem extends ItemForestry {
 					}
 
 					player.awardStat(Stats.ITEM_USED.get(this));
-					return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
+					return (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
 				}
 			} else {
-				return InteractionResultHolder.pass(stack);
+				return InteractionResult.PASS;
 			}
 		}
 	}

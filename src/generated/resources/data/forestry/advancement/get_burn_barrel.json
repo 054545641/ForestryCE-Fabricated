@@ -17,7 +17,6 @@
       "translate": "advancements.forestry.get_burn_barrel.description"
     },
     "icon": {
-      "count": 1,
       "id": "forestry:burn_barrel"
     },
     "title": {

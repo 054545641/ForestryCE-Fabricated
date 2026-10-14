@@ -2,7 +2,7 @@ package forestry.api.core.circuits;
 
 import forestry.api.core.INbtWritable;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -27,5 +27,5 @@ public interface ICircuitBoard extends INbtWritable {
 	 * Specifies where a circuit can be used.
 	 */
 	@Nullable
-	ResourceLocation getSocketType();
+	Identifier getSocketType();
 }

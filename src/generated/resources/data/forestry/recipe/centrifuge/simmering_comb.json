@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/simmering_comb",
-  "input": {
-    "item": "forestry:simmering_comb"
-  },
+  "input": "forestry:simmering_comb",
   "products": [
     {
       "chance": 1.0,

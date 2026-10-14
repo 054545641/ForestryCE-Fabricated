@@ -1,6 +1,6 @@
 {
   "parent": "forestry:block/machines/base_machine",
-  "render_type": "minecraft:cutout",
+  "render_type": "cutout",
   "textures": {
     "base": "forestry:block/machines/bottler/base",
     "particle": "forestry:block/machines/bottler/particles",

@@ -10,9 +10,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
-import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import forestry.core.platform.inventory.InventoryTransferView;
 
 import javax.annotation.Nullable;
 
@@ -36,7 +36,7 @@ public class TileFarmHatch extends TileFarm implements WorldlyContainer, IFarmCo
 	public void updateServer(int tickCount) {
 		if (tickCount % 40 == 0) {
 			Container productInventory = getMultiblockLogic().getController().getFarmInventory().getProductInventory();
-			IItemHandler productItemHandler = new InvWrapper(productInventory);
+			ResourceHandler<ItemResource> productItemHandler = InventoryTransferView.internal(productInventory);
 
 			InventoryUtil.moveItemStack(productItemHandler, this.inventoryCache.getAdjacentInventories());
 		}
@@ -48,10 +48,7 @@ public class TileFarmHatch extends TileFarm implements WorldlyContainer, IFarmCo
 	}
 
 	@Nullable
-	public IItemHandler getItemHandler(@Nullable Direction facing) {
-		if (facing != null) {
-			return new SidedInvWrapper(this, facing);
-		}
-		return new InvWrapper(this);
+	public ResourceHandler<ItemResource> getItemHandler(@Nullable Direction facing) {
+		return InventoryTransferView.automation(this, facing);
 	}
 }

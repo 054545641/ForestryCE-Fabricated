@@ -11,7 +11,7 @@ import forestry.core.platform.util.datastructures.TriFunction;
 import forestry.core.content.backpacks.ModuleStorage;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -47,10 +47,10 @@ public class FeatureRegistry implements IFeatureRegistry {
 	private final HashMap<ResourceKey, DeferredRegister> registries = new HashMap<>();
 	private final LinkedListMultimap<ResourceKey<? extends Registry<?>>, Consumer<RegisterEvent>> registryListeners = LinkedListMultimap.create();
 
-	private final ResourceLocation moduleId;
+	private final Identifier moduleId;
 	private final IEventBus modBus;
 
-	public FeatureRegistry(ResourceLocation moduleId, IEventBus modBus) {
+	public FeatureRegistry(Identifier moduleId, IEventBus modBus) {
 		this.moduleId = moduleId;
 		this.modBus = modBus;
 		this.modBus.addListener(this::onRegisterEvent);
@@ -85,14 +85,10 @@ public class FeatureRegistry implements IFeatureRegistry {
 	}
 
 	public <B extends Block, I extends BlockItem> FeatureBlock<B, I> block(Function<BlockBehaviour.Properties, B> constructor, Supplier<BlockBehaviour.Properties> blockProperties, @Nullable BiFunction<B, Item.Properties, I> itemConstructor, Supplier<Item.Properties> itemProperties, String name) {
-		ResourceLocation id = this.moduleId.withPath(name);
+		Identifier id = this.moduleId.withPath(name);
 		Supplier<B> blockSupplier = () -> constructor.apply(IFeatureRegistry.setBlockId(id, blockProperties.get()));
-		Function<B, I> itemFunction = itemConstructor == null ? null : (block) -> itemConstructor.apply(block, IFeatureRegistry.setItemId(id, itemProperties.get()));
+		Function<B, I> itemFunction = itemConstructor == null ? null : (block) -> itemConstructor.apply(block, IFeatureRegistry.setItemId(id, itemProperties.get().useBlockDescriptionPrefix()));
 		return register(new FeatureBlock<>(this, this.moduleId, name, blockSupplier, itemFunction));
-	}
-
-	public <B extends Block, S extends IBlockSubtype> FeatureBlockGroup.Builder<B, S> blockGroup(Function<S, B> constructor, Collection<S> types) {
-		return blockGroup((properties, type) -> constructor.apply(type), types);
 	}
 
 	public <B extends Block, S extends IBlockSubtype> FeatureBlockGroup.Builder<B, S> blockGroup(BiFunction<BlockBehaviour.Properties, S, B> constructor, Collection<S> types) {
@@ -108,8 +104,8 @@ public class FeatureRegistry implements IFeatureRegistry {
 		return blockGroup(Arrays.asList(types));
 	}
 
-	public <I extends Item> FeatureItem<I> item(Supplier<I> constructor, String name) {
-		return register(new FeatureItem<>(this, this.moduleId, name, constructor));
+	public <I extends Item> FeatureItem<I> item(Function<Item.Properties, I> constructor, String name) {
+		return item(constructor, Item.Properties::new, name);
 	}
 
 	public FeatureItem<Item> item(String name) {
@@ -117,39 +113,35 @@ public class FeatureRegistry implements IFeatureRegistry {
 	}
 
 	public <I extends Item> FeatureItem<I> item(Function<Item.Properties, I> constructor, Supplier<Item.Properties> properties, String identifier) {
-		return register(new FeatureItem<>(this, this.moduleId, identifier, () -> constructor.apply(properties.get())));
+		return register(new FeatureItem<>(this, this.moduleId, identifier, () -> constructor.apply(IFeatureRegistry.setItemId(this.moduleId.withPath(identifier), properties.get()))));
 	}
 
 	public FeatureItem<Item> backpack(IBackpackDefinition definition, EnumBackpackType type, String identifier) {
-		return item(() -> ModuleStorage.BACKPACK_INTERFACE.createBackpack(definition, type), identifier);
+		return item(properties -> ModuleStorage.BACKPACK_INTERFACE.createBackpack(definition, type, properties), identifier);
 	}
 
-	public FeatureItem<Item> naturalistBackpack(IBackpackDefinition definition, ResourceLocation speciesTypeId, CreativeModeTab tab, String identifier) {
-		return item(() -> ModuleStorage.BACKPACK_INTERFACE.createNaturalistBackpack(definition, speciesTypeId, tab), identifier);
+	public FeatureItem<Item> naturalistBackpack(IBackpackDefinition definition, Identifier speciesTypeId, CreativeModeTab tab, String identifier) {
+		return item(properties -> ModuleStorage.BACKPACK_INTERFACE.createNaturalistBackpack(definition, speciesTypeId, tab, properties), identifier);
 	}
 
-	public <I extends Item, S extends IItemSubtype> FeatureItemGroup<I, S> itemGroup(Function<S, I> constructor, String identifier, S[] subTypes) {
+	public <I extends Item, S extends IItemSubtype> FeatureItemGroup<I, S> itemGroup(BiFunction<S, Item.Properties, I> constructor, String identifier, S[] subTypes) {
 		return itemGroup(constructor, subTypes).identifier(identifier).create();
 	}
 
-	public <I extends Item, S extends IItemSubtype> FeatureItemGroup.Builder<I, S> itemGroup(Function<S, I> constructor, S[] subTypes) {
-		return (FeatureItemGroup.Builder<I, S>) new FeatureItemGroup.Builder<>(this, constructor).types(subTypes);
+	public <I extends Item, S extends IItemSubtype> FeatureItemGroup.Builder<I, S> itemGroup(BiFunction<S, Item.Properties, I> constructor, S[] subTypes) {
+		return itemGroup(constructor, type -> new Item.Properties(), subTypes);
 	}
 
 	public <I extends Item, S extends IItemSubtype> FeatureItemGroup.Builder<I, S> itemGroup(BiFunction<S, Item.Properties, I> constructor, Function<S, Item.Properties> properties, S[] subTypes) {
-		return (FeatureItemGroup.Builder<I, S>) new FeatureItemGroup.Builder<I, S>(this, s -> constructor.apply(s, properties.apply(s))).types(subTypes);
+		return (FeatureItemGroup.Builder<I, S>) new FeatureItemGroup.Builder<I, S>(this, constructor, properties).types(subTypes);
 	}
 
-	public <I extends Item, R extends IItemSubtype, C extends IItemSubtype> FeatureItemTable<I, R, C> itemTable(BiFunction<R, C, I> constructor, R[] rowTypes, C[] columnTypes, String identifier) {
+	public <I extends Item, R extends IItemSubtype, C extends IItemSubtype> FeatureItemTable<I, R, C> itemTable(TriFunction<R, C, Item.Properties, I> constructor, R[] rowTypes, C[] columnTypes, String identifier) {
 		return itemTable(constructor, rowTypes, columnTypes).identifier(identifier).create();
 	}
 
-	public <I extends Item, R extends IItemSubtype, C extends IItemSubtype> FeatureItemTable.Builder<I, R, C> itemTable(BiFunction<R, C, I> constructor, R[] rowTypes, C[] columnTypes) {
+	public <I extends Item, R extends IItemSubtype, C extends IItemSubtype> FeatureItemTable.Builder<I, R, C> itemTable(TriFunction<R, C, Item.Properties, I> constructor, R[] rowTypes, C[] columnTypes) {
 		return (FeatureItemTable.Builder<I, R, C>) new FeatureItemTable.Builder<>(this, constructor).rowTypes(rowTypes).columnTypes(columnTypes);
-	}
-
-	public <B extends Block, R extends IBlockSubtype, C extends IBlockSubtype> FeatureBlockTable.Builder<B, R, C> blockTable(BiFunction<R, C, B> constructor, R[] rowTypes, C[] columnTypes) {
-		return blockTable((properties, rowType, columnType) -> constructor.apply(rowType, columnType), rowTypes, columnTypes);
 	}
 
 	public <B extends Block, R extends IBlockSubtype, C extends IBlockSubtype> FeatureBlockTable.Builder<B, R, C> blockTable(TriFunction<BlockBehaviour.Properties, R, C, B> constructor, R[] rowTypes, C[] columnTypes) {
@@ -210,13 +202,6 @@ public class FeatureRegistry implements IFeatureRegistry {
 		return this.features;
 	}
 
-	/**
-	 * Used to get every deferred register this module owns, keyed by registry. Features are only part
-	 * of what a module registers - point of interest types go through {@link #getRegistry} directly -
-	 * so this is the complete list of what the module puts into the game.
-	 *
-	 * @return The deferred registers, keyed by registry
-	 */
 	public Map<ResourceKey, DeferredRegister> getRegistries() {
 		return this.registries;
 	}
@@ -225,7 +210,7 @@ public class FeatureRegistry implements IFeatureRegistry {
 		return this.featureByRegistry.get(type);
 	}
 
-	public ResourceLocation getModuleId() {
+	public Identifier getModuleId() {
 		return this.moduleId;
 	}
 }

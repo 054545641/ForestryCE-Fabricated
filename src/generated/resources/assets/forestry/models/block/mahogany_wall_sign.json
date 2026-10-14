@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_wall_sign",
+  "textures": {
+    "all": "forestry:entity/signs/mahogany",
+    "particle": "forestry:block/mahogany_planks"
+  }
+}

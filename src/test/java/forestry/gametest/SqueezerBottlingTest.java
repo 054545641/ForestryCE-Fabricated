@@ -10,7 +10,7 @@ import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import forestry.core.platform.fluids.FluidHelper;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -131,7 +131,7 @@ public class SqueezerBottlingTest {
 		TileSqueezer squeezer = (TileSqueezer) helper.getBlockEntity(SQUEEZER_POS);
 
 		// The product tank refuses external fills by design, so seed it the way workCycle() does.
-		tank(squeezer).fillInternal(new FluidStack(fluid, amount), IFluidHandler.FluidAction.EXECUTE);
+		FluidHelper.fill(tank(squeezer).internal(), new FluidStack(fluid, amount));
 		inventory(squeezer).setItem(InventorySqueezer.SLOT_CAN_INPUT, new ItemStack(Items.GLASS_BOTTLE, BOTTLES_IN));
 		return squeezer;
 	}

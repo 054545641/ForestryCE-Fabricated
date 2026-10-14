@@ -10,10 +10,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -88,33 +86,33 @@ public class BlockBurnBarrel extends BlockForestry implements EntityBlock {
 
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-		if (!level.isClientSide) {
+		if (!level.isClientSide()) {
 			TileBurnBarrel barrel = TileUtil.getTile(level, pos, TileBurnBarrel.class);
 			if (barrel != null) {
 				barrel.openGui((ServerPlayer) player, InteractionHand.MAIN_HAND, pos);
 			}
 		}
-		return InteractionResult.sidedSuccess(level.isClientSide);
+		return (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
 	}
 
 	// Deviation from 1.20.1: Block#use split into useItemOn and useWithoutItem. The barrel lights from a held flint
 	// and steel or fire charge, so this path forwards the hand the player actually used and consumes the click,
 	// which also stops flint and steel from placing a fire against the barrel
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-		if (!level.isClientSide) {
+	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+		if (!level.isClientSide()) {
 			TileBurnBarrel barrel = TileUtil.getTile(level, pos, TileBurnBarrel.class);
 			if (barrel != null) {
 				barrel.openGui((ServerPlayer) player, hand, pos);
 			}
 		}
-		return ItemInteractionResult.sidedSuccess(level.isClientSide);
+		return (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
 	}
 
 	@Nullable
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> actualType) {
-		if (level.isClientSide || actualType != CoreTiles.BURN_BARREL.tileType()) {
+		if (level.isClientSide() || actualType != CoreTiles.BURN_BARREL.tileType()) {
 			return null;
 		}
 		// IForestryTicker and not a bare lambda. It advances the TickHelper that updateOnInterval reads
@@ -123,18 +121,6 @@ public class BlockBurnBarrel extends BlockForestry implements EntityBlock {
 		return (BlockEntityTicker<T>) ticker;
 	}
 
-	@Override
-	protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-		if (!state.is(newState.getBlock())) {
-			TileBurnBarrel barrel = TileUtil.getTile(level, pos, TileBurnBarrel.class);
-			if (barrel != null) {
-				Containers.dropContents(level, pos, barrel.getInternalInventory());
-			}
-			level.removeBlockEntity(pos);
-		}
-
-		super.onRemove(state, level, pos, newState, movedByPiston);
-	}
 
 	// Deviation from 1.20.1: this overrode a vanilla BlockBehaviour method. 1.21.1 moved it to NeoForge's
 	// IBlockExtension, where returning null means "use the value from the block properties"
@@ -148,7 +134,7 @@ public class BlockBurnBarrel extends BlockForestry implements EntityBlock {
 		if (!state.getValue(LIT)) {
 			return;
 		}
-		addParticlesAndSound(level, pos.getCenter().add(0, 0.55f, 0), random);
+		addParticlesAndSound(level, net.minecraft.world.phys.Vec3.atCenterOf(pos).add(0, 0.55f, 0), random);
 	}
 
 	// Adapted from Jumbo Candles which was adapted from vanilla candles

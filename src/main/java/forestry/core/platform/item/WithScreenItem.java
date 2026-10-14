@@ -4,7 +4,7 @@ import forestry.core.platform.gui.ContainerItemInventory;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -20,26 +20,27 @@ public abstract class WithScreenItem extends ItemForestry {
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level worldIn, Player player, InteractionHand handIn) {
+	public InteractionResult use(Level worldIn, Player player, InteractionHand handIn) {
 		ItemStack stack = player.getItemInHand(handIn);
 
 		if (player instanceof ServerPlayer serverPlayer) {
-			openGui(serverPlayer, stack);
+			openGui(serverPlayer, stack, handIn);
 		}
 
-		return InteractionResultHolder.success(stack);
+		return InteractionResult.SUCCESS;
 	}
 
-	protected void openGui(ServerPlayer serverPlayer, ItemStack heldItem) {
-		serverPlayer.openMenu(getMenuProvider(heldItem), buffer -> writeContainerData(serverPlayer, heldItem, buffer));
+	protected void openGui(ServerPlayer serverPlayer, ItemStack heldItem, InteractionHand hand) {
+		serverPlayer.openMenu(getMenuProvider(heldItem), buffer -> writeContainerData(serverPlayer, heldItem, hand, buffer));
 	}
 
 	public SimpleMenuProvider getMenuProvider(ItemStack heldItem) {
 		return new SimpleMenuProvider((windowId, playerInv, player) -> getContainer(windowId, player, heldItem), heldItem.getHoverName());
 	}
 
-	protected void writeContainerData(ServerPlayer player, ItemStack stack, RegistryFriendlyByteBuf buffer) {
-		buffer.writeBoolean(player.getUsedItemHand() == InteractionHand.MAIN_HAND);
+	protected void writeContainerData(ServerPlayer player, ItemStack stack, InteractionHand hand, RegistryFriendlyByteBuf buffer) {
+		// Opening a screen does not start an active item-use action (food, bow, etc.).
+		buffer.writeBoolean(hand == InteractionHand.MAIN_HAND);
 	}
 
 	@Override

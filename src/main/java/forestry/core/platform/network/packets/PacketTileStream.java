@@ -46,10 +46,14 @@ public class PacketTileStream implements CustomPacketPayload {
 	}
 
 	public static void handle(PacketTileStream msg, Player player) {
-		IStreamable tile = TileUtil.getTile(player.level(), msg.pos, IStreamable.class);
+		try {
+			IStreamable tile = TileUtil.getTile(player.level(), msg.pos, IStreamable.class);
 
-		if (tile != null) {
-			tile.readData(msg.payload);
+			if (tile != null) {
+				tile.readData(msg.payload);
+			}
+		} finally {
+			msg.payload.release();
 		}
 	}
 }

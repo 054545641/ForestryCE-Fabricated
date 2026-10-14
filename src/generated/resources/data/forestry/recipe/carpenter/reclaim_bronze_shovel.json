@@ -1,16 +1,11 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/reclaim_bronze_shovel",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:broken_survivalists_shovel"
-      }
+      "forestry:broken_survivalists_shovel"
     ],
     "result": {
-      "count": 1,
       "id": "forestry:bronze_ingot"
     }
   },

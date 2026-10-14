@@ -97,7 +97,7 @@ public class Letter implements ILetter {
 
 	@Override
 	public void addAttachment(ItemStack itemstack) {
-		InventoryUtil.tryAddStack(this.inventory, itemstack, false);
+		if (!InventoryUtil.tryAddStack(this.inventory, itemstack, SLOT_ATTACHMENT_1, SLOT_ATTACHMENT_COUNT, true)) throw new IllegalArgumentException("Letter attachments exceed capacity");
 	}
 
 	@Override
@@ -244,6 +244,11 @@ public class Letter implements ILetter {
 		return stacks;
 	}
 
+	public void setInventoryChangedListener(Runnable listener) { this.inventory.setInventoryOwner(listener); }
+
+	@Override
+	public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> getTransferHandler() { return this.inventory.getTransferHandler(); }
+
 	// / IINVENTORY
 	@Override
 	public boolean isEmpty() {
@@ -291,12 +296,12 @@ public class Letter implements ILetter {
 	}
 
 	@Override
-	public void startOpen(Player var1) {
+	public void startOpen(net.minecraft.world.entity.ContainerUser var1) {
         this.inventory.startOpen(var1);
 	}
 
 	@Override
-	public void stopOpen(Player var1) {
+	public void stopOpen(net.minecraft.world.entity.ContainerUser var1) {
         this.inventory.stopOpen(var1);
 	}
 

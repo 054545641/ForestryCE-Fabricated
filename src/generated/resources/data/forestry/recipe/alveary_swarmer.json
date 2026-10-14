@@ -3,15 +3,9 @@
   "category": "building",
   "group": "alveary",
   "key": {
-    "#": {
-      "item": "forestry:diamantine_electron_tube"
-    },
-    "G": {
-      "tag": "c:ingots/gold"
-    },
-    "X": {
-      "item": "forestry:alveary_block"
-    }
+    "#": "forestry:diamantine_electron_tube",
+    "G": "#c:ingots/gold",
+    "X": "forestry:alveary_block"
   },
   "pattern": [
     "#G#",
@@ -19,7 +13,6 @@
     "#G#"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:alveary_swarmer"
   }
 }

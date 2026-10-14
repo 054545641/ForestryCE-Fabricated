@@ -2,7 +2,7 @@ package forestry.core.platform.advancements;
 
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -17,10 +17,10 @@ public class AdvancementHelper {
 	 * @param player The player to award, ignored on the client and for any non-server player
 	 * @param id     The advancement to award
 	 */
-	public static void tryUnlock(Player player, ResourceLocation id) {
+	public static void tryUnlock(Player player, Identifier id) {
 		if (player instanceof ServerPlayer serverPlayer) {
 			// Deviation from 1.20.1: getAdvancement(id) became get(id) and returns an AdvancementHolder
-			AdvancementHolder advancement = serverPlayer.getServer().getAdvancements().get(id);
+			AdvancementHolder advancement = serverPlayer.level().getServer().getAdvancements().get(id);
 
 			if (advancement != null) {
 				AdvancementProgress progress = serverPlayer.getAdvancements().getOrStartProgress(advancement);

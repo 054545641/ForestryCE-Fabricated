@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/balsa_planks"
-  }
+  "parent": "forestry:block/balsa_hanging_sign_rot_0"
 }

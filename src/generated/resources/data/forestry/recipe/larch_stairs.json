@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_stairs",
   "key": {
-    "#": {
-      "item": "forestry:larch_planks"
-    }
+    "#": "forestry:larch_planks"
   },
   "pattern": [
     "#  ",

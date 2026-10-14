@@ -3,10 +3,10 @@ package forestry.core.platform.advancements;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.ContextAwarePredicate;
-import net.minecraft.advancements.critereon.EntityPredicate;
-import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
+import net.minecraft.advancements.triggers.Criterion;
+import net.minecraft.advancements.predicates.ContextAwarePredicate;
+import net.minecraft.advancements.predicates.entity.EntityPredicate;
+import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -42,7 +42,7 @@ public class ApicultureResearchTrigger extends SimpleCriterionTrigger<Apiculture
 			return;
 		}
 
-		Player player = serverLevel.getPlayerByUUID(profile.getId());
+		Player player = serverLevel.getPlayerByUUID(profile.id());
 		if (player instanceof ServerPlayer serverPlayer) {
 			trigger(serverPlayer, instance -> instance.check(researchCompletion));
 		}

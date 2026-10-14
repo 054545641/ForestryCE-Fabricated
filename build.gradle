@@ -4,9 +4,9 @@ import groovy.json.JsonSlurper
 plugins {
 	id('idea')
 	id('maven-publish')
-	id 'net.neoforged.moddev' version '2.0.140'
+	id 'net.neoforged.moddev' version '2.0.148'
 	// todo replace with mc-publish, as these plugins do not support Gradle configuration cache
-	id('com.modrinth.minotaur') version '2.+'
+	id('com.modrinth.minotaur') version '2.8.10'
 	id('com.matthewprenger.cursegradle') version '1.4.0'
 }
 
@@ -18,8 +18,8 @@ group = 'thedarkcolour.forestry'
 version = forestryVersion
 base.archivesName = "forestry-$minecraftVersion"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-java.toolchain.vendor = JvmVendorSpec.JETBRAINS
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+layout.buildDirectory = layout.projectDirectory.dir('build/26.2')
 
 // The jars of D1, one source set each. sourceSets.main IS the core jar: Gradle's jar task,
 // processResources, components.java and the access transformers all attach to main by convention,
@@ -32,12 +32,7 @@ java.toolchain.vendor = JvmVendorSpec.JETBRAINS
 //
 // 9a still produces one jar and one mod id. Splitting the artifacts is 9b.
 //
-// Datagen has no source set of its own. Each jar's providers live beside the content they generate
-// for, so a farms provider physically cannot name a butterflies type. The providers are the only
-// thing in the repo that touches ModKit, a dev-only dependency, and every jar task excludes their
-// packages: a datagen lambda puts a ModKit type into a synthetic method descriptor that FML's
-// boot-time annotation scanner would then try to resolve from the shipped jar. What proves the
-// exclude held is checkJarPartition, which reads the built artifact.
+// datagen and optional APIs are isolated in gradle/porting-source-sets.gradle
 var contentModules = ['butterflies', 'farms', 'mail']
 
 // Source set name to Java package name. The two diverge because the jars were renamed and the
@@ -58,6 +53,14 @@ sourceSets {
 	butterflies
 	farms
 	mail
+	gametest {
+		java.srcDir 'src/test/java'
+		resources.srcDir 'src/test/resources'
+	}
+	test {
+		java.setSrcDirs([])
+		resources.setSrcDirs([])
+	}
 }
 
 // Everything requires core, and nothing else. Arboriculture moving into core dissolved the only
@@ -72,30 +75,12 @@ contentModules.each { m ->
 	configurations["${m}CompileOnly"].extendsFrom configurations.compileOnly
 }
 
-configurations {
-	// ModKit, dev only. It reaches the production compile classpaths because the data providers
-	// now live beside the code they generate for, and every jar task excludes those packages. What
-	// keeps it out of a shipped jar is checkJarPartition, which reads the built artifact.
-	//
-	// It must go on the *runtime* classpath rather than an MDG additionalRuntimeClasspath, because
-	// the latter loads outside the game layer and ModKit extends net.minecraft.data.tags.TagsProvider.
-	// compileOnly keeps it out of the published POM, which strips dependencies anyway
-	modkit
-	runtimeOnly.extendsFrom modkit
-	compileOnly.extendsFrom modkit
-}
+neoForge.version = project.forgeVersion
+apply from: 'gradle/porting-source-sets.gradle'
 
 neoForge {
-	version = "$forgeVersion"
-
 	accessTransformers = files('src/main/resources/META-INF/accesstransformer.cfg')
 	validateAccessTransformers = true
-
-	// Add Parchment parameter mappings
-	parchment {
-		mappingsVersion = project.mappingsVersion
-		minecraftVersion = project.minecraftVersion
-	}
 
 	mods {
 		// One mod id per jar. A jar loads as a mod only if it carries neoforge.mods.toml, so this
@@ -112,18 +97,15 @@ neoForge {
 		// is what lets the partial-install boot configurations leave it out: NeoForge's gametest
 		// scanner resolves every @GameTest method descriptor at registration, and a test naming a
 		// farms type crashes a core-only boot outright - the D3 safety condition, exactly
-		create('forestrygametest') { sourceSet sourceSets.test }
+		create('forestrygametest') { sourceSet sourceSets.gametest }
 	}
 
 	runs {
 		configureEach {
+			gameDirectory.set(project.layout.projectDirectory.dir('run/26.2/' + name))
 			logLevel = org.slf4j.event.Level.DEBUG
 			jvmArgument '-XX:+AllowEnhancedClassRedefinition'
 			jvmArgument '-XX:+IgnoreUnrecognizedVMOptions'
-			// Every dev run loads forestry.core.data as part of the forestry mod, and FML's
-			// AutomaticEventSubscriber resolves Data's method signatures at construction, so ModKit
-			// has to be on the runtime classpath of all of them - not just runData. See the modkit
-			// configuration above; it rides in on main's runtimeClasspath
 		}
 
 		client {
@@ -132,16 +114,18 @@ neoForge {
 
 		server {
 			server()
-			gameDirectory.set(project.layout.projectDirectory.dir('run/server'))
+			gameDirectory.set(project.layout.projectDirectory.dir('run/26.2/server'))
 			programArgument '--nogui'
 		}
 
 		data {
-			data()
+			clientData()
+			logLevel = org.slf4j.event.Level.INFO
+			sourceSet = sourceSets.datagen
 			// The output folder is the parent of every jar's generated root, which is what lets
 			// HashCache purge a file that stopped being generated into any of them
-			programArguments.addAll('--mod', 'forestry', '--all',
-					'--output', file('src/generated/').absolutePath,
+			programArguments.addAll('--mod', 'forestrydatagen', '--all',
+					'--output', file(providers.gradleProperty('datagenOutput').orElse('src/generated/').get()).absolutePath,
 					'--existing', file('src/main/resources/').absolutePath,
 					'--existing', file('src/farms/resources/').absolutePath,
 					'--existing', file('src/mail/resources/').absolutePath,
@@ -158,7 +142,7 @@ neoForge {
 		// being broken. Distinct ports mean a survivor can only ever block a rerun of itself.
 		coreOnlyServer {
 			server()
-			gameDirectory.set(project.layout.projectDirectory.dir('run/boot-core'))
+			gameDirectory.set(project.layout.projectDirectory.dir('run/26.2/boot-core'))
 			programArguments.addAll('--nogui', '--port', '25566')
 			loadedMods = [mods.forestry]
 		}
@@ -168,7 +152,7 @@ neoForge {
 		// item, and the lepidopterist chest resolved a species type the butterfly jar owns.
 		coreOnlyClient {
 			client()
-			gameDirectory.set(project.layout.projectDirectory.dir('run/boot-core-client'))
+			gameDirectory.set(project.layout.projectDirectory.dir('run/26.2/boot-core-client'))
 			loadedMods = [mods.forestry]
 		}
 
@@ -176,7 +160,7 @@ neoForge {
 		// butterfly jar needs nothing but base
 		butterfliesServer {
 			server()
-			gameDirectory.set(project.layout.projectDirectory.dir('run/boot-butterflies'))
+			gameDirectory.set(project.layout.projectDirectory.dir('run/26.2/boot-butterflies'))
 			programArguments.addAll('--nogui', '--port', '25567')
 			loadedMods = [mods.forestry, mods.forestrybutterflies]
 		}
@@ -185,14 +169,14 @@ neoForge {
 		// partition bug is most likely to still be
 		farmsServer {
 			server()
-			gameDirectory.set(project.layout.projectDirectory.dir('run/boot-farms'))
+			gameDirectory.set(project.layout.projectDirectory.dir('run/26.2/boot-farms'))
 			programArguments.addAll('--nogui', '--port', '25568')
 			loadedMods = [mods.forestry, mods.forestryfarms]
 		}
 
 		mailServer {
 			server()
-			gameDirectory.set(project.layout.projectDirectory.dir('run/boot-mail'))
+			gameDirectory.set(project.layout.projectDirectory.dir('run/26.2/boot-mail'))
 			programArguments.addAll('--nogui', '--port', '25569')
 			loadedMods = [mods.forestry, mods.forestrymail]
 		}
@@ -200,9 +184,15 @@ neoForge {
 		// Every jar. All boot configurations run from build/resources and build/classes, never a built
 		// jar, and loadedMods names mod ids rather than artifacts. What this one proves is narrower than
 		// its name suggests: every mod id loading together, nothing about the published artifacts
+		allJarsClient {
+			client()
+			gameDirectory.set(project.layout.projectDirectory.dir('run/26.2/boot-all-client'))
+			loadedMods = [mods.forestry, mods.forestrybutterflies, mods.forestryfarms, mods.forestrymail]
+		}
+
 		allJarsServer {
 			server()
-			gameDirectory.set(project.layout.projectDirectory.dir('run/boot-all'))
+			gameDirectory.set(project.layout.projectDirectory.dir('run/26.2/boot-all'))
 			programArguments.addAll('--nogui', '--port', '25570')
 			loadedMods = [mods.forestry, mods.forestrybutterflies, mods.forestryfarms, mods.forestrymail]
 		}
@@ -212,7 +202,7 @@ neoForge {
 		// tests are completely inert in normal client/server play.
 		gameTestServer {
 			type = "gameTestServer"
-			gameDirectory.set(project.layout.projectDirectory.dir('run/gametest'))
+			gameDirectory.set(project.layout.projectDirectory.dir('run/26.2/gametest'))
 			systemProperty 'neoforge.enabledGameTestNamespaces', 'forestry'
 			// Forwards `-Pforestry.genomeBaseline=generate` to the forked gametest JVM so GenomeBaselineTest
 			// can (re)generate its golden-master snapshot. Empty/absent => assert mode.
@@ -225,7 +215,7 @@ neoForge {
 
 	// src/test and the content roots have no Minecraft/NeoForge on their classpath by default.
 	// Moddev only wires that into source sets it's told about. Without this they won't compile.
-	addModdingDependenciesTo sourceSets.test
+	addModdingDependenciesTo sourceSets.gametest
 	contentModules.each { addModdingDependenciesTo sourceSets[it] }
 }
 
@@ -244,7 +234,6 @@ neoForge {
 // are small and up-to-date checks make a no-op run free.
 tasks.named('classes') {
 	contentModules.each { finalizedBy sourceSets[it].classesTaskName }
-	finalizedBy sourceSets.test.classesTaskName
 }
 
 // The test source set holds GameTests (run via runGameTestServer), not JUnit tests, so the standard `test` task
@@ -482,95 +471,48 @@ tasks.named('check') {
 }
 
 repositories {
-	maven {
-		name = 'jei'
-		url = 'https://maven.blamejared.com/'
-		content { includeGroup 'mezz.jei' }
-	}
-	maven {
-		name = 'Patchouli'
-		url = 'https://maven.blamejared.com/'
-	}
-	maven {
-		name = 'Architectury API'
-		url = 'https://maven.architectury.dev'
-		content { includeGroup 'dev.architectury' }
-	}
-	maven {
-		name = 'KubeJS and Rhino'
-		url = 'https://maven.latvian.dev/releases'
-		content { includeGroupAndSubgroups 'dev.latvian' }
-	}
-	maven {
-		name = 'Mekanism'
-		url = 'https://modmaven.dev/'
-		content { includeGroup 'mekanism' }
-	}
-	maven {
-		name = 'Curios'
-		url = 'https://maven.theillusivec4.top/'
-		content { includeGroup 'top.theillusivec4.curios' }
-	}
-	maven {
-		name = 'CurseMaven'
-		url = 'https://cursemaven.com'
-		content { includeGroup 'curse.maven' }
-	}
-	maven { url = "https://maven.createmod.net" }
-	maven {
-		name = 'Ponder'
-		url = 'https://raw.githubusercontent.com/Fuzss/modresources/main/maven/'
-	}
-	maven {
-		name = 'ModKit'
-		url = 'https://jitpack.io'
-		content {
-			includeGroup 'com.github.thedarkcolour'
-			includeGroup 'com.github.rtyley'
-		}
-	}
+    mavenCentral()
+    maven {
+        name = 'JEI'
+        url = 'https://maven.blamejared.com'
+        content {
+            includeGroup 'mezz.jei'
+            includeGroup 'net.mezzdev.config'
+        }
+    }
+    maven {
+        name = 'Curios'
+        url = 'https://maven.theillusivec4.top'
+        content { includeGroup 'top.theillusivec4.curios' }
+    }
+    maven {
+        name = 'ModKit'
+        url = 'https://jitpack.io'
+        content {
+            includeGroup 'com.github.thedarkcolour'
+            includeGroup 'com.github.rtyley'
+        }
+    }
 }
-
 dependencies {
-	// JEI OPTIONAL
-	compileOnly "mezz.jei:jei-$minecraftVersion-neoforge-api:$jeiVersion"
-	runtimeOnly "mezz.jei:jei-$minecraftVersion-neoforge:$jeiVersion"
-	// KubeJS OPTIONAL
-	implementation "dev.architectury:architectury-neoforge:${architecturyVersion}"
-	implementation "dev.latvian.mods:rhino:${rhinoVersion}"
-	implementation "dev.latvian.mods:kubejs-neoforge:${kubejsVersion}"
-	// Curios Optional
-	implementation "top.theillusivec4.curios:curios-neoforge:${curiosVersion}+${minecraftVersion}"
-	// Ponder OPTIONAL
-	implementation("net.createmod.ponder:ponder-neoforge:${ponderVersion}+mc${minecraftVersion}")
-	// PATCHOULI OPTIONAL: the compile-time API always stays, the dev runtime mod sits behind an
-	// explicit switch so -PwithPatchouli=false exercises the missing-dependency boot and manual
-	// behaviour without editing the build file
-	compileOnly "vazkii.patchouli:Patchouli:$patchouliVersion-NEOFORGE:api"
-	if (providers.gradleProperty('withPatchouli').orElse('true').get().toBoolean()) {
-		runtimeOnly "vazkii.patchouli:Patchouli:$patchouliVersion-NEOFORGE"
-	}
-	// ModKit DEV ONLY
-	modkit 'com.github.thedarkcolour:ModKit:c0c491b35bf7c5785b933b27966a9c0b9dee4163'
-
-	// GameTests exercise every jar, and two of them build their expected species maps from the data
-	// providers that now live in those jars
-	contentModules.each { testImplementation sourceSets[it].output }
+    gametestImplementation sourceSets.main.output
+    contentModules.each { gametestImplementation sourceSets[it].output }
+    gametestImplementation sourceSets.datagen.output
 }
-
 var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
 	var replaceProperties = [
 			'version'              : project.version,
 			'forgeVersionRange'    : forgeVersionRange,
 			'jeiVersionRange'      : jeiVersionRange,
-			'patchouliVersionRange': patchouliVersionRange,
-			'fmlVersionRange'      : fmlVersionRange,
+			'curiosVersionRange'   : curiosVersionRange,
+
+			'minecraftVersionRange': minecraftVersionRange,
 	]
 	inputs.properties replaceProperties
 	expand replaceProperties
 
 	from 'src/main/templates'
-	into 'build/generated/sources/modMetadata'
+	into 'build/26.2/generated/sources/modMetadata'
 }
 
 // One neoforge.mods.toml per content jar, expanded from the same properties as core's
@@ -579,29 +521,29 @@ var contentModMetadata = contentModules.collectEntries { m ->
 		var replaceProperties = [
 				'version'          : project.version,
 				'forgeVersionRange': forgeVersionRange,
-				'fmlVersionRange'  : fmlVersionRange,
+				'minecraftVersionRange': minecraftVersionRange,
 		]
 		inputs.properties replaceProperties
 		expand replaceProperties
 
 		from "src/${m}/templates"
-		into "build/generated/sources/modMetadata${m.capitalize()}"
+		into "build/26.2/generated/sources/modMetadata${m.capitalize()}"
 	}]
 }
 
 var gametestModMetadata = tasks.register('generateModMetadataGametest', ProcessResources) {
-	var replaceProperties = ['version': project.version, 'fmlVersionRange': fmlVersionRange]
+	var replaceProperties = ['version': project.version, 'minecraftVersionRange': minecraftVersionRange]
 	inputs.properties replaceProperties
 	expand replaceProperties
 	from 'src/test/templates'
-	into 'build/generated/sources/modMetadataGametest'
+	into 'build/26.2/generated/sources/modMetadataGametest'
 }
-sourceSets.test.resources.srcDir gametestModMetadata
+sourceSets.gametest.resources.srcDir gametestModMetadata
 // AlleleTranslationKeyTest reads en_us.json off its own classloader, and since the suite became its
 // own mod id it no longer shares one with core. Give the gametest mod the merged lang directly; it
 // is dev-only and never published, so the duplicate costs nothing
-sourceSets.test.resources.srcDir 'build/generated/sources/mergedAssets'
-tasks.named('processTestResources') { dependsOn(generateEnUsLang) }
+sourceSets.gametest.resources.srcDir 'build/26.2/generated/sources/mergedAssets'
+tasks.named('processGametestResources') { dependsOn(generateEnUsLang) }
 neoForge.ideSyncTask gametestModMetadata
 
 contentModules.each { m ->
@@ -648,7 +590,7 @@ static def extractJsonEntries(File jsonFile) {
 var generateEnUsLang = tasks.register('generateEnUsLang', DefaultTask) {
 	var manualFile = project.file('src/main/resources/assets/forestry/lang/en_us.json')
 	var generatedFile = project.file('src/generated/resources/assets/forestry/lang/en_us.json')
-	var mergedFile = project.file('build/generated/sources/mergedAssets/assets/forestry/lang/en_us.json')
+	var mergedFile = project.file('build/26.2/generated/sources/mergedAssets/assets/forestry/lang/en_us.json')
 
 	inputs.file(manualFile)
 	inputs.file(generatedFile).skipWhenEmpty(true)
@@ -705,7 +647,7 @@ tasks.named('processResources', ProcessResources) {
 	// core's generated one, and the merge of the two. Only the merge belongs in the jar, and an
 	// exclude at the top of a Copy task applies to every source it has, so the two originals are told
 	// apart from the merge by where they came from
-	var mergedRoot = project.file('build/generated/sources/mergedAssets').absolutePath + File.separator
+	var mergedRoot = project.file('build/26.2/generated/sources/mergedAssets').absolutePath + File.separator
 	exclude { details ->
 		return !details.directory
 				&& details.relativePath.pathString == 'assets/forestry/lang/en_us.json'
@@ -720,7 +662,7 @@ tasks.named('processResources', ProcessResources) {
 sourceSets.main {
 	resources {
 		srcDir 'src/generated/resources'
-		srcDir 'build/generated/sources/mergedAssets'
+		srcDir 'build/26.2/generated/sources/mergedAssets'
 		srcDir generateModMetadata
 	}
 }
@@ -746,8 +688,7 @@ jar {
 				'Specification-Version'   : "${project.version}",
 				'Implementation-Title'    : "${project.name}",
 				'Implementation-Version'  : "${project.version}",
-				'Implementation-Vendor'   : 'SirSengir',
-				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+				'Implementation-Vendor'   : 'SirSengir'
 		])
 	}
 }
@@ -770,8 +711,7 @@ var contentJars = contentModules.collectEntries { m ->
 					'Specification-Version'   : "${project.version}",
 					'Implementation-Title'    : "forestry${m}",
 					'Implementation-Version'  : "${project.version}",
-					'Implementation-Vendor'   : 'SirSengir',
-					'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+					'Implementation-Vendor'   : 'SirSengir'
 			])
 		}
 	}]
@@ -797,10 +737,7 @@ var checkJarPartition = tasks.register('checkJarPartition') {
 		var langPath = 'assets/forestry/lang/en_us.json'
 		var langBytes = new HashMap<String, byte[]>()
 
-		// A source set boundary used to keep ModKit off the production compile classpath. The datagen
-		// providers live in the production source sets now, so the artifact is what has to prove it.
-		// The literal below is ModKit's java package, not its maven coordinate, so re-pinning the sha
-		// leaves it correct. A package rename is what would silently stop the check firing
+		// verify the built artifacts as well as the source set boundary
 		var entries = jarFiles.collectEntries { jarName, file ->
 			var names = new HashSet<String>()
 			new java.util.zip.ZipFile(file).withCloseable { zip ->
@@ -808,8 +745,10 @@ var checkJarPartition = tasks.register('checkJarPartition') {
 					names.add(entry.name)
 					if (entry.name.endsWith('.class')) {
 						var text = new String(zip.getInputStream(entry).bytes, 'ISO-8859-1')
-						if (text.contains('thedarkcolour/modkit') || text.contains('thedarkcolour.modkit')) {
-							problems.add("${jarName} jar: ${entry.name} references ModKit")
+						if (text.contains('thedarkcolour/modkit') || text.contains('thedarkcolour.modkit')
+								|| text.contains('forestry/gametest/') || text.contains('forestry/datagen/') || text.contains('forestry/environment/')
+								|| text.contains('forestry/lifecycle/') || text.contains('forestry/n6/')) {
+							problems.add("${jarName} jar: ${entry.name} references development-only code")
 						}
 					} else if (entry.name == langPath) {
 						langBytes[jarName] = zip.getInputStream(entry).bytes
@@ -887,7 +826,7 @@ tasks.named('assemble') {
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
-	options.compilerArgs << '-Xmaxerrs' << '400'
+	options.compilerArgs << '-Xmaxerrs' << providers.gradleProperty('portingMaxErrors').getOrElse('400')
 }
 
 idea {
@@ -916,11 +855,9 @@ tasks.register('javadocJar', Jar) {
 tasks.register('sourcesJar', Jar) {
 	archiveClassifier.set('sources')
 	from sourceSets.main.allJava
+	from sourceSets.mainJei.allJava
+	from sourceSets.curios.allJava
 
-	// The data providers moved into main when datagen lost its own source set, so allJava carries
-	// them now. This jar has no classes and cannot reproduce the boot failure the binary excludes
-	// prevent, but a provider names ModKit, which is on no classpath a consumer of this jar has, so
-	// it is source that cannot compile where it lands. Same rule as the binary jars
 	excludeDatagen(delegate)
 }
 
@@ -947,10 +884,15 @@ publishing {
 				artifactId = project.base.archivesName.get()
 				version = project.version
 
-				// ForgeGradle will generate wild dependency definitions, see https://github.com/MinecraftForge/ForgeGradle/issues/584
-				// Since we don't actually depend on anything, just remove the entire node.
-				pom.withXml {
-					asNode().remove(asNode().dependencies)
+				// Loader/game libraries and optional development runtime mods are supplied by the pack.
+				pom.withXml { xml ->
+					def root = xml.asNode()
+					root.children().findAll { child ->
+						if (!(child instanceof groovy.util.Node)) return false
+						def name = child.name()
+						(name instanceof groovy.namespace.QName ? name.localPart : name) == 'dependencies'
+					}
+						.each { root.remove(it) }
 				}
 
 				from components.java
@@ -966,8 +908,8 @@ publishing {
 					version = project.version
 					artifact contentJars[m]
 
-					pom.withXml {
-						var dependency = asNode().appendNode('dependencies').appendNode('dependency')
+					pom.withXml { xml ->
+						var dependency = xml.asNode().appendNode('dependencies').appendNode('dependency')
 						dependency.appendNode('groupId', project.group)
 						dependency.appendNode('artifactId', project.base.archivesName.get())
 						dependency.appendNode('version', project.version)
@@ -998,6 +940,10 @@ publishing {
 	}
 }
 
+// A Gradle module descriptor would bypass the POM's intentional dependency boundary and
+// publish withJei/withCurios development settings as mandatory runtime dependencies.
+tasks.withType(GenerateModuleMetadata).configureEach { enabled = false }
+
 if (System.getenv('CURSEFORGE_TOKEN')) {
 	curseforge {
 		apiKey = System.getenv('CURSEFORGE_TOKEN')
@@ -1007,17 +953,17 @@ if (System.getenv('CURSEFORGE_TOKEN')) {
 			changelogType = 'markdown'
 			changelog = getChangelog(version)
 
-			releaseType = 'release'
+			releaseType = 'alpha'
 
 			addGameVersion(project.minecraftVersion)
 			addGameVersion('NeoForge')
-			addGameVersion('Java 21')
+			addGameVersion('Java 25')
 
 			mainArtifact(jar.archiveFile) {
 				displayName = "Forestry: Community Edition ${project.version}"
 				relations {
 					optionalDependency 'jei'
-					optionalDependency 'patchouli'
+					optionalDependency 'curios'
 				}
 			}
 		}
@@ -1029,7 +975,7 @@ modrinth {
 	projectId = project.modrinthId
 	versionName = "Forestry: Community Edition $version"
 	versionNumber = version.toString()
-	versionType = 'release'
+	versionType = 'alpha'
 	gameVersions = [minecraftVersion]
 	loaders = ['neoforge']
 	changelog = getChangelog(project.version)
@@ -1041,7 +987,7 @@ modrinth {
 
 	dependencies {
 		optional.project('jei')
-		optional.project('patchouli')
+		optional.project('curios')
 	}
 }
 
@@ -1070,3 +1016,26 @@ static def getChangelog(Object version) {
 	// Fallback in case this fails
 	return "Forestry Update ${version}"
 }
+
+apply from: 'gradle/porting-verification.gradle'
+
+allprojects {
+    plugins.withId('net.neoforged.moddev') {
+        // the asset downloader defaults to Java 21 even for a Java 25 project
+        tasks.withType(net.neoforged.nfrtgradle.NeoFormRuntimeTask).configureEach {
+            javaExecutable = javaToolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(25)
+            }.map { it.executablePath.asFile.absolutePath }
+        }
+    }
+}
+
+apply from: 'gradle/n1-verification.gradle'
+
+apply from: 'gradle/n2-verification.gradle'
+
+apply from: 'gradle/lifecycle-tests.gradle'
+
+apply from: 'gradle/n6-verification.gradle'
+
+apply from: 'gradle/g2-verification.gradle'

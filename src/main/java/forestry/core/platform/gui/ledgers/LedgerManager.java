@@ -1,14 +1,13 @@
 package forestry.core.platform.gui.ledgers;
 
 import com.google.common.collect.Iterables;
-import com.mojang.blaze3d.systems.RenderSystem;
 import forestry.api.core.IError;
 import forestry.api.core.IErrorSource;
 import forestry.api.core.tooltips.ToolTip;
 import forestry.core.platform.config.SessionVars;
 import forestry.core.platform.gui.GuiForestry;
 import forestry.core.platform.gui.GuiUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -126,7 +125,7 @@ public class LedgerManager {
 		return areas;
 	}
 
-	public void drawLedgers(GuiGraphics transform) {
+	public void drawLedgers(GuiGraphicsExtractor transform) {
 		int yPosRight = 8;
 		int yPosLeft = 8;
 		for (Ledger ledger : this.ledgers) {
@@ -135,8 +134,6 @@ public class LedgerManager {
 			if (!ledger.isVisible()) {
 				continue;
 			}
-
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			int yPos = ledger.isRightSide() ? yPosRight : yPosLeft;
 			ledger.setPosition(ledger.isRightSide() ? this.gui.getSizeX() : -ledger.getWidth(), yPos);
 			ledger.draw(transform);
@@ -163,15 +160,12 @@ public class LedgerManager {
 			if (!errorLedger.isVisible()) {
 				continue;
 			}
-
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			errorLedger.draw(transform, yPos, -errorLedger.getWidth());
 			yPos += errorLedger.getHeight();
 		}
-		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 
-	public void drawTooltips(GuiGraphics graphics, int mouseX, int mouseY) {
+	public void drawTooltips(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 		Ledger ledger = getAtPosition(mouseX, mouseY);
 		if (ledger != null && ledger.shouldDrawTooltip()) {
 			ToolTip toolTip = new ToolTip();

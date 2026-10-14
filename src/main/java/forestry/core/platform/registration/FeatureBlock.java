@@ -4,7 +4,7 @@ import forestry.api.ForestryConstants;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -22,7 +22,7 @@ public class FeatureBlock<B extends Block, I extends BlockItem> extends ModFeatu
 	@Nullable
 	private final DeferredHolder<Item, I> itemObject;
 
-	public FeatureBlock(IFeatureRegistry features, ResourceLocation moduleId, String identifier, Supplier<B> constructorBlock, @Nullable Function<B, I> constructorItem) {
+	public FeatureBlock(IFeatureRegistry features, Identifier moduleId, String identifier, Supplier<B> constructorBlock, @Nullable Function<B, I> constructorItem) {
 		super(moduleId, identifier);
 		this.blockObject = features.getRegistry(Registries.BLOCK).register(identifier, constructorBlock);
 		this.itemObject = constructorItem == null ? null : features.getRegistry(Registries.ITEM).register(identifier, () -> constructorItem.apply(this.blockObject.get()));
@@ -53,8 +53,8 @@ public class FeatureBlock<B extends Block, I extends BlockItem> extends ModFeatu
 	}
 
 	@Override
-	public ResourceLocation id() {
-		return this.itemObject.getId();
+	public Identifier id() {
+		return this.blockObject.getId();
 	}
 
 	@Override

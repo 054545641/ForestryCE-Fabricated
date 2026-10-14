@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_wall_hanging_sign",
+  "textures": {
+    "all": "forestry:entity/signs/hanging/zebrawood",
+    "particle": "forestry:block/stripped_zebrano_log"
+  }
+}

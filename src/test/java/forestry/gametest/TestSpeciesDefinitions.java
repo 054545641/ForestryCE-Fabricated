@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.apiculture.ForestryBeeJubilances;
 import forestry.api.arboriculture.ITreeSpecies;
@@ -83,7 +83,7 @@ public final class TestSpeciesDefinitions {
 		int escritoireColor = -1;
 		TemperatureType temperature = TemperatureType.NORMAL;
 		HumidityType humidity = HumidityType.NORMAL;
-		Map<ResourceLocation, AlleleOverride<?>> genome = Map.of();
+		Map<Identifier, AlleleOverride<?>> genome = Map.of();
 
 		Base(String genus, String species) {
 			this.genus = genus;
@@ -97,7 +97,7 @@ public final class TestSpeciesDefinitions {
 		private int outline = -1;
 		private List<IProduct> products = List.of();
 		private List<IProduct> specialties = List.of();
-		private ResourceLocation jubilance = ForestryBeeJubilances.DEFAULT;
+		private Identifier jubilance = ForestryBeeJubilances.DEFAULT;
 
 		private Bee(String genus, String species) {
 			super(genus, species);
@@ -106,8 +106,8 @@ public final class TestSpeciesDefinitions {
 		public Bee dominant(boolean v) { this.dominant = v; return this; }
 		public Bee outline(int v) { this.outline = v; return this; }
 		public Bee products(List<IProduct> v) { this.products = v; return this; }
-		public Bee jubilance(ResourceLocation v) { this.jubilance = v; return this; }
-		public Bee genome(Map<ResourceLocation, AlleleOverride<?>> v) { this.genome = v; return this; }
+		public Bee jubilance(Identifier v) { this.jubilance = v; return this; }
+		public Bee genome(Map<Identifier, AlleleOverride<?>> v) { this.genome = v; return this; }
 
 		public BeeSpeciesDefinition build() {
 			return new BeeSpeciesDefinition(genus, species, dominant, glint, secret, complexity, authority,
@@ -123,7 +123,7 @@ public final class TestSpeciesDefinitions {
 		}
 
 		public Tree escritoireColor(int v) { this.escritoireColor = v; return this; }
-		public Tree genome(Map<ResourceLocation, AlleleOverride<?>> v) { this.genome = v; return this; }
+		public Tree genome(Map<Identifier, AlleleOverride<?>> v) { this.genome = v; return this; }
 
 		public TreeSpeciesDefinition build() {
 			return new TreeSpeciesDefinition(genus, species, dominant, glint, secret, complexity, authority,
@@ -146,7 +146,7 @@ public final class TestSpeciesDefinitions {
 		}
 
 		public Butterfly rarity(float v) { this.rarity = v; return this; }
-		public Butterfly genome(Map<ResourceLocation, AlleleOverride<?>> v) { this.genome = v; return this; }
+		public Butterfly genome(Map<Identifier, AlleleOverride<?>> v) { this.genome = v; return this; }
 
 		public ButterflySpeciesDefinition build() {
 			return new ButterflySpeciesDefinition(genus, species, dominant, glint, secret, complexity, authority,

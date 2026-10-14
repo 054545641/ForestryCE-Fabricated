@@ -20,11 +20,11 @@ import forestry.core.platform.util.Translator;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -40,19 +40,19 @@ public class AnalyzerScreenGraphics<S extends ISpecies<I>, I extends IIndividual
 	public static final int COLUMN_1 = 78;
 	public static final int COLUMN_2 = 143;
 
-	private final GuiGraphics graphics;
+	private final GuiGraphicsExtractor graphics;
 	private final Font font;
 	private final int mouseX;
 	private final int mouseY;
 	private final IIndividual individual;
 	private final IGenome genome;
-	private final ResourceLocation texture;
+	private final Identifier texture;
 
 	private boolean haploid;
 	private int currentX;
 	private int currentY;
 
-	public AnalyzerScreenGraphics(GuiGraphics graphics, PortableAnalyzerScreen parent, int mouseX, int mouseY, I individual) {
+	public AnalyzerScreenGraphics(GuiGraphicsExtractor graphics, PortableAnalyzerScreen parent, int mouseX, int mouseY, I individual) {
 		this.graphics = graphics;
 		this.font = parent.getMinecraft().font;
 		this.currentX = parent.getGuiLeft() + 12;
@@ -135,7 +135,7 @@ public class AnalyzerScreenGraphics<S extends ISpecies<I>, I extends IIndividual
 	}
 
 	@Override
-	public void drawFertilityRow(IChromosome<Integer> chromosome, ResourceLocation offspringSprite) {
+	public void drawFertilityRow(IChromosome<Integer> chromosome, Identifier offspringSprite) {
 		TextureAtlasSprite sprite = IForestryClientApi.INSTANCE.getTextureManager().getSprite(offspringSprite);
 
 		drawChromosomeRow(chromosome, (active, c, value, options, text) -> {
@@ -147,7 +147,7 @@ public class AnalyzerScreenGraphics<S extends ISpecies<I>, I extends IIndividual
 				int x = this.currentX + (active ? COLUMN_1 : COLUMN_2) + this.font.width(newText) - 3;
 				int y = this.currentY - 5;
 
-				this.graphics.blit(x, y, 0, 16, 16, sprite);
+				this.graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, sprite, x, y, 16, 16);
 
 				return newText;
 			}
@@ -197,7 +197,7 @@ public class AnalyzerScreenGraphics<S extends ISpecies<I>, I extends IIndividual
 				});
 				int x = this.currentX - 16 + (right ? COLUMN_2 : COLUMN_1);
 				int y = this.currentY - 4;
-				this.graphics.blit(x, y, 0, 16, 16, sprite);
+				this.graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, sprite, x, y, 16, 16);
 
 				// format text
 				options.setColor(PortableAnalyzerScreen.getColorCoding(allele.dominant()));
@@ -282,7 +282,7 @@ public class AnalyzerScreenGraphics<S extends ISpecies<I>, I extends IIndividual
 			text = withStyle(text, options.applyStyle(Style.EMPTY));
 		}
 
-		this.graphics.drawString(this.font, text, minX, minY, color, dropShadow);
+		this.graphics.text(this.font, text, minX, minY, 0xFF000000 | (color), dropShadow);
 	}
 
 	@Override
@@ -308,7 +308,7 @@ public class AnalyzerScreenGraphics<S extends ISpecies<I>, I extends IIndividual
 			}
 		}
 
-		this.graphics.renderTooltip(this.font, styledTooltip, Optional.empty(), x, y);
+		this.graphics.setTooltipForNextFrame(this.font, styledTooltip, Optional.empty(), x, y);
 	}
 
 	@Override
@@ -381,8 +381,8 @@ public class AnalyzerScreenGraphics<S extends ISpecies<I>, I extends IIndividual
 			drawIcon(34, 0, mutation.getResult().cast(), iconGetter);
 		} else {
 			// draw question marks
-			this.graphics.blit(this.texture, this.currentX, this.currentY, 78, 240, 16, 16);
-			this.graphics.blit(this.texture, this.currentX + 33, this.currentY, 78, 240, 16, 16);
+			this.graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.texture, this.currentX, this.currentY, 78, 240, 16, 16, 256, 256);
+			this.graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.texture, this.currentX + 33, this.currentY, 78, 240, 16, 16, 256, 256);
 		}
 
 		// draw arrow
@@ -394,7 +394,7 @@ public class AnalyzerScreenGraphics<S extends ISpecies<I>, I extends IIndividual
 			case LOWEST -> 5;
 			default -> 0;
 		};
-		this.graphics.blit(this.texture, this.currentX + 18, this.currentY + 4, textureU, 247, 15, 9);
+		this.graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.texture, this.currentX + 18, this.currentY + 4, textureU, 247, 15, 9, 256, 256);
 		if (researched) {
 			addVerticalSpacing(5);
 			drawText(Component.literal("+"), 27, new InteractableTextOptions().setColor(ForestryColors.BLACK));

@@ -6,7 +6,7 @@ import forestry.api.plugin.IApicultureRegistration;
 import forestry.api.plugin.IForestryPlugin;
 import forestry.api.plugin.IGeneticRegistration;
 import forestry.core.platform.compat.kubejs.event.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.fml.ModList;
 
 import java.util.function.Consumer;
@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * A Forestry plugin that fires events for the KubeJS integration
  */
 public class KubeForestryPlugin implements IForestryPlugin {
-	public static final ResourceLocation ID = ForestryConstants.forestry("kubejs");
+	public static final Identifier ID = ForestryConstants.forestry("kubejs");
 
 	@Override
 	public void registerGenetics(IGeneticRegistration genetics) {
@@ -33,7 +33,7 @@ public class KubeForestryPlugin implements IForestryPlugin {
 	}
 
 	@Override
-	public ResourceLocation id() {
+	public Identifier id() {
 		return ID;
 	}
 

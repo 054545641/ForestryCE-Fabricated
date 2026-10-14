@@ -43,20 +43,20 @@ public class BeeParticleRender {
 		// At 32+ distance, have no bee particles. Make more particles up close.
 		BlockPos playerPosition = Minecraft.getInstance().player.blockPosition();
 		double playerDistanceSq = playerPosition.distToCenterSqr(particleStart.x, particleStart.y, particleStart.z);
-		if (world.random.nextInt(1024) < playerDistanceSq) {
+		if (world.getRandom().nextInt(1024) < playerDistanceSq) {
 			return;
 		}
 
 		IBeeSpecies species = genome.resolveActive(BeeChromosomes.SPECIES);
 		int color = species.getOutline();
 
-		int randomInt = world.random.nextInt(100);
+		int randomInt = world.getRandom().nextInt(100);
 
 		if (housing instanceof IHiveTile) {
 			if (((IHiveTile) housing).isAngry() || randomInt >= 85) {
 				List<LivingEntity> entitiesInRange = ThrottledBeeEffect.getEntitiesInRange(genome, housing, LivingEntity.class);
 				if (!entitiesInRange.isEmpty()) {
-					LivingEntity entity = entitiesInRange.get(world.random.nextInt(entitiesInRange.size()));
+					LivingEntity entity = entitiesInRange.get(world.getRandom().nextInt(entitiesInRange.size()));
 					//Particle particle = new ParticleBeeTargetEntity(world, particleStart, entity, color);
 					//effectRenderer.add(particle);
 					world.addParticle(new BeeTargetParticleData(entity.getId(), color), particleStart.x, particleStart.y, particleStart.z, 0, 0, 0);
@@ -66,14 +66,14 @@ public class BeeParticleRender {
 		}
 
 		if (randomInt < 75 && !flowerPositions.isEmpty()) {
-			BlockPos destination = flowerPositions.get(world.random.nextInt(flowerPositions.size()));
+			BlockPos destination = flowerPositions.get(world.getRandom().nextInt(flowerPositions.size()));
 			//Particle particle = new ParticleBeeRoundTrip(world, particleStart, destination, color);
 			//effectRenderer.add(particle);
 			world.addParticle(new BeeParticleData(ApicultureParticles.BEE_ROUND_TRIP_PARTICLE.get(), destination, color), particleStart.x, particleStart.y, particleStart.z, 0, 0, 0);
 		} else {
 			Vec3i area = Bee.getParticleArea(genome, housing);
 			Vec3i offset = housing.getBlockPos().offset(-area.getX() / 2, -area.getY() / 4, -area.getZ() / 2);
-			BlockPos destination = VecUtil.getRandomPositionInArea(world.random, area).offset(offset);
+			BlockPos destination = VecUtil.getRandomPositionInArea(world.getRandom(), area).offset(offset);
 			world.addParticle(new BeeParticleData(ApicultureParticles.BEE_EXPLORER_PARTICLE.get(), destination, color), particleStart.x, particleStart.y, particleStart.z, 0, 0, 0);
 			//Particle particle = new ParticleBeeExplore(world, particleStart, destination, color);
 			//effectRenderer.add(particle);
@@ -85,8 +85,7 @@ public class BeeParticleRender {
 			return;
 		}
 
-		ParticleEngine effectRenderer = Minecraft.getInstance().particleEngine;
-		effectRenderer.add(new SnowParticle((ClientLevel) world, x + world.random.nextGaussian(), y, z + world.random.nextGaussian()));
+		world.addParticle(ApicultureParticles.SNOW_PARTICLE.get(), x + world.getRandom().nextGaussian(), y, z + world.getRandom().nextGaussian(), 0, 0, 0);
 	}
 
 	private BeeParticleRender() {}

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -71,7 +71,7 @@ public class TaxonSystemTest {
 			helper.fail("the Demonic bee species was not loaded");
 			return;
 		}
-		ResourceLocation flowerType = demonic.getDefaultGenome().getActiveValue(BeeChromosomes.FLOWER_TYPE);
+		Identifier flowerType = demonic.getDefaultGenome().getActiveValue(BeeChromosomes.FLOWER_TYPE);
 		if (!ForestryFlowerTypes.NETHER.equals(flowerType)) {
 			helper.fail("Demonic should inherit the infernal genus NETHER flower type, but got '" + flowerType + "'");
 			return;

@@ -5,7 +5,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.core.genetics.GeneticTranslationKeys;
 
@@ -17,15 +17,15 @@ public final class ChromosomeFactory {
 	private ChromosomeFactory() {
 	}
 
-	public static IChromosome<Float> floatChromosome(ResourceLocation id) {
+	public static IChromosome<Float> floatChromosome(Identifier id) {
 		return new Chromosome<>(id, Codec.FLOAT, dataNaming(id, String::valueOf), null);
 	}
 
-	public static IChromosome<Integer> intChromosome(ResourceLocation id) {
+	public static IChromosome<Integer> intChromosome(Identifier id) {
 		return new Chromosome<>(id, Codec.INT, dataNaming(id, String::valueOf), null);
 	}
 
-	public static IChromosome<Boolean> booleanChromosome(ResourceLocation id) {
+	public static IChromosome<Boolean> booleanChromosome(Identifier id) {
 		// Booleans are universally Yes/No, so every boolean chromosome shares one key per value
 		// (allele.<ns>.true / allele.<ns>.false) instead of a per-chromosome key. This matches the long-standing
 		// allele.forestry.true = "Yes" / allele.forestry.false = "No" lang entries.
@@ -38,33 +38,33 @@ public final class ChromosomeFactory {
 	 *
 	 * @param valueKeyPart Maps a value to its translation-key suffix (e.g. enum name, "x_y_z" for Vec3i).
 	 */
-	public static <V> IChromosome<V> valueChromosome(ResourceLocation id, Codec<V> valueCodec, Function<V, String> valueKeyPart) {
+	public static <V> IChromosome<V> valueChromosome(Identifier id, Codec<V> valueCodec, Function<V, String> valueKeyPart) {
 		return new Chromosome<>(id, valueCodec, dataNaming(id, valueKeyPart), null);
 	}
 
 	/**
-	 * A reference chromosome: the genome stores a {@link ResourceLocation}, resolved to a behavior object on demand.
+	 * A reference chromosome: the genome stores a {@link Identifier}, resolved to a behavior object on demand.
 	 * The translation key reproduces the existing scheme ("allele.&lt;ns&gt;.&lt;chromosome&gt;.&lt;ref path&gt;").
 	 *
 	 * @param get       Resolves an id to its behavior object (lazily, after registries are populated).
 	 * @param dominant  Reads the default dominance of a resolved value.
 	 */
-	public static <R> IChromosome<ResourceLocation> referenceChromosome(ResourceLocation id, Function<ResourceLocation, R> get, Predicate<R> dominant) {
+	public static <R> IChromosome<Identifier> referenceChromosome(Identifier id, Function<Identifier, R> get, Predicate<R> dominant) {
 		IChromosome.IReferenceResolver<R> resolver = new IChromosome.IReferenceResolver<>() {
 			@Override
-			public R get(ResourceLocation refId) {
+			public R get(Identifier refId) {
 				return get.apply(refId);
 			}
 
 			@Override
-			public boolean isDominant(ResourceLocation refId) {
+			public boolean isDominant(Identifier refId) {
 				return dominant.test(get.apply(refId));
 			}
 		};
-		return new Chromosome<>(id, ResourceLocation.CODEC, refId -> GeneticTranslationKeys.createTranslationKey("allele", id, refId), resolver);
+		return new Chromosome<>(id, Identifier.CODEC, refId -> GeneticTranslationKeys.createTranslationKey("allele", id, refId), resolver);
 	}
 
-	private static <V> Function<V, String> dataNaming(ResourceLocation id, Function<V, String> valueKeyPart) {
+	private static <V> Function<V, String> dataNaming(Identifier id, Function<V, String> valueKeyPart) {
 		String base = "allele." + id.getNamespace() + '.' + id.getPath() + '.';
 		return value -> base + sanitize(valueKeyPart.apply(value));
 	}

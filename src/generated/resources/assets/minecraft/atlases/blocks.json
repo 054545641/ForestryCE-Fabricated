@@ -1,9 +1,563 @@
 {
   "sources": [
     {
-      "type": "minecraft:directory",
-      "prefix": "slots/",
-      "source": "forestry/atlas/gui/slots"
+      "type": "minecraft:single",
+      "resource": "forestry:item/lime_sapling",
+      "sprite": "forestry:block/saplings/lime_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/sour_cherry_sapling",
+      "sprite": "forestry:block/saplings/sour_cherry_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/walnut_sapling",
+      "sprite": "forestry:block/saplings/walnut_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/chestnut_sapling",
+      "sprite": "forestry:block/saplings/chestnut_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/pear_sapling",
+      "sprite": "forestry:block/saplings/pear_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/plum_sapling",
+      "sprite": "forestry:block/saplings/plum_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/feijoa_sapling",
+      "sprite": "forestry:block/saplings/feijoa_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/elm_sapling",
+      "sprite": "forestry:block/saplings/elm_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/maple_sapling",
+      "sprite": "forestry:block/saplings/maple_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/beech_sapling",
+      "sprite": "forestry:block/saplings/beech_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/poplar_sapling",
+      "sprite": "forestry:block/saplings/poplar_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/willow_sapling",
+      "sprite": "forestry:block/saplings/willow_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/dogwood_sapling",
+      "sprite": "forestry:block/saplings/dogwood_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/jacaranda_sapling",
+      "sprite": "forestry:block/saplings/jacaranda_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/ipe_sapling",
+      "sprite": "forestry:block/saplings/ipe_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/ginkgo_sapling",
+      "sprite": "forestry:block/saplings/ginkgo_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/larch_sapling",
+      "sprite": "forestry:block/saplings/larch_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/pine_sapling",
+      "sprite": "forestry:block/saplings/pine_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/fir_sapling",
+      "sprite": "forestry:block/saplings/fir_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/macrocarpa_sapling",
+      "sprite": "forestry:block/saplings/macrocarpa_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/sequoia_sapling",
+      "sprite": "forestry:block/saplings/sequoia_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/giant_sequoia_sapling",
+      "sprite": "forestry:block/saplings/giant_sequoia_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/pewen_sapling",
+      "sprite": "forestry:block/saplings/pewen_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/kauri_sapling",
+      "sprite": "forestry:block/saplings/kauri_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/teak_sapling",
+      "sprite": "forestry:block/saplings/teak_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/kapok_sapling",
+      "sprite": "forestry:block/saplings/kapok_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/balsa_sapling",
+      "sprite": "forestry:block/saplings/balsa_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/orange_sapling",
+      "sprite": "forestry:block/saplings/orange_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/ebony_sapling",
+      "sprite": "forestry:block/saplings/ebony_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/greenheart_sapling",
+      "sprite": "forestry:block/saplings/greenheart_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/lemon_sapling",
+      "sprite": "forestry:block/saplings/lemon_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/zebrano_sapling",
+      "sprite": "forestry:block/saplings/zebrano_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/mahogany_sapling",
+      "sprite": "forestry:block/saplings/mahogany_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/coconut_sapling",
+      "sprite": "forestry:block/saplings/coconut_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/papaya_sapling",
+      "sprite": "forestry:block/saplings/papaya_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/camelthorn_sapling",
+      "sprite": "forestry:block/saplings/camelthorn_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/padauk_sapling",
+      "sprite": "forestry:block/saplings/padauk_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/cocobolo_sapling",
+      "sprite": "forestry:block/saplings/cocobolo_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/wenge_sapling",
+      "sprite": "forestry:block/saplings/wenge_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/mahoe_sapling",
+      "sprite": "forestry:block/saplings/mahoe_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/baobab_sapling",
+      "sprite": "forestry:block/saplings/baobab_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/date_sapling",
+      "sprite": "forestry:block/saplings/date_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:item/olive_sapling",
+      "sprite": "forestry:block/saplings/olive_sapling"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/larch"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/larch"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/teak"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/teak"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/acacia_desert"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/acacia_desert"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/lime"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/lime"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/chestnut"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/chestnut"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/wenge"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/wenge"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/baobab"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/baobab"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/sequoia"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/sequoia"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/kapok"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/kapok"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/ebony"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/ebony"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/elm"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/elm"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/mahogany"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/mahogany"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/balsa"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/balsa"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/willow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/willow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/walnut"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/walnut"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/greenheart"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/greenheart"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hill_cherry"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/hill_cherry"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/mahoe"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/mahoe"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/poplar"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/poplar"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/palm"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/palm"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/papaya"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/papaya"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/pine"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/pine"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/plum"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/plum"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/maple"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/maple"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/citrus"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/citrus"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/giganteum"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/giganteum"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/ipe"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/ipe"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/padauk"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/padauk"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/cocobolo"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/cocobolo"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/fir"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/fir"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/coconut"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/coconut"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/beech"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/beech"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/feijoa"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/feijoa"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/dogwood"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/dogwood"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/ginkgo"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/ginkgo"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/jacaranda"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/jacaranda"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/pewen"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/pewen"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/macrocarpa"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/macrocarpa"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/olive"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/olive"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/orange"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/orange"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/pear"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/pear"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/kauri"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/kauri"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/zebrawood"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "forestry:entity/signs/hanging/zebrawood"
     }
   ]
 }

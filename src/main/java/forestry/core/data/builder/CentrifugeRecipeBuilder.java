@@ -5,7 +5,7 @@ import forestry.api.core.IProduct;
 import forestry.api.core.Product;
 import forestry.core.content.machines.recipes.CentrifugeRecipe;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
@@ -37,8 +37,8 @@ public class CentrifugeRecipeBuilder {
 		return this;
 	}
 
-	public void build(RecipeOutput output, ResourceLocation id) {
+	public void build(RecipeOutput output, Identifier id) {
 		Preconditions.checkState(!this.outputs.isEmpty(), "Empty centrifuge recipes are not allowed");
-		output.accept(id, new CentrifugeRecipe(id, this.processingTime, this.input, this.outputs), null);
+		output.accept(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id), new CentrifugeRecipe(id, this.processingTime, this.input, this.outputs), null);
 	}
 }

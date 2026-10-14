@@ -12,17 +12,15 @@ import forestry.core.data.models.ForestryItemModelProvider;
 import forestry.core.data.models.ForestryWoodModelProvider;
 import forestry.core.data.recipe.ForestryRecipeProvider;
 import forestry.core.platform.util.SpeciesUtil;
-import forestry.modules.ForestryModuleManager;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import thedarkcolour.modkit.data.DataHelper;
+import forestry.core.data.ScopedDataHelper;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -31,11 +29,11 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-@EventBusSubscriber(modid = ForestryConstants.MOD_ID)
+@EventBusSubscriber(modid = "forestrydatagen")
 public class Data {
 	@SubscribeEvent
-	public static void gatherData(GatherDataEvent event) {
-		preDataGen();
+	public static void gatherData(GatherDataEvent.Client event) {
+		preDataGen(event.getLookupProvider().join());
 
 		// Content jars attach here through ServiceLoader rather than by naming a provider class directly,
 		// so core need not import a content jar's types. Each provider compiles from the source set of the
@@ -49,15 +47,11 @@ public class Data {
 
 		DataGenerator generator = event.getGenerator();
 		PackOutput output = DataRoots.of(event, DataRoots.CORE);
-		ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 		// Core takes everything the content jars do not, which is the safe direction: an id registered
 		// outside a feature module still gets its item model, and it gets it in the jar that is always
 		// installed. The same set scopes core's models and core's loot, so the two cannot come to disagree
-		Set<ResourceLocation> contentOwned = JarModules.ownedIds(contentModules(contentProviders));
-		DataHelper dataHelper = new DataHelper.Builder(ForestryConstants.MOD_ID, event)
-				.packOutput(output)
-				.entryFilter(id -> !contentOwned.contains(id))
-				.build();
+		Set<Identifier> contentOwned = JarModules.ownedIds(contentModules(contentProviders));
+		ScopedDataHelper dataHelper = new ScopedDataHelper(ForestryConstants.MOD_ID, event, output, "core");
 		CompletableFuture<HolderLookup.Provider> lookup = event.getLookupProvider();
 
 		// English is the one thing that is not partitioned. Every content jar requires base, so base
@@ -65,10 +59,7 @@ public class Data {
 		// where a translator can find all of them at once. Unfiltered, so it names content ids too.
 		// dataHelper stays scoped because its other job is item models, and a model does have to ship
 		// in the jar registering the item it belongs to
-		new DataHelper.Builder(ForestryConstants.MOD_ID, event)
-				.packOutput(output)
-				.build()
-				.createEnglish(true, ForestryEnglishProvider::addTranslations);
+		dataHelper.createEnglish(true, ForestryEnglishProvider::addTranslations);
 		dataHelper.createTags(Registries.BLOCK, ForestryBlockTagsProvider::addTags);
 		dataHelper.createTags(Registries.ITEM, (tags, l) -> {
 			ForestryItemTagsProvider.addTags(tags);
@@ -81,29 +72,31 @@ public class Data {
 		// the placeable tag are shipped under src/main/resources/data/forestry/painting_variant/
 		// and data/minecraft/tags/painting_variant/placeable.json respectively. A small
 		// validator (below) fails datagen if a variant JSON is missing from the tag.
-		generator.addProvider(event.includeServer(), new ForestryPaintingPlaceableValidator());
-		dataHelper.createRecipes(ForestryRecipeProvider::addRecipes);
+		generator.addProvider(true, new ForestryPaintingPlaceableValidator(event.getResourceManager(net.minecraft.server.packs.PackType.SERVER_DATA)));
+		dataHelper.createForestryRecipes(ForestryRecipeProvider::addRecipes);
 		dataHelper.createDamageTypes(ForestryDamageTypesProvider::addTypes);
-		dataHelper.createItemModels(false, false, false, ForestryItemModels::addModels);
+		dataHelper.createForestryItemModels(ForestryItemModels::addModels);
 
-		generator.addProvider(event.includeServer(), new ForestryAdvancementProvider(output, lookup, existingFileHelper));
-		generator.addProvider(event.includeServer(), new ForestryLootTableProvider(output, lookup, contentOwned));
-		generator.addProvider(event.includeServer(), new ForestryLootModifierProvider(output, lookup));
-		generator.addProvider(event.includeClient(), new ForestryBlockStateProvider(output, existingFileHelper));
-		generator.addProvider(event.includeClient(), new ForestryWoodModelProvider(output, existingFileHelper));
-		generator.addProvider(event.includeClient(), new ForestryItemModelProvider(output, existingFileHelper));
-		generator.addProvider(event.includeClient(), new ForestryAtlasProvider(output, lookup, existingFileHelper));
-		generator.addProvider(event.includeServer(), new ForestryFeaturesProvider(output, lookup));
-		generator.addProvider(event.includeServer(), new TaxonProvider(output));
-		generator.addProvider(event.includeServer(), new FlowerTypeProvider(output));
-		generator.addProvider(event.includeServer(), SpeciesUtil.BEE_TYPE.get().createEffectProvider(output, lookup, DefaultBeeEffects.create()));
-		generator.addProvider(event.includeServer(), SpeciesUtil.BEE_TYPE.get().createSpeciesProvider(output, lookup, DefaultBeeSpecies::register));
-		generator.addProvider(event.includeServer(), SpeciesUtil.TREE_TYPE.get().createSpeciesProvider(output, lookup, DefaultTreeSpecies::register));
-		generator.addProvider(event.includeServer(), new MutationProvider(output, lookup));
-		generator.addProvider(event.includeServer(), new ForestryDataMapProvider(output, lookup));
-		generator.addProvider(event.includeClient(), new ForestryCuriosProvider(output, existingFileHelper, lookup));
+		generator.addProvider(true, new ForestryAdvancementProvider(output, lookup));
+		generator.addProvider(true, new ForestryLootTableProvider(output, lookup, contentOwned));
+		generator.addProvider(true, new ForestryLootModifierProvider(output, lookup));
+		generator.addProvider(true, new ForestryBlockStateProvider(output));
+		generator.addProvider(true, new ForestryWoodModelProvider(output));
+		generator.addProvider(true, new ForestryItemModelProvider(output));
+		generator.addProvider(true, new forestry.core.data.models.ForestryItemDefinitions(output, id -> !contentOwned.contains(id)));
+		generator.addProvider(true, new ForestryAtlasProvider(output, lookup));
+		generator.addProvider(true, new ForestryFeaturesProvider(output, lookup));
+		generator.addProvider(true, new TaxonProvider(output));
+		generator.addProvider(true, new FlowerTypeProvider(output));
+		generator.addProvider(true, SpeciesUtil.BEE_TYPE.get().createEffectProvider(output, lookup, DefaultBeeEffects.create()));
+		generator.addProvider(true, SpeciesUtil.BEE_TYPE.get().createSpeciesProvider(output, lookup, DefaultBeeSpecies::register));
+		generator.addProvider(true, SpeciesUtil.TREE_TYPE.get().createSpeciesProvider(output, lookup, DefaultTreeSpecies::register));
+		generator.addProvider(true, new MutationProvider(output, lookup));
+		generator.addProvider(true, new ForestryDataMapProvider(output, lookup));
+		generator.addProvider(true, new ForestryCuriosProvider(output, lookup));
 
 		// Last, so a content provider can read whatever core's providers seeded
+		dataHelper.attach();
 		contentProviders.forEach(provider -> provider.gather(event));
 	}
 
@@ -111,10 +104,10 @@ public class Data {
 	 * @param contentProviders The content jars' entry points, in the order they were loaded
 	 * @return Every module those jars ship
 	 */
-	private static Set<ResourceLocation> contentModules(List<IForestryDataProvider> contentProviders) {
-		Set<ResourceLocation> union = new HashSet<>();
+	private static Set<Identifier> contentModules(List<IForestryDataProvider> contentProviders) {
+		Set<Identifier> union = new HashSet<>();
 		for (IForestryDataProvider provider : contentProviders) {
-			for (ResourceLocation moduleId : provider.moduleIds()) {
+			for (Identifier moduleId : provider.moduleIds()) {
 				// Two jars claiming one module would write the same lang keys and the same loot tables
 				// into both, and load order would decide which the game reads
 				if (!union.add(moduleId)) {
@@ -126,8 +119,16 @@ public class Data {
 	}
 
 	// Hack fix to make API work in data generation environment
-	public static void preDataGen() {
-		((ForestryModuleManager) IForestryApi.INSTANCE.getModuleManager()).setupApi();
+	public static void preDataGen(HolderLookup.Provider registries) {
+		forestry.core.ModuleCore.ensureApiInitialized();
+		// Datagen skips the server reload that normally binds defaults. Build the actual registered
+		// initializers with the datagen registry context before providers materialize organism stacks.
+		// NeoForge whitelists Named, but vanilla datagen returns its non-dereferenceable anonymous
+		// subclass for tags. The same symbolic tag reference must also be accepted in this datagen JVM.
+		var symbolicTag = registries.lookupOrThrow(Registries.ITEM).getOrThrow(net.minecraft.tags.ItemTags.PLANKS);
+		net.neoforged.neoforge.common.CommonHooks.markComponentClassAsValid(symbolicTag.getClass());
+		net.minecraft.core.registries.BuiltInRegistries.DATA_COMPONENT_INITIALIZERS.build(registries)
+			.forEach(net.minecraft.core.component.DataComponentInitializers.PendingComponents::apply);
 
 		PluginManager.registerClient();
 

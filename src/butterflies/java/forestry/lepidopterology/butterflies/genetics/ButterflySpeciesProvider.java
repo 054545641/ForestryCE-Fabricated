@@ -16,7 +16,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.lepidopterology.genetics.IButterflySpeciesType;
 import forestry.api.plugin.IButterflySpeciesBuilder;
@@ -51,16 +51,16 @@ public class ButterflySpeciesProvider implements DataProvider {
 		});
 	}
 
-	public static Map<ResourceLocation, ButterflySpeciesDefinition> buildDefinitions(IButterflySpeciesType type, Consumer<ILepidopterologyRegistration> species) {
+	public static Map<Identifier, ButterflySpeciesDefinition> buildDefinitions(IButterflySpeciesType type, Consumer<ILepidopterologyRegistration> species) {
 		LepidopterologyRegistration reg = new LepidopterologyRegistration(type);
 		species.accept(reg);
 
-		Map<ResourceLocation, ButterflySpeciesDefinition> definitions = new LinkedHashMap<>();
+		Map<Identifier, ButterflySpeciesDefinition> definitions = new LinkedHashMap<>();
 		reg.forEachSpeciesBuilder((id, builder) -> definitions.put(id, buildDefinition(builder)));
 		return definitions;
 	}
 
-	public static Map<ResourceLocation, ButterflySpeciesDefinition> buildDefinitions() {
+	public static Map<Identifier, ButterflySpeciesDefinition> buildDefinitions() {
 		return buildDefinitions(SpeciesUtil.BUTTERFLY_TYPE.get(), DefaultButterflySpecies::register);
 	}
 
@@ -96,7 +96,7 @@ public class ButterflySpeciesProvider implements DataProvider {
 		);
 	}
 
-	private CompletableFuture<?> saveSpecies(CachedOutput cache, RegistryOps<JsonElement> ops, ResourceLocation id, ButterflySpeciesDefinition def) {
+	private CompletableFuture<?> saveSpecies(CachedOutput cache, RegistryOps<JsonElement> ops, Identifier id, ButterflySpeciesDefinition def) {
 		JsonElement json = ButterflySpeciesDefinition.codec().encodeStart(ops, def).getOrThrow();
 		return DataProvider.saveStable(cache, json, this.pathProvider.json(id));
 	}

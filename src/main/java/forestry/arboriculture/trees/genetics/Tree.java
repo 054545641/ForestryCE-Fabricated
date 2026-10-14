@@ -115,12 +115,12 @@ public class Tree extends Individual<ITreeSpecies, ITree, ITreeSpeciesType> impl
 
 		float chance = this.genome.getActiveValue(TreeChromosomes.SAPLINGS) * modifier;
 
-		if (level.random.nextFloat() <= chance) {
+		if (level.getRandom().nextFloat() <= chance) {
 			if (this.mate == null) {
 				prod.add(copy());
 			} else {
 				SpeciesUtil.ISpeciesMutator mutator = (p1, p2) -> mutateSpecies(level, playerProfile, pos, p1, p2);
-				prod.add(SpeciesUtil.createOffspring(level.random, this.genome, this.mate, mutator, Tree::new));
+				prod.add(SpeciesUtil.createOffspring(level.getRandom(), this.genome, this.mate, mutator, Tree::new));
 			}
 		}
 

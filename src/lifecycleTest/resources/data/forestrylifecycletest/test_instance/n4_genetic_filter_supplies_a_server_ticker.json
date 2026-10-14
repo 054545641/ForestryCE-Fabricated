@@ -1,0 +1,1 @@
+{"type": "minecraft:function", "function": "forestrylifecycletest:n4_genetic_filter_supplies_a_server_ticker", "environment": "minecraft:default", "structure": "forestrylifecycletest:n4_empty", "max_ticks": 1200}

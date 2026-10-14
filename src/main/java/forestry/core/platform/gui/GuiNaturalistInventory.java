@@ -11,9 +11,9 @@ import forestry.core.platform.gui.ledgers.Ledger;
 import forestry.core.platform.network.packets.PacketGuiSelectRequest;
 import forestry.core.platform.util.NBTUtilForestry;
 import forestry.core.platform.util.NetworkUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class GuiNaturalistInventory<C extends AbstractContainerMenu & INaturalistMenu> extends GuiForestry<C> {
-	private static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.withDefaultNamespace("container/creative_inventory/scroller");
+	private static final Identifier SCROLLER_SPRITE = Identifier.withDefaultNamespace("container/creative_inventory/scroller");
 	private static final int INVENTORY_X = 6;
 	private static final int INVENTORY_Y = 6;
 	private static final int INVENTORY_WIDTH = ContainerNaturalistInventory.COLUMNS * 18;
@@ -43,16 +43,14 @@ public class GuiNaturalistInventory<C extends AbstractContainerMenu & INaturalis
 	private final ISpeciesType<?, ?> speciesType;
 	private final IBreedingTracker breedingTracker;
 	private final ItemStack ledgerIcon;
-	private final HashMap<ResourceLocation, ItemStack> iconStacks = new HashMap<>();
+	private final HashMap<Identifier, ItemStack> iconStacks = new HashMap<>();
 	private final CycleTimer timer = new CycleTimer(0);
 	private boolean scrolling;
 
 	public GuiNaturalistInventory(C menu, Inventory playerInv, Component name) {
-		super(Constants.TEXTURE_PATH_GUI + "/naturalistinventory.png", menu, playerInv, name);
+		super(Constants.TEXTURE_PATH_GUI + "/naturalistinventory.png", menu, playerInv, name, 176, 189);
 
 		this.speciesType = menu.getSpeciesType();
-		this.imageWidth = 176;
-		this.imageHeight = 189;
 
 		// todo have one place where icon stacks are stored
 		for (ISpecies species : this.speciesType.getAllSpecies()) {
@@ -64,8 +62,8 @@ public class GuiNaturalistInventory<C extends AbstractContainerMenu & INaturalis
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics graphics, float partialTicks, int j, int i) {
-		super.renderBg(graphics, partialTicks, j, i);
+	public void extractBackground(GuiGraphicsExtractor graphics, int j, int i, float partialTicks) {
+		super.extractBackground(graphics, j, i, partialTicks);
 		this.timer.onDraw();
 		drawScrollBar(graphics);
 	}
@@ -81,12 +79,14 @@ public class GuiNaturalistInventory<C extends AbstractContainerMenu & INaturalis
 	}
 
 	@Override
-	public boolean mouseDragged(double mouseX, double mouseY, int mouseButton, double dragX, double dragY) {
+	public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent event, double dragX, double dragY) {
+		double mouseY = event.y();
+		int mouseButton = event.button();
 		if (this.scrolling && mouseButton == 0) {
 			scrollTo(mouseY);
 			return true;
 		}
-		return super.mouseDragged(mouseX, mouseY, mouseButton, dragX, dragY);
+		return super.mouseDragged(event, dragX, dragY);
 	}
 
 	@Override
@@ -104,20 +104,9 @@ public class GuiNaturalistInventory<C extends AbstractContainerMenu & INaturalis
 		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 	}
 
-	private void drawScrollBar(GuiGraphics graphics) {
-		graphics.blit(
-			this.textureFile,
-			this.leftPos + SCROLL_X + 1,
-			this.topPos + SCROLL_Y,
-			SCROLL_WIDTH,
-			SCROLL_HEIGHT,
-			SCROLL_U,
-			SCROLL_V,
-			SCROLL_WIDTH,
-			SCROLL_HEIGHT,
-			256,
-			256
-		);
+	private void drawScrollBar(GuiGraphicsExtractor graphics) {
+		graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.textureFile,
+			this.leftPos + SCROLL_X + 1, this.topPos + SCROLL_Y, SCROLL_U, SCROLL_V, SCROLL_WIDTH, SCROLL_HEIGHT, 256, 256);
 
 		int range = SCROLL_HEIGHT - SCROLLER_HEIGHT - 2;
 		int offset = 1 + Math.round(
@@ -127,7 +116,7 @@ public class GuiNaturalistInventory<C extends AbstractContainerMenu & INaturalis
 		);
 
 		graphics.blitSprite(
-			SCROLLER_SPRITE,
+			net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE,
 			this.leftPos + SCROLL_X + 2,
 			this.topPos + SCROLL_Y + offset,
 			SCROLLER_WIDTH,
@@ -173,7 +162,7 @@ public class GuiNaturalistInventory<C extends AbstractContainerMenu & INaturalis
 		return IIndividualHandlerItem.getIndividual(slot.getItem());
 	}
 
-	private void drawUnknownIcon(GuiGraphics graphics, IMutation<?> mutation, int x, int y) {
+	private void drawUnknownIcon(GuiGraphicsExtractor graphics, IMutation<?> mutation, int x, int y) {
 		float chance = mutation.getChance();
 
 		int line;
@@ -198,7 +187,7 @@ public class GuiNaturalistInventory<C extends AbstractContainerMenu & INaturalis
 			column = 196;
 		}
 
-		graphics.blit(this.textureFile, x, y, column, line, 16, 16);
+		graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.textureFile, x, y, column, line, 16, 16, 256, 256);
 	}
 
 	private static List<List<? extends IMutation<?>>> splitMutations(List<? extends IMutation<?>> mutations, int maxMutationCount) {
@@ -237,7 +226,7 @@ public class GuiNaturalistInventory<C extends AbstractContainerMenu & INaturalis
 		}
 
 		@Override
-		public void draw(GuiGraphics graphics, int y, int x) {
+		public void draw(GuiGraphicsExtractor graphics, int y, int x) {
 			drawBackground(graphics, y, x);
 			GuiUtil.drawItemStack(graphics, GuiNaturalistInventory.this, GuiNaturalistInventory.this.ledgerIcon, x + 4, y + 4);
 
@@ -255,7 +244,7 @@ public class GuiNaturalistInventory<C extends AbstractContainerMenu & INaturalis
 			}
 		}
 
-		private void drawStatistics(GuiGraphics graphics, int x, int y) {
+		private void drawStatistics(GuiGraphicsExtractor graphics, int x, int y) {
 			int textY = y + 28;
 
 			drawSplitText(
@@ -285,9 +274,9 @@ public class GuiNaturalistInventory<C extends AbstractContainerMenu & INaturalis
 			}
 		}
 
-		private void drawIndividual(GuiGraphics graphics, IIndividual individual, int x, int y) {
+		private void drawIndividual(GuiGraphicsExtractor graphics, IIndividual individual, int x, int y) {
 			IGenome genome = individual.getGenome();
-			IChromosome<ResourceLocation> chromosome = individual.getType().getKaryotype().getSpeciesChromosome();
+			IChromosome<Identifier> chromosome = individual.getType().getKaryotype().getSpeciesChromosome();
 			boolean pureBred = genome.getAllelePair(chromosome).isSameAlleles();
 
 			int nextY = drawSpecies(graphics, true, genome.getActiveSpecies(), x, y + 32, pureBred ? 25 : 10);
@@ -296,7 +285,7 @@ public class GuiNaturalistInventory<C extends AbstractContainerMenu & INaturalis
 			}
 		}
 
-		private int drawSpecies(GuiGraphics graphics, boolean analyzed, ISpecies<?> species, int x, int y, int maxMutationCount) {
+		private int drawSpecies(GuiGraphicsExtractor graphics, boolean analyzed, ISpecies<?> species, int x, int y, int maxMutationCount) {
 			if (!analyzed) {
 				drawHeader(graphics, Component.translatable("for.gui.unknown"), x + 22, y);
 				return y + 22;

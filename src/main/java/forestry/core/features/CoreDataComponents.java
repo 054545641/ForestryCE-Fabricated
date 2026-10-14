@@ -1,6 +1,7 @@
 package forestry.core.features;
 
 import forestry.api.core.genetics.IGenome;
+import forestry.core.content.backpacks.BackpackMode;
 import forestry.api.modules.ForestryModuleIds;
 import forestry.core.platform.registration.FeatureProvider;
 import forestry.core.platform.registration.IFeatureRegistry;
@@ -12,14 +13,6 @@ import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/**
- * Forestry-side {@link DataComponentType} registrations.
- *
- * <p>Registered here because the 1.21 NeoForge {@code FluidHandlerItemStack} /
- * {@code FluidHandlerItemStackSimple} constructors now require a
- * {@code Supplier<DataComponentType<SimpleFluidContent>>} for fluid storage on item stacks
- * (replacing the implicit NBT storage used in 1.20).
- */
 @FeatureProvider
 public class CoreDataComponents {
 	private static final IFeatureRegistry REGISTRY = ModFeatureRegistry.get(ForestryModuleIds.CORE);
@@ -74,6 +67,9 @@ public class CoreDataComponents {
 
 	public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ITEM_INVENTORY_UID =
 		intComponent("item_inventory_uid");
+
+	public static final DeferredHolder<DataComponentType<?>, DataComponentType<BackpackMode>> BACKPACK_MODE =
+		DATA_COMPONENT_TYPES.register("backpack_mode", BackpackMode::componentType);
 
 	private static DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> booleanComponent(String id) {
 		return DATA_COMPONENT_TYPES.register(id, () -> DataComponentType.<Boolean>builder()

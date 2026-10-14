@@ -13,6 +13,10 @@ import net.minecraft.world.level.block.LevelEvent;
 import forestry.core.platform.item.ItemForestry;
 
 public class ItemFertilizer extends ItemForestry {
+	public ItemFertilizer(Properties properties) {
+		super(properties);
+	}
+
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
 		Player player = context.getPlayer();
@@ -29,7 +33,7 @@ public class ItemFertilizer extends ItemForestry {
 		}
 
 		if (BoneMealItem.applyBonemeal(heldItem, worldIn, pos, player)) {
-			if (!worldIn.isClientSide) {
+			if (!worldIn.isClientSide()) {
 				worldIn.levelEvent(LevelEvent.PARTICLES_AND_SOUND_PLANT_GROWTH, pos, 15);
 			}
 

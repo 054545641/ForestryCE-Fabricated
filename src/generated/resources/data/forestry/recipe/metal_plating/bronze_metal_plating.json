@@ -8,9 +8,7 @@
   "recipe": {
     "category": "building",
     "key": {
-      "#": {
-        "item": "forestry:bronze_ingot"
-      }
+      "#": "forestry:bronze_ingot"
     },
     "pattern": [
       "###",

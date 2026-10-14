@@ -7,7 +7,7 @@ import forestry.api.core.genetics.alleles.Allele;
 import forestry.api.core.genetics.alleles.AllelePair;
 import forestry.api.core.genetics.alleles.IChromosome;
 import forestry.api.core.genetics.alleles.IKaryotype;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ import java.util.Objects;
 
 /**
  * Holds the {@link AllelePair}s which comprise the traits of a given individual. Allele values are stored inline;
- * reference chromosomes (species, flower type, effect, ...) store a {@link ResourceLocation} resolved on demand.
+ * reference chromosomes (species, flower type, effect, ...) store a {@link Identifier} resolved on demand.
  */
 public interface IGenome {
 	Codec<IGenome> CODEC = IKaryotype.CODEC.dispatch("karyotype", IGenome::getKaryotype, karyotype -> karyotype.getGenomeCodec().fieldOf("genome"));
@@ -54,7 +54,7 @@ public interface IGenome {
 			Allele<?> allele = entry.getValue();
 			IChromosome.IReferenceResolver<?> resolver = chromosome.resolver();
 			if (resolver != null) {
-				ResourceLocation id = (ResourceLocation) allele.value();
+				Identifier id = (Identifier) allele.value();
 				allele = new Allele<>(id, resolver.isDominant(id));
 			}
 			pairMap.put(chromosome, AllelePair.both(allele));
@@ -88,7 +88,7 @@ public interface IGenome {
 
 	/**
 	 * @return The active value of the given chromosome. For reference chromosomes this is the stored
-	 * {@link ResourceLocation}; use {@link #resolveActive} for the behavior object.
+	 * {@link Identifier}; use {@link #resolveActive} for the behavior object.
 	 */
 	default <V> V getActiveValue(IChromosome<V> chromosome) {
 		return getActiveAllele(chromosome).value();
@@ -107,7 +107,7 @@ public interface IGenome {
 	 * @throws NullPointerException If the chromosome is a data chromosome (has no resolver).
 	 */
 	@SuppressWarnings("unchecked")
-	default <R> R resolveActive(IChromosome<ResourceLocation> chromosome) {
+	default <R> R resolveActive(IChromosome<Identifier> chromosome) {
 		IChromosome.IReferenceResolver<R> resolver = (IChromosome.IReferenceResolver<R>) Objects.requireNonNull(chromosome.resolver(), () -> "Not a reference chromosome: " + chromosome.id());
 		return resolver.get(getActiveValue(chromosome));
 	}
@@ -118,7 +118,7 @@ public interface IGenome {
 	 * @throws NullPointerException If the chromosome is a data chromosome (has no resolver).
 	 */
 	@SuppressWarnings("unchecked")
-	default <R> R resolveInactive(IChromosome<ResourceLocation> chromosome) {
+	default <R> R resolveInactive(IChromosome<Identifier> chromosome) {
 		IChromosome.IReferenceResolver<R> resolver = (IChromosome.IReferenceResolver<R>) Objects.requireNonNull(chromosome.resolver(), () -> "Not a reference chromosome: " + chromosome.id());
 		return resolver.get(getInactiveValue(chromosome));
 	}

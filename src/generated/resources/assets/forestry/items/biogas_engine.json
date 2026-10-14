@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "forestry:item/biogas_engine",
+    "model": {
+      "type": "forestry:machine",
+      "kind": "biogas_engine"
+    }
+  }
+}

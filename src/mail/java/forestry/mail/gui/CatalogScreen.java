@@ -1,6 +1,7 @@
 package forestry.mail.gui;
 
 import forestry.api.mail.ITradeStationInfo;
+import forestry.api.ForestryRegistries;
 import forestry.core.platform.config.SessionVars;
 import forestry.core.platform.gui.GuiForestry;
 import forestry.core.platform.gui.widgets.ItemStackWidget;
@@ -10,16 +11,12 @@ import forestry.core.platform.render.ColourProperties;
 import forestry.core.platform.util.NetworkUtil;
 import forestry.mail.carriers.PostalCarriers;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -36,10 +33,8 @@ public class CatalogScreen extends GuiForestry<CatalogMenu> {
 	private final List<ItemStackWidget> tradeInfoWidgets = new ArrayList<>();
 
 	public CatalogScreen(CatalogMenu container, Inventory inv, Component title) {
-		super(ResourceLocation.parse("textures/gui/book.png"), container, inv, title);
+		super(Identifier.parse("textures/gui/book.png"), container, inv, title, 192, 192);
 
-		this.imageWidth = 192;
-		this.imageHeight = 192;
 	}
 
 	@Override
@@ -59,12 +54,12 @@ public class CatalogScreen extends GuiForestry<CatalogMenu> {
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseY, int mouseX) {
-		super.renderBg(graphics, partialTicks, mouseY, mouseX);
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		updateTradeInfoWidgets();
+		super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 
-		graphics.drawString(this.font, String.format("%s / %s", this.menu.getPageNumber(), this.menu.getPageCount()), this.leftPos + this.imageWidth - 72, this.topPos + 12, ColourProperties.INSTANCE.get("gui.book"), false);
+		graphics.text(this.font, String.format("%s / %s", this.menu.getPageNumber(), this.menu.getPageCount()), this.leftPos + this.imageWidth - 72, this.topPos + 12, (0xff000000 | ColourProperties.INSTANCE.get("gui.book")), false);
 
-		clearTradeInfoWidgets();
 
 		ITradeStationInfo tradeInfo = this.menu.getTradeInfo();
 
@@ -83,30 +78,34 @@ public class CatalogScreen extends GuiForestry<CatalogMenu> {
 		}
 	}
 
-	private void drawNoTrade(GuiGraphics graphics, int x, int y) {
-		graphics.drawWordWrap(this.font, Component.translatable("for.gui.mail.notrades"), x, y + 18, 119, ColourProperties.INSTANCE.get("gui.book"));
+	private void drawNoTrade(GuiGraphicsExtractor graphics, int x, int y) {
+		graphics.textWithWordWrap(this.font, Component.translatable("for.gui.mail.notrades"), x, y + 18, 119, (0xff000000 | ColourProperties.INSTANCE.get("gui.book")));
 	}
 
-	private void drawTradePreview(GuiGraphics graphics, ITradeStationInfo tradeInfo, int x, int y) {
+	private void drawTradePreview(GuiGraphicsExtractor graphics, ITradeStationInfo tradeInfo, int x, int y) {
 		Font font = this.font;
-		graphics.drawString(font, BOLD_UNDERLINE + tradeInfo.address().getName(), x, y, ColourProperties.INSTANCE.get("gui.book"), false);
+		graphics.text(font, BOLD_UNDERLINE + tradeInfo.address().getName(), x, y, (0xff000000 | ColourProperties.INSTANCE.get("gui.book")), false);
 
-		graphics.drawString(font, Component.translatable("for.gui.mail.willtrade", tradeInfo.owner().getName()), x, y + 18, ColourProperties.INSTANCE.get("gui.book"), false);
+		graphics.text(font, Component.translatable("for.gui.mail.willtrade", tradeInfo.owner().name()), x, y + 18, (0xff000000 | ColourProperties.INSTANCE.get("gui.book")), false);
 
-		addTradeInfoWidget(new ItemStackWidget(this.widgetManager, x - this.leftPos, y - this.topPos + 28, tradeInfo.tradegood()));
 
-		graphics.drawString(font, Component.translatable("for.gui.mail.tradefor"), x, y + 46, ColourProperties.INSTANCE.get("gui.book"), false);
+		graphics.text(font, Component.translatable("for.gui.mail.tradefor"), x, y + 46, (0xff000000 | ColourProperties.INSTANCE.get("gui.book")), false);
 
-		for (int i = 0; i < tradeInfo.required().size(); i++) {
-			ItemStack itemStack = tradeInfo.required().get(i);
-			addTradeInfoWidget(new ItemStackWidget(this.widgetManager, x - this.leftPos + i * 18, y - this.topPos + 56, itemStack));
-		}
 
-		//TODO: Fix later
 		if (tradeInfo.state().isOk()) {
-			graphics.drawWordWrap(font, ((MutableComponent) tradeInfo.state().getDescription()).withStyle(ChatFormatting.DARK_GREEN), x, y + 82, 119, ColourProperties.INSTANCE.get("gui.book"));
+			graphics.textWithWordWrap(font, tradeInfo.state().getDescription().copy().withStyle(ChatFormatting.DARK_GREEN), x, y + 82, 119, (0xff000000 | ColourProperties.INSTANCE.get("gui.book")));
 		} else {
-			graphics.drawWordWrap(font, ((MutableComponent) tradeInfo.state().getDescription()).withStyle(ChatFormatting.DARK_RED), x, y + 82, 119, ColourProperties.INSTANCE.get("gui.book"));
+			graphics.textWithWordWrap(font, tradeInfo.state().getDescription().copy().withStyle(ChatFormatting.DARK_RED), x, y + 82, 119, (0xff000000 | ColourProperties.INSTANCE.get("gui.book")));
+		}
+	}
+
+	private void updateTradeInfoWidgets() {
+		clearTradeInfoWidgets();
+		ITradeStationInfo info = this.menu.getTradeInfo();
+		if (info == null) return;
+		addTradeInfoWidget(new ItemStackWidget(this.widgetManager, 38, 58, info.tradegood()));
+		for (int i = 0; i < info.required().size(); i++) {
+			addTradeInfoWidget(new ItemStackWidget(this.widgetManager, 38 + i * 18, 86, info.required().get(i)));
 		}
 	}
 
@@ -123,9 +122,8 @@ public class CatalogScreen extends GuiForestry<CatalogMenu> {
 	}
 
 	protected void actionPerformed(int id) {
-		LocalPlayer player = Minecraft.getInstance().player;
 		switch (id) {
-			case 0 -> player.closeContainer();
+			case 0 -> onClose();
 			case 2 -> // next page
 				NetworkUtil.sendToServer(new PacketGuiSelectRequest(0, 0));
 			case 3 -> // previous page
@@ -136,10 +134,10 @@ public class CatalogScreen extends GuiForestry<CatalogMenu> {
 				ITradeStationInfo info = this.menu.getTradeInfo();
 				if (info != null) {
 					SessionVars.setStringVar("mail.letter.recipient", info.address().getName());
-					SessionVars.setStringVar("mail.letter.carrier", PostalCarriers.TRADER.getKey().location().toString());
+					SessionVars.setStringVar("mail.letter.carrier", ForestryRegistries.POSTAL_CARRIER.getKey(PostalCarriers.TRADER.value()).toString());
 				}
-				player.displayClientMessage(Component.translatable("for.gui.mail.catalogue.save_info"), false);
-				player.closeContainer();
+				this.minecraft.gui.hud.getChat().addClientSystemMessage(Component.translatable("for.gui.mail.catalogue.save_info"));
+				onClose();
 			}
 		}
 	}

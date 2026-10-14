@@ -2,151 +2,54 @@ package forestry.core.content.backpacks.client;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Either;
 import forestry.api.ForestryConstants;
-import net.minecraft.client.renderer.block.model.*;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
-import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
-import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
-import org.joml.Vector3f;
-
-import javax.annotation.Nullable;
+import forestry.core.platform.models.FlatItemGeometry;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.resources.model.cuboid.CuboidModel;
+import net.minecraft.client.resources.model.cuboid.CuboidModelElement;
+import net.minecraft.client.resources.model.cuboid.UnbakedCuboidGeometry;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.resources.model.sprite.TextureSlots;
+import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.client.model.UnbakedModelLoader;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
-@SuppressWarnings("deprecation")
-public class FilledCrateModel implements IUnbakedGeometry<FilledCrateModel> {
-	@Nullable
-	public static BakedModel cachedBaseModel = null;
-	@Nullable
-	public static ItemTransforms cachedTransforms = null;
-	@Nullable
-	public static List<BakedQuad> cachedQuads;
-
-	private final BlockModel contents;
-
-	public FilledCrateModel(BlockModel contents) {
-		this.contents = contents;
-	}
-
-	@SuppressWarnings("DataFlowIssue")
-	@Override
-	public BakedModel bake(IGeometryBakingContext context, ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
-		if (cachedBaseModel == null) {
-			cachedBaseModel = bakery.getModel(Loader.FILLED_CRATE_LOCATION).bake(bakery, spriteGetter, modelState);
-			cachedTransforms = cachedBaseModel.getTransforms();
-			cachedQuads = cachedBaseModel.getQuads(null, null, RandomSource.create());
-		}
-
-		return new Baked(this.contents.bake(bakery, spriteGetter, modelState), cachedQuads, cachedTransforms);
-	}
-
-	public static class Loader implements IGeometryLoader<FilledCrateModel> {
-		private static final ResourceLocation FILLED_CRATE_LOCATION = ForestryConstants.forestry("item/filled_crate");
-
-		@Override
-		public FilledCrateModel read(JsonObject json, JsonDeserializationContext ctx) {
-			List<BlockElement> elements = new ArrayList<>();
-			Map<String, Either<Material, String>> textureMap = new HashMap<>();
-			ArrayList<Material> materials = new ArrayList<>();
-
-			// vanilla models support layer0 to layer4; layer0 is implied to be the crate
-			for (int layer = 1; layer <= 4; ++layer) {
-				if (json.has("textures") && json.get("textures").getAsJsonObject().has("layer" + layer)) {
-					elements.add(make2dElement(layer, 3f, 4f, 11f, 12f, 0.002f));
-					// add material
-					ResourceLocation contentsTexture = ResourceLocation.tryParse(GsonHelper.getAsString(GsonHelper.getAsJsonObject(json, "textures"), "layer" + layer));
-					//noinspection DataFlowIssue
-					Material contentsMaterial = new Material(TextureAtlas.LOCATION_BLOCKS, contentsTexture);
-					textureMap.put("layer" + layer, Either.left(contentsMaterial));
-					materials.add(contentsMaterial);
-				}
-			}
-			BlockModel contents = new BlockModel(FILLED_CRATE_LOCATION, elements, textureMap, false, BlockModel.GuiLight.FRONT, ItemTransforms.NO_TRANSFORMS, List.of());
-			materials.trimToSize();
-
-			return new FilledCrateModel(contents);
-		}
-	}
-
-	public static BlockElement make2dElement(int layer, float startX, float startY, float endX, float endY, float zOffset) {
-		Map<Direction, BlockElementFace> faces = Map.of(
-			Direction.SOUTH, new BlockElementFace(null, layer, "layer" + layer, new BlockFaceUV(new float[]{0.0F, 0.0F, 16.0F, 16.0F}, 0)),
-			Direction.NORTH, new BlockElementFace(null, layer, "layer" + layer, new BlockFaceUV(new float[]{16.0F, 0.0F, 0.0F, 16.0F}, 0))
-		);
-		// front and back 2d faces
-		// add the element, scaled down
-		return new BlockElement(new Vector3f(startX, startY, 7.5f - zOffset), new Vector3f(endX, endY, 8.5f + zOffset), faces, null, false);
-	}
-
-	private static class Baked implements BakedModel {
-		private final ItemTransforms transforms;
-		private final TextureAtlasSprite particle;
-		private final List<BakedQuad> quads;
-
-		private Baked(BakedModel bakedContents, List<BakedQuad> baseQuads, ItemTransforms transforms) {
-			RandomSource random = RandomSource.create();
-			List<BakedQuad> contentsQuads = bakedContents.getQuads(null, null, random);
-			this.quads = new ArrayList<>(baseQuads.size() + contentsQuads.size());
-			this.quads.addAll(baseQuads);
-			this.quads.addAll(contentsQuads);
-
-			this.transforms = transforms;
-			this.particle = bakedContents.getParticleIcon();
-		}
-
-		@Override
-		public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction cullFace, RandomSource rand) {
-			return this.quads;
-		}
-
-		@Override
-		public boolean useAmbientOcclusion() {
-			return false;
-		}
-
-		@Override
-		public boolean isGui3d() {
-			return false;
-		}
-
-		@Override
-		public boolean usesBlockLight() {
-			return false;
-		}
-
-		@Override
-		public boolean isCustomRenderer() {
-			return false;
-		}
-
-		@Override
-		public TextureAtlasSprite getParticleIcon() {
-			return this.particle;
-		}
-
-		@Override
-		public ItemOverrides getOverrides() {
-			return ItemOverrides.EMPTY;
-		}
-
-		@Override
-		public ItemTransforms getTransforms() {
-			return this.transforms;
-		}
-	}
+/** Crate geometry is baked within the current resource reload; no static sprite/model cache survives it. */
+public final class FilledCrateModel {
+    public static final Identifier BASE = ForestryConstants.forestry("item/filled_crate");
+    public record Item(net.minecraft.resources.Identifier model) implements net.minecraft.client.renderer.item.ItemModel.Unbaked {
+        public static final com.mojang.serialization.MapCodec<Item> CODEC = Identifier.CODEC.fieldOf("model").xmap(Item::new, Item::model);
+        @Override public com.mojang.serialization.MapCodec<Item> type() { return CODEC; }
+        @Override public void resolveDependencies(Resolver resolver) { resolver.markDependency(this.model); }
+        @Override public net.minecraft.client.renderer.item.ItemModel bake(net.minecraft.client.renderer.item.ItemModel.BakingContext context, org.joml.Matrix4fc transform) {
+            var baker = context.blockModelBaker();
+            var resolved = baker.getModel(this.model);
+            var slots = resolved.getTopTextureSlots();
+            var quads = resolved.bakeTopGeometry(slots, baker, net.minecraft.client.renderer.block.dispatch.BlockModelRotation.IDENTITY);
+            var properties = net.minecraft.client.renderer.item.ModelRenderProperties.fromResolvedModel(baker, resolved, slots);
+            // A crate can combine an item-atlas frame with block-atlas cargo. Each native layer owns one atlas.
+            var layers = new java.util.LinkedHashMap<Identifier, QuadCollection.Builder>();
+            for (var quad : quads.getAll()) layers.computeIfAbsent(quad.materialInfo().sprite().atlasLocation(), key -> new QuadCollection.Builder()).addUnculledFace(quad);
+            java.util.List<net.minecraft.client.color.item.ItemTintSource> tints = java.util.stream.IntStream.range(0, 5)
+                .mapToObj(i -> (net.minecraft.client.color.item.ItemTintSource) new forestry.core.platform.models.ForestryItemTintSource(i)).toList();
+            return new net.minecraft.client.renderer.item.CompositeModel(layers.values().stream()
+                .map(layer -> (net.minecraft.client.renderer.item.ItemModel) new net.minecraft.client.renderer.item.CuboidItemModelWrapper(tints, layer.build(), properties, transform)).toList());
+        }
+    }
+    public static class Loader implements UnbakedModelLoader<CuboidModel> {
+        @Override public CuboidModel read(JsonObject json, JsonDeserializationContext context) {
+            var textures = json.getAsJsonObject("textures");
+            var elements = new ArrayList<CuboidModelElement>();
+            if (textures != null) for (int layer = 1; layer <= 4; layer++) {
+                if (textures.has("layer" + layer)) elements.add(FlatItemGeometry.element(layer, 3, 4, 11, 12, 0.002f));
+            }
+            var contents = new UnbakedCuboidGeometry(elements);
+            return new CuboidModel((slots, baker, state, name) -> {
+                var base = baker.getModel(BASE);
+                return new QuadCollection.Builder().addAll(base.bakeTopGeometry(base.getTopTextureSlots(), baker, state))
+                    .addAll(contents.bake(slots, baker, state, name)).build();
+            }, UnbakedModel.GuiLight.FRONT, false, null,
+                textures == null ? TextureSlots.Data.EMPTY : TextureSlots.parseTextureMap(textures), BASE);
+        }
+    }
 }

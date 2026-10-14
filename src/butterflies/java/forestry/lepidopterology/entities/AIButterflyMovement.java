@@ -41,7 +41,7 @@ public abstract class AIButterflyMovement extends AIButterflyBase {
             this.flightTarget = getRandomDestinationUpwards();
 		} else if (this.entity.horizontalCollision || this.entity.verticalCollision) {
             this.flightTarget = this.entity.getRandom().nextBoolean() ? getRandomDestination() : null;
-		} else if (this.entity.level().random.nextInt(300) == 0) {
+		} else if (this.entity.level().getRandom().nextInt(300) == 0) {
             this.flightTarget = getRandomDestination();
 		}
         this.entity.setDestination(this.flightTarget);

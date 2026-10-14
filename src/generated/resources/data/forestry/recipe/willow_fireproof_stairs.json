@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_stairs",
   "key": {
-    "#": {
-      "item": "forestry:willow_fireproof_planks"
-    }
+    "#": "forestry:willow_fireproof_planks"
   },
   "pattern": [
     "#  ",

@@ -28,7 +28,7 @@ public class JeiDataMaps {
 		return BuiltInRegistries.ITEM.getDataMap(type)
 			.keySet()
 			.stream()
-			.sorted(Comparator.comparing(ResourceKey::location));
+			.sorted(Comparator.comparing(ResourceKey::identifier));
 	}
 
 	public static <V> List<ItemStack> stacks(DataMapType<Item, V> type) {

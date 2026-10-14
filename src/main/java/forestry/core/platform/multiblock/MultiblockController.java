@@ -1,6 +1,11 @@
 package forestry.core.platform.multiblock;
 
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import forestry.api.core.ITransactionalContainer;
+
 import com.mojang.authlib.GameProfile;
+import net.minecraft.world.entity.ContainerUser;
 import forestry.api.IForestryApi;
 import forestry.api.core.IErrorLogic;
 import forestry.api.core.IErrorLogicSource;
@@ -58,7 +63,7 @@ import java.util.List;
  * supplies storage, accessors and the inventory plumbing. It deliberately does <em>not</em> re-implement
  * the old per-tick majority vote.
  */
-public abstract class MultiblockController implements IMultiblockController, WorldlyContainer, IOwnedTile, IErrorLogicSource, ILocationProvider {
+public abstract class MultiblockController implements ITransactionalContainer, IMultiblockController, WorldlyContainer, IOwnedTile, IErrorLogicSource, ILocationProvider {
 	protected final Level level;
 
 	private final OwnerHandler ownerHandler;
@@ -106,7 +111,7 @@ public abstract class MultiblockController implements IMultiblockController, Wor
 		this.level = level;
 		this.ownerHandler = new OwnerHandler();
 		this.errorLogic = IForestryApi.INSTANCE.getErrorManager().createErrorLogic();
-		this.tickPhase = level.random.nextInt(256);
+		this.tickPhase = level.getRandom().nextInt(256);
 	}
 
 	/**
@@ -282,7 +287,7 @@ public abstract class MultiblockController implements IMultiblockController, Wor
 	 * read, {@link #markOwnerResolved()} latches this without a vote so the adopted owner is authoritative.
 	 */
 	protected final void voteOwnerOnceIfNeeded() {
-		if (this.ownerResolved || this.level.isClientSide) {
+		if (this.ownerResolved || this.level.isClientSide()) {
 			return;
 		}
 
@@ -386,22 +391,16 @@ public abstract class MultiblockController implements IMultiblockController, Wor
 
 	/* ===== Inventory plumbing (ported from MultiblockControllerForestry) ===== */
 
-	/**
-	 * Returns the shared controller inventory. Concrete controllers return their real inventory when assembled
-	 * and {@link FakeInventoryAdapter#INSTANCE} otherwise, so caps and GUIs resolve to a no-op before assembly.
-	 */
+	@Override
+	public ResourceHandler<ItemResource> getTransferHandler() {
+		return getInternalInventory().getTransferHandler();
+	}
+
 	public IInventoryAdapter getInternalInventory() {
 		return FakeInventoryAdapter.INSTANCE;
 	}
 
-	/**
-	 * Marks the holder's chunk unsaved so a mutation of the shared inventory survives an unload. The shared
-	 * inventory has no tile of its own, and every controller inventory bottoms out in a {@code setChanged}
-	 * with an empty body, so delegating there marked nothing dirty.
-	 *
-	 * <p>Called by every member's {@code setChanged} and by the alveary inventory. {@link MultiblockTicker}
-	 * only dirties the holder when {@link #serverTick(int)} reports a change, which an idle alveary never does.
-	 */
+	// the holder owns the persisted payload even when another member changes it
 	@Override
 	public void setChanged() {
 		BlockPos holder = getHolderPos();
@@ -441,13 +440,13 @@ public abstract class MultiblockController implements IMultiblockController, Wor
 	}
 
 	@Override
-	public final void startOpen(Player player) {
-		getInternalInventory().startOpen(player);
+	public final void startOpen(ContainerUser user) {
+		getInternalInventory().startOpen(user);
 	}
 
 	@Override
-	public final void stopOpen(Player player) {
-		getInternalInventory().stopOpen(player);
+	public final void stopOpen(ContainerUser user) {
+		getInternalInventory().stopOpen(user);
 	}
 
 	@Override
@@ -519,13 +518,13 @@ public abstract class MultiblockController implements IMultiblockController, Wor
 	public static void markChunkDirty(Level level, BlockPos pos) {
 		net.minecraft.world.level.chunk.LevelChunk chunk = level.getChunkSource().getChunkNow(pos.getX() >> 4, pos.getZ() >> 4);
 		if (chunk != null) {
-			chunk.setUnsaved(true);
+			chunk.markUnsaved();
 		}
 	}
 
 	// resends the holder's description packet so clients rebuild or drop their controller to match the server
 	public static void syncHolder(Level level, BlockPos holderPos) {
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return;
 		}
 		net.minecraft.world.level.chunk.LevelChunk chunk = level.getChunkSource().getChunkNow(holderPos.getX() >> 4, holderPos.getZ() >> 4);

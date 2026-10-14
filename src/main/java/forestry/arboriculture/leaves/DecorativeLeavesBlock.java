@@ -8,9 +8,9 @@ import forestry.core.platform.block.IColoredBlock;
 import forestry.core.platform.util.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -41,7 +41,7 @@ public class DecorativeLeavesBlock extends Block implements IColoredBlock, IShea
 		this.type = type;
 	}
 
-	public ResourceLocation getSpeciesId() {
+	public Identifier getSpeciesId() {
 		return this.type.getSpeciesId();
 	}
 
@@ -63,7 +63,7 @@ public class DecorativeLeavesBlock extends Block implements IColoredBlock, IShea
 	}
 
 	@Override
-	public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn) {
+	public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn, net.minecraft.world.entity.InsideBlockEffectApplier effects, boolean isPrecise) {
 		Vec3 motion = entityIn.getDeltaMovement();
 		entityIn.setDeltaMovement(motion.multiply(0.4D, 1.0D, 0.4D));
 	}

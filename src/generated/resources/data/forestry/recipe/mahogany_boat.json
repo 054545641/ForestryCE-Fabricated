@@ -1,14 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "P": [
-      {
-        "item": "forestry:mahogany_planks"
-      },
-      {
-        "item": "forestry:mahogany_fireproof_planks"
-      }
+      "forestry:mahogany_planks",
+      "forestry:mahogany_fireproof_planks"
     ]
   },
   "pattern": [
@@ -16,7 +11,6 @@
     "PPP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:mahogany_boat"
   }
 }

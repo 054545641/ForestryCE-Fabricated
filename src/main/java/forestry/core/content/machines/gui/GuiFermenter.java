@@ -4,7 +4,8 @@ import forestry.core.platform.config.Constants;
 import forestry.core.platform.gui.GuiForestryTitled;
 import forestry.core.platform.gui.widgets.TankWidget;
 import forestry.core.content.machines.tiles.TileFermenter;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -19,19 +20,19 @@ public class GuiFermenter extends GuiForestryTitled<ContainerFermenter> {
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics graphics, float partialTicks, int mX, int mY) {
-		super.renderBg(graphics, partialTicks, mX, mY);
+	public void extractBackground(GuiGraphicsExtractor graphics, int mX, int mY, float partialTicks) {
+		super.extractBackground(graphics, mX, mY, partialTicks);
 
 		// Fuel remaining
 		int fuelRemain = this.tile.getBurnTimeRemainingScaled(16);
 		if (fuelRemain > 0) {
-			graphics.blit(this.textureFile, this.leftPos + 98, this.topPos + 46 + 17 - fuelRemain, 176, 78 + 17 - fuelRemain, 4, fuelRemain);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, this.textureFile, this.leftPos + 98, this.topPos + 46 + 17 - fuelRemain, 176, 78 + 17 - fuelRemain, 4, fuelRemain, 256, 256);
 		}
 
 		// Raw bio mush remaining
 		int bioRemain = this.tile.getFermentationProgressScaled(16);
 		if (bioRemain > 0) {
-			graphics.blit(this.textureFile, this.leftPos + 74, this.topPos + 32 + 17 - bioRemain, 176, 60 + 17 - bioRemain, 4, bioRemain);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, this.textureFile, this.leftPos + 74, this.topPos + 32 + 17 - bioRemain, 176, 60 + 17 - bioRemain, 4, bioRemain, 256, 256);
 		}
 	}
 

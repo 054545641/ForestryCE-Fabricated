@@ -7,7 +7,7 @@ import forestry.api.plugin.IButterflySpeciesBuilder;
 import forestry.lepidopterology.butterflies.ButterflySpecies;
 import forestry.apiimpl.plugin.SpeciesBuilder;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 
@@ -23,7 +23,7 @@ public class ButterflySpeciesBuilder extends SpeciesBuilder<IButterflySpeciesTyp
 	@Nullable
 	private TagKey<Biome> spawnBiomes = null;
 
-	public ButterflySpeciesBuilder(ResourceLocation id, String genus, String species) {
+	public ButterflySpeciesBuilder(Identifier id, String genus, String species) {
 		super(id, genus, species);
 	}
 

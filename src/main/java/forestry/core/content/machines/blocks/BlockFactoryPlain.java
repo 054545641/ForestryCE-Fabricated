@@ -21,8 +21,8 @@ public class BlockFactoryPlain extends BlockBase<BlockTypeFactoryPlain> {
 	// this.blockType, so the type is smuggled in through this thread-local instead
 	private static final ThreadLocal<BlockTypeFactoryPlain> CACHE_TYPE = new ThreadLocal<>();
 
-	private BlockFactoryPlain(BlockTypeFactoryPlain type) {
-		super(Properties.of(), type);
+	private BlockFactoryPlain(Properties properties, BlockTypeFactoryPlain type) {
+		super(properties, type);
 	}
 
 	public static void setMachineType(BlockTypeFactoryPlain type) {
@@ -73,15 +73,12 @@ public class BlockFactoryPlain extends BlockBase<BlockTypeFactoryPlain> {
 		}
 	}
 
-	/**
-	 * The registry needs to use this instead of calling BlockFactoryPlain::new, because otherwise
-	 * createBlockStateDefinition can't see the type and blockstates don't generate.
-	 *
-	 * @param type The type of factory block to make
-	 * @return A new instance of this factory block
-	 */
-	public static BlockFactoryPlain create(BlockTypeFactoryPlain type) {
+	public static BlockFactoryPlain create(Properties properties, BlockTypeFactoryPlain type) {
 		setMachineType(type);
-		return new BlockFactoryPlain(type);
+		try {
+			return new BlockFactoryPlain(properties, type);
+		} finally {
+			CACHE_TYPE.remove();
+		}
 	}
 }

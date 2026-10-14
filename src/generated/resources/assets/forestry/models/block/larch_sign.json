@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/larch_planks"
-  }
+  "parent": "forestry:block/larch_sign_rot_0"
 }

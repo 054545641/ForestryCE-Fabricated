@@ -4,7 +4,7 @@ import forestry.api.core.circuits.CircuitHolder;
 import forestry.api.core.circuits.ICircuit;
 import forestry.api.plugin.ICircuitRegistration;
 import forestry.core.engine.circuits.CircuitLayout;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class CircuitRegistration implements ICircuitRegistration {
 	}
 
 	@Override
-	public void registerLayout(String layoutId, ResourceLocation socketType) {
+	public void registerLayout(String layoutId, Identifier socketType) {
 		this.layouts.add(new CircuitLayout(layoutId, socketType));
 	}
 

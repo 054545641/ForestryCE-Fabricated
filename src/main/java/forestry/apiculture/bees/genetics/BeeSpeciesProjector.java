@@ -2,7 +2,7 @@ package forestry.apiculture.bees.genetics;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.Forestry;
 import forestry.api.apiculture.genetics.IBeeSpeciesType;
@@ -17,7 +17,7 @@ public final class BeeSpeciesProjector {
 	}
 
 	@Nullable
-	public static BeeSpecies project(IBeeSpeciesType type, ResourceLocation id, BeeSpeciesDefinition def) {
+	public static BeeSpecies project(IBeeSpeciesType type, Identifier id, BeeSpeciesDefinition def) {
 		try {
 			if (type.getJubilanceSafe(def.jubilance()) == null) {
 				Forestry.LOGGER.warn("Skipping bee species {}: unknown jubilance {}", id, def.jubilance());

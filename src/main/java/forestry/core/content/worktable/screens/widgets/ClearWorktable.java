@@ -4,7 +4,7 @@ import forestry.core.platform.gui.widgets.Widget;
 import forestry.core.platform.gui.widgets.WidgetManager;
 import forestry.core.platform.util.SoundUtil;
 import forestry.core.content.worktable.screens.WorktableMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class ClearWorktable extends Widget {
 	public ClearWorktable(WidgetManager manager, int xPos, int yPos) {
@@ -14,7 +14,7 @@ public class ClearWorktable extends Widget {
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int startX, int startY) {
+	public void draw(GuiGraphicsExtractor graphics, int startX, int startY) {
 	}
 
 	@Override

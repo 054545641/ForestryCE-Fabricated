@@ -1,7 +1,7 @@
 package forestry.api.client.arboriculture;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.FoliageColor;
 
 import javax.annotation.Nullable;
@@ -17,7 +17,7 @@ public interface ILeafTint {
 	/**
 	 * A default fallback tint.
 	 */
-	ILeafTint DEFAULT = (level, pos) -> FoliageColor.getDefaultColor();
+	ILeafTint DEFAULT = (level, pos) -> FoliageColor.FOLIAGE_DEFAULT;
 
 	int get(@Nullable BlockAndTintGetter level, @Nullable BlockPos pos);
 }

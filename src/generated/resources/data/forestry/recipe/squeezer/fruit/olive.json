@@ -9,13 +9,10 @@
     }
   },
   "remnant": {
-    "count": 1,
     "id": "forestry:mulch"
   },
   "resources": [
-    {
-      "tag": "c:fruits/olive"
-    }
+    "#c:fruits/olive"
   ],
   "time": 70
 }

@@ -9,9 +9,7 @@
     }
   },
   "resources": [
-    {
-      "item": "minecraft:cactus"
-    }
+    "minecraft:cactus"
   ],
   "time": 10
 }

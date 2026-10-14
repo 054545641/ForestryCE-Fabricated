@@ -10,7 +10,7 @@ import forestry.api.core.genetics.filter.IFilterRule;
 import forestry.api.core.genetics.filter.IFilterRuleType;
 import forestry.core.content.sorting.DefaultFilterRuleType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import forestry.api.apiculture.ForestryActivityTypes;
 
@@ -77,7 +77,7 @@ public enum ApicultureFilterRule implements IFilterRule {
 	}
 
 	@Override
-	public ResourceLocation getSpeciesTypeId() {
+	public Identifier getSpeciesTypeId() {
 		return ForestrySpeciesTypes.BEE;
 	}
 }

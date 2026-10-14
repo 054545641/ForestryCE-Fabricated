@@ -80,8 +80,7 @@ public class TreeUtil {
 		ITree tree = leaves.getTree();
 
 		if (canMate(tree, pollen)) {
-			tree.setMate(pollen.getGenome());
-			leaves.sendNetworkUpdate();
+			leaves.setMate(pollen);
 			return true;
 		}
 		return false;

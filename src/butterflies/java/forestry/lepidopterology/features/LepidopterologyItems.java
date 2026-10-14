@@ -14,8 +14,8 @@ public class LepidopterologyItems {
 
 	// registry names come from the life stage so the two cannot drift; ButterflyLifeStage
 	// resolves its item form back out of the registry by the same id
-	public static final FeatureItem<ItemButterflyGE> BUTTERFLY_GE = REGISTRY.item(() -> new ItemButterflyGE(ButterflyLifeStage.BUTTERFLY), ButterflyLifeStage.BUTTERFLY.itemId().getPath());
-	public static final FeatureItem<ItemButterflyGE> SERUM_GE = REGISTRY.item(() -> new ItemButterflyGE(ButterflyLifeStage.SERUM), ButterflyLifeStage.SERUM.itemId().getPath());
-	public static final FeatureItem<ItemButterflyGE> CATERPILLAR_GE = REGISTRY.item(() -> new ItemButterflyGE(ButterflyLifeStage.CATERPILLAR), ButterflyLifeStage.CATERPILLAR.itemId().getPath());
-	public static final FeatureItem<ItemButterflyGE> COCOON_GE = REGISTRY.item(() -> new ItemButterflyGE(ButterflyLifeStage.COCOON), ButterflyLifeStage.COCOON.itemId().getPath());
+	public static final FeatureItem<ItemButterflyGE> BUTTERFLY_GE = REGISTRY.item(properties -> new ItemButterflyGE(ButterflyLifeStage.BUTTERFLY, properties), ButterflyLifeStage.BUTTERFLY.itemId().getPath());
+	public static final FeatureItem<ItemButterflyGE> SERUM_GE = REGISTRY.item(properties -> new ItemButterflyGE(ButterflyLifeStage.SERUM, properties), ButterflyLifeStage.SERUM.itemId().getPath());
+	public static final FeatureItem<ItemButterflyGE> CATERPILLAR_GE = REGISTRY.item(properties -> new ItemButterflyGE(ButterflyLifeStage.CATERPILLAR, properties), ButterflyLifeStage.CATERPILLAR.itemId().getPath());
+	public static final FeatureItem<ItemButterflyGE> COCOON_GE = REGISTRY.item(properties -> new ItemButterflyGE(ButterflyLifeStage.COCOON, properties), ButterflyLifeStage.COCOON.itemId().getPath());
 }

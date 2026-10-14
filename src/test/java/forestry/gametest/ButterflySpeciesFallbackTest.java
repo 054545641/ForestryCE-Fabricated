@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -44,7 +44,7 @@ public class ButterflySpeciesFallbackTest {
 
 		IChromosome.IReferenceResolver<IButterflySpecies> resolver =
 			(IChromosome.IReferenceResolver<IButterflySpecies>) ButterflyChromosomes.SPECIES.resolver();
-		ResourceLocation unknownId = ForestryConstants.forestry("does_not_exist");
+		Identifier unknownId = ForestryConstants.forestry("does_not_exist");
 		IButterflySpecies resolved = resolver.get(unknownId);
 
 		if (resolved != type.getDefaultSpecies()) {
@@ -66,7 +66,7 @@ public class ButterflySpeciesFallbackTest {
 	@SuppressWarnings("unchecked")
 	public static void cocoonAndEffectResolversFallSoft(GameTestHelper helper) {
 		IButterflySpeciesType type = SpeciesUtil.BUTTERFLY_TYPE.get();
-		ResourceLocation unknownId = ForestryConstants.forestry("does_not_exist");
+		Identifier unknownId = ForestryConstants.forestry("does_not_exist");
 
 		IChromosome.IReferenceResolver<IButterflyCocoon> cocoonResolver =
 			(IChromosome.IReferenceResolver<IButterflyCocoon>) ButterflyChromosomes.COCOON.resolver();
@@ -109,14 +109,14 @@ public class ButterflySpeciesFallbackTest {
 		IButterflySpeciesType type = SpeciesUtil.BUTTERFLY_TYPE.get();
 
 		// Snapshot the live, full species map before mutating it, so it can be restored afterwards.
-		ImmutableMap<ResourceLocation, IButterflySpecies> snapshot = ImmutableMap.copyOf(
+		ImmutableMap<Identifier, IButterflySpecies> snapshot = ImmutableMap.copyOf(
 			type.getAllSpeciesIds().stream().collect(Collectors.toMap(id -> id, type::getSpecies))
 		);
 
 		// GLASSWING is a plain built-in (not MONARCH, the karyotype's default species), so removing it lets us
 		// distinguish "the removed species is gone" from "the default species is gone".
-		ResourceLocation removedId = ForestryButterflySpecies.GLASSWING;
-		Map<ResourceLocation, ButterflySpeciesDefinition> defs = new LinkedHashMap<>(ButterflySpeciesProvider.buildDefinitions());
+		Identifier removedId = ForestryButterflySpecies.GLASSWING;
+		Map<Identifier, ButterflySpeciesDefinition> defs = new LinkedHashMap<>(ButterflySpeciesProvider.buildDefinitions());
 		if (defs.remove(removedId) == null) {
 			helper.fail("Expected " + removedId + " to be a built-in butterfly species definition");
 			return;

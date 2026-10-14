@@ -3,8 +3,8 @@ package forestry.core.platform.fluids;
 import forestry.api.core.machines.*;
 import forestry.core.platform.util.RecipeUtils;
 import forestry.core.content.machines.features.FactoryRecipeTypes;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.crafting.RecipeMap;
 
 import java.util.Set;
 import java.util.function.Function;
@@ -17,7 +17,7 @@ public class FluidRecipeFilter extends ReloadableFluidFilter {
 	public static final FluidRecipeFilter STILL_INPUT = new FluidRecipeFilter(manager -> RecipeUtils.getTargetFluidsFromStacks(manager, FactoryRecipeTypes.STILL.type(), IStillRecipe::getInput));
 	public static final FluidRecipeFilter STILL_OUTPUT = new FluidRecipeFilter(manager -> RecipeUtils.getTargetFluidsFromStacks(manager, FactoryRecipeTypes.STILL.type(), IStillRecipe::getOutput));
 
-	public FluidRecipeFilter(Function<RecipeManager, Set<ResourceLocation>> filters) {
-		super(() -> filters.apply(RecipeUtils.getRecipeManager()));
+	public FluidRecipeFilter(Function<RecipeMap, Set<Identifier>> filters) {
+		super(() -> filters.apply(RecipeUtils.getRecipeMap()));
 	}
 }

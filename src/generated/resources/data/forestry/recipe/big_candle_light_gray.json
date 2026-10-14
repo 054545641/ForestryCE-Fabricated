@@ -1,16 +1,10 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "tag": "forestry:big_candles"
-    },
-    {
-      "tag": "c:dyes/light_gray"
-    }
+    "#forestry:big_candles",
+    "#c:dyes/light_gray"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:big_candle_light_gray"
   }
 }

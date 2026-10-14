@@ -1,5 +1,7 @@
 package forestry.agriculture.multifarm.multiblock;
 
+import net.minecraft.world.level.storage.ValueOutput;
+
 import forestry.api.core.HumidityType;
 import forestry.api.core.INbtReadable;
 import forestry.api.core.INbtWritable;
@@ -89,6 +91,11 @@ public class FarmHydrationManager implements IFarmLedgerDelegate, INbtWritable, 
 		return Math.round((double) this.ticksSinceRainfall / 24000 * 10) / 10.;
 	}
 
+	public void write(ValueOutput output) {
+		output.putInt("HydrationDelay", this.hydrationDelay);
+		output.putInt("TicksSinceRainfall", this.ticksSinceRainfall);
+	}
+
 	@Override
 	public CompoundTag write(CompoundTag compoundNBT, HolderLookup.Provider registries) {
 		compoundNBT.putInt("HydrationDelay", this.hydrationDelay);
@@ -110,7 +117,7 @@ public class FarmHydrationManager implements IFarmLedgerDelegate, INbtWritable, 
 
 	@Override
 	public void read(CompoundTag nbt, HolderLookup.Provider registries) {
-        this.hydrationDelay = nbt.getInt("HydrationDelay");
-        this.ticksSinceRainfall = nbt.getInt("TicksSinceRainfall");
+        this.hydrationDelay = nbt.getIntOr("HydrationDelay", 0);
+        this.ticksSinceRainfall = nbt.getIntOr("TicksSinceRainfall", 0);
 	}
 }

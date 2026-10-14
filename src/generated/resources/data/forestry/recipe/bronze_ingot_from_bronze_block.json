@@ -1,10 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "item": "forestry:bronze_block"
-    }
+    "forestry:bronze_block"
   ],
   "result": {
     "count": 9,

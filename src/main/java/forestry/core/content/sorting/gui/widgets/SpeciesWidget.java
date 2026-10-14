@@ -1,7 +1,6 @@
 package forestry.core.content.sorting.gui.widgets;
 
 import com.google.common.collect.ImmutableSet;
-import com.mojang.blaze3d.systems.RenderSystem;
 import forestry.api.IForestryApi;
 import forestry.api.core.tooltips.ToolTip;
 import forestry.api.core.genetics.IBreedingTracker;
@@ -18,10 +17,10 @@ import forestry.core.platform.util.GeneticsUtil;
 import forestry.core.platform.util.SoundUtil;
 import forestry.core.content.sorting.gui.GuiGeneticFilter;
 import forestry.core.content.sorting.gui.ISelectableProvider;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
@@ -47,7 +46,7 @@ public class SpeciesWidget extends Widget implements ISelectableProvider<ISpecie
 		for (ISpeciesType<?, ?> type : IForestryApi.INSTANCE.getGeneticManager().getSpeciesTypes()) {
 			IBreedingTracker tracker = type.getBreedingTracker(manager.minecraft.level, manager.minecraft.player.getGameProfile());
 
-			for (ResourceLocation id : tracker.getDiscoveredSpecies()) {
+			for (Identifier id : tracker.getDiscoveredSpecies()) {
 				ISpecies<?> species = type.getSpeciesSafe(id);
 
 				if (species != null) {
@@ -59,7 +58,7 @@ public class SpeciesWidget extends Widget implements ISelectableProvider<ISpecie
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int startX, int startY) {
+	public void draw(GuiGraphicsExtractor graphics, int startX, int startY) {
 		int x = this.xPos + startX;
 		int y = this.yPos + startY;
 		IFilterLogic logic = this.gui.getLogic();
@@ -69,8 +68,8 @@ public class SpeciesWidget extends Widget implements ISelectableProvider<ISpecie
 		}
 
 		if (this.gui.selection.isSame(this)) {
-			RenderSystem.setShaderTexture(0, SelectionWidget.TEXTURE);
-			graphics.blit(SelectionWidget.TEXTURE, x - 1, y - 1, 212, 0, 18, 18);
+
+			graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, SelectionWidget.TEXTURE, x - 1, y - 1, 212, 0, 18, 18, 256, 256);
 		}
 	}
 
@@ -92,7 +91,7 @@ public class SpeciesWidget extends Widget implements ISelectableProvider<ISpecie
 	}
 
 	@Override
-	public void draw(GuiForestry<?> gui, ISpecies<?> selectable, GuiGraphics graphics, int y, int x) {
+	public void draw(GuiForestry<?> gui, ISpecies<?> selectable, GuiGraphicsExtractor graphics, int y, int x) {
 		GuiUtil.drawItemStack(graphics, gui, ITEMS.getOrDefault(selectable, ItemStack.EMPTY), x, y);
 	}
 

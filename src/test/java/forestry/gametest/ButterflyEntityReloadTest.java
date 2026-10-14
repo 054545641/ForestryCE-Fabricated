@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -43,7 +43,7 @@ public class ButterflyEntityReloadTest {
 		IButterflySpeciesType type = SpeciesUtil.BUTTERFLY_TYPE.get();
 
 		// Snapshot the live, full species map before mutating it, so it can be restored afterwards.
-		ImmutableMap<ResourceLocation, IButterflySpecies> snapshot = ImmutableMap.copyOf(
+		ImmutableMap<Identifier, IButterflySpecies> snapshot = ImmutableMap.copyOf(
 			type.getAllSpeciesIds().stream().collect(Collectors.toMap(id -> id, type::getSpecies))
 		);
 
@@ -57,7 +57,7 @@ public class ButterflyEntityReloadTest {
 			IButterflySpecies beforeSpecies = entity.getButterfly().getSpecies();
 
 			ButterflySpeciesDefinition def = TestSpeciesDefinitions.butterflyFrom(defaultSpecies).build();
-			Map<ResourceLocation, ButterflySpeciesDefinition> defs = Map.of(defaultSpecies.id(), def);
+			Map<Identifier, ButterflySpeciesDefinition> defs = Map.of(defaultSpecies.id(), def);
 
 			// reload: rebuild the species map (fresh species instances) then refresh loaded entities.
 			LepidopterologyReloadHandler.rebuildButterflySpecies(defs);

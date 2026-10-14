@@ -32,9 +32,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
-import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import forestry.core.platform.inventory.InventoryTransferView;
 
 import javax.annotation.Nullable;
 
@@ -86,12 +86,8 @@ public abstract class AbstractAlvearyBlockEntity extends MultiblockTileEntityFor
 	}
 
 	@Nullable
-	public IItemHandler getItemHandler(@Nullable Direction facing) {
-		if (facing != null) {
-			// todo why is sided inventory used here? the side is ignored, see InventoryAdapter
-			return new SidedInvWrapper(getInternalInventory(), facing);
-		}
-		return new InvWrapper(getInternalInventory());
+	public ResourceHandler<ItemResource> getItemHandler(@Nullable Direction facing) {
+		return InventoryTransferView.automation(getInternalInventory(), facing);
 	}
 
 	/* IHousing */

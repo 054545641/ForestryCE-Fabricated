@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/powdery_comb",
-  "input": {
-    "item": "forestry:powdery_comb"
-  },
+  "input": "forestry:powdery_comb",
   "products": [
     {
       "chance": 0.2,

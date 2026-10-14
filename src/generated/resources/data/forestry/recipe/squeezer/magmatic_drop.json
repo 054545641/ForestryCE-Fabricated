@@ -9,9 +9,7 @@
     }
   },
   "resources": [
-    {
-      "item": "forestry:magmatic_drop"
-    }
+    "forestry:magmatic_drop"
   ],
   "time": 10
 }

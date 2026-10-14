@@ -13,7 +13,7 @@ import forestry.mail.carriers.PostalCarriers;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
@@ -23,7 +23,7 @@ import java.util.UUID;
 
 public class MailAddress implements IMailAddress {
 	public static final Codec<MailAddress> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-		ResourceLocation.CODEC.fieldOf("carrier").forGetter(address -> ForestryRegistries.POSTAL_CARRIER.getKey(address.getCarrier())),
+		Identifier.CODEC.fieldOf("carrier").forGetter(address -> ForestryRegistries.POSTAL_CARRIER.getKey(address.getCarrier())),
 		Codec.STRING.optionalFieldOf("name", "").forGetter(MailAddress::getName),
 		UUIDUtil.CODEC.optionalFieldOf("id").forGetter(MailAddress::getPlayerId)
 	).apply(instance, MailAddress::fromCodec));
@@ -59,13 +59,14 @@ public class MailAddress implements IMailAddress {
 		IPostalCarrier carrier = null;
 		GameProfile gameProfile = INVALID_GAME_PROFILE;
 		if (nbt.contains("carrier")) {
-			carrier = ForestryRegistries.POSTAL_CARRIER.get(ResourceLocation.tryParse(nbt.getString("carrier")));
+			Identifier carrierId = Identifier.tryParse(nbt.getStringOr("carrier", ""));
+			carrier = carrierId == null ? null : ForestryRegistries.POSTAL_CARRIER.getValue(carrierId);
 		}
 
 		if (carrier == null) {
 			carrier = PostalCarriers.PLAYER.value();
 		} else if (nbt.contains("profile")) {
-			CompoundTag profileTag = nbt.getCompound("profile");
+			CompoundTag profileTag = nbt.getCompoundOrEmpty("profile");
 			gameProfile = NBTUtilForestry.readGameProfile(profileTag);
 			if (gameProfile == null) {
 				gameProfile = INVALID_GAME_PROFILE;
@@ -81,8 +82,8 @@ public class MailAddress implements IMailAddress {
 		this.gameProfile = gameProfile;
 	}
 
-	private static MailAddress fromCodec(ResourceLocation carrierId, String name, Optional<UUID> id) {
-		IPostalCarrier carrier = ForestryRegistries.POSTAL_CARRIER.get(carrierId);
+	private static MailAddress fromCodec(Identifier carrierId, String name, Optional<UUID> id) {
+		IPostalCarrier carrier = ForestryRegistries.POSTAL_CARRIER.getValue(carrierId);
 		if (carrier == null) {
 			carrier = PostalCarriers.PLAYER.value();
 		}
@@ -109,7 +110,7 @@ public class MailAddress implements IMailAddress {
 
 	// Empty for traders, which are identified by name alone
 	private Optional<UUID> getPlayerId() {
-		UUID id = this.gameProfile.getId();
+		UUID id = this.gameProfile.id();
 		return id == null || id.equals(NO_ID) ? Optional.empty() : Optional.of(id);
 	}
 
@@ -120,12 +121,12 @@ public class MailAddress implements IMailAddress {
 
 	@Override
 	public String getName() {
-		return this.gameProfile.getName();
+		return this.gameProfile.name();
 	}
 
 	@Override
 	public boolean isValid() {
-		return this.gameProfile.getName() != null && !PlayerUtil.isSameGameProfile(this.gameProfile, INVALID_GAME_PROFILE);
+		return this.gameProfile.name() != null && !PlayerUtil.isSameGameProfile(this.gameProfile, INVALID_GAME_PROFILE);
 	}
 
 	@Override
@@ -138,7 +139,7 @@ public class MailAddress implements IMailAddress {
 
 	@Override
 	public int hashCode() {
-		return this.gameProfile.getName().hashCode();
+		return this.gameProfile.name().hashCode();
 	}
 
 	@Override
@@ -154,7 +155,7 @@ public class MailAddress implements IMailAddress {
 	public String toString() {
 		String name = getName().toLowerCase(Locale.ENGLISH);
 		if (getCarrier().equals(PostalCarriers.PLAYER.value())) {
-			return getCarrier() + "-" + name + '-' + this.gameProfile.getId();
+			return getCarrier() + "-" + name + '-' + this.gameProfile.id();
 		} else {
 			return getCarrier() + "-" + name;
 		}

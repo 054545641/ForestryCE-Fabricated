@@ -40,7 +40,7 @@ public class DiagnosticsCommand {
 			Forestry.LOGGER.info("Species type {} has {} registered species", type.id(), allSpecies.size());
 
 			for (ISpecies<?> species : allSpecies) {
-				if (FMLEnvironment.dist == Dist.CLIENT) {
+				if (FMLEnvironment.getDist() == Dist.CLIENT) {
 					// Name translation
 					if (!Translator.canTranslateToLocal(species.getTranslationKey())) {
 						Forestry.LOGGER.error(species.id() + " is missing a translated name");
@@ -52,7 +52,7 @@ public class DiagnosticsCommand {
 				}
 			}
 
-			if (FMLEnvironment.dist == Dist.CLIENT) {
+			if (FMLEnvironment.getDist() == Dist.CLIENT) {
 				IKaryotype karyotype = type.getKaryotype();
 
 				for (IChromosome<?> chromosome : karyotype.getChromosomes()) {

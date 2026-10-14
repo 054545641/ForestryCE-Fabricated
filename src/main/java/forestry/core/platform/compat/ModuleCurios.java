@@ -5,7 +5,7 @@ import forestry.api.modules.ForestryModule;
 import forestry.api.modules.ForestryModuleIds;
 import forestry.api.modules.IForestryModule;
 import forestry.core.platform.compat.curios.client.CuriosClientHandler;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.fml.ModList;
 
 import java.util.function.Consumer;
@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 @ForestryModule
 public class ModuleCurios implements IForestryModule {
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return ForestryModuleIds.CURIOS;
 	}
 

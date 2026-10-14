@@ -2,7 +2,7 @@ package forestry.lepidopterology.butterflies.genetics;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.Forestry;
 import forestry.api.core.genetics.IGenome;
@@ -30,7 +30,7 @@ public final class ButterflySpeciesProjector {
 	 * (logged).
 	 */
 	@Nullable
-	public static ButterflySpecies project(IButterflySpeciesType type, ResourceLocation id, ButterflySpeciesDefinition def) {
+	public static ButterflySpecies project(IButterflySpeciesType type, Identifier id, ButterflySpeciesDefinition def) {
 		try {
 			IKaryotype karyotype = type.getKaryotype();
 			IGenome genome = SpeciesProjection.buildGenome(karyotype, id, def);

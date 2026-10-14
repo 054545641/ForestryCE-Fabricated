@@ -2,13 +2,10 @@ package forestry.core.platform.models.baker;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 /**
  * A face of a {@link ModelBakerModel }
  */
-@OnlyIn(Dist.CLIENT)
 public class ModelBakerFace {
 	public final Direction face;
 

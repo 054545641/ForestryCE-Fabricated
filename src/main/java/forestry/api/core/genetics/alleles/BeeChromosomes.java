@@ -9,7 +9,7 @@ import forestry.api.apiculture.genetics.IBeeSpeciesType;
 import forestry.api.core.ToleranceType;
 import forestry.api.core.genetics.ForestrySpeciesTypes;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -25,7 +25,7 @@ public class BeeChromosomes {
 	/**
 	 * The species of a bee. The genome stores the species' ID.
 	 */
-	public static final IChromosome<ResourceLocation> SPECIES = ChromosomeFactory.referenceChromosome(ForestrySpeciesTypes.BEE, BeeChromosomes::resolveSpeciesOrDefault, IBeeSpecies::isDominant);
+	public static final IChromosome<Identifier> SPECIES = ChromosomeFactory.referenceChromosome(ForestrySpeciesTypes.BEE, BeeChromosomes::resolveSpeciesOrDefault, IBeeSpecies::isDominant);
 
 	/**
 	 * Determines a queen's production speed. Shows up as "worker" in the portable analyzer.
@@ -50,7 +50,7 @@ public class BeeChromosomes {
 	/**
 	 * The activity type determines when this bee is awake. Builtin types are found in {@link forestry.api.apiculture.ForestryActivityTypes}.
 	 */
-	public static final IChromosome<ResourceLocation> ACTIVITY = ChromosomeFactory.referenceChromosome(forestry("activity"), id -> BEE_TYPE.get().getActivityType(id), IActivityType::isDominant);
+	public static final IChromosome<Identifier> ACTIVITY = ChromosomeFactory.referenceChromosome(forestry("activity"), id -> BEE_TYPE.get().getActivityType(id), IActivityType::isDominant);
 	/**
 	 * Whether this bee can work when the sky above its housing is obstructed.
 	 */
@@ -66,11 +66,11 @@ public class BeeChromosomes {
 	 * ButterflyChromosomes.FLOWER_TYPE is this same chromosome, so a butterfly must be able to
 	 * resolve it with no apiculture jar installed.
 	 */
-	public static final IChromosome<ResourceLocation> FLOWER_TYPE = ChromosomeFactory.referenceChromosome(forestry("flower_type"), id -> IForestryApi.INSTANCE.getFlowerTypeManager().getFlowerType(id), IFlowerType::isDominant);
+	public static final IChromosome<Identifier> FLOWER_TYPE = ChromosomeFactory.referenceChromosome(forestry("flower_type"), id -> IForestryApi.INSTANCE.getFlowerTypeManager().getFlowerType(id), IFlowerType::isDominant);
 	/**
 	 * Determines the effect of a bee species. Its range is determined by {@link #TERRITORY}.
 	 */
-	public static final IChromosome<ResourceLocation> EFFECT = ChromosomeFactory.referenceChromosome(forestry("bee_effect"), id -> BEE_TYPE.get().getBeeEffect(id), IBeeEffect::isDominant);
+	public static final IChromosome<Identifier> EFFECT = ChromosomeFactory.referenceChromosome(forestry("bee_effect"), id -> BEE_TYPE.get().getBeeEffect(id), IBeeEffect::isDominant);
 	/**
 	 * Determines how fast the hive can pollinate trees and plant flowers. Range is determined by {@link #TERRITORY}.
 	 */
@@ -81,7 +81,7 @@ public class BeeChromosomes {
 	public static final IChromosome<Vec3i> TERRITORY = ChromosomeFactory.valueChromosome(forestry("territory"), Vec3i.CODEC, v -> v.getX() + "_" + v.getY() + "_" + v.getZ());
 
 	@ApiStatus.Internal
-	private static IBeeSpecies resolveSpeciesOrDefault(ResourceLocation id) {
+	private static IBeeSpecies resolveSpeciesOrDefault(Identifier id) {
 		IBeeSpeciesType type = BEE_TYPE.get();
 		IBeeSpecies species = type.getSpeciesSafe(id);
 		if (species != null) {

@@ -16,13 +16,13 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import mezz.jei.api.recipe.types.IRecipeType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public class StillRecipeCategory extends ForestryRecipeCategory<IStillRecipe> {
-	private static final ResourceLocation guiTexture = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/still.png");
+	private static final Identifier guiTexture = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/still.png");
 
 	private final IDrawable tankOverlay;
 	private final IDrawable icon;
@@ -39,7 +39,7 @@ public class StillRecipeCategory extends ForestryRecipeCategory<IStillRecipe> {
 	}
 
 	@Override
-	public RecipeType<IStillRecipe> getRecipeType() {
+	public IRecipeType<IStillRecipe> getRecipeType() {
 		return ForestryRecipeType.STILL;
 	}
 
@@ -62,7 +62,7 @@ public class StillRecipeCategory extends ForestryRecipeCategory<IStillRecipe> {
 	}
 
 	@Override
-	public void draw(IStillRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+	public void draw(IStillRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
 		super.draw(recipe, recipeSlotsView, graphics, mouseX, mouseY);
 		this.progressBar.draw(graphics, 50, 3);
 	}

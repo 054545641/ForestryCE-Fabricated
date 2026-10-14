@@ -1,6 +1,7 @@
 {
   "pack": {
-    "description": "Forestry Resources",
-    "pack_format": 4
+    "description": "Forestry Resources (26.2 port in progress)",
+    "min_format": 88,
+    "max_format": [107, 1]
   }
 }

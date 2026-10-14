@@ -21,9 +21,9 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import mezz.jei.api.recipe.types.IRecipeType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -31,7 +31,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import java.util.List;
 
 public class CarpenterRecipeCategory extends ForestryRecipeCategory<ICarpenterRecipe> {
-	private final static ResourceLocation guiTexture = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/carpenter.png");
+	private final static Identifier guiTexture = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/carpenter.png");
 	private final ICraftingGridHelper craftingGridHelper;
 	private final IDrawableAnimated arrow;
 	private final IDrawable tankOverlay;
@@ -49,7 +49,7 @@ public class CarpenterRecipeCategory extends ForestryRecipeCategory<ICarpenterRe
 	}
 
 	@Override
-	public RecipeType<ICarpenterRecipe> getRecipeType() {
+	public IRecipeType<ICarpenterRecipe> getRecipeType() {
 		return ForestryRecipeType.CARPENTER;
 	}
 
@@ -62,20 +62,19 @@ public class CarpenterRecipeCategory extends ForestryRecipeCategory<ICarpenterRe
 	public void setRecipe(IRecipeLayoutBuilder builder, ICarpenterRecipe recipe, IFocusGroup focuses) {
 		CraftingRecipe craftingGridRecipe = recipe.getCraftingGridRecipe();
 
-		ItemStack processingIngredient = craftingGridRecipe.getResultItem(RecipeUtils.getRegistryAccess()).copy();
+		ItemStack processingIngredient = recipe.getResultItem(RecipeUtils.getRegistryAccess()).copy();
 		processingIngredient.setCount(1);
 		builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 71, 35)
 			.addItemStack(processingIngredient);
 
 		builder.addSlot(RecipeIngredientRole.OUTPUT, 120 - 9, 56 - 16)
-			.addItemStack(craftingGridRecipe.getResultItem(RecipeUtils.getRegistryAccess()));
+			.addItemStack(recipe.getResultItem(RecipeUtils.getRegistryAccess()));
 
 		List<IRecipeSlotBuilder> craftingSlots = JeiUtil.layoutSlotGrid(builder, RecipeIngredientRole.INPUT, 3, 3, 1, 4, 18);
 		JeiUtil.setCraftingItems(craftingSlots, craftingGridRecipe, this.craftingGridHelper);
 
 		// crate comes last to match the internal inventory layout of the carpenter
-		builder.addSlot(RecipeIngredientRole.INPUT, 74, 4)
-			.addIngredients(recipe.getBox());
+		recipe.getBox().ifPresent(box -> builder.addSlot(RecipeIngredientRole.INPUT, 74, 4).add(VanillaTypes.ITEM_STACK, box));
 
 		IRecipeSlotBuilder tankSlot = builder.addSlot(RecipeIngredientRole.INPUT, 141, 1)
 			.setFluidRenderer(10000, false, 16, 58)
@@ -88,7 +87,7 @@ public class CarpenterRecipeCategory extends ForestryRecipeCategory<ICarpenterRe
 	}
 
 	@Override
-	public void draw(ICarpenterRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+	public void draw(ICarpenterRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
 		super.draw(recipe, recipeSlotsView, graphics, mouseX, mouseY);
 		this.arrow.draw(graphics, 89, 34);
 	}

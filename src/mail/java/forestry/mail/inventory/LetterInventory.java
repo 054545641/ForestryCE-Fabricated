@@ -25,6 +25,7 @@ public class LetterInventory extends ItemInventory implements IErrorSource {
 		super(player, 0, itemstack);
 		Letter letter = LetterUtils.getLetterData(itemstack);
         this.letter = letter == null ? new Letter(new MailAddress(player.getGameProfile()), null) : letter;
+		((Letter) this.letter).setInventoryChangedListener(() -> LetterUtils.setLetterData(getParent(), this.letter));
 	}
 
 	private HolderLookup.Provider getRegistries() {
@@ -64,6 +65,9 @@ public class LetterInventory extends ItemInventory implements IErrorSource {
 	}
 
 	@Override
+	public net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> getTransferHandler() { return this.letter.getTransferHandler(); }
+
+	@Override
 	public ItemStack removeItem(int index, int count) {
 		ItemStack result = this.letter.removeItem(index, count);
 		LetterUtils.setLetterData(getParent(), this.letter);
@@ -98,7 +102,9 @@ public class LetterInventory extends ItemInventory implements IErrorSource {
 
 	@Override
 	public ItemStack removeItemNoUpdate(int slot) {
-		return this.letter.removeItemNoUpdate(slot);
+		ItemStack removed = this.letter.removeItemNoUpdate(slot);
+		LetterUtils.setLetterData(getParent(), this.letter);
+		return removed;
 	}
 
 	@Override

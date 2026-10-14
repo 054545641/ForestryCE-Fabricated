@@ -1,18 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "P": [
-      {
-        "item": "forestry:dogwood_planks"
-      },
-      {
-        "item": "forestry:dogwood_fireproof_planks"
-      }
+      "forestry:dogwood_planks",
+      "forestry:dogwood_fireproof_planks"
     ],
-    "S": {
-      "tag": "c:rods/wooden"
-    }
+    "S": "#c:rods/wooden"
   },
   "pattern": [
     "PPP",
@@ -20,7 +13,6 @@
     " S "
   ],
   "result": {
-    "count": 1,
     "id": "forestry:dogwood_sign"
   }
 }

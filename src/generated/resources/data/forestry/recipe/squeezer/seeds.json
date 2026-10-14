@@ -9,9 +9,7 @@
     }
   },
   "resources": [
-    {
-      "tag": "c:seeds"
-    }
+    "#c:seeds"
   ],
   "time": 10
 }

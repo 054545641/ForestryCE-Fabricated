@@ -27,7 +27,7 @@ import static thedarkcolour.modkit.data.MKRecipeProvider.path;
  * core casings and tubes, so the recipes ship from here rather than from core.
  */
 public class AgricultureRecipeProvider {
-	public static void addRecipes(RecipeOutput output, MKRecipeProvider recipes) {
+	public static void addRecipes(RecipeOutput output, MKRecipeProvider recipes, net.minecraft.core.HolderLookup.Provider registries) {
 		registerCultivationRecipes(recipes);
 		registerFarmingRecipes(recipes);
 	}

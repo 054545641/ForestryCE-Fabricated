@@ -30,7 +30,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -54,15 +54,15 @@ public class BeeAnalyzerPlugin implements IAnalyzerPlugin<IBeeSpecies, IBee> {
 	}
 
 	private static <V> Component addFlowerTypeTooltip(IAnalyzerGraphics<?, ?> graphics, IChromosome<V> chromosome, V value, InteractableTextOptions options, Component text) {
-		if (value instanceof ResourceLocation id && IForestryApi.INSTANCE.getFlowerTypeManager().getFlowerTypeSafe(id) instanceof TagFlowerType type) {
+		if (value instanceof Identifier id && IForestryApi.INSTANCE.getFlowerTypeManager().getFlowerTypeSafe(id) instanceof TagFlowerType type) {
 			options.setOnHover((x, y) -> {
 				ArrayList<Component> lines = Lists.newArrayList(Component.literal("Accepts the following:"), Component.literal("#" + type.acceptableFlowers().location()));
 				ArrayList<TextOptions> lineOptions = Lists.newArrayList(null, new TextOptions().setColor(ForestryColors.LIGHT_GRAY));
 				TextOptions gray = new TextOptions().setColor(ForestryColors.GRAY);
 
-				if (Screen.hasShiftDown()) {
+				if (net.minecraft.client.Minecraft.getInstance().hasShiftDown()) {
 					ClientLevel level = Minecraft.getInstance().level;
-					level.registryAccess().registryOrThrow(Registries.BLOCK).getTag(type.acceptableFlowers()).ifPresent(list -> {
+					level.registryAccess().lookupOrThrow(Registries.BLOCK).get(type.acceptableFlowers()).ifPresent(list -> {
 						int length = list.size();
 						int entries = Math.min(5, length);
 						boolean cycle = length > 5;

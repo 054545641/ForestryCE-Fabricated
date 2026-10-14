@@ -5,7 +5,7 @@ import forestry.api.core.genetics.ForestrySpeciesTypes;
 import forestry.api.core.genetics.filter.FilterData;
 import forestry.api.core.genetics.filter.IFilterRuleType;
 import forestry.api.lepidopterology.genetics.ButterflyLifeStage;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Locale;
@@ -43,20 +43,20 @@ public enum LepidopterologyFilterRuleType implements IFilterRuleType {
 	};
 
 	private final String id;
-	private final ResourceLocation sprite;
+	private final Identifier sprite;
 
-	LepidopterologyFilterRuleType(ResourceLocation sprite) {
+	LepidopterologyFilterRuleType(Identifier sprite) {
 		this.sprite = sprite;
 		this.id = "forestry.lepidopterology." + name().toLowerCase(Locale.ENGLISH);
 	}
 
 	@Override
-	public ResourceLocation getSprite() {
+	public Identifier getSprite() {
 		return this.sprite;
 	}
 
 	@Override
-	public ResourceLocation getSpeciesTypeId() {
+	public Identifier getSpeciesTypeId() {
 		return ForestrySpeciesTypes.BUTTERFLY;
 	}
 

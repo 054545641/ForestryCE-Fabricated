@@ -18,9 +18,15 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.RootCommitJournal;
 
 import javax.annotation.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 /**
  * Base class for machines that consume energy to do work.
@@ -44,11 +50,81 @@ public abstract class TilePowered extends TileBase implements IRenderableTile, I
 	private int energyPerWorkCycle;
 	// the number of steps that this tile has had no power
 	private int noPowerTime = 0;
+	private String workRecipe = "";
+	private boolean worldWorkScheduled;
+	private long processingSeed = net.minecraft.world.level.levelgen.RandomSupport.generateUniqueSeed();
+	private record WorkState(int counter, int steps, int energy, String recipe, long seed, boolean scheduled, Object processing) {}
+	private final SnapshotJournal<WorkState> workJournal = new SnapshotJournal<>() {
+		@Override protected WorkState createSnapshot() {
+			return new WorkState(workCounter, stepsPerWorkCycle, energyPerWorkCycle, workRecipe, processingSeed, worldWorkScheduled, captureProcessingState());
+		}
+		@Override protected void revertToSnapshot(WorkState state) {
+			workCounter = state.counter();
+			stepsPerWorkCycle = state.steps();
+			energyPerWorkCycle = state.energy();
+			workRecipe = state.recipe();
+			processingSeed = state.seed();
+			worldWorkScheduled = state.scheduled();
+			restoreProcessingState(state.processing());
+		}
+		@Override protected void onRootCommit(WorkState previous) { setChanged(); }
+	};
+
+	protected Object captureProcessingState() { return null; }
+	protected void restoreProcessingState(Object state) {}
+
+	protected final Transaction beginWorkTransaction() {
+		var transaction = Transaction.open(Transaction.getCurrentOpenedTransaction());
+		this.workJournal.updateSnapshots(transaction);
+		return transaction;
+	}
+
+	protected final void afterWorkCommit(Runnable action) {
+		var transaction = Transaction.getCurrentOpenedTransaction();
+		if (transaction == null) action.run();
+		else new RootCommitJournal(action).updateSnapshots(transaction);
+	}
+
+	protected final net.minecraft.util.RandomSource workRandom() {
+		var random = net.minecraft.util.RandomSource.create(this.processingSeed);
+		this.processingSeed = random.nextLong();
+		return random;
+	}
+
+	protected final net.minecraft.util.RandomSource previewWorkRandom() {
+		var random = net.minecraft.util.RandomSource.create(this.processingSeed);
+		random.nextLong();
+		return random;
+	}
+
+	/** Stable recipe identity preserves paid progress on reload, but resets it when the recipe changes. */
+	protected final void configureWork(String recipe, int steps, int energy) {
+		if (!this.workRecipe.equals(recipe) || this.stepsPerWorkCycle != Math.max(1, steps)
+			|| this.energyPerWorkCycle != EnergyHelper.scaleForDifficulty(energy)) this.workCounter = 0;
+		this.workRecipe = recipe;
+		this.stepsPerWorkCycle = Math.max(1, steps);
+		setEnergyPerWorkCycle(energy);
+	}
+
+	protected enum CycleResult { BLOCKED, PROGRESS, COMPLETE }
+	protected CycleResult completeWorkCycle() { return workCycle() ? CycleResult.COMPLETE : CycleResult.BLOCKED; }
+
+	/** World edits are irreversible side effects: spend the saved work credit only after root commit. */
+	protected final CycleResult deferWorldWork(java.util.function.BooleanSupplier work) {
+		this.worldWorkScheduled = true;
+		afterWorkCommit(() -> {
+			this.worldWorkScheduled = false;
+			if (isRemoved()) return;
+			if (work.getAsBoolean()) this.workCounter = 0;
+			setChanged();
+		});
+		return CycleResult.PROGRESS;
+	}
 
 	protected TilePowered(BlockEntityType<?> type, BlockPos pos, BlockState state, int maxTransfer, int capacity) {
 		super(type, pos, state);
 
-		this.energyStorage = new ForestryEnergyStorage(maxTransfer, capacity, EnergyTransferMode.RECEIVE);
+		this.energyStorage = EnergyHelper.createStorage(maxTransfer, capacity, EnergyTransferMode.RECEIVE, this::setChanged);
 
 		this.stepsPerWorkCycle = 4;
 	}
@@ -67,7 +143,7 @@ public abstract class TilePowered extends TileBase implements IRenderableTile, I
 	}
 
 	public int getStepsPerWorkCycle() {
-		if (this.level.isClientSide) {
+		if (this.level.isClientSide()) {
 			return this.stepsPerWorkCycle;
 		}
 		return Math.round(this.stepsPerWorkCycle / this.speedMultiplier);
@@ -109,32 +185,31 @@ public abstract class TilePowered extends TileBase implements IRenderableTile, I
 		if (disabled) {
 			return;
 		}
+		processWorkStep();
+	}
 
-		if (!hasWork()) {
-			return;
-		}
-
-		int stepsPerWorkCycle = getStepsPerWorkCycle();
-
-		if (this.workCounter < stepsPerWorkCycle) {
-			int energyPerWorkCycle = getEnergyPerWorkCycle();
-			boolean consumedEnergy = EnergyHelper.consumeEnergyToDoWork(this.energyStorage, stepsPerWorkCycle, energyPerWorkCycle);
-			if (consumedEnergy) {
-				errorLogic.setCondition(false, ForestryError.NO_POWER);
-				this.workCounter++;
-				this.noPowerTime = 0;
-			} else {
-				this.noPowerTime++;
-				if (this.noPowerTime > 4) {
-					errorLogic.setCondition(true, ForestryError.NO_POWER);
+	/** One paid step, including final conversion, is atomic with a caller's transaction. */
+	public final boolean processWorkStep() {
+		if (this.worldWorkScheduled) return false;
+		try (var transaction = beginWorkTransaction()) {
+			if (!hasWork()) return false;
+			int steps = Math.max(1, getStepsPerWorkCycle());
+			if (this.workCounter < steps) {
+				if (!EnergyHelper.consumeEnergyToDoWork(this.energyStorage, steps, getEnergyPerWorkCycle())) {
+					if (++this.noPowerTime > 4) getErrorLogic().setCondition(true, ForestryError.NO_POWER);
+					return false;
 				}
+				this.workCounter++;
 			}
-		}
-
-		if (this.workCounter >= stepsPerWorkCycle) {
-			if (workCycle()) {
-				this.workCounter = 0;
+			if (this.workCounter >= steps) {
+				CycleResult result = completeWorkCycle();
+				if (result == CycleResult.BLOCKED) return false;
+				if (result == CycleResult.COMPLETE) this.workCounter = 0;
 			}
+			getErrorLogic().setCondition(false, ForestryError.NO_POWER);
+			this.noPowerTime = 0;
+			transaction.commit();
+			return true;
 		}
 	}
 
@@ -152,15 +227,34 @@ public abstract class TilePowered extends TileBase implements IRenderableTile, I
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-		super.saveAdditional(nbt, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag nbt = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
 		this.energyStorage.write(nbt, registries);
+		output.putInt("WorkCounter", this.workCounter);
+		output.putInt("WorkSteps", this.stepsPerWorkCycle);
+		output.putInt("WorkEnergy", this.energyPerWorkCycle);
+		output.putString("WorkRecipe", this.workRecipe);
+		output.putLong("ProcessingSeed", this.processingSeed);
+
+		ValueIOUtil.mergeInto(output, nbt);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-		super.loadAdditional(nbt, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag nbt = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
+		this.speedMultiplier = 1.0f;
+		this.powerMultiplier = 1.0f;
+		this.outputMultiplier = 1.0;
 		this.energyStorage.read(nbt, registries);
+		this.workCounter = Math.max(0, input.getIntOr("WorkCounter", 0));
+		this.stepsPerWorkCycle = Math.max(1, input.getIntOr("WorkSteps", this.stepsPerWorkCycle));
+		this.energyPerWorkCycle = Math.max(0, input.getIntOr("WorkEnergy", this.energyPerWorkCycle));
+		this.workRecipe = input.getStringOr("WorkRecipe", "");
+		this.processingSeed = input.getLongOr("ProcessingSeed", this.processingSeed);
 	}
 
 	@Override
@@ -175,6 +269,13 @@ public abstract class TilePowered extends TileBase implements IRenderableTile, I
 		this.energyStorage.readData(data);
 		this.workCounter = data.readVarInt();
 		this.stepsPerWorkCycle = data.readVarInt();
+	}
+
+	/* IMachineUpgradable */
+	protected final void loadMachineUpgrade(forestry.api.core.circuits.ICircuitBoard board) {
+		int savedWork = this.workCounter;
+		board.onLoad(this);
+		this.workCounter = savedWork;
 	}
 
 	/* IMachineUpgradable */
@@ -210,7 +311,7 @@ public abstract class TilePowered extends TileBase implements IRenderableTile, I
 	}
 
 	@Nullable
-	public IEnergyStorage getEnergyHandler(@Nullable Direction facing) {
+	public EnergyHandler getEnergyHandler(@Nullable Direction facing) {
 		return this.remove ? null : this.energyStorage;
 	}
 }

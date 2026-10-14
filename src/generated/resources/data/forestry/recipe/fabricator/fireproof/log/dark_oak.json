@@ -8,12 +8,8 @@
   "recipe": {
     "category": "building",
     "key": {
-      "#": {
-        "item": "forestry:refractory_wax"
-      },
-      "X": {
-        "item": "minecraft:dark_oak_log"
-      }
+      "#": "forestry:refractory_wax",
+      "X": "minecraft:dark_oak_log"
     },
     "pattern": [
       "   ",

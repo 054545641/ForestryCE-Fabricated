@@ -10,15 +10,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.ItemAccessFluidHandler;
 
 import java.util.List;
 import forestry.core.platform.item.ItemForestry;
 
 public class ItemPipette extends ItemForestry implements IToolPipette, ITintedItem {
-	public ItemPipette() {
-		super(new Properties().stacksTo(1));
+	public ItemPipette(Properties properties) {
+		super(properties.stacksTo(1));
 	}
 
 	@Override
@@ -28,17 +28,19 @@ public class ItemPipette extends ItemForestry implements IToolPipette, ITintedIt
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemstack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
-		super.appendHoverText(itemstack, context, list, flag);
+	public void appendHoverText(ItemStack itemstack, Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flag) {
+		super.appendHoverText(itemstack, context, display, builder, flag);
 
 		PipetteContents contained = PipetteContents.create(itemstack);
 		if (contained != null) {
-			contained.addTooltip(list);
+			List<Component> lines = new java.util.ArrayList<>();
+			contained.addTooltip(lines);
+			lines.forEach(builder);
 		}
 	}
 
-	public IFluidHandlerItem createFluidHandler(ItemStack stack) {
-		return new FluidHandlerItemStack(CoreDataComponents.FLUID_CONTENT, stack, FluidType.BUCKET_VOLUME);
+	public ItemAccessFluidHandler createFluidHandler(ItemAccess access) {
+		return new ItemAccessFluidHandler(access, CoreDataComponents.FLUID_CONTENT.get(), FluidType.BUCKET_VOLUME);
 	}
 
 	@Override

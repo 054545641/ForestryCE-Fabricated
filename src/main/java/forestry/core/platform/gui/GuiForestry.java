@@ -2,8 +2,6 @@ package forestry.core.platform.gui;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.LinkedListMultimap;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import forestry.Forestry;
 import forestry.api.ForestryConstants;
 import forestry.api.core.climate.IClimateProvider;
@@ -19,16 +17,20 @@ import forestry.core.platform.render.ColourProperties;
 import forestry.core.content.energy.ForestryEnergyStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
+import org.joml.Matrix3x2fStack;
 
 import javax.annotation.Nullable;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -38,7 +40,7 @@ public abstract class GuiForestry<C extends AbstractContainerMenu> extends Abstr
 	// Used to display "Did you know?" ledgers in GUI
 	public static final LinkedListMultimap<String, String> HINTS = readDefaultHints();
 
-	public final ResourceLocation textureFile;
+	public final Identifier textureFile;
 	protected final WidgetManager widgetManager;
 	protected final LedgerManager ledgerManager;
 	protected TextLayoutHelper textLayout;
@@ -47,8 +49,16 @@ public abstract class GuiForestry<C extends AbstractContainerMenu> extends Abstr
 		this(ForestryConstants.forestry(texture), menu, inv, title);
 	}
 
-	protected GuiForestry(ResourceLocation texture, C menu, Inventory inv, Component title) {
-		super(menu, inv, title);
+	protected GuiForestry(Identifier texture, C menu, Inventory inv, Component title) {
+		this(texture, menu, inv, title, 176, 166);
+	}
+
+	protected GuiForestry(String texture, C menu, Inventory inv, Component title, int width, int height) {
+		this(ForestryConstants.forestry(texture), menu, inv, title, width, height);
+	}
+
+	protected GuiForestry(Identifier texture, C menu, Inventory inv, Component title, int width, int height) {
+		super(menu, inv, title, width, height);
 
 		this.widgetManager = new WidgetManager(this);
 		this.ledgerManager = new LedgerManager(this);
@@ -72,8 +82,8 @@ public abstract class GuiForestry<C extends AbstractContainerMenu> extends Abstr
 	}
 
 	@Override
-	public void resize(Minecraft mc, int width, int height) {
-		super.resize(mc, width, height);
+	public void resize(int width, int height) {
+		super.resize(width, height);
 	}
 
 	@Override
@@ -82,9 +92,9 @@ public abstract class GuiForestry<C extends AbstractContainerMenu> extends Abstr
 	}
 
 	@Override
-	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-		super.render(graphics, mouseX, mouseY, partialTicks);
-		renderTooltip(graphics, mouseX, mouseY);
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
+		extractTooltip(graphics, mouseX, mouseY);
 	}
 
 	protected abstract void addLedgers();
@@ -138,20 +148,38 @@ public abstract class GuiForestry<C extends AbstractContainerMenu> extends Abstr
 		return this.font;
 	}
 
+	@Nullable private MouseButtonEvent mouseEvent;
+	private boolean doubleClick;
+
 	@Override
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		this.mouseEvent = event;
+		this.doubleClick = doubleClick;
+		try { return mouseClicked(event.x(), event.y(), event.button()); }
+		finally { this.mouseEvent = null; this.doubleClick = false; }
+	}
+
+	@Override
+	public boolean mouseReleased(MouseButtonEvent event) {
+		this.mouseEvent = event;
+		try { return mouseReleased(event.x(), event.y(), event.button()); }
+		finally { this.mouseEvent = null; }
+	}
+
+	/** Compatibility hook for Forestry screens while their widget input is migrated. */
 	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 		// / Handle ledger clicks
 		this.ledgerManager.handleMouseClicked(mouseX, mouseY, mouseButton);
 		this.widgetManager.handleMouseClicked(mouseX, mouseY, mouseButton);
-		return super.mouseClicked(mouseX, mouseY, mouseButton);
+		return super.mouseClicked(this.mouseEvent != null ? this.mouseEvent : new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(mouseButton, 0)), this.doubleClick);
 	}
 
-	@Override
+	/** Compatibility hook preserving existing screen-specific release handling. */
 	public boolean mouseReleased(double mouseX, double mouseY, int mouseButton) {
 		if (this.widgetManager.handleMouseRelease(mouseX, mouseY, mouseButton)) {
 			return true;
 		}
-		return super.mouseReleased(mouseX, mouseY, mouseButton);
+		return super.mouseReleased(this.mouseEvent != null ? this.mouseEvent : new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(mouseButton, 0)));
 	}
 
 	@Nullable
@@ -182,7 +210,7 @@ public abstract class GuiForestry<C extends AbstractContainerMenu> extends Abstr
 	}
 
 	@Override
-	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+	protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         this.ledgerManager.drawTooltips(graphics, mouseX, mouseY);
 
 		if (this.menu.getCarried().isEmpty()) {
@@ -192,33 +220,27 @@ public abstract class GuiForestry<C extends AbstractContainerMenu> extends Abstr
 		}
 	}
 
-	protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
+	@Override
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 		drawBackground(graphics);
 
         this.widgetManager.updateWidgets(mouseX - this.leftPos, mouseY - this.topPos);
 
-		graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
-		PoseStack transform = graphics.pose();
-		transform.pushPose();
-		transform.translate(this.leftPos, this.topPos, 0.0F);
+		Matrix3x2fStack pose = graphics.pose();
+		pose.pushMatrix();
+		pose.translate(this.leftPos, this.topPos);
 		drawWidgets(graphics);
-		transform.popPose();
-
-		bindTexture(this.textureFile);
+		pose.popMatrix();
 	}
 
-	protected void drawBackground(GuiGraphics transform) {
-		transform.blit(this.textureFile, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+	protected void drawBackground(GuiGraphicsExtractor graphics) {
+		graphics.blit(RenderPipelines.GUI_TEXTURED, this.textureFile, this.leftPos, this.topPos, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
 	}
 
-	protected void drawWidgets(GuiGraphics graphics) {
+	protected void drawWidgets(GuiGraphicsExtractor graphics) {
         this.ledgerManager.drawLedgers(graphics);
         this.widgetManager.drawWidgets(graphics);
-	}
-
-	protected void bindTexture(ResourceLocation texturePath) {
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderSystem.setShaderTexture(0, texturePath);
 	}
 
 	@Override

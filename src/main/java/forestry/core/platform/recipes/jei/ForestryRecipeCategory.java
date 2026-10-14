@@ -5,21 +5,21 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 public abstract class ForestryRecipeCategory<T> implements IRecipeCategory<T> {
 	protected final IDrawable background;
-	private final String localizedName;
+	private final Component title;
 
 	public ForestryRecipeCategory(IDrawable background, String unlocalizedName) {
 		this.background = background;
-		this.localizedName = Component.translatable(unlocalizedName).getString();
+		this.title = Component.translatable(unlocalizedName);
 	}
 
 	@Override
 	public Component getTitle() {
-		return Component.translatable(localizedName);
+		return this.title;
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public abstract class ForestryRecipeCategory<T> implements IRecipeCategory<T> {
 	}
 
 	@Override
-	public void draw(T recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+	public void draw(T recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
 		this.background.draw(guiGraphics);
 	}
 

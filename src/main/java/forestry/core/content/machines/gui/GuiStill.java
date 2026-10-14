@@ -4,7 +4,8 @@ import forestry.core.platform.config.Constants;
 import forestry.core.platform.gui.GuiForestryTitled;
 import forestry.core.platform.gui.widgets.TankWidget;
 import forestry.core.content.machines.tiles.TileStill;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -19,14 +20,14 @@ public class GuiStill extends GuiForestryTitled<ContainerStill> {
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseY, int mouseX) {
-		super.renderBg(graphics, partialTicks, mouseY, mouseX);
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 
-		graphics.blit(this.textureFile, this.leftPos + 81, this.topPos + 57, 176, 60, 14, 14);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, this.textureFile, this.leftPos + 81, this.topPos + 57, 176, 60, 14, 14, 256, 256);
 
 		if (this.tile.getWorkCounter() > 0) {
 			int massRemaining = this.tile.getProgressScaled(16);
-			graphics.blit(this.textureFile, this.leftPos + 84, this.topPos + 17 + massRemaining, 176, 74 + massRemaining, 4, 17 - massRemaining);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, this.textureFile, this.leftPos + 84, this.topPos + 17 + massRemaining, 176, 74 + massRemaining, 4, 17 - massRemaining, 256, 256);
 		}
 	}
 

@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "forestry:item/solar_engine",
+    "model": {
+      "type": "forestry:machine",
+      "kind": "solar_engine"
+    }
+  }
+}

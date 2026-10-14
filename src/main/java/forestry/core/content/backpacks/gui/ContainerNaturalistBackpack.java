@@ -10,7 +10,7 @@ import forestry.core.platform.gui.ContainerNaturalistInventory;
 import forestry.core.platform.gui.IGuiSelectable;
 import forestry.core.platform.gui.INaturalistMenu;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -22,7 +22,7 @@ public class ContainerNaturalistBackpack extends ContainerItemInventory<Backpack
 	private final SimpleContainerData scrollData = new SimpleContainerData(1);
 	private final ISpeciesType<?, ?> speciesRoot;
 
-	public ContainerNaturalistBackpack(int windowId, Inventory inv, BackpackInventory inventory, ResourceLocation rootUid) {
+	public ContainerNaturalistBackpack(int windowId, Inventory inv, BackpackInventory inventory, Identifier rootUid) {
 		super(windowId, inventory, inv, 7, 107, BackpackMenuTypes.NATURALIST_BACKPACK.menuType());
 
 		addDataSlots(this.scrollData);
@@ -31,7 +31,7 @@ public class ContainerNaturalistBackpack extends ContainerItemInventory<Backpack
 		this.speciesRoot = IForestryApi.INSTANCE.getGeneticManager().getSpeciesType(rootUid);
 	}
 
-	public static ContainerNaturalistBackpack makeContainer(int windowId, Player player, ItemStack heldItem, ResourceLocation typeId) {
+	public static ContainerNaturalistBackpack makeContainer(int windowId, Player player, ItemStack heldItem, Identifier typeId) {
 		BackpackInventory inventory = new BackpackInventory(player, BackpackItem.SLOTS_BACKPACK_APIARIST, heldItem);
 		return new ContainerNaturalistBackpack(windowId, player.getInventory(), inventory, typeId);
 	}
@@ -57,8 +57,8 @@ public class ContainerNaturalistBackpack extends ContainerItemInventory<Backpack
 	}
 
 	public static ContainerNaturalistBackpack fromNetwork(int windowId, Inventory playerInventory, FriendlyByteBuf buffer) {
-		ResourceLocation typeId = buffer.readResourceLocation();
-		ItemStack parent = playerInventory.getSelected();
+		Identifier typeId = buffer.readIdentifier();
+		ItemStack parent = playerInventory.getSelectedItem();
 
 		return makeContainer(windowId, playerInventory.player, parent, typeId);
 	}

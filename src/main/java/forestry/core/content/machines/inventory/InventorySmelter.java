@@ -1,5 +1,7 @@
 package forestry.core.content.machines.inventory;
 
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import forestry.core.content.machines.tiles.TileSmelter;
 import forestry.core.platform.inventory.InventoryAdapterTile;
 import forestry.core.platform.inventory.wrappers.InventoryMapper;
@@ -86,12 +88,15 @@ public class InventorySmelter extends InventoryAdapterTile<TileSmelter> {
 			}
 		}
 
-		// We have enough resources, now let's actually remove them
-		for (Map.Entry<Integer, Integer> entry : removeAmounts.entrySet()) {
-			ItemStack oldStack = inventory.getItem(entry.getKey());
-			int remaining = oldStack.getCount() - entry.getValue();
-			inventory.setItem(entry.getKey(), remaining <= 0 ? ItemStack.EMPTY : oldStack.copyWithCount(remaining));
+		try (var transaction = Transaction.open(
+			Transaction.getCurrentOpenedTransaction())) {
+			for (Map.Entry<Integer, Integer> entry : removeAmounts.entrySet()) {
+				int slot = SLOT_INPUT_1 + entry.getKey();
+				var resource = ItemResource.of(getItem(slot));
+				if (getTransferHandler().extract(slot, resource, entry.getValue(), transaction) != entry.getValue()) return false;
+			}
+			transaction.commit();
+			return true;
 		}
-		return true;
 	}
 }

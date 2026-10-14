@@ -16,16 +16,16 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import mezz.jei.api.recipe.types.IRecipeType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
 import java.util.Arrays;
 
 public class SmelterRecipeCategory extends ForestryRecipeCategory<ISmelterRecipe> {
-	private static final ResourceLocation TEXTURE = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/smelter.png");
+	private static final Identifier TEXTURE = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/smelter.png");
 
 	private final IDrawableAnimated arrow;
 	private final IDrawable icon;
@@ -43,7 +43,7 @@ public class SmelterRecipeCategory extends ForestryRecipeCategory<ISmelterRecipe
 	}
 
 	@Override
-	public RecipeType<ISmelterRecipe> getRecipeType() {
+	public IRecipeType<ISmelterRecipe> getRecipeType() {
 		return ForestryRecipeType.SMELTER;
 	}
 
@@ -61,9 +61,10 @@ public class SmelterRecipeCategory extends ForestryRecipeCategory<ISmelterRecipe
 		int oY = 5;
 
 		for (SizedIngredient input : recipe.getInputs()) {
-			// getItems already applies the count. Copy anyway, the array behind it is cached
+			// Resolve the ingredient display and apply the recipe's required count.
 			builder.addSlot(RecipeIngredientRole.INPUT, oX + cellX, oY + cellY).addItemStacks(
-				Arrays.stream(input.getItems()).map(ItemStack::copy).toList()
+				forestry.core.platform.util.JeiUtil.ingredientStacks(input.ingredient()).stream()
+					.map(stack -> stack.copyWithCount(input.count())).toList()
 			);
 
 			cellX += 18;
@@ -78,7 +79,7 @@ public class SmelterRecipeCategory extends ForestryRecipeCategory<ISmelterRecipe
 	}
 
 	@Override
-	public void draw(ISmelterRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+	public void draw(ISmelterRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
 		super.draw(recipe, recipeSlotsView, graphics, mouseX, mouseY);
 		this.arrow.draw(graphics, 72, 23);
 		this.fire.draw(graphics, 87, 42);

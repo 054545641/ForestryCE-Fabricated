@@ -18,8 +18,8 @@ public class ForestryLogBlock extends RotatedPillarBlock implements IWoodTyped {
 	private final boolean fireproof;
 	private final IWoodType woodType;
 
-	public ForestryLogBlock(WoodBlockKind kind, boolean fireproof, IWoodType woodType) {
-		super(ForestryPlanksBlock.createWoodProperties(woodType));
+	public ForestryLogBlock(Properties properties, WoodBlockKind kind, boolean fireproof, IWoodType woodType) {
+		super(ForestryPlanksBlock.createWoodProperties(woodType, properties));
 		this.kind = kind;
 		this.fireproof = fireproof;
 		this.woodType = woodType;

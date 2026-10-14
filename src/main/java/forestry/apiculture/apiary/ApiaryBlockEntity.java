@@ -12,7 +12,7 @@ import forestry.apiculture.bees.BeeHousingScreen;
 import forestry.core.platform.util.NetworkUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Tuple;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -53,9 +53,9 @@ public class ApiaryBlockEntity extends AbstractBeeHousingBlockEntity implements 
 
 		beeModifiers.add(this.beeModifier);
 
-		for (Tuple<IHiveFrame, ItemStack> frame : this.inventory.getFrames()) {
-			IHiveFrame hiveFrame = frame.getA();
-			ItemStack stack = frame.getB();
+		for (Pair<IHiveFrame, ItemStack> frame : this.inventory.getFrames()) {
+			IHiveFrame hiveFrame = frame.getFirst();
+			ItemStack stack = frame.getSecond();
 			IBeeModifier beeModifier = hiveFrame.getBeeModifier(stack);
 			beeModifiers.add(beeModifier);
 		}

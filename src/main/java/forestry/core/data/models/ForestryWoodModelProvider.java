@@ -18,17 +18,16 @@ import forestry.arboriculture.wood.ForestryWallSignBlock;
 import forestry.arboriculture.features.ArboricultureBlocks;
 import forestry.core.platform.registration.FeatureBlockGroup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import forestry.core.data.models.ModelAsset;
 import org.jetbrains.annotations.NotNull;
 
 public class ForestryWoodModelProvider extends ForestryBlockStateProvider {
-	public ForestryWoodModelProvider(PackOutput output, ExistingFileHelper exFileHelper) {
-		super(output, exFileHelper);
+	public ForestryWoodModelProvider(PackOutput output) {
+		super(output);
 	}
 
 	@Override
@@ -39,63 +38,63 @@ public class ForestryWoodModelProvider extends ForestryBlockStateProvider {
 			Block planks = ArboricultureBlocks.PLANKS_VANILLA_FIREPROOF.get(woodType).block();
 			String woodTypeName = woodType.getSerializedName();
 			String planksName = woodTypeName + "_planks";
-			ModelFile planksModel = existingMcBlock(planksName);
+			ModelAsset planksModel = existingMcBlock(planksName);
 			simpleBlock(planks, planksModel);
 			generic3d(planks, mcLoc(planksName));
 			// log
 			ForestryLogBlock log = ArboricultureBlocks.LOGS_VANILLA_FIREPROOF.get(woodType).block();
 			String logName = woodTypeName + "_log";
-			ModelFile logModel = existingMcBlock(logName);
+			ModelAsset logModel = existingMcBlock(logName);
 			axisBlock(log, logModel, logModel);
 			generic3d(log, mcLoc(logName));
 			// wood
 			ForestryLogBlock wood = ArboricultureBlocks.WOOD_VANILLA_FIREPROOF.get(woodType).block();
 			String woodName = woodTypeName + "_wood";
-			ModelFile woodModel = existingMcBlock(woodName);
+			ModelAsset woodModel = existingMcBlock(woodName);
 			axisBlock(wood, woodModel, woodModel);
 			generic3d(wood, mcLoc(woodName));
 			// stripped log
 			ForestryLogBlock strippedLog = ArboricultureBlocks.STRIPPED_LOGS_VANILLA_FIREPROOF.get(woodType).block();
 			String strippedLogName = "stripped_" + woodTypeName + "_log";
-			ModelFile strippedLogModel = existingMcBlock(strippedLogName);
+			ModelAsset strippedLogModel = existingMcBlock(strippedLogName);
 			axisBlock(strippedLog, strippedLogModel, strippedLogModel);
 			generic3d(strippedLog, mcLoc(strippedLogName));
 			// stripped wood
 			ForestryLogBlock strippedWood = ArboricultureBlocks.STRIPPED_WOOD_VANILLA_FIREPROOF.get(woodType).block();
 			String strippedWoodName = "stripped_" + woodTypeName + "_wood";
-			ModelFile strippedWoodModel = existingMcBlock(strippedWoodName);
+			ModelAsset strippedWoodModel = existingMcBlock(strippedWoodName);
 			axisBlock(strippedWood, strippedWoodModel, strippedWoodModel);
 			generic3d(strippedWood, mcLoc(strippedWoodName));
 			// slab
 			SlabBlock slab = ArboricultureBlocks.SLABS_VANILLA_FIREPROOF.get(woodType).block();
 			String slabName = woodTypeName + "_slab";
-			ModelFile bottomSlabModel = existingMcBlock(slabName);
-			ModelFile topSlabModel = existingMcBlock(slabName + "_top");
+			ModelAsset bottomSlabModel = existingMcBlock(slabName);
+			ModelAsset topSlabModel = existingMcBlock(slabName + "_top");
 			slabBlock(slab, bottomSlabModel, topSlabModel, planksModel);
 			generic3d(slab, mcLoc(slabName));
 			// stairs
 			StairBlock stairs = ArboricultureBlocks.STAIRS_VANILLA_FIREPROOF.get(woodType).block();
 			String stairsName = woodTypeName + "_stairs";
-			ModelFile stairsModel = existingMcBlock(stairsName);
-			ModelFile innerStairsModel = existingMcBlock(stairsName + "_inner");
-			ModelFile outerStairsModel = existingMcBlock(stairsName + "_outer");
+			ModelAsset stairsModel = existingMcBlock(stairsName);
+			ModelAsset innerStairsModel = existingMcBlock(stairsName + "_inner");
+			ModelAsset outerStairsModel = existingMcBlock(stairsName + "_outer");
 			stairsBlock(stairs, stairsModel, innerStairsModel, outerStairsModel);
 			generic3d(stairs, mcLoc(stairsName));
 			// fence
 			ForestryFenceBlock fence = ArboricultureBlocks.FENCES_VANILLA_FIREPROOF.get(woodType).block();
 			String fenceName = woodTypeName + "_fence";
-			ModelFile fencePostModel = existingMcBlock(fenceName + "_post");
-			ModelFile fenceSideModel = existingMcBlock(fenceName + "_side");
-			ModelFile fenceInventoryModel = existingMcBlock(fenceName + "_inventory");
+			ModelAsset fencePostModel = existingMcBlock(fenceName + "_post");
+			ModelAsset fenceSideModel = existingMcBlock(fenceName + "_side");
+			ModelAsset fenceInventoryModel = existingMcBlock(fenceName + "_inventory");
 			fourWayBlock(fence, fencePostModel, fenceSideModel);
 			itemModels().withExistingParent(path(fence), fenceInventoryModel.getLocation());
 			// fence gate
 			ForestryFenceGateBlock fenceGate = ArboricultureBlocks.FENCE_GATES_VANILLA_FIREPROOF.get(woodType).block();
 			String fenceGateName = woodTypeName + "_fence_gate";
-			ModelFile gateModel = existingMcBlock(fenceGateName);
-			ModelFile gateOpenModel = existingMcBlock(fenceGateName + "_open");
-			ModelFile gateWallModel = existingMcBlock(fenceGateName + "_wall");
-			ModelFile gateWallOpenModel = existingMcBlock(fenceGateName + "_wall_open");
+			ModelAsset gateModel = existingMcBlock(fenceGateName);
+			ModelAsset gateOpenModel = existingMcBlock(fenceGateName + "_open");
+			ModelAsset gateWallModel = existingMcBlock(fenceGateName + "_wall");
+			ModelAsset gateWallOpenModel = existingMcBlock(fenceGateName + "_wall_open");
 			fenceGateBlock(fenceGate, gateModel, gateOpenModel, gateWallModel, gateWallOpenModel);
 			generic3d(fenceGate, mcLoc(fenceGateName));
 		}
@@ -105,7 +104,7 @@ public class ForestryWoodModelProvider extends ForestryBlockStateProvider {
 			// Planks
 			Block planks = ArboricultureBlocks.PLANKS.get(woodType).block();
 			Block fireproofPlanks = ArboricultureBlocks.PLANKS_FIREPROOF.get(woodType).block();
-			ModelFile planksModel = cubeAll(planks);
+			ModelAsset planksModel = cubeAll(planks);
 
 			simpleBlock(planks);
 			simpleBlock(fireproofPlanks, planksModel);
@@ -114,8 +113,8 @@ public class ForestryWoodModelProvider extends ForestryBlockStateProvider {
 
 			// Logs, Wood, Stripped Logs, Stripped Wood
 			ForestryLogBlock log = ArboricultureBlocks.LOGS.get(woodType).block();
-			ResourceLocation logTexture = blockTexture(log);
-			ResourceLocation strippedLogTexture = withPrefix("stripped_", logTexture);
+			Identifier logTexture = blockTexture(log);
+			Identifier strippedLogTexture = withPrefix("stripped_", logTexture);
 
 			logLike(woodType, ArboricultureBlocks.LOGS, ArboricultureBlocks.LOGS_FIREPROOF, logTexture, withSuffix(logTexture, "_top"));
 			logLike(woodType, ArboricultureBlocks.STRIPPED_LOGS, ArboricultureBlocks.STRIPPED_LOGS_FIREPROOF, strippedLogTexture, withPrefix("stripped_", withSuffix(logTexture, "_top")));
@@ -125,9 +124,9 @@ public class ForestryWoodModelProvider extends ForestryBlockStateProvider {
 			// Slab
 			ForestrySlabBlock slab = ArboricultureBlocks.SLABS.get(woodType).block();
 			ForestrySlabBlock fireproofSlab = ArboricultureBlocks.SLABS_FIREPROOF.get(woodType).block();
-			ResourceLocation planksLoc = blockTexture(planks);
-			ModelFile bottomSlabModel = models().slab(path(slab), planksLoc, planksLoc, planksLoc);
-			ModelFile topSlabModel = models().slabTop(path(slab) + "_top", planksLoc, planksLoc, planksLoc);
+			Identifier planksLoc = blockTexture(planks);
+			ModelAsset bottomSlabModel = models().slab(path(slab), planksLoc, planksLoc, planksLoc);
+			ModelAsset topSlabModel = models().slabTop(path(slab) + "_top", planksLoc, planksLoc, planksLoc);
 			slabBlock(slab, bottomSlabModel, topSlabModel, planksModel);
 			slabBlock(fireproofSlab, bottomSlabModel, topSlabModel, planksModel);
 			generic3d(slab);
@@ -136,9 +135,9 @@ public class ForestryWoodModelProvider extends ForestryBlockStateProvider {
 			// Stairs
 			ForestryStairsBlock stairs = ArboricultureBlocks.STAIRS.get(woodType).block();
 			ForestryStairsBlock fireproofStairs = ArboricultureBlocks.STAIRS_FIREPROOF.get(woodType).block();
-			ModelFile stairsModel = models().stairs(path(stairs), planksLoc, planksLoc, planksLoc);
-			ModelFile innerStairsModel = models().stairsInner(path(stairs) + "_inner", planksLoc, planksLoc, planksLoc);
-			ModelFile outerStairsModel = models().stairsOuter(path(stairs) + "_outer", planksLoc, planksLoc, planksLoc);
+			ModelAsset stairsModel = models().stairs(path(stairs), planksLoc, planksLoc, planksLoc);
+			ModelAsset innerStairsModel = models().stairsInner(path(stairs) + "_inner", planksLoc, planksLoc, planksLoc);
+			ModelAsset outerStairsModel = models().stairsOuter(path(stairs) + "_outer", planksLoc, planksLoc, planksLoc);
 			stairsBlock(stairs, stairsModel, innerStairsModel, outerStairsModel);
 			stairsBlock(fireproofStairs, stairsModel, innerStairsModel, outerStairsModel);
 			generic3d(stairs);
@@ -147,9 +146,9 @@ public class ForestryWoodModelProvider extends ForestryBlockStateProvider {
 			// Fence
 			ForestryFenceBlock fence = ArboricultureBlocks.FENCES.get(woodType).block();
 			ForestryFenceBlock fireproofFence = ArboricultureBlocks.FENCES_FIREPROOF.get(woodType).block();
-			ModelFile fencePostModel = models().fencePost(path(fence) + "_post", planksLoc);
-			ModelFile fenceSideModel = models().fenceSide(path(fence) + "_side", planksLoc);
-			ModelFile fenceInventoryModel = models().fenceInventory(path(fence) + "_inventory", planksLoc);
+			ModelAsset fencePostModel = models().fencePost(path(fence) + "_post", planksLoc);
+			ModelAsset fenceSideModel = models().fenceSide(path(fence) + "_side", planksLoc);
+			ModelAsset fenceInventoryModel = models().fenceInventory(path(fence) + "_inventory", planksLoc);
 			fourWayBlock(fence, fencePostModel, fenceSideModel);
 			fourWayBlock(fireproofFence, fencePostModel, fenceSideModel);
 			itemModels().withExistingParent(path(fence), fenceInventoryModel.getLocation());
@@ -158,10 +157,10 @@ public class ForestryWoodModelProvider extends ForestryBlockStateProvider {
 			// Fence Gate
 			ForestryFenceGateBlock fenceGate = ArboricultureBlocks.FENCE_GATES.get(woodType).block();
 			ForestryFenceGateBlock fireproofFenceGate = ArboricultureBlocks.FENCE_GATES_FIREPROOF.get(woodType).block();
-			ModelFile gateModel = models().fenceGate(path(fenceGate), planksLoc);
-			ModelFile gateOpenModel = models().fenceGateOpen(path(fenceGate) + "_open", planksLoc);
-			ModelFile gateWallModel = models().fenceGateWall(path(fenceGate) + "_wall", planksLoc);
-			ModelFile gateWallOpenModel = models().fenceGateWallOpen(path(fenceGate) + "_wall_open", planksLoc);
+			ModelAsset gateModel = models().fenceGate(path(fenceGate), planksLoc);
+			ModelAsset gateOpenModel = models().fenceGateOpen(path(fenceGate) + "_open", planksLoc);
+			ModelAsset gateWallModel = models().fenceGateWall(path(fenceGate) + "_wall", planksLoc);
+			ModelAsset gateWallOpenModel = models().fenceGateWallOpen(path(fenceGate) + "_wall_open", planksLoc);
 			fenceGateBlock(fenceGate, gateModel, gateOpenModel, gateWallModel, gateWallOpenModel);
 			fenceGateBlock(fireproofFenceGate, gateModel, gateOpenModel, gateWallModel, gateWallOpenModel);
 			generic3d(fenceGate);
@@ -180,23 +179,19 @@ public class ForestryWoodModelProvider extends ForestryBlockStateProvider {
 			// Sign
 			ForestryStandingSignBlock sign = ArboricultureBlocks.SIGN.get(woodType).block();
 			ForestryWallSignBlock wallSign = ArboricultureBlocks.WALL_SIGN.get(woodType).block();
-			ModelFile signModel = particleOnly(this, path(sign), blockTexture(planks));
-			singleModelBlock(this, sign, signModel);
-			singleModelBlock(this, wallSign, signModel);
+			legacySign(woodType, sign, wallSign, false);
 			generic2d(sign);
 
 			// Hanging Sign
 			ForestryHangingSignBlock hangingSign = ArboricultureBlocks.HANGING_SIGN.get(woodType).block();
 			ForestryWallHangingSignBlock hangingWallSign = ArboricultureBlocks.WALL_HANGING_SIGN.get(woodType).block();
-			ModelFile hangingSignModel = particleOnly(this, path(hangingSign), blockTexture(planks));
-			singleModelBlock(this, hangingSign, hangingSignModel);
-			singleModelBlock(this, hangingWallSign, hangingSignModel);
+			legacySign(woodType, hangingSign, hangingWallSign, true);
 			generic2d(hangingSign);
 
 			// Button
 			ForestryButtonBlock button = ArboricultureBlocks.BUTTON.get(woodType).block();
 			buttonBlock(button, planksLoc);
-			ModelFile buttonInventoryModel = itemModels().buttonInventory(path(button) + "_inventory", planksLoc);
+			ModelAsset buttonInventoryModel = itemModels().buttonInventory(path(button) + "_inventory", planksLoc);
 			itemModels().withExistingParent(path(button), buttonInventoryModel.getLocation());
 
 			// Pressure plate
@@ -206,14 +201,48 @@ public class ForestryWoodModelProvider extends ForestryBlockStateProvider {
 		}
 	}
 
-	private void logLike(ForestryWoodType woodType, FeatureBlockGroup<ForestryLogBlock, ForestryWoodType> logs, FeatureBlockGroup<ForestryLogBlock, ForestryWoodType> fireproofLogs, ResourceLocation sideTexture, ResourceLocation topTexture) {
+	private void logLike(ForestryWoodType woodType, FeatureBlockGroup<ForestryLogBlock, ForestryWoodType> logs, FeatureBlockGroup<ForestryLogBlock, ForestryWoodType> fireproofLogs, Identifier sideTexture, Identifier topTexture) {
 		ForestryLogBlock wood = logs.get(woodType).block();
 		ForestryLogBlock fireproofWood = fireproofLogs.get(woodType).block();
-		ModelFile woodModel = models().cubeColumn(path(wood), sideTexture, topTexture);
+		ModelAsset woodModel = models().cubeColumn(path(wood), sideTexture, topTexture);
 		axisBlock(wood, woodModel, woodModel);
 		axisBlock(fireproofWood, woodModel, woodModel);
 		generic3d(wood);
 		generic3d(fireproofWood, wood);
+	}
+
+	public static String legacyTextureName(ForestryWoodType wood) {
+		return switch (wood) {
+			case CAMELTHORN -> "acacia_desert";
+			case SOUR_CHERRY -> "hill_cherry";
+			case LEMON -> "citrus";
+			case GIANT_SEQUOIA -> "giganteum";
+			case ZEBRANO -> "zebrawood";
+			default -> wood.getSerializedName();
+		};
+	}
+
+	private void legacySign(ForestryWoodType wood, Block sign, Block wallSign, boolean hanging) {
+		String name=wood.getSerializedName();
+		String texture=legacyTextureName(wood);
+		String family=hanging?"hanging_sign":"sign";
+		Identifier sprite=modLoc("entity/signs/"+(hanging?"hanging/":"")+texture);
+		Identifier particle=modLoc("block/"+(hanging?"stripped_"+name+"_log":name+"_planks"));
+		var variants=new com.google.gson.JsonObject();
+		for(boolean attached : hanging?new boolean[]{false,true}:new boolean[]{false}) {
+			for(int rotation=0;rotation<16;rotation++) {
+				String model=name+"_"+family+(attached?"_attached":"")+"_rot_"+(rotation%4);
+				if(rotation<4) models().withExistingParent(model,modLoc("block/template_legacy_"+(attached?"attached_":"")+family+"_rot_"+rotation)).texture("all",sprite).texture("particle",particle);
+				variants.add((hanging?"attached="+attached+",":"")+"rotation="+rotation,new ModelVariant(new ModelAsset(modLoc("block/"+model)),0,rotation/4*90,false).json());
+			}
+		}
+		var state=new com.google.gson.JsonObject(); state.add("variants",variants); blockStateJson(sign,state);
+		String wall=name+"_wall_"+family;
+		models().withExistingParent(wall,modLoc("block/template_legacy_wall_"+family)).texture("all",sprite).texture("particle",particle);
+		var wallVariants=new com.google.gson.JsonObject();
+		for(var facing:net.minecraft.core.Direction.Plane.HORIZONTAL) wallVariants.add("facing="+facing.getSerializedName(),new ModelVariant(new ModelAsset(modLoc("block/"+wall)),0,(int)facing.toYRot(),false).json());
+		var wallState=new com.google.gson.JsonObject(); wallState.add("variants",wallVariants); blockStateJson(wallSign,wallState);
+		models().withExistingParent(name+"_"+family,modLoc("block/"+name+"_"+family+"_rot_0"));
 	}
 
 	@Override

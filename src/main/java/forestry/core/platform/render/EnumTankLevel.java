@@ -1,6 +1,6 @@
 package forestry.core.platform.render;
 
-import net.neoforged.neoforge.fluids.IFluidTank;
+import forestry.core.platform.fluids.StandardTank;
 
 public enum EnumTankLevel {
 	EMPTY(0),
@@ -19,7 +19,7 @@ public enum EnumTankLevel {
 		return this.level * scale / 100;
 	}
 
-	public static EnumTankLevel rateTankLevel(IFluidTank tank) {
+	public static EnumTankLevel rateTankLevel(StandardTank tank) {
 		return rateTankLevel(100 * tank.getFluidAmount() / tank.getCapacity());
 	}
 

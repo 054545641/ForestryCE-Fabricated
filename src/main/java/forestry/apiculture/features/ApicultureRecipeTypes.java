@@ -16,5 +16,5 @@ import forestry.core.platform.registration.ModFeatureRegistry;
 public class ApicultureRecipeTypes {
 	private static final IFeatureRegistry REGISTRY = ModFeatureRegistry.get(ForestryModuleIds.APICULTURE);
 
-	public static final FeatureRecipeType<IHygroregulatorRecipe> HYGROREGULATOR = REGISTRY.recipeType("hygroregulator", HygroregulatorRecipe.Serializer::new);
+	public static final FeatureRecipeType<IHygroregulatorRecipe> HYGROREGULATOR = REGISTRY.recipeType("hygroregulator", () -> HygroregulatorRecipe.SERIALIZER);
 }

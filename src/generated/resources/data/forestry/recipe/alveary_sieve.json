@@ -3,15 +3,9 @@
   "category": "building",
   "group": "alveary",
   "key": {
-    "I": {
-      "tag": "c:ingots/iron"
-    },
-    "W": {
-      "item": "forestry:woven_silk"
-    },
-    "X": {
-      "item": "forestry:alveary_block"
-    }
+    "I": "#c:ingots/iron",
+    "W": "forestry:woven_silk",
+    "X": "forestry:alveary_block"
   },
   "pattern": [
     "III",
@@ -19,7 +13,6 @@
     "WWW"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:alveary_sieve"
   }
 }

@@ -10,9 +10,10 @@ import forestry.api.plugin.ITreeSpeciesBuilder;
 import forestry.arboriculture.trees.TreeSpecies;
 import forestry.arboriculture.worldgen.DefaultTreeGenerator;
 import forestry.apiimpl.plugin.SpeciesBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
@@ -31,9 +32,10 @@ public class TreeSpeciesBuilder extends SpeciesBuilder<ITreeSpeciesType, ITreeSp
 	private float rarity = 0.0f;
 	private final HashSet<BlockState> vanillaStates = new HashSet<>();
 	private final HashSet<Item> vanillaItems = new HashSet<>();
-	private ItemStack decorativeLeaves = ItemStack.EMPTY;
+	@Nullable
+	private ItemStackTemplate decorativeLeaves;
 
-	public TreeSpeciesBuilder(ResourceLocation id, String genus, String species) {
+	public TreeSpeciesBuilder(Identifier id, String genus, String species) {
 		super(id, genus, species);
 	}
 
@@ -81,8 +83,8 @@ public class TreeSpeciesBuilder extends SpeciesBuilder<ITreeSpeciesType, ITreeSp
 	}
 
 	@Override
-	public ITreeSpeciesBuilder setDecorativeLeaves(ItemStack stack) {
-		this.decorativeLeaves = stack;
+	public ITreeSpeciesBuilder setDecorativeLeaves(@Nullable ItemStackTemplate template) {
+		this.decorativeLeaves = template;
 		return this;
 	}
 
@@ -103,7 +105,7 @@ public class TreeSpeciesBuilder extends SpeciesBuilder<ITreeSpeciesType, ITreeSp
 	}
 
 	@Override
-	public ItemStack getDecorativeLeaves() {
+	public ItemStackTemplate getDecorativeLeavesTemplate() {
 		return this.decorativeLeaves;
 	}
 

@@ -1,13 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "tag": "c:ingots/iron"
-    },
-    "X": {
-      "tag": "c:nuggets/iron"
-    }
+    "#": "#c:ingots/iron",
+    "X": "#c:nuggets/iron"
   },
   "pattern": [
     " # ",
@@ -15,7 +10,6 @@
     " # "
   ],
   "result": {
-    "count": 1,
     "id": "forestry:iron_gear"
   }
 }

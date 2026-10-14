@@ -51,7 +51,7 @@ public class ForestryBackpackTagProvider {
 
 		tags.tag(ForestryTags.Items.FORESTER_ALLOW).addTags(
 			ForestryTags.Items.GRASSES,
-			ItemTags.FLOWERS,
+			Tags.Items.FLOWERS,
 			ItemTags.LOGS,
 			ItemTags.SAPLINGS,
 			Tags.Items.CROPS,
@@ -84,7 +84,7 @@ public class ForestryBackpackTagProvider {
 			Tags.Items.FEATHERS,
 			Tags.Items.GUNPOWDERS,
 			Tags.Items.LEATHERS,
-			Tags.Items.SLIMEBALLS,
+			Tags.Items.SLIME_BALLS,
 			Tags.Items.STRINGS
 		);
 		tags.tag(ForestryTags.Items.HUNTER_ALLOW).add(
@@ -129,7 +129,7 @@ public class ForestryBackpackTagProvider {
 
 		tags.tag(ForestryTags.Items.BUILDER_ALLOW).addTags(
 			ItemTags.FENCE_GATES,
-			ItemTags.FENCES,
+			Tags.Items.FENCES,
 			ItemTags.PLANKS,
 			ItemTags.TERRACOTTA,
 			ItemTags.WOODEN_DOORS,
@@ -193,9 +193,9 @@ public class ForestryBackpackTagProvider {
 			Items.STONE_SLAB,
 			Items.TERRACOTTA,
 			Items.TORCH,
-			Items.WHITE_CARPET,
-			Items.WHITE_GLAZED_TERRACOTTA,
-			Items.WHITE_TERRACOTTA
+			Items.CARPET.white(),
+			Items.GLAZED_TERRACOTTA.white(),
+			Items.DYED_TERRACOTTA.white()
 		);
 		tags.tag(ForestryTags.Items.BUILDER_REJECT);
 

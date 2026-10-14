@@ -1,0 +1,144 @@
+// Release tests load Forestry exclusively from the four built jars in an isolated mods directory.
+// The probe has a separate mod id and is never part of a published artifact.
+sourceSets { n6Test }
+['main', 'butterflies', 'farms', 'mail', 'mainJei', 'butterfliesJei', 'farmsJei', 'mailJei', 'curios'].each {
+    sourceSets.n6Test.compileClasspath += sourceSets[it].output
+}
+configurations.n6TestCompileOnly.extendsFrom configurations.mainJeiCompileOnly, configurations.curiosCompileOnly
+configurations { n6OptionalMods { transitive = false } }
+def integrations = providers.gradleProperty('n6Integrations').orElse('none').get()
+if (!(integrations in ['none', 'jei', 'curios', 'all'])) throw new GradleException('Unknown n6Integrations: ' + integrations)
+dependencies {
+    if (integrations in ['jei', 'all']) n6OptionalMods "mezz.jei:jei-${minecraftVersion}-neoforge:${jeiVersion}"
+    if (integrations in ['curios', 'all']) n6OptionalMods "top.theillusivec4.curios:curios-neoforge:${curiosVersion}"
+}
+def mask = providers.gradleProperty('n6Modules').orElse('7').get().toInteger()
+if (mask < 0 || mask > 7) throw new GradleException('n6Modules must be 0..7 (butterflies=1, farms=2, mail=4)')
+def network = providers.gradleProperty('n6Network').orElse('false').get().toBoolean()
+def scenario = "${mask}-${integrations}" + (network ? '-network' : '')
+neoForge {
+    addModdingDependenciesTo sourceSets.n6Test
+    mods { forestryn6test { sourceSet sourceSets.n6Test } }
+    runs {
+        n6ReleaseServer {
+            server()
+            sourceSet = sourceSets.n6Test
+            loadedMods = [mods.forestryn6test]
+            gameDirectory = layout.projectDirectory.dir("run/26.2/n6-server-${scenario}")
+            logLevel = org.slf4j.event.Level.INFO
+            programArguments.addAll('--nogui', '--port', '25577')
+            systemProperty 'forestry.n6.side', 'server'
+            systemProperty 'forestry.n6.modules', mask.toString()
+            systemProperty 'forestry.n6.integrations', integrations
+            systemProperty 'forestry.n6.network', network.toString()
+            systemProperty 'forestry.n6.networkReload', providers.gradleProperty('n6NetworkReload').orElse('false').get()
+        }
+        n6ReleaseClient {
+            client()
+            sourceSet = sourceSets.n6Test
+            loadedMods = [mods.forestryn6test]
+            gameDirectory = layout.projectDirectory.dir("run/26.2/n6-client-${scenario}")
+            logLevel = org.slf4j.event.Level.INFO
+            programArguments.addAll(network ? '--quickPlayMultiplayer' : '--quickPlaySingleplayer', network ? '127.0.0.1:25577' : 'n6-acceptance', '--username', 'N6Client', '--width', '1280', '--height', '800')
+            programArguments.addAll('--graphicsBackend', providers.gradleProperty('n6Graphics').orElse('opengl').get().toUpperCase(java.util.Locale.ROOT))
+            systemProperty 'forestry.n6.side', 'client'
+            systemProperty 'forestry.n6.modules', mask.toString()
+            systemProperty 'forestry.n6.integrations', integrations
+            systemProperty 'forestry.n6.network', network.toString()
+            systemProperty 'forestry.n6.networkReload', providers.gradleProperty('n6NetworkReload').orElse('false').get()
+            systemProperty 'forestry.n6.graphics', providers.gradleProperty('n6Graphics').orElse('opengl').get()
+            systemProperty 'forestry.n6.expectDisconnect', providers.gradleProperty('n6ExpectDisconnect').orElse('false').get()
+        }
+    }
+}
+['Server', 'Client'].each { side ->
+    tasks.named("runN6Release${side}") {
+        dependsOn 'jar', 'butterfliesJar', 'farmsJar', 'mailJar'
+        doFirst {
+            def dir = file("run/26.2/n6-${side.toLowerCase()}-${scenario}")
+            def modsDir = new File(dir, 'mods')
+            modsDir.mkdirs()
+            // Only this task's dedicated instance is managed here; retain unrelated files.
+            modsDir.listFiles().findAll { it.name.endsWith('.jar') }.each { it.delete() }
+            def jars = [tasks.named('jar').get().archiveFile.get().asFile]
+            ['butterflies', 'farms', 'mail'].eachWithIndex { owner, i ->
+                if ((mask & (1 << i)) != 0) jars.add(tasks.named("${owner}Jar").get().archiveFile.get().asFile)
+            }
+            copy { from jars; from configurations.n6OptionalMods; into modsDir }
+            new File(dir, 'n6.passed').delete()
+            new File(dir, 'n6.network.stop').delete()
+            if (side == 'Server') {
+                new File(dir, 'server.properties').setText('server-ip=127.0.0.1\nonline-mode=false\npause-when-empty-seconds=0\nlevel-name=n6-acceptance\nlevel-type=minecraft:flat\ngenerate-structures=false\nview-distance=3\nsimulation-distance=3\n', 'UTF-8')
+            } else {
+                def world = new File(dir, 'saves/n6-acceptance')
+                if (!world.exists()) {
+                    def source = file('run/26.2/lifecycle-client/saves/lifecycle-ready')
+                    if (!source.exists()) throw new GradleException('Prepare isolated lifecycle-ready test world first')
+                    copy { from source; into world; exclude 'session.lock' }
+                }
+                new File(dir, 'options.txt').setText('lang:zh_cn\nguiScale:2\nrenderDistance:4\npauseOnLostFocus:false\ntutorialStep:none\nskipMultiplayerWarning:true\n', 'UTF-8')
+                new File(dir, 'config').mkdirs()
+                new File(dir, 'config/fml.toml').setText('earlyWindowControl = false\n', 'UTF-8')
+                new File(dir, 'config/neoforge-client.toml').setText('showLoadWarnings = false\n', 'UTF-8')
+            }
+        }
+        doLast {
+            if (!file("run/26.2/n6-${side.toLowerCase()}-${scenario}/n6.passed").exists()) {
+                throw new GradleException("N6 ${side} assertions did not finish for ${scenario}; inspect log")
+            }
+        }
+    }
+}
+
+tasks.register('checkN6Release') {
+    group = 'verification'
+    description = 'Audits integration packaging, preview metadata and absence of development dependencies in release jars.'
+    dependsOn 'jar', 'butterfliesJar', 'farmsJar', 'mailJar'
+    doLast {
+        ['jar', 'butterfliesJar', 'farmsJar', 'mailJar'].each { taskName ->
+            def artifact = tasks.named(taskName).get().archiveFile.get().asFile
+            new java.util.zip.ZipFile(artifact).withCloseable { zip ->
+                def names = zip.entries().collect { it.name }
+                if (!names.any { it.endsWith('JeiPlugin.class') }) throw new GradleException("Missing JEI adapter: ${artifact}")
+                if (taskName == 'jar' && !names.contains('META-INF/services/forestry.core.platform.compat.NaturalistEyeAccess')) throw new GradleException('Missing Curios service registration')
+                def forbidden = names.findAll { it.endsWith('.class') && (it ==~ /(?:mezz\/jei|top\/theillusivec4|vazkii|dev\/latvian|thedarkcolour\/modkit|forestry\/(?:gametest|lifecycle|n6|datagen|environment))\/.*/) || it.contains('/patchouli_books/') || it == 'kubejs.plugins.txt' }
+                if (forbidden) throw new GradleException("Non-release entries in ${artifact}: ${forbidden.take(5)}")
+                names.findAll { it.startsWith('assets/forestry/equipment/') && it.endsWith('.json') }.each { equipment ->
+                    def data = new groovy.json.JsonSlurper().parse(zip.getInputStream(zip.getEntry(equipment)))
+                    data.layers.each { type, layers -> layers.each { layer ->
+                        if (layer.texture.startsWith('forestry:')) {
+                            def texture = "assets/forestry/textures/entity/equipment/${type}/${layer.texture.substring('forestry:'.length())}.png"
+                            if (zip.getEntry(texture.toString()) == null) throw new GradleException("${equipment} references missing equipment texture ${texture}")
+                        }
+                    } }
+                }
+                def metadata = zip.getInputStream(zip.getEntry('META-INF/neoforge.mods.toml')).getText('UTF-8')
+                if (metadata.contains('${') || !metadata.contains('26.2') || !metadata.contains('alpha')) throw new GradleException("Incorrect preview metadata: ${artifact}")
+                if (taskName == 'jar' && !(metadata =~ /(?s)modId = "curios"\s+type = "OPTIONAL"/)) throw new GradleException('Curios must be optional')
+            }
+        }
+        logger.lifecycle('N6: four release jars contain their adapters, optional Curios metadata and no unavailable integration entry points or bundled APIs.')
+    }
+}
+tasks.named('check') { dependsOn 'checkN6Release' }
+
+tasks.register('checkN6PublicationMetadata') {
+    group = 'verification'
+    def publications = ['mavenJava', 'mavenButterflies', 'mavenFarms', 'mavenMail']
+    publications.each { dependsOn "generatePomFileFor${it.capitalize()}Publication" }
+    doLast {
+        publications.eachWithIndex { name, index ->
+            def pom = new groovy.xml.XmlSlurper().parse(layout.buildDirectory.file("publications/${name}/pom-default.xml").get().asFile)
+            def dependencies = pom.dependencies.dependency
+            if (index == 0) {
+                if (dependencies.size() != 0) throw new GradleException('Core POM leaks development or optional dependencies')
+            } else {
+                if (dependencies.size() != 1 || dependencies[0].artifactId.text() != project.base.archivesName.get()
+                    || dependencies[0].version.text() != project.version.toString()) throw new GradleException("${name} must require only the matching core artifact")
+            }
+            if (pom.version.text() != project.version.toString()) throw new GradleException("Wrong version in ${name}")
+        }
+        logger.lifecycle('N6: four POMs verified; core has no development dependencies, optional modules require matching core only.')
+    }
+}
+tasks.named('check') { dependsOn 'checkN6PublicationMetadata' }

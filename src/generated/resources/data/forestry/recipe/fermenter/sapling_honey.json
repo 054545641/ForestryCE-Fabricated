@@ -8,7 +8,5 @@
   "id": "forestry:fermenter/sapling_honey",
   "modifier": 1.5,
   "output": "forestry:biomass",
-  "resource": {
-    "tag": "minecraft:saplings"
-  }
+  "resource": "#minecraft:saplings"
 }

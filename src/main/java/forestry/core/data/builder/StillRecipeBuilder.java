@@ -2,7 +2,7 @@ package forestry.core.data.builder;
 
 import forestry.core.content.machines.recipes.StillRecipe;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 public class StillRecipeBuilder {
@@ -26,7 +26,7 @@ public class StillRecipeBuilder {
 		return this;
 	}
 
-	public void build(RecipeOutput output, ResourceLocation id) {
-		output.accept(id, new StillRecipe(id, this.timePerUnit, this.input, this.output), null);
+	public void build(RecipeOutput output, Identifier id) {
+		output.accept(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id), new StillRecipe(id, this.timePerUnit, this.input, this.output), null);
 	}
 }

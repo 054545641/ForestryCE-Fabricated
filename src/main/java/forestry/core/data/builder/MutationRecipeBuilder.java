@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,15 +29,15 @@ import forestry.core.engine.genetics.mutations.MutationRecipe;
  * built-in mutations can be ported one-to-one.
  */
 public class MutationRecipeBuilder {
-	private final ResourceLocation speciesTypeId;
-	private final ResourceLocation firstParentId;
-	private final ResourceLocation secondParentId;
-	private final ResourceLocation resultId;
+	private final Identifier speciesTypeId;
+	private final Identifier firstParentId;
+	private final Identifier secondParentId;
+	private final Identifier resultId;
 	private final float chance;
 	private final List<IMutationCondition> conditions = new ArrayList<>();
-	private final Map<ResourceLocation, Allele<?>> resultAlleles = new LinkedHashMap<>();
+	private final Map<Identifier, Allele<?>> resultAlleles = new LinkedHashMap<>();
 
-	public MutationRecipeBuilder(ResourceLocation speciesTypeId, ResourceLocation firstParentId, ResourceLocation secondParentId, ResourceLocation resultId, float chance) {
+	public MutationRecipeBuilder(Identifier speciesTypeId, Identifier firstParentId, Identifier secondParentId, Identifier resultId, float chance) {
 		this.speciesTypeId = speciesTypeId;
 		this.firstParentId = firstParentId;
 		this.secondParentId = secondParentId;
@@ -45,11 +45,11 @@ public class MutationRecipeBuilder {
 		this.chance = chance;
 	}
 
-	public ResourceLocation getSpeciesTypeId() {
+	public Identifier getSpeciesTypeId() {
 		return this.speciesTypeId;
 	}
 
-	public ResourceLocation getResultId() {
+	public Identifier getResultId() {
 		return this.resultId;
 	}
 
@@ -111,7 +111,7 @@ public class MutationRecipeBuilder {
 		return this;
 	}
 
-	public MutationRecipe build(ResourceLocation id) {
+	public MutationRecipe build(Identifier id) {
 		return new MutationRecipe(this.speciesTypeId, id, this.firstParentId, this.secondParentId, this.resultId, this.chance, List.copyOf(this.conditions), Map.copyOf(this.resultAlleles));
 	}
 }

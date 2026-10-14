@@ -3,22 +3,22 @@ package forestry.api.core.genetics.alleles;
 import java.util.function.Function;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 
 import javax.annotation.Nullable;
 
 /**
  * The single, generic chromosome implementation. Replaces the former float/integer/boolean/value/registry subtypes.
- * Data chromosomes have a {@code null} resolver; reference chromosomes store a {@link ResourceLocation} and resolve
+ * Data chromosomes have a {@code null} resolver; reference chromosomes store a {@link Identifier} and resolve
  * it to a behavior object lazily via the resolver.
  */
 public final class Chromosome<V> implements IChromosome<V> {
-	private final ResourceLocation id;
+	private final Identifier id;
 	private final Codec<V> valueCodec;
 	private final StreamCodec<RegistryFriendlyByteBuf, V> valueStreamCodec;
 	private final String chromosomeTranslationKey;
@@ -26,7 +26,7 @@ public final class Chromosome<V> implements IChromosome<V> {
 	@Nullable
 	private final IReferenceResolver<?> resolver;
 
-	public Chromosome(ResourceLocation id, Codec<V> valueCodec, Function<V, String> naming, @Nullable IReferenceResolver<?> resolver) {
+	public Chromosome(Identifier id, Codec<V> valueCodec, Function<V, String> naming, @Nullable IReferenceResolver<?> resolver) {
 		this.id = id;
 		this.valueCodec = valueCodec;
 		this.valueStreamCodec = ByteBufCodecs.fromCodecWithRegistries(valueCodec);
@@ -36,7 +36,7 @@ public final class Chromosome<V> implements IChromosome<V> {
 	}
 
 	@Override
-	public ResourceLocation id() {
+	public Identifier id() {
 		return this.id;
 	}
 

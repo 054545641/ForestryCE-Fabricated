@@ -1,14 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "P": [
-      {
-        "item": "forestry:cocobolo_planks"
-      },
-      {
-        "item": "forestry:cocobolo_fireproof_planks"
-      }
+      "forestry:cocobolo_planks",
+      "forestry:cocobolo_fireproof_planks"
     ]
   },
   "pattern": [
@@ -16,7 +11,6 @@
     "PPP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:cocobolo_boat"
   }
 }

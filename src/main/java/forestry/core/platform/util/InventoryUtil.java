@@ -1,22 +1,24 @@
 package forestry.core.platform.util;
 
-import com.mojang.serialization.DataResult;
-import net.minecraft.nbt.NbtOps;
+import net.minecraft.core.HolderLookup;
 import forestry.core.engine.circuits.ISocketable;
 import forestry.core.platform.inventory.ItemHandlerInventoryManipulator;
-import forestry.core.platform.inventory.StandardStackFilters;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.items.IItemHandler;
+import forestry.core.platform.inventory.InventoryTransferView;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import net.neoforged.neoforge.transfer.transaction.RootCommitJournal;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -29,9 +31,9 @@ public abstract class InventoryUtil {
 	 * @param dest   The destination IInventory.
 	 * @return true if any items were moved
 	 */
-	public static boolean moveItemStack(IItemHandler source, IItemHandler dest) {
+	public static boolean moveItemStack(ResourceHandler<ItemResource> source, ResourceHandler<ItemResource> dest) {
 		ItemHandlerInventoryManipulator manipulator = new ItemHandlerInventoryManipulator(source);
-		return manipulator.transferOneStack(dest, StandardStackFilters.ALL);
+		return manipulator.transferOneStack(dest, stack -> true);
 	}
 
 	/**
@@ -41,8 +43,8 @@ public abstract class InventoryUtil {
 	 * @param destinations The destination IInventory.
 	 * @return true if any items were moved
 	 */
-	public static boolean moveItemStack(IItemHandler source, Iterable<IItemHandler> destinations) {
-		for (IItemHandler dest : destinations) {
+	public static boolean moveItemStack(ResourceHandler<ItemResource> source, Iterable<ResourceHandler<ItemResource>> destinations) {
+		for (ResourceHandler<ItemResource> dest : destinations) {
 			if (moveItemStack(source, dest)) {
 				return true;
 			}
@@ -50,145 +52,89 @@ public abstract class InventoryUtil {
 		return false;
 	}
 
-	/* REMOVAL */
+	/** Shared inventory entry point, also used by fluid/container exchanges. */
+	public static ResourceHandler<ItemResource> getTransferHandler(Container inventory) { return InventoryTransferView.internal(inventory); }
+
+	private static Transaction transaction() { return Transaction.open(Transaction.getCurrentOpenedTransaction()); }
+
 	public static boolean consumeIngredients(Container inventory, List<Ingredient> ingredients, @Nullable Player player, boolean stowContainer, boolean craftingTools, boolean doRemove) {
-		int[] consumeStacks = ItemStackUtil.createConsume(ingredients, inventory, craftingTools);
-		if (doRemove && consumeStacks.length > 0) {
-			return consumeItems(inventory, consumeStacks, player, stowContainer);
-		} else {
-			return consumeStacks.length > 0;
+		try (var tx = transaction()) {
+			int[] counts = InventoryCrafting.createConsume(ingredients, inventory, craftingTools);
+			if (counts.length == 0 && !ingredients.isEmpty()) return false;
+			if (!consumeItems(inventory, counts, player, stowContainer, tx)) return false;
+			if (doRemove) tx.commit();
+			return true;
 		}
 	}
 
-	private static boolean consumeItems(Container inventory, int[] consumeStacks, @Nullable Player player, boolean stowContainer) {
-		for (int i = 0; i < inventory.getContainerSize(); i++) {
-			int count = consumeStacks[i];
-			if (count <= 0) {
-				continue;
-			}
-			ItemStack oldStack = inventory.getItem(i);
-			ItemStack removed = inventory.removeItem(i, count);
+	private record Remainder(int slot, ItemStack stack) {}
 
-			if (stowContainer && oldStack.getItem().hasCraftingRemainingItem(oldStack)) {
-				stowContainerItem(removed, inventory, i, player);
+	private static boolean consumeItems(Container inventory, int[] counts, @Nullable Player player, boolean stowContainer, TransactionContext tx) {
+		var handler = getTransferHandler(inventory);
+		var remainders = new java.util.ArrayList<Remainder>();
+		for (int i = 0; i < counts.length; i++) {
+			if (counts[i] <= 0) continue;
+			ItemStack stack = inventory.getItem(i).copy();
+			if (stack.isEmpty() || handler.extract(i, ItemResource.of(stack), counts[i], tx) != counts[i]) return false;
+			if (stowContainer) {
+				var remainder = stack.getCraftingRemainder();
+				if (remainder != null) {
+					for (int n = 0; n < counts[i]; n++) remainders.add(new Remainder(i, remainder.create()));
+				}
 			}
-
-			if (count > removed.getCount()) {
-				return false;
-			}
+		}
+		for (var remainder : remainders) {
+			if (!stowRemainder(remainder.stack(), inventory, remainder.slot(), player, tx)) return false;
 		}
 		return true;
 	}
 
-	/**
-	 * Removes a set of items from an inventory.
-	 * Removes the exact items first if they exist, and then removes crafting equivalents.
-	 * If the inventory doesn't have all the required items, returns false without removing anything.
-	 * If stowContainer is true, items with containers will have their container stowed.
-	 */
 	public static boolean removeSets(Container inventory, int count, List<ItemStack> set, @Nullable Player player, boolean stowContainer, boolean craftingTools, boolean doRemove) {
-		NonNullList<ItemStack> stock = getStacks(inventory);
-
-		if (doRemove) {
-			NonNullList<ItemStack> removed = removeSets(inventory, count, set, player, stowContainer, craftingTools);
-			return removed != null && removed.size() >= count;
-		} else {
-			return ItemStackUtil.containsSets(set, stock, craftingTools) >= count;
+		try (var tx = transaction()) {
+			if (removeSets(inventory, count, set, player, stowContainer, craftingTools) == null) return false;
+			if (doRemove) tx.commit();
+			return true;
 		}
 	}
 
 	@Nullable
 	public static NonNullList<ItemStack> removeSets(Container inventory, int count, List<ItemStack> set, @Nullable Player player, boolean stowContainer, boolean craftingTools) {
-		NonNullList<ItemStack> removed = NonNullList.withSize(set.size(), ItemStack.EMPTY);
-		NonNullList<ItemStack> stock = getStacks(inventory);
-
-		if (ItemStackUtil.containsSets(set, stock, craftingTools) < count) {
-			return null;
-		}
-
-		for (int i = 0; i < set.size(); i++) {
-			ItemStack itemStack = set.get(i);
-			if (!itemStack.isEmpty()) {
-				ItemStack stackToRemove = itemStack.copy();
-				stackToRemove.setCount(stackToRemove.getCount() * count);
-
-				// try to remove the exact stack first
-				ItemStack removedStack = removeStack(inventory, stackToRemove, player, stowContainer, false);
-				if (removedStack.isEmpty()) {
-					// remove crafting equivalents next
-					removedStack = removeStack(inventory, stackToRemove, player, stowContainer, craftingTools);
+		if (count < 0) throw new IllegalArgumentException("Negative set count");
+		try (var tx = transaction()) {
+			int[] counts = new int[inventory.getContainerSize()];
+			NonNullList<ItemStack> removed = NonNullList.withSize(set.size(), ItemStack.EMPTY);
+			for (int requirement = 0; requirement < set.size(); requirement++) {
+				ItemStack wanted = set.get(requirement);
+				int remaining = Math.multiplyExact(wanted.getCount(), count);
+				int total = remaining;
+				for (int pass = 0; pass < 2 && remaining > 0; pass++) {
+					for (int slot = 0; slot < counts.length && remaining > 0; slot++) {
+						ItemStack offered = inventory.getItem(slot);
+						if (!offered.isEmpty() && (pass == 0 ? ItemStack.isSameItemSameComponents(wanted, offered) : InventoryCrafting.isCraftingEquivalent(wanted, offered, craftingTools))) {
+							int take = Math.min(remaining, offered.getCount() - counts[slot]);
+							counts[slot] += take;
+							remaining -= take;
+							if (take > 0) removed.set(requirement, offered.copyWithCount(total));
+						}
+					}
 				}
-
-				removed.set(i, removedStack);
+				if (remaining > 0) return null;
 			}
+			if (!consumeItems(inventory, counts, player, stowContainer, tx)) return null;
+			tx.commit();
+			return removed;
 		}
-		return removed;
 	}
 
 	public static boolean deleteExactSet(Container inventory, NonNullList<ItemStack> required) {
-		NonNullList<ItemStack> offered = getStacks(inventory);
-		List<ItemStack> condensedRequired = ItemStackUtil.condenseStacks(required);
-		List<ItemStack> condensedOffered = ItemStackUtil.condenseStacks(offered);
-
-		for (ItemStack req : condensedRequired) {
-			if (!containsExactStack(req, condensedOffered)) {
-				return false;
+		try (var tx = transaction()) {
+			var items = getTransferHandler(inventory);
+			for (ItemStack stack : required) {
+				if (!stack.isEmpty() && items.extract(ItemResource.of(stack), stack.getCount(), tx) != stack.getCount()) return false;
 			}
+			tx.commit();
+			return true;
 		}
-
-		for (ItemStack itemStack : condensedRequired) {
-			deleteExactStack(inventory, itemStack);
-		}
-		return true;
-	}
-
-	private static boolean containsExactStack(ItemStack req, List<ItemStack> condensedOffered) {
-		for (ItemStack offer : condensedOffered) {
-			if (offer.getCount() >= req.getCount() && ItemStackUtil.areItemStacksEqualIgnoreCount(req, offer)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static void deleteExactStack(Container inventory, ItemStack itemStack) {
-		int count = itemStack.getCount();
-		for (int j = 0; j < inventory.getContainerSize(); j++) {
-			ItemStack stackInSlot = inventory.getItem(j);
-			if (!stackInSlot.isEmpty()) {
-				if (ItemStackUtil.areItemStacksEqualIgnoreCount(itemStack, stackInSlot)) {
-					ItemStack removed = inventory.removeItem(j, count);
-					count -= removed.getCount();
-					if (count == 0) {
-						return;
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Private Helper for removeSetsFromInventory. Assumes removal is possible.
-	 */
-	private static ItemStack removeStack(Container inventory, ItemStack stackToRemove, @Nullable Player player, boolean stowContainer, boolean craftingTools) {
-		for (int j = 0; j < inventory.getContainerSize(); j++) {
-			ItemStack stackInSlot = inventory.getItem(j);
-			if (!stackInSlot.isEmpty()) {
-				if (ItemStackUtil.isCraftingEquivalent(stackToRemove, stackInSlot, craftingTools)) {
-					ItemStack removed = inventory.removeItem(j, stackToRemove.getCount());
-					stackToRemove.shrink(removed.getCount());
-
-					if (stowContainer && stackToRemove.getItem().hasCraftingRemainingItem(stackToRemove)) {
-						stowContainerItem(removed, inventory, j, player);
-					}
-
-					if (stackToRemove.isEmpty()) {
-						return removed;
-					}
-				}
-			}
-		}
-		return ItemStack.EMPTY;
 	}
 
 	/* CONTAINS */
@@ -198,8 +144,8 @@ public abstract class InventoryUtil {
 	}
 
 	public static boolean contains(Container inventory, List<ItemStack> query, int startSlot, int slots) {
-		NonNullList<ItemStack> stock = getStacks(inventory, startSlot, slots);
-		return ItemStackUtil.containsSets(query, stock) > 0;
+		Container range = new forestry.core.platform.inventory.wrappers.InventoryMapper(inventory, startSlot, slots, false);
+		return removeSets(range, 1, query, null, false, false, false);
 	}
 
 	public static boolean isEmpty(Container inventory, int slotStart, int slotCount) {
@@ -228,176 +174,78 @@ public abstract class InventoryUtil {
 	}
 
 	public static boolean tryAddStacksCopy(Container inventory, NonNullList<ItemStack> stacks, int startSlot, int slots, boolean all) {
-
-		for (ItemStack stack : stacks) {
-			if (stack == null || stack.isEmpty()) {
-				continue;
+		try (var tx = transaction()) {
+			for (ItemStack stack : stacks) {
+				if (!stack.isEmpty() && !tryAddStack(inventory, stack, startSlot, slots, all)) return false;
 			}
-
-			if (!tryAddStack(inventory, stack.copy(), startSlot, slots, all)) {
-				return false;
-			}
+			tx.commit();
+			return true;
 		}
+	}
 
+	public static boolean tryAddStack(Container inventory, ItemStack stack, boolean all) { return tryAddStack(inventory, stack, 0, inventory.getContainerSize(), all, true); }
+	public static boolean tryAddStack(Container inventory, ItemStack stack, boolean all, boolean doAdd) { return tryAddStack(inventory, stack, 0, inventory.getContainerSize(), all, doAdd); }
+	public static boolean tryAddStack(Container inventory, ItemStack stack, int startSlot, int slots, boolean all) { return tryAddStack(inventory, stack, startSlot, slots, all, true); }
+	public static boolean tryAddStack(Container inventory, ItemStack stack, int startSlot, int slots, boolean all, boolean doAdd) {
+		try (var tx = transaction()) {
+			int added = insert(inventory, stack, startSlot, slots, tx);
+			boolean success = all ? added == stack.getCount() : added > 0;
+			if (success && doAdd) tx.commit();
+			return success;
+		}
+	}
+
+	public static int addStack(Container inventory, ItemStack stack, boolean doAdd) { return addStack(inventory, stack, 0, inventory.getContainerSize(), doAdd); }
+	public static int addStack(Container inventory, ItemStack stack, int startSlot, int slots, boolean doAdd) {
+		try (var tx = transaction()) {
+			int added = insert(inventory, stack, startSlot, slots, tx);
+			if (doAdd) tx.commit();
+			return added;
+		}
+	}
+
+	private static int insert(Container inventory, ItemStack stack, int start, int size, TransactionContext tx) {
+		java.util.Objects.checkFromIndexSize(start, size, inventory.getContainerSize());
+		if (stack.isEmpty()) return 0;
+		var view = new InventoryTransferView(getTransferHandler(inventory), size, i -> start + i, (i, r) -> true, (i, r) -> true);
+		return ResourceHandlerUtil.insertStacking(view, ItemResource.of(stack), stack.getCount(), tx);
+	}
+
+	public static boolean stowInInventory(ItemStack stack, Container inventory, boolean doAdd) { return stowInInventory(stack, inventory, doAdd, 0, inventory.getContainerSize()); }
+	public static boolean stowInInventory(ItemStack stack, Container inventory, boolean doAdd, int start, int slots) {
+		try (var tx = transaction()) {
+			int added = insert(inventory, stack, start, slots, tx);
+			if (doAdd && added > 0) {
+				// The caller's loose stack is also part of the transaction.
+				new net.neoforged.neoforge.transfer.transaction.SnapshotJournal<ItemStack>() {
+					@Override protected ItemStack createSnapshot() { return stack.copy(); }
+					@Override protected void revertToSnapshot(ItemStack snapshot) { stack.setCount(snapshot.getCount()); }
+				}.updateSnapshots(tx);
+				stack.shrink(added);
+				tx.commit();
+			}
+			return added > 0;
+		}
+	}
+
+	private static boolean stowRemainder(ItemStack stack, Container inventory, int slot, @Nullable Player player, TransactionContext tx) {
+		int added = insert(inventory, stack, slot, 1, tx);
+		added += insert(inventory, stack.copyWithCount(stack.getCount() - added), 0, inventory.getContainerSize(), tx);
+		if (added == stack.getCount()) return true;
+		if (player == null) return false;
+		ItemStack dropped = stack.copyWithCount(stack.getCount() - added);
+		new RootCommitJournal(() -> player.drop(dropped, true)).updateSnapshots(tx);
 		return true;
 	}
 
-	public static boolean tryAddStack(Container inventory, ItemStack stack, boolean all) {
-		return tryAddStack(inventory, stack, 0, inventory.getContainerSize(), all, true);
-	}
-
-	public static boolean tryAddStack(Container inventory, ItemStack stack, boolean all, boolean doAdd) {
-		return tryAddStack(inventory, stack, 0, inventory.getContainerSize(), all, doAdd);
-	}
-
-	/**
-	 * Tries to add a stack to the specified slot range.
-	 */
-	public static boolean tryAddStack(Container inventory, ItemStack stack, int startSlot, int slots, boolean all) {
-		return tryAddStack(inventory, stack, startSlot, slots, all, true);
-	}
-
-	public static boolean tryAddStack(Container inventory, ItemStack stack, int startSlot, int slots, boolean all, boolean doAdd) {
-		int added = addStack(inventory, stack, startSlot, slots, false);
-		boolean success = all ? added == stack.getCount() : added > 0;
-
-		if (success && doAdd) {
-			addStack(inventory, stack, startSlot, slots, true);
-		}
-
-		return success;
-	}
-
-	public static int addStack(Container inventory, ItemStack stack, boolean doAdd) {
-		return addStack(inventory, stack, 0, inventory.getContainerSize(), doAdd);
-	}
-
-	public static int addStack(Container inventory, ItemStack stack, int startSlot, int slots, boolean doAdd) {
-		if (stack.isEmpty()) {
-			return 0;
-		}
-
-		int added = 0;
-		// Add to existing stacks first
-		for (int i = startSlot; i < startSlot + slots; i++) {
-
-			ItemStack inventoryStack = inventory.getItem(i);
-			// Empty slot. Add
-			if (inventoryStack.isEmpty()) {
-				continue;
+	public static void stowContainerItem(ItemStack stack, Container inventory, int slot, @Nullable Player player) {
+		var remainder = stack.getCraftingRemainder();
+		if (remainder == null) return;
+		try (var tx = transaction()) {
+			for (int i = 0; i < stack.getCount(); i++) {
+				if (!stowRemainder(remainder.create(), inventory, slot, player, tx)) return;
 			}
-
-			// Already occupied by different item, skip this slot.
-			if (!inventoryStack.isStackable()) {
-				continue;
-			}
-			if (!ItemStackUtil.isIdenticalItem(inventoryStack, stack)) {
-				continue;
-			}
-
-			int remain = stack.getCount() - added;
-			int space = inventoryStack.getMaxStackSize() - inventoryStack.getCount();
-			// No space left, skip this slot.
-			if (space <= 0) {
-				continue;
-			}
-			// Enough space
-			if (space >= remain) {
-				if (doAdd) {
-					inventoryStack.grow(remain);
-				}
-				return stack.getCount();
-			}
-
-			// Not enough space
-			if (doAdd) {
-				inventoryStack.setCount(inventoryStack.getMaxStackSize());
-			}
-
-			added += space;
-		}
-
-		if (added >= stack.getCount()) {
-			return added;
-		}
-
-		for (int i = startSlot; i < startSlot + slots; i++) {
-			if (inventory.getItem(i).isEmpty()) {
-				if (doAdd) {
-					inventory.setItem(i, stack.copy());
-					inventory.getItem(i).setCount(stack.getCount() - added);
-				}
-				return stack.getCount();
-			}
-		}
-
-		return added;
-	}
-
-	public static boolean stowInInventory(ItemStack stack, Container inventory, boolean doAdd) {
-		return stowInInventory(stack, inventory, doAdd, 0, inventory.getContainerSize());
-	}
-
-	public static boolean stowInInventory(ItemStack stack, Container inventory, boolean doAdd, int slot1, int count) {
-		boolean added = false;
-
-		for (int i = slot1; i < slot1 + count; i++) {
-			ItemStack inventoryStack = inventory.getItem(i);
-
-			// Grab those free slots
-			if (inventoryStack.isEmpty()) {
-				if (doAdd) {
-					inventory.setItem(i, stack.copy());
-					stack.setCount(0);
-				}
-				return true;
-			}
-
-			// Already full
-			if (inventoryStack.getCount() >= inventoryStack.getMaxStackSize()) {
-				continue;
-			}
-
-			// Not same type
-			if (!ItemStackUtil.isIdenticalItem(inventoryStack, stack)) {
-				continue;
-			}
-
-			int space = inventoryStack.getMaxStackSize() - inventoryStack.getCount();
-
-			// Enough space to add all
-			if (space > stack.getCount()) {
-				if (doAdd) {
-					inventoryStack.grow(stack.getCount());
-					stack.setCount(0);
-				}
-				return true;
-				// Only part can be added
-			} else {
-				if (doAdd) {
-					inventoryStack.setCount(inventoryStack.getMaxStackSize());
-					stack.shrink(space);
-				}
-				added = true;
-			}
-
-		}
-
-		return added;
-	}
-
-	public static void stowContainerItem(ItemStack itemstack, Container stowing, int slotIndex, @Nullable Player player) {
-		if (!itemstack.getItem().hasCraftingRemainingItem(itemstack)) {
-			return;
-		}
-
-		ItemStack container = CommonHooks.getCraftingRemainingItem(itemstack);
-		if (!container.isEmpty()) {
-			if (!tryAddStack(stowing, container, slotIndex, 1, true)) {
-				if (!tryAddStack(stowing, container, true) && player != null) {
-					player.drop(container, true);
-				}
-			}
+			tx.commit();
 		}
 	}
 
@@ -427,47 +275,19 @@ public abstract class InventoryUtil {
 		dropSockets(socketable, level, pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	/* NBT */
-
-	/**
-	 * The database has an inventory large enough that int must be used here instead of byte
-	 */
-	public static void readFromNBT(Container inventory, String name, CompoundTag compoundNBT) {
-		if (!compoundNBT.contains(name)) {
-			return;
-		}
-
-		ListTag nbttaglist = compoundNBT.getList(name, 10);
-
-		for (int j = 0; j < nbttaglist.size(); ++j) {
-			CompoundTag compoundNBT2 = nbttaglist.getCompound(j);
-			int index = compoundNBT2.getInt("Slot");
-			inventory.setItem(index, deserializeItemStack(compoundNBT2));
-		}
+	public static void readFromNBT(Container inventory, String name, CompoundTag tag, HolderLookup.Provider registries) {
+		InventoryData.read(inventory, name, tag, registries);
 	}
 
-	public static void writeToNBT(Container inventory, String name, CompoundTag compoundNBT) {
-		ListTag nbttaglist = new ListTag();
-		for (int i = 0; i < inventory.getContainerSize(); i++) {
-			if (!inventory.getItem(i).isEmpty()) {
-				CompoundTag compoundNBT2 = serializeItemStack(inventory.getItem(i));
-				compoundNBT2.putInt("Slot", i);
-				nbttaglist.add(compoundNBT2);
-			}
-		}
-		compoundNBT.put(name, nbttaglist);
+	public static void writeToNBT(Container inventory, String name, CompoundTag tag, HolderLookup.Provider registries) {
+		InventoryData.write(inventory, name, tag, registries);
 	}
 
-	public static ItemStack deserializeItemStack(CompoundTag nbt) {
-		DataResult<ItemStack> result = ItemStack.CODEC.parse(NbtOps.INSTANCE, nbt);
-		return result.result().orElse(ItemStack.EMPTY);
+	public static ItemStack deserializeItemStack(CompoundTag tag, HolderLookup.Provider registries) {
+		return InventoryData.readStack(tag, registries);
 	}
 
-	public static CompoundTag serializeItemStack(ItemStack stack) {
-		DataResult<net.minecraft.nbt.Tag> result = ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, stack);
-		return result.result()
-			.filter(CompoundTag.class::isInstance)
-			.map(CompoundTag.class::cast)
-			.orElseGet(CompoundTag::new);
+	public static CompoundTag serializeItemStack(ItemStack stack, HolderLookup.Provider registries) {
+		return InventoryData.writeStack(stack, registries);
 	}
 }

@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:kauri_planks"
-      },
-      {
-        "item": "forestry:kauri_fireproof_planks"
-      }
+      "forestry:kauri_planks",
+      "forestry:kauri_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:kauri_pressure_plate"
   }
 }

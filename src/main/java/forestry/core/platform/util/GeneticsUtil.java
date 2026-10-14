@@ -37,7 +37,7 @@ import forestry.api.arboriculture.genetics.TreeLifeStage;
 import forestry.api.lepidopterology.IButterflyNursery;
 import forestry.api.lepidopterology.genetics.IButterfly;
 import forestry.api.lepidopterology.genetics.IButterflySpecies;
-import forestry.core.platform.compat.curios.CuriosCompat;
+import forestry.core.platform.compat.NaturalistEyeAccess;
 import forestry.api.core.genetics.capability.IIndividualHandlerItem;
 import forestry.core.engine.genetics.ItemGE;
 import forestry.core.platform.tile.TileUtil;
@@ -78,7 +78,7 @@ public class GeneticsUtil {
 	}
 
 	public static boolean hasNaturalistEye(Player player) {
-		return hasNaturalistEye(player, player.getItemBySlot(EquipmentSlot.HEAD)) || (CuriosCompat.IS_LOADED && CuriosCompat.hasNaturalistEye(player));
+		return hasNaturalistEye(player, player.getItemBySlot(EquipmentSlot.HEAD)) || NaturalistEyeAccess.hasEye(player);
 	}
 
 	public static boolean hasNaturalistEye(Player player, ItemStack armorItemStack) {
@@ -190,7 +190,7 @@ public class GeneticsUtil {
 	/**
 	 * @return A stable, whitespace-free string key identifying an allele value, used by debug commands for suggestions
 	 * and matching. {@link Vec3i#toString} contains spaces, so it is rendered as {@code x_y_z}; all other built-in
-	 * value types ({@code Float}/{@code Integer}/{@code Boolean}/enum/{@link ResourceLocation}) are already space-free.
+	 * value types ({@code Float}/{@code Integer}/{@code Boolean}/enum/{@link Identifier}) are already space-free.
 	 */
 	public static String alleleKey(Allele<?> allele) {
 		Object value = allele.value();

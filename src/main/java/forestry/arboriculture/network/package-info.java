@@ -1,4 +1,5 @@
-@javax.annotation.ParametersAreNonnullByDefault
 @forestry.core.platform.util.FieldsAreNonnullByDefault
-@net.minecraft.MethodsReturnNonnullByDefault
+@NullMarked
 package forestry.arboriculture.network;
+
+import org.jspecify.annotations.NullMarked;

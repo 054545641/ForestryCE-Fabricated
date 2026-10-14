@@ -10,8 +10,8 @@ import net.minecraft.world.level.material.MapColor;
 public class ForestryWallHangingSignBlock extends WallHangingSignBlock implements IWoodTyped {
 	private final ForestryWoodType type;
 
-	public ForestryWallHangingSignBlock(ForestryWoodType type) {
-		super(type.getWoodType(), Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(1.0F).lootFrom(ArboricultureBlocks.HANGING_SIGN.get(type)::block).ignitedByLava());
+	public ForestryWallHangingSignBlock(Properties properties, ForestryWoodType type) {
+		super(type.getWoodType(), properties.mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollision().strength(1.0F).overrideLootTable(ArboricultureBlocks.HANGING_SIGN.get(type).block().getLootTable()).ignitedByLava());
 
 		this.type = type;
 	}

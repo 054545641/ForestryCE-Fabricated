@@ -1,18 +1,8 @@
 {
   "parent": "minecraft:block/bricks",
   "children": {
-    "base": {
-      "parent": "minecraft:block/bricks",
-      "render_type": "minecraft:solid"
-    },
-    "overlay": {
-      "parent": "minecraft:block/cube_column",
-      "render_type": "minecraft:cutout",
-      "textures": {
-        "end": "forestry:block/farm/top",
-        "side": "forestry:block/farm/plain"
-      }
-    }
+    "base": "minecraft:block/bricks",
+    "overlay": "forestry:block/brick_farm_plain_overlay"
   },
   "item_render_order": [
     "base",

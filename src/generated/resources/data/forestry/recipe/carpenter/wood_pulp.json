@@ -1,17 +1,13 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/wood_pulp",
   "liquid": {
     "amount": 250,
     "id": "minecraft:water"
   },
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "tag": "minecraft:logs"
-      }
+      "#minecraft:logs"
     ],
     "result": {
       "count": 4,

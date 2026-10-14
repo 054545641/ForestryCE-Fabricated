@@ -11,13 +11,10 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
 
-import java.util.LinkedList;
-import java.util.List;
-
 public class BackpackResupplyHandler {
 	private static NonNullList<ItemStack> getBackpacks(Inventory playerInventory) {
 		NonNullList<ItemStack> backpacks = NonNullList.create();
-		for (ItemStack itemStack : playerInventory.items) {
+		for (ItemStack itemStack : playerInventory.getNonEquipmentItems()) {
 			if (itemStack.getItem() instanceof BackpackItem) {
 				backpacks.add(itemStack);
 			}
@@ -27,7 +24,7 @@ public class BackpackResupplyHandler {
 
 	public static void resupply(Player player) {
 		// Do not attempt resupplying if this backpack is already opened.
-		if (player.containerMenu instanceof InventoryMenu) {
+		if (!player.level().isClientSide() && player.containerMenu instanceof InventoryMenu) {
 			for (ItemStack backpack : getBackpacks(player.getInventory())) {
 				if (BackpackItem.getMode(backpack) == BackpackMode.RESUPPLY) {
 					// Load their inventory
@@ -36,42 +33,16 @@ public class BackpackResupplyHandler {
 
 					BackpackResupplyEvent event = new BackpackResupplyEvent(player, backpackItem.getDefinition(), backpackInventory);
 					if (!NeoForge.EVENT_BUS.post(event).isCanceled()) {
-						for (int i = 0; i < backpackInventory.getContainerSize(); i++) {
-							ItemStack itemStack = backpackInventory.getItem(i);
-							if (topOffPlayerInventory(player, itemStack)) {
-								backpackInventory.setItem(i, itemStack);
-								break;
+						try (var transaction = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+							for (int i = 0; i < backpackInventory.getContainerSize(); i++) {
+								if (BackpackTransfers.topOff(player, backpackInventory.getTransferHandler(), i, 1, transaction) > 0) break;
 							}
+							transaction.commit();
 						}
 					}
 				}
 			}
 		}
-	}
-
-	/**
-	 * This tops off existing stacks in the player's inventory.
-	 * Adds to player inventory if there is an incomplete stack in there.
-	 */
-	private static boolean topOffPlayerInventory(Player player, ItemStack itemstack) {
-		if (itemstack.isEmpty()) {
-			return false;
-		}
-		Inventory playerInventory = player.getInventory();
-		List<ItemStack> inventory = new LinkedList<>();
-		inventory.addAll(playerInventory.items);
-		inventory.addAll(playerInventory.offhand);
-
-		for (ItemStack inventoryStack : inventory) {
-			if (playerInventory.hasRemainingSpaceForItem(inventoryStack, itemstack)) {
-				inventoryStack.grow(1);
-				inventoryStack.setPopTime(5);
-				itemstack.shrink(1);
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 }

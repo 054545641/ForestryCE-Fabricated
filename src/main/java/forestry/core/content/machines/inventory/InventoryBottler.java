@@ -1,5 +1,6 @@
 package forestry.core.content.machines.inventory;
 
+
 import forestry.core.platform.fluids.FluidHelper;
 import forestry.core.platform.inventory.InventoryAdapterTile;
 import forestry.core.content.machines.tiles.TileBottler;
@@ -7,7 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ public class InventoryBottler extends InventoryAdapterTile<TileBottler> {
 		if (slotIndex == SLOT_INPUT_EMPTY_CONTAINER) {
 			return FluidHelper.isFillableContainerWithRoom(stack);
 		} else if (slotIndex == SLOT_INPUT_FULL_CONTAINER) {
-			Optional<FluidStack> fluidStack = FluidUtil.getFluidContained(stack);
+			Optional<FluidStack> fluidStack = Optional.of(FluidUtil.getFirstStackContained(stack)).filter(contents -> !contents.isEmpty());
 			return fluidStack.map(f -> f.getFluid() != Fluids.EMPTY).orElse(false);
 		}
 		return false;

@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -63,7 +63,7 @@ public class TreeReloadSideEffectsTest {
 		ITree before = type.getVanillaIndividual(keptState);
 		int handlersBefore = type.getLeafTickHandlers().size();
 
-		ImmutableMap<ResourceLocation, ITreeSpecies> full = ImmutableMap.copyOf(
+		ImmutableMap<Identifier, ITreeSpecies> full = ImmutableMap.copyOf(
 			type.getAllSpeciesIds().stream().collect(Collectors.toMap(id -> id, type::getSpecies))
 		);
 

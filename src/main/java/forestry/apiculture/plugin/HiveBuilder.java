@@ -9,7 +9,7 @@ import forestry.api.core.genetics.alleles.IChromosome;
 import forestry.api.plugin.IHiveBuilder;
 import forestry.apiculture.bees.genetics.HiveDrop;
 import forestry.apiculture.hives.Hive;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -30,8 +30,8 @@ public class HiveBuilder implements IHiveBuilder {
 	}
 
 	@Override
-	public IHiveBuilder addDrop(double chance, ResourceLocation speciesId, Supplier<List<ItemStack>> extraItems, float ignobleChance, Map<IChromosome<?>, Allele<?>> alleles) {
-		this.drops.add(new HiveDrop(chance, speciesId, extraItems.get(), ignobleChance, alleles));
+	public IHiveBuilder addDrop(double chance, Identifier speciesId, Supplier<List<ItemStack>> extraItems, float ignobleChance, Map<IChromosome<?>, Allele<?>> alleles) {
+		this.drops.add(new HiveDrop(chance, speciesId, extraItems, ignobleChance, alleles));
 		return this;
 	}
 

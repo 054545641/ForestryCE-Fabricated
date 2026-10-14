@@ -9,9 +9,9 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.AdvancementType;
-import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import forestry.api.ForestryConstants;
@@ -71,7 +71,7 @@ public final class ForestryAdvancements {
 		return Advancement.Builder.advancement()
 			.parent(parent)
 			.display(
-				icon,
+				net.minecraft.world.item.ItemStackTemplate.fromNonEmptyStack(icon),
 				Component.translatable("advancements.forestry." + name + ".title"),
 				Component.translatable("advancements.forestry." + name + ".description"),
 				null,
@@ -106,7 +106,7 @@ public final class ForestryAdvancements {
 	// Deviation from 1.20.1: a parent is passed as an Advancement in 1.20.1 and as an AdvancementHolder
 	// in 1.21. The overload taking a bare id is deprecated for removal, so a holder stands in instead
 	public static AdvancementHolder reference(String name) {
-		ResourceLocation id = ForestryConstants.forestry(name);
+		Identifier id = ForestryConstants.forestry(name);
 		Advancement empty = new Advancement(Optional.empty(), Optional.empty(), AdvancementRewards.EMPTY, Map.of(), AdvancementRequirements.EMPTY, false);
 		return new AdvancementHolder(id, empty);
 	}

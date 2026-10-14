@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_stairs",
   "key": {
-    "#": {
-      "item": "forestry:sour_cherry_planks"
-    }
+    "#": "forestry:sour_cherry_planks"
   },
   "pattern": [
     "#  ",

@@ -13,8 +13,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import forestry.core.platform.item.ItemForestry;
 
 public class ItemWrench extends ItemForestry {
-	public ItemWrench() {
-		super(new Properties());
+	public ItemWrench(Properties properties) {
+		super(properties);
 	}
 
 	@Override

@@ -11,7 +11,6 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.util.FakePlayer;
@@ -59,7 +58,7 @@ public class ManualAccessTest {
 		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(CoreItems.FORESTERS_MANUAL.item()));
 
 		// a missing provider must not throw NoClassDefFoundError, consume the item, or fail the use
-		InteractionResultHolder<ItemStack> result = CoreItems.FORESTERS_MANUAL.item()
+		InteractionResult result = CoreItems.FORESTERS_MANUAL.item()
 			.use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
 		helper.assertTrue(result.getResult() == InteractionResult.SUCCESS,
 			"expected SUCCESS using the manual without patchouli, got " + result.getResult());

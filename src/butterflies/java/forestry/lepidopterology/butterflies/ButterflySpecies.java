@@ -17,7 +17,7 @@ import forestry.lepidopterology.butterflies.genetics.Butterfly;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 
@@ -38,7 +38,7 @@ public class ButterflySpecies extends Species<IButterflySpeciesType, IButterfly>
 	private final List<IProduct> products;
 	private final List<IProduct> caterpillarProducts;
 
-	public ButterflySpecies(ResourceLocation id, IButterflySpeciesType speciesType, IGenome defaultGenome, IButterflySpeciesBuilder builder) {
+	public ButterflySpecies(Identifier id, IButterflySpeciesType speciesType, IGenome defaultGenome, IButterflySpeciesBuilder builder) {
 		super(id, speciesType, defaultGenome, builder);
 
 		this.temperature = builder.getTemperature();

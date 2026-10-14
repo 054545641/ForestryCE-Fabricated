@@ -3,9 +3,7 @@
   "category": "building",
   "group": "bark",
   "key": {
-    "#": {
-      "item": "forestry:jacaranda_stripped_log"
-    }
+    "#": "forestry:jacaranda_stripped_log"
   },
   "pattern": [
     "##",

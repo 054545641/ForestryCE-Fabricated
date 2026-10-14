@@ -2,7 +2,7 @@ package forestry.core.data.builder;
 
 import forestry.apiculture.recipes.HygroregulatorRecipe;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 public class HygroregulatorRecipeBuilder {
@@ -31,7 +31,7 @@ public class HygroregulatorRecipeBuilder {
 		return this;
 	}
 
-	public void build(RecipeOutput output, ResourceLocation id) {
-		output.accept(id, new HygroregulatorRecipe(id, this.liquid, this.retainTime, (byte) this.humiditySteps, (byte) this.temperatureSteps), null);
+	public void build(RecipeOutput output, Identifier id) {
+		output.accept(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id), new HygroregulatorRecipe(id, this.liquid, this.retainTime, (byte) this.humiditySteps, (byte) this.temperatureSteps), null);
 	}
 }

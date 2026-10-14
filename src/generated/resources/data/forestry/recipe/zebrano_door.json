@@ -4,12 +4,8 @@
   "group": "wooden_door",
   "key": {
     "#": [
-      {
-        "item": "forestry:zebrano_planks"
-      },
-      {
-        "item": "forestry:zebrano_fireproof_planks"
-      }
+      "forestry:zebrano_planks",
+      "forestry:zebrano_fireproof_planks"
     ]
   },
   "pattern": [

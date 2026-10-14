@@ -1,51 +1,45 @@
 package forestry.apiculture.bees.genetics;
 
 import forestry.api.apiculture.genetics.IBee;
-import forestry.api.apiculture.genetics.IBeeSpecies;
 import forestry.api.apiculture.hives.IHiveDrop;
 import forestry.api.core.genetics.alleles.Allele;
 import forestry.api.core.genetics.alleles.IChromosome;
 import forestry.core.platform.util.SpeciesUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class HiveDrop implements IHiveDrop {
-	private final ResourceLocation speciesId;
+	private final Identifier speciesId;
 	private final double chance;
-	private final List<ItemStack> bonus;
+	private final Supplier<List<ItemStack>> bonus;
 	private final double ignobleChance;
 	private final Map<IChromosome<?>, Allele<?>> alleles;
 
-	@Nullable
-	private IBeeSpecies species;
-
-	public HiveDrop(double chance, ResourceLocation speciesId, List<ItemStack> bonus, float ignobleChance, Map<IChromosome<?>, Allele<?>> alleles) {
+	public HiveDrop(double chance, Identifier speciesId, Supplier<List<ItemStack>> bonus, float ignobleChance, Map<IChromosome<?>, Allele<?>> alleles) {
 		this.speciesId = speciesId;
 		this.chance = chance;
 		this.bonus = bonus;
 		this.ignobleChance = ignobleChance;
-		this.alleles = alleles;
+		this.alleles = Map.copyOf(alleles);
 	}
 
 	@Override
 	public IBee createIndividual(BlockGetter level, BlockPos pos) {
-		if (this.species == null) {
-			this.species = SpeciesUtil.getBeeSpecies(this.speciesId);
-		}
-		return this.species.createIndividual(this.alleles);
+		// Species objects are replaced on reload; resolve the current one for each drop.
+		return SpeciesUtil.getBeeSpecies(this.speciesId).createIndividual(this.alleles);
 	}
 
 	@Override
 	public List<ItemStack> getExtraItems(BlockGetter level, BlockPos pos, int fortune) {
 		ArrayList<ItemStack> result = new ArrayList<>();
-		for (ItemStack stack : this.bonus) {
+		for (ItemStack stack : this.bonus.get()) {
 			result.add(stack.copy());
 		}
 

@@ -1,17 +1,13 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/turf_blocks",
   "liquid": {
     "amount": 100,
     "id": "minecraft:water"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "X": {
-        "item": "minecraft:grass_block"
-      }
+      "X": "minecraft:grass_block"
     },
     "pattern": [
       "XX",

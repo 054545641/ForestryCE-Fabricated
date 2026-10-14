@@ -8,12 +8,8 @@
   "recipe": {
     "category": "building",
     "key": {
-      "#": {
-        "item": "forestry:refractory_wax"
-      },
-      "X": {
-        "item": "forestry:kauri_wood"
-      }
+      "#": "forestry:refractory_wax",
+      "X": "forestry:kauri_wood"
     },
     "pattern": [
       "   ",

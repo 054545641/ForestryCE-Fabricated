@@ -1,10 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "item": "forestry:tin_block"
-    }
+    "forestry:tin_block"
   ],
   "result": {
     "count": 9,

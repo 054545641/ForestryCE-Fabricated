@@ -11,6 +11,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.resources.Identifier;
+import forestry.core.platform.util.SavedDataMigration;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -93,18 +96,21 @@ public class TradeStationRegistry extends SavedData implements IWatchable.Watche
 
 	private static TradeStationRegistry load(CompoundTag compoundTag, HolderLookup.Provider registries) {
 		TradeStationRegistry registry = new TradeStationRegistry();
-		ListTag tradeStations = compoundTag.getList("tradeStations", 10);
+		ListTag tradeStations = compoundTag.getList("tradeStations").orElseThrow(() -> new IllegalArgumentException("Missing tradeStations list"));
 		for (int i = 0; i < tradeStations.size(); ++i) {
-			CompoundTag stationTag = tradeStations.getCompound(i);
+			CompoundTag stationTag = tradeStations.getCompound(i).orElseThrow(() -> new IllegalArgumentException("Invalid mail registry entry"));
 
-			IMailAddress address = new MailAddress(stationTag.getCompound("address"));
-			ITradeStation station = new TradeStation(stationTag.getCompound("station"), registries);
-			registry.registerTradeStation(address, station);
+			IMailAddress address = new MailAddress(stationTag.getCompound("address").orElseThrow(() -> new IllegalArgumentException("Missing mail address")));
+			ITradeStation station = new TradeStation(stationTag.getCompound("station").orElseThrow(() -> new IllegalArgumentException("Missing station data")), registries);
+			if (!address.isValid() || !address.getCarrier().equals(PostalCarriers.TRADER.value()) || registry.getTradeStation(address) != null) {
+				throw new IllegalArgumentException("Invalid or duplicate mail address " + address);
+			}
+			registry.cachedTradeStations.put(address, station);
+			station.registerUpdateWatcher(registry);
 		}
 		return registry;
 	}
 
-	@Override
 	public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider registries) {
 		ListTag tradeStations = new ListTag();
 		for (Map.Entry<IMailAddress, ITradeStation> entry : this.cachedTradeStations.entrySet()) {
@@ -118,7 +124,9 @@ public class TradeStationRegistry extends SavedData implements IWatchable.Watche
 	}
 
 	public static TradeStationRegistry getOrCreate(ServerLevel level) {
-		SavedData.Factory<TradeStationRegistry> factory = new SavedData.Factory<>(TradeStationRegistry::create, TradeStationRegistry::load);
-		return level.getDataStorage().computeIfAbsent(factory, SAVE_NAME);
+		var registries = level.registryAccess();
+		SavedDataType<TradeStationRegistry> type = new SavedDataType<>(Identifier.parse("forestry:mail/trade_stations"),
+			TradeStationRegistry::create, CompoundTag.CODEC.xmap(tag -> load(tag, registries), data -> data.save(new CompoundTag(), registries)));
+		return SavedDataMigration.getOrCreate(level, type, SAVE_NAME, tag -> load(tag, registries));
 	}
 }

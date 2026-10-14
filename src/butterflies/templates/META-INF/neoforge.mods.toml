@@ -1,5 +1,3 @@
-modLoader = "javafml"
-loaderVersion = "{fmlVersionRange}"
 issueTrackerURL = "https://github.com/thedarkcolour/ForestryCE/issues"
 
 license = "GNU Lesser Public License v3"
@@ -9,7 +7,7 @@ modId = "forestrybutterflies"
 version = "${version}"
 displayName = "Forestry: Butterflies"
 displayURL = "https://github.com/thedarkcolour/ForestryCE"
-logoFile = "forestry-ce-logo-banner.png"
+bannerFile = "forestry-ce-logo-banner.png"
 authors = "thedarkcolour, SirSengir, mezz, Nedelosk"
 description = '''
 Butterflies, cocoons and the lepidopterist chain.
@@ -27,4 +25,11 @@ modId = "forestry"
 type = "REQUIRED"
 versionRange = "[${version},]"
 ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.forestrybutterflies]]
+modId = "minecraft"
+type = "REQUIRED"
+versionRange = "${minecraftVersionRange}"
+ordering = "NONE"
 side = "BOTH"

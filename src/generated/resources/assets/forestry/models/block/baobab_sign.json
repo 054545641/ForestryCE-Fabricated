@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/baobab_planks"
-  }
+  "parent": "forestry:block/baobab_sign_rot_0"
 }

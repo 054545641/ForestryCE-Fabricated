@@ -3,16 +3,11 @@
   "category": "redstone",
   "ingredients": [
     [
-      {
-        "item": "forestry:mahoe_planks"
-      },
-      {
-        "item": "forestry:mahoe_fireproof_planks"
-      }
+      "forestry:mahoe_planks",
+      "forestry:mahoe_fireproof_planks"
     ]
   ],
   "result": {
-    "count": 1,
     "id": "forestry:mahoe_button"
   }
 }

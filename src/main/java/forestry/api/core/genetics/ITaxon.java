@@ -2,7 +2,7 @@ package forestry.api.core.genetics;
 
 import forestry.api.core.genetics.alleles.Allele;
 import forestry.api.core.genetics.alleles.IChromosome;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -55,7 +55,7 @@ public interface ITaxon {
 	 * @param reference The referenced value's ID for a reference chromosome, or {@code null} for a data chromosome.
 	 * @param required  Whether members of the taxon are required to have this chromosome.
 	 */
-	record TaxonAllele(@Nullable Allele<?> allele, @Nullable ResourceLocation reference, boolean required) {
+	record TaxonAllele(@Nullable Allele<?> allele, @Nullable Identifier reference, boolean required) {
 		/**
 		 * @return A taxon default for a data chromosome.
 		 */
@@ -66,7 +66,7 @@ public interface ITaxon {
 		/**
 		 * @return A taxon default for a reference chromosome (species, flower type, effect, ...).
 		 */
-		public static TaxonAllele reference(ResourceLocation id, boolean required) {
+		public static TaxonAllele reference(Identifier id, boolean required) {
 			return new TaxonAllele(null, id, required);
 		}
 	}

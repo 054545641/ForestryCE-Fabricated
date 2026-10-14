@@ -4,12 +4,8 @@
   "group": "wooden_door",
   "key": {
     "#": [
-      {
-        "item": "forestry:olive_planks"
-      },
-      {
-        "item": "forestry:olive_fireproof_planks"
-      }
+      "forestry:olive_planks",
+      "forestry:olive_fireproof_planks"
     ]
   },
   "pattern": [

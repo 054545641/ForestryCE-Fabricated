@@ -54,7 +54,7 @@ public interface IBeekeepingLogic extends INbtWritable, INbtReadable {
 	/* CLIENT */
 
 	/**
-	 * Sync to client by using {@link #write(net.minecraft.nbt.CompoundTag)} in your {@link net.minecraft.world.level.block.entity.BlockEntity#getUpdateTag()}
+	 * Synchronizes the current beekeeping state to clients tracking the housing.
 	 */
 	void syncToClient();
 

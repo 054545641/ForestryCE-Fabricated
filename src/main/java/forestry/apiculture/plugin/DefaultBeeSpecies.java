@@ -13,7 +13,7 @@ import forestry.apiculture.bees.EnumPollenCluster;
 import forestry.core.features.CoreItems;
 import forestry.core.content.resources.EnumCraftingMaterial;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -28,7 +28,7 @@ import forestry.api.apiculture.ForestryFlowerTypes;
 public class DefaultBeeSpecies {
 	@SuppressWarnings("CodeBlock2Expr")
 	public static void register(IApicultureRegistration apiculture) {
-		ResourceLocation[] overworldHiveBees = new ResourceLocation[]{ForestryBeeSpecies.FOREST, ForestryBeeSpecies.MARSHY, ForestryBeeSpecies.MEADOWS, ForestryBeeSpecies.MODEST, ForestryBeeSpecies.SAVANNA, ForestryBeeSpecies.TROPICAL, ForestryBeeSpecies.VALIANT, ForestryBeeSpecies.WINTRY, ForestryBeeSpecies.LUSH, ForestryBeeSpecies.AQUATIC};
+		Identifier[] overworldHiveBees = new Identifier[]{ForestryBeeSpecies.FOREST, ForestryBeeSpecies.MARSHY, ForestryBeeSpecies.MEADOWS, ForestryBeeSpecies.MODEST, ForestryBeeSpecies.SAVANNA, ForestryBeeSpecies.TROPICAL, ForestryBeeSpecies.VALIANT, ForestryBeeSpecies.WINTRY, ForestryBeeSpecies.LUSH, ForestryBeeSpecies.AQUATIC};
 
 		// Forest
 		apiculture.registerSpecies(ForestryBeeSpecies.FOREST, GENUS_HONEY, SPECIES_FOREST, true, TextColor.fromRgb(0x19d0ec))

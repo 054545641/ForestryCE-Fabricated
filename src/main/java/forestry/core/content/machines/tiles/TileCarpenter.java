@@ -1,5 +1,9 @@
 package forestry.core.content.machines.tiles;
 
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+
 import forestry.api.core.ForestryError;
 import forestry.api.core.IErrorLogic;
 import forestry.api.core.machines.ICarpenterRecipe;
@@ -39,9 +43,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 
 import javax.annotation.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public class TileCarpenter extends TilePowered implements WorldlyContainer, ILiquidTankTile, IItemStackDisplay {
 	private static final int STEPS_PER_RECIPE_TIME = 1;
@@ -55,6 +63,13 @@ public class TileCarpenter extends TilePowered implements WorldlyContainer, ILiq
 
 	@Nullable
 	private ICarpenterRecipe currentRecipe;
+	private record ProcessingState(ICarpenterRecipe recipe, ItemStack preview) {}
+	@Override protected Object captureProcessingState() { return new ProcessingState(this.currentRecipe, this.craftPreviewInventory.getItem(0).copy()); }
+	@Override protected void restoreProcessingState(Object state) {
+		var previous = (ProcessingState) state;
+		this.currentRecipe = previous.recipe();
+		this.craftPreviewInventory.setItem(0, previous.preview());
+	}
 
 	private ItemStack getBoxStack() {
 		return getInternalInventory().getItem(InventoryCarpenter.SLOT_BOX);
@@ -75,16 +90,22 @@ public class TileCarpenter extends TilePowered implements WorldlyContainer, ILiq
 	/* LOADING & SAVING */
 
 	@Override
-	public void saveAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.saveAdditional(compoundNBT, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag compoundNBT = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
 
-        this.tankManager.write(compoundNBT, registries);
+        this.tankManager.write(output);
         this.craftingInventory.write(compoundNBT, registries);
+
+		ValueIOUtil.mergeInto(output, compoundNBT);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.loadAdditional(compoundNBT, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compoundNBT = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
         this.tankManager.read(compoundNBT, registries);
         this.craftingInventory.read(compoundNBT, registries);
 	}
@@ -103,18 +124,17 @@ public class TileCarpenter extends TilePowered implements WorldlyContainer, ILiq
 	}
 
 	public void checkRecipe(RegistryAccess registryAccess) {
-		if (this.level.isClientSide) {
+		if (this.level.isClientSide()) {
 			return;
 		}
 
 		if (this.currentRecipe == null || !this.currentRecipe.matches(this.resourceTank.getFluid(), getBoxStack(), this.craftingInventory, this.level)) {
-			ICarpenterRecipe recipe = RecipeUtils.getCarpenterRecipe(this.level.getRecipeManager(), this.resourceTank.getFluid(), getBoxStack(), this.craftingInventory, this.level);
+			ICarpenterRecipe recipe = RecipeUtils.getCarpenterRecipe(RecipeUtils.getRecipeMap(this.level), this.resourceTank.getFluid(), getBoxStack(), this.craftingInventory, this.level);
 			this.currentRecipe = recipe;
 
 			if (recipe != null) {
 				int recipeTime = this.currentRecipe.getPackagingTime();
-				setStepsPerWorkCycle(recipeTime * STEPS_PER_RECIPE_TIME);
-				setEnergyPerWorkCycle(recipeTime * ENERGY_PER_RECIPE_TIME);
+				configureWork(recipe.getId().toString(), recipeTime * STEPS_PER_RECIPE_TIME, recipeTime * ENERGY_PER_RECIPE_TIME);
 
 				ItemStack craftingResult = this.currentRecipe.getResultItem(registryAccess);
                 this.craftPreviewInventory.setItem(0, craftingResult);
@@ -150,64 +170,58 @@ public class TileCarpenter extends TilePowered implements WorldlyContainer, ILiq
 
 	@Override
 	public boolean workCycle() {
-		if (!removeLiquidResources(true)) {
-			return false;
+		if (this.currentRecipe == null) return false;
+		try (var tx = beginWorkTransaction()) {
+			var fluid = this.currentRecipe.getInputFluid();
+			if (!fluid.isEmpty() && this.resourceTank.extractInternal(FluidResource.of(fluid), fluid.getAmount(), tx) != fluid.getAmount()) return false;
+			if (this.currentRecipe.getBox().isPresent()) {
+				ItemStack box = getBoxStack();
+				if (!this.currentRecipe.getBox().get().test(box) || getTransferHandler().extract(InventoryCarpenter.SLOT_BOX, ItemResource.of(box), 1, tx) != 1) return false;
+			}
+			Container ingredients = new InventoryMapper(getInternalInventory(), InventoryCarpenter.SLOT_INVENTORY_1, InventoryCarpenter.SLOT_INVENTORY_COUNT);
+			if (!InventoryUtil.consumeIngredients(ingredients, this.currentRecipe.getCraftingGridRecipe().placementInfo().ingredients(), null, true, false, true)) return false;
+			if (!InventoryUtil.tryAddStack(this, this.currentRecipe.getResultItem(this.level.registryAccess()), InventoryCarpenter.SLOT_PRODUCT, InventoryCarpenter.SLOT_PRODUCT_COUNT, true)) return false;
+			tx.commit();
+			return true;
 		}
-		if (!removeItemResources(true)) {
-			return false;
-		}
-
-		if (this.currentRecipe != null) {
-			ItemStack pendingProduct = this.currentRecipe.getResultItem(this.level.registryAccess());
-			InventoryUtil.tryAddStack(this, pendingProduct, InventoryCarpenter.SLOT_PRODUCT, InventoryCarpenter.SLOT_PRODUCT_COUNT, true);
-		}
-		return true;
 	}
 
-	private boolean removeLiquidResources(boolean doRemove) {
+	private boolean hasLiquidResources() {
 		if (this.currentRecipe == null) {
 			return true;
 		}
 
 		FluidStack fluid = this.currentRecipe.getInputFluid();
 		if (!fluid.isEmpty()) {
-			FluidStack drained = this.resourceTank.drainInternal(fluid, IFluidHandler.FluidAction.SIMULATE);
+			FluidStack drained = FluidHelper.simulateDrain(this.resourceTank.internal(), fluid);
 			if (!FluidStack.matches(fluid, drained)) {
 				return false;
-			}
-			if (doRemove) {
-                this.resourceTank.drainInternal(fluid, IFluidHandler.FluidAction.EXECUTE);
 			}
 		}
 
 		return true;
 	}
 
-	private boolean removeItemResources(boolean doRemove) {
+	private boolean hasItemResources() {
 		if (this.currentRecipe == null) {
 			return true;
 		}
 
 		if (!this.currentRecipe.getBox().isEmpty()) {
 			ItemStack box = getItem(InventoryCarpenter.SLOT_BOX);
-			if (box.isEmpty()) {
+			if (!this.currentRecipe.getBox().get().test(box)) {
 				return false;
-			}
-			if (doRemove) {
-				removeItem(InventoryCarpenter.SLOT_BOX, 1);
 			}
 		}
 
 		Container inventory = new InventoryMapper(getInternalInventory(), InventoryCarpenter.SLOT_INVENTORY_1, InventoryCarpenter.SLOT_INVENTORY_COUNT);
-		return InventoryUtil.consumeIngredients(inventory, this.currentRecipe.getCraftingGridRecipe().getIngredients(), null, true, false, doRemove);
+		return InventoryUtil.consumeIngredients(inventory, this.currentRecipe.getCraftingGridRecipe().placementInfo().ingredients(), null, true, false, false);
 	}
 
 	/* STATE INFORMATION */
 	@Override
 	public boolean hasWork() {
-		if (updateOnInterval(20)) {
-			checkRecipe(this.level.registryAccess());
-		}
+		checkRecipe(this.level.registryAccess());
 
 		boolean hasRecipe = this.currentRecipe != null;
 		boolean hasLiquidResources = true;
@@ -215,8 +229,8 @@ public class TileCarpenter extends TilePowered implements WorldlyContainer, ILiq
 		boolean canAdd = true;
 
 		if (hasRecipe) {
-			hasLiquidResources = removeLiquidResources(false);
-			hasItemResources = removeItemResources(false);
+			hasLiquidResources = hasLiquidResources();
+			hasItemResources = hasItemResources();
 
 			ItemStack pendingProduct = this.currentRecipe.getResultItem(this.level.registryAccess());
 			canAdd = InventoryUtil.tryAddStack(this, pendingProduct, InventoryCarpenter.SLOT_PRODUCT, InventoryCarpenter.SLOT_PRODUCT_COUNT, true, false);
@@ -258,7 +272,7 @@ public class TileCarpenter extends TilePowered implements WorldlyContainer, ILiq
 		return this.tankManager;
 	}
 
-	public IFluidHandler getFluidHandler(@Nullable Direction facing) {
+	public ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction facing) {
 		return this.tankManager;
 	}
 

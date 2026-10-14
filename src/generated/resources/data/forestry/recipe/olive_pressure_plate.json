@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:olive_planks"
-      },
-      {
-        "item": "forestry:olive_fireproof_planks"
-      }
+      "forestry:olive_planks",
+      "forestry:olive_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:olive_pressure_plate"
   }
 }

@@ -8,12 +8,8 @@
   "recipe": {
     "category": "building",
     "key": {
-      "#": {
-        "item": "forestry:refractory_wax"
-      },
-      "X": {
-        "item": "forestry:ebony_log"
-      }
+      "#": "forestry:refractory_wax",
+      "X": "forestry:ebony_log"
     },
     "pattern": [
       "   ",

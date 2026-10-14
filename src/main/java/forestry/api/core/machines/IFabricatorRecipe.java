@@ -1,5 +1,6 @@
 package forestry.api.core.machines;
 
+import java.util.Optional;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -14,9 +15,9 @@ public interface IFabricatorRecipe extends IForestryRecipe {
 	FluidStack getResultFluid();
 
 	/**
-	 * @return the plan for this recipe (the item in the top right slot)
+	 * @return The required plan, or an empty optional when no plan is required
 	 */
-	Ingredient getPlan();
+	Optional<Ingredient> getPlan();
 
 	/**
 	 * @return the crafting grid recipe. The crafting recipe's getRecipeOutput() is used as the IFabricatorRecipe's output.

@@ -5,7 +5,7 @@ import com.google.common.base.Preconditions;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -47,19 +47,19 @@ public abstract class ModUtil {
 		return true;
 	}
 
-	public static ResourceLocation getRegistryName(Fluid o) {
+	public static Identifier getRegistryName(Fluid o) {
 		return BuiltInRegistries.FLUID.getKey(o);
 	}
 
-	public static ResourceLocation getRegistryName(Block o) {
+	public static Identifier getRegistryName(Block o) {
 		return BuiltInRegistries.BLOCK.getKey(o);
 	}
 
-	public static ResourceLocation getRegistryName(Item o) {
+	public static Identifier getRegistryName(Item o) {
 		return BuiltInRegistries.ITEM.getKey(o);
 	}
 
-	public static ResourceLocation getRegistryName(ParticleType<?> o) {
+	public static Identifier getRegistryName(ParticleType<?> o) {
 		return BuiltInRegistries.PARTICLE_TYPE.getKey(o);
 	}
 
@@ -73,7 +73,7 @@ public abstract class ModUtil {
 		Preconditions.checkArgument(block != null && block != Blocks.AIR);
 	}
 
-	public static ResourceLocation withSuffix(ResourceLocation id, String suffix) {
-		return ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath() + suffix);
+	public static Identifier withSuffix(Identifier id, String suffix) {
+		return Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath() + suffix);
 	}
 }

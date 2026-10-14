@@ -48,8 +48,7 @@ public abstract class BlockBurnable extends Block {
 	}
 
 	@Override
-	public void onCaughtFire(BlockState state, Level level, BlockPos pos, @Nullable Direction direction, @Nullable LivingEntity igniter) {
-		super.onCaughtFire(state, level, pos, direction, igniter);
-		level.setBlock(pos, Blocks.FIRE.defaultBlockState(), 3);
+	public boolean onCaughtFire(BlockState state, Level level, BlockPos pos, @Nullable Direction direction, @Nullable LivingEntity igniter) {
+		return level.setBlock(pos, Blocks.FIRE.defaultBlockState(), 3);
 	}
 }

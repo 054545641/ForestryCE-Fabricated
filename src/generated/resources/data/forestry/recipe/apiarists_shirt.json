@@ -3,9 +3,7 @@
   "category": "equipment",
   "group": "apiarist_armour",
   "key": {
-    "#": {
-      "item": "forestry:woven_silk"
-    }
+    "#": "forestry:woven_silk"
   },
   "pattern": [
     "# #",
@@ -13,7 +11,6 @@
     "###"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:apiarists_shirt"
   }
 }

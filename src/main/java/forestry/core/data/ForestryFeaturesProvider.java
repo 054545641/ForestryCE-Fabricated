@@ -11,7 +11,6 @@ import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.data.worldgen.placement.OrePlacements;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -52,16 +51,19 @@ public class ForestryFeaturesProvider extends DatapackBuiltinEntriesProvider {
 	private static void addPlacedFeatures(BootstrapContext<PlacedFeature> context) {
 		HolderGetter<ConfiguredFeature<?, ?>> holders = context.lookup(Registries.CONFIGURED_FEATURE);
 
-		context.register(CoreFeatures.PLACED_APATITE, new PlacedFeature(holders.getOrThrow(CoreFeatures.ORE_APATITE), OrePlacements.commonOrePlacement(3, HeightRangePlacement.triangle(
+		context.register(CoreFeatures.PLACED_APATITE, new PlacedFeature(holders.getOrThrow(CoreFeatures.ORE_APATITE), commonOrePlacement(3, HeightRangePlacement.triangle(
 			VerticalAnchor.absolute(48),
 			VerticalAnchor.absolute(112)
 		))));
-		context.register(CoreFeatures.PLACED_TIN, new PlacedFeature(holders.getOrThrow(CoreFeatures.ORE_TIN), OrePlacements.commonOrePlacement(16, HeightRangePlacement.triangle(
+		context.register(CoreFeatures.PLACED_TIN, new PlacedFeature(holders.getOrThrow(CoreFeatures.ORE_TIN), commonOrePlacement(16, HeightRangePlacement.triangle(
 			VerticalAnchor.bottom(), VerticalAnchor.absolute(64)
 		))));
 
 		context.register(ApicultureFeatures.PLACED_HIVE, new PlacedFeature(holders.getOrThrow(ApicultureFeatures.CONFIGURED_HIVE), List.of()));
 
 		context.register(ArboricultureFeatures.PLACED_TREE, new PlacedFeature(holders.getOrThrow(ArboricultureFeatures.CONFIGURED_TREE), List.of()));
+	}
+	private static List<net.minecraft.world.level.levelgen.placement.PlacementModifier> commonOrePlacement(int count, net.minecraft.world.level.levelgen.placement.PlacementModifier height) {
+		return List.of(net.minecraft.world.level.levelgen.placement.CountPlacement.of(count), net.minecraft.world.level.levelgen.placement.InSquarePlacement.spread(), height, net.minecraft.world.level.levelgen.placement.BiomeFilter.biome());
 	}
 }

@@ -1,19 +1,14 @@
 {
   "type": "forestry:carpenter",
-  "box": {
-    "item": "forestry:crate"
-  },
+  "box": "forestry:crate",
   "id": "forestry:carpenter/crates/pack/minecraft/beetroot",
   "liquid": {
     "amount": 100,
     "id": "minecraft:water"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "tag": "c:crops/beetroot"
-      }
+      "#": "#c:crops/beetroot"
     },
     "pattern": [
       "###",
@@ -21,7 +16,6 @@
       "###"
     ],
     "result": {
-      "count": 1,
       "id": "forestry:crated_beetroot"
     }
   },

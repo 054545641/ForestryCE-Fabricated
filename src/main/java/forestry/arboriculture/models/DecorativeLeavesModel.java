@@ -15,14 +15,13 @@ import forestry.core.platform.models.baker.ModelBakerModel;
 import forestry.core.platform.util.ResourceUtil;
 import forestry.core.platform.util.SpeciesUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 public class DecorativeLeavesModel<B extends Block> extends ModelBlockCached<B, DefaultLeavesModel.Key> {
 	public DecorativeLeavesModel(Class<B> blockClass) {
@@ -34,7 +33,7 @@ public class DecorativeLeavesModel<B extends Block> extends ModelBlockCached<B, 
 		Block block = Block.byItem(stack.getItem());
 		Preconditions.checkArgument(block instanceof DecorativeLeavesBlock, "ItemStack must be for decorative leaves.");
 		DecorativeLeavesBlock bBlock = (DecorativeLeavesBlock) block;
-		return new DefaultLeavesModel.Key(bBlock.getSpeciesId(), Minecraft.useFancyGraphics());
+		return new DefaultLeavesModel.Key(bBlock.getSpeciesId(), Minecraft.getInstance().options.cutoutLeaves().get());
 	}
 
 	@Override
@@ -42,12 +41,12 @@ public class DecorativeLeavesModel<B extends Block> extends ModelBlockCached<B, 
 		Block block = state.getBlock();
 		Preconditions.checkArgument(block instanceof DecorativeLeavesBlock, "state must be for decorative leaves.");
 		DecorativeLeavesBlock bBlock = (DecorativeLeavesBlock) block;
-		return new DefaultLeavesModel.Key(bBlock.getSpeciesId(), Minecraft.useFancyGraphics());
+		return new DefaultLeavesModel.Key(bBlock.getSpeciesId(), Minecraft.getInstance().options.cutoutLeaves().get());
 	}
 
 	@Override
 	protected void bakeBlock(B block, ModelData extraData, DefaultLeavesModel.Key key, ModelBaker baker, boolean inventory) {
-		ResourceLocation speciesId = key.speciesId;
+		Identifier speciesId = key.speciesId;
 
 		// Resolve fail-soft: a datapack may have removed this species while its leaf block is still placed, so use
 		// getSpeciesSafe (not the throwing getTreeSpecies) and fall the species itself back to default - it's reused
@@ -63,40 +62,24 @@ public class DecorativeLeavesModel<B extends Block> extends ModelBlockCached<B, 
 			sprite = IForestryClientApi.INSTANCE.getTreeManager().getLeafSprite(SpeciesUtil.TREE_TYPE.get().getDefaultSpecies());
 		}
 
-		ResourceLocation textureLocation = sprite.get(false, key.fancy);
-		TextureAtlasSprite textureSprite = ResourceUtil.getBlockSprite(textureLocation);
+		Identifier textureLocation = sprite.get(false, key.fancy);
+		TextureAtlasSprite textureSprite = getSprite(textureLocation);
 		// Render the plain leaf block.
 		baker.addBlockModel(textureSprite, AbstractLeavesBlock.FOLIAGE_COLOR_INDEX);
 
 		// Render overlay for fruit leaves.
 		IFruit fruit = species.getDefaultGenome().resolveActive(TreeChromosomes.FRUIT);
-		ResourceLocation fruitSpriteLocation = fruit.getDecorativeSprite();
+		Identifier fruitSpriteLocation = fruit.getDecorativeSprite();
 		if (fruitSpriteLocation != null) {
-			TextureAtlasSprite fruitSprite = ResourceUtil.getBlockSprite(fruitSpriteLocation);
+			TextureAtlasSprite fruitSprite = getSprite(fruitSpriteLocation);
 			baker.addBlockModel(fruitSprite, AbstractLeavesBlock.FRUIT_COLOR_INDEX);
 		}
 
 		// Set the particle sprite
-		ResourceLocation particleLocation = sprite.getParticle();
-		TextureAtlasSprite particleSprite = ResourceUtil.getBlockSprite(particleLocation);
+		Identifier particleLocation = sprite.getParticle();
+		TextureAtlasSprite particleSprite = getSprite(particleLocation);
 		baker.setParticleSprite(particleSprite);
 	}
 
-	@Override
-	protected BakedModel bakeModel(BlockState state, DefaultLeavesModel.Key key, B block, ModelData extraData) {
-		ModelBaker baker = new ModelBaker();
 
-		bakeBlock(block, extraData, key, baker, false);
-
-		// return the local, not the field: another worker thread may overwrite blockModel mid-bake
-		ModelBakerModel model = baker.bake(false);
-		onCreateModel(model);
-		this.blockModel = model;
-		return model;
-	}
-
-	@Override
-	public ItemTransforms getTransforms() {
-		return ModelTransforms.BLOCK;
-	}
 }

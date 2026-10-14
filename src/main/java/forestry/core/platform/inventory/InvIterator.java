@@ -1,21 +1,22 @@
 package forestry.core.platform.inventory;
 
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class InvIterator implements Iterator<IInvSlot> {
-	private final IItemHandler inv;
+	private final ResourceHandler<ItemResource> inv;
 	private int slot = 0;
 
-	public InvIterator(IItemHandler inv) {
+	public InvIterator(ResourceHandler<ItemResource> inv) {
 		this.inv = inv;
 	}
 
 	@Override
 	public boolean hasNext() {
-		return this.slot < this.inv.getSlots();
+		return this.slot < this.inv.size();
 	}
 
 	@Override

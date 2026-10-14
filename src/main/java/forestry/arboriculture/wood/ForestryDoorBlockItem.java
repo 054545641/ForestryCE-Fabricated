@@ -10,8 +10,8 @@ import javax.annotation.Nullable;
 
 public class ForestryDoorBlockItem extends ForestryWoodBlockItem<ForestryDoorBlock> {
 
-	public ForestryDoorBlockItem(ForestryDoorBlock block) {
-		super(block);
+	public ForestryDoorBlockItem(ForestryDoorBlock block, Properties properties) {
+		super(block, properties);
 	}
 
 	/**
@@ -24,7 +24,7 @@ public class ForestryDoorBlockItem extends ForestryWoodBlockItem<ForestryDoorBlo
 	}
 
 	@Override
-	public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
+	public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType, net.minecraft.world.level.block.entity.FuelValues fuelValues) {
 		if (getBlock().isFireproof()) {
 			return 0;
 		} else {

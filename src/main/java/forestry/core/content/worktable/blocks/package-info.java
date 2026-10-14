@@ -1,4 +1,5 @@
-@javax.annotation.ParametersAreNonnullByDefault
 @forestry.core.platform.util.FieldsAreNonnullByDefault
-@net.minecraft.MethodsReturnNonnullByDefault
+@NullMarked
 package forestry.core.content.worktable.blocks;
+
+import org.jspecify.annotations.NullMarked;

@@ -19,8 +19,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.List;
 
 public class GrafterItem extends ItemForestry implements IToolGrafter {
-	public GrafterItem(int maxDamage) {
-		super(new Item.Properties().durability(maxDamage));
+	public GrafterItem(int maxDamage, Properties properties) {
+		super(properties.durability(maxDamage));
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class GrafterItem extends ItemForestry implements IToolGrafter {
 
 	@Override
 	public boolean mineBlock(ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity entity) {
-		if (!world.isClientSide && !state.is(BlockTags.FIRE)) {
+		if (!world.isClientSide() && !state.is(BlockTags.FIRE)) {
 			stack.hurtAndBreak(1, entity, EquipmentSlot.MAINHAND);
 		}
 		return state.is(BlockTags.LEAVES);

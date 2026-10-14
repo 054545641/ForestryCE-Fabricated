@@ -1,62 +1,35 @@
 package forestry.arboriculture.client;
 
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import forestry.arboriculture.features.ArboricultureItems;
 import forestry.api.ForestryConstants;
 import forestry.api.client.IClientModuleHandler;
-import forestry.arboriculture.wood.ForestryWoodType;
 import forestry.arboriculture.leaves.DecorativeLeavesBlock;
 import forestry.arboriculture.features.ArboricultureBlocks;
 import forestry.arboriculture.features.ArboricultureEntities;
 import forestry.arboriculture.features.ArboricultureTiles;
 import forestry.arboriculture.models.*;
 import forestry.core.platform.models.ClientManager;
-import net.minecraft.client.model.BoatModel;
-import net.minecraft.client.model.ChestBoatModel;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.blockentity.SignRenderer;
+import net.minecraft.client.model.object.boat.BoatModel;
+import net.minecraft.client.renderer.blockentity.StandingSignRenderer;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class ArboricultureClientHandler implements IClientModuleHandler {
 	@Override
 	public void registerEvents(IEventBus modBus) {
 		modBus.addListener(ArboricultureClientHandler::registerBlockColors);
-		modBus.addListener(ArboricultureClientHandler::registerItemColors);
 		modBus.addListener(ArboricultureClientHandler::registerModelLoaders);
-		modBus.addListener(ArboricultureClientHandler::onClientSetup);
+		modBus.addListener(ArboricultureClientHandler::registerItemModels);
+		modBus.addListener(ArboricultureClientHandler::registerBlockModels);
 		modBus.addListener(ArboricultureClientHandler::registerEntityRenderers);
 		modBus.addListener(ArboricultureClientHandler::registerModelLayers);
-		modBus.addListener(ArboricultureClientHandler::beforeResourceLoad);
+		modBus.addListener((net.neoforged.neoforge.client.event.AddClientReloadListenersEvent event) ->
+			SignEditorTexture.register(event, java.util.Arrays.stream(forestry.arboriculture.wood.ForestryWoodType.VALUES).map(type -> type.getSerializedName()).toList()));
 	}
 
-	private static void beforeResourceLoad(RegisterClientReloadListenersEvent event) {
-		for (ForestryWoodType type : ForestryWoodType.VALUES) {
-			Sheets.addWoodType(type.getWoodType());
-		}
-	}
 
-	private static void onClientSetup(FMLClientSetupEvent event) {
-		event.enqueueWork(() -> {
-			// fruit overlays require CUTOUT_MIPPED, even in Fast graphics
-			ArboricultureBlocks.LEAVES_DEFAULT.getList().forEach(block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped()));
-			ItemBlockRenderTypes.setRenderLayer(ArboricultureBlocks.LEAVES.block(), RenderType.cutoutMipped());
-			ArboricultureBlocks.LEAVES_DEFAULT_FRUIT.getList().forEach(block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped()));
-			ArboricultureBlocks.LEAVES_DECORATIVE.getList().forEach(block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped()));
-			ItemBlockRenderTypes.setRenderLayer(ArboricultureBlocks.SAPLING_GE.block(), RenderType.cutout());
-			ArboricultureBlocks.DOORS.getList().forEach(block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutout()));
-
-			ArboricultureBlocks.PODS.getList().forEach(block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped()));
-		});
-	}
-
-	private static void registerModelLoaders(ModelEvent.RegisterGeometryLoaders event) {
-		event.register(ForestryConstants.forestry("sapling_ge"), new SaplingModelLoader());
+	private static void registerModelLoaders(ModelEvent.RegisterLoaders event) {
 
 		// Registered here and not in FMLClientSetupEvent: this event is posted at the top of ModelManager.reload,
 		// so it is ordered before the ModifyBakingResult that reads these models back. Client setup runs on its own
@@ -69,38 +42,32 @@ public class ArboricultureClientHandler implements IClientModuleHandler {
 		clientManager.registerModel(new DefaultFruitLeavesModel(), ArboricultureBlocks.LEAVES_DEFAULT_FRUIT);
 	}
 
-	private static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+	private static void registerItemModels(net.neoforged.neoforge.client.event.RegisterItemModelsEvent event) {
+        event.register(ForestryConstants.forestry("sapling_ge"), SaplingModel.Item.CODEC);
+    }
+    private static void registerBlockModels(net.neoforged.neoforge.client.event.RegisterBlockStateModels event) {
+        event.registerModel(ForestryConstants.forestry("sapling_ge"), SaplingModel.Block.CODEC);
+    }
+    private static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
 		event.registerEntityRenderer(ArboricultureEntities.BOAT.entityType(), ctx -> new ForestryBoatRenderer(ctx, false));
 		event.registerEntityRenderer(ArboricultureEntities.CHEST_BOAT.entityType(), ctx -> new ForestryBoatRenderer(ctx, true));
-		event.registerBlockEntityRenderer(ArboricultureTiles.SIGN.tileType(), SignRenderer::new);
+		event.registerBlockEntityRenderer(ArboricultureTiles.SIGN.tileType(), StandingSignRenderer::new);
 		// HANGING_SIGN BE renderer is provided by vanilla; Forestry's hanging-sign blocks reuse
 		// vanilla's BlockEntityType.HANGING_SIGN via BlockEntityTypeAddBlocksEvent.
 	}
 
 	private static void registerModelLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-		for (ForestryWoodType type : ForestryWoodType.VALUES) {
-			event.registerLayerDefinition(ForestryBoatRenderer.createBoatModelLocation(type, false), BoatModel::createBodyModel);
-			event.registerLayerDefinition(ForestryBoatRenderer.createBoatModelLocation(type, true), ChestBoatModel::createBodyModel);
-			// Vanilla / NeoForge auto-registers hanging-sign and standing-sign layers for any
-			// WoodType added via Sheets.addWoodType (see beforeResourceLoad). Registering them
-			// manually here causes a duplicate-key crash at boot.
-		}
+		event.registerLayerDefinition(BoatRenderGeometry.BOAT, BoatModel::createBoatModel);
+		event.registerLayerDefinition(BoatRenderGeometry.CHEST_BOAT, BoatModel::createChestBoatModel);
+		// Sign boards now come from block models; the vanilla block entity renderers submit only their text.
 	}
 
-	private static void registerBlockColors(RegisterColorHandlersEvent.Block event) {
+	private static void registerBlockColors(RegisterColorHandlersEvent.BlockTintSources event) {
 		event.register(ClientManager.FORESTRY_BLOCK_COLOR, ArboricultureBlocks.LEAVES.block());
 		event.register(ClientManager.FORESTRY_BLOCK_COLOR, ArboricultureBlocks.LEAVES_DEFAULT.blockArray());
 		event.register(ClientManager.FORESTRY_BLOCK_COLOR, ArboricultureBlocks.LEAVES_DEFAULT_FRUIT.blockArray());
 		event.register(ClientManager.FORESTRY_BLOCK_COLOR, ArboricultureBlocks.LEAVES_DECORATIVE.blockArray());
 	}
 
-	private static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-		event.register(ClientManager.FORESTRY_ITEM_COLOR, ArboricultureBlocks.LEAVES.block());
-		event.register(ClientManager.FORESTRY_ITEM_COLOR, ArboricultureBlocks.LEAVES_DEFAULT.blockArray());
-		event.register(ClientManager.FORESTRY_ITEM_COLOR, ArboricultureBlocks.LEAVES_DEFAULT_FRUIT.blockArray());
-		event.register(ClientManager.FORESTRY_ITEM_COLOR, ArboricultureBlocks.LEAVES_DECORATIVE.blockArray());
-		event.register(ClientManager.FORESTRY_ITEM_COLOR, ArboricultureItems.TREE_SAPLING.item());
-		event.register(ClientManager.FORESTRY_ITEM_COLOR, ArboricultureItems.TREE_POLLEN.item());
-	}
 
 }

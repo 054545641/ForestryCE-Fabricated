@@ -1,7 +1,7 @@
 package forestry.core.platform.gui;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -63,7 +63,7 @@ public class GuiTextBox extends EditBox {
 		return text.substring(0, cursorPos) + "_" + text.substring(cursorPos);
 	}
 
-	private void drawScrolledSplitString(GuiGraphics graphics, Component text, int startX, int startY, int width, int textColour) {
+	private void drawScrolledSplitString(GuiGraphicsExtractor graphics, Component text, int startX, int startY, int width, int textColour) {
 		List<FormattedCharSequence> lines = this.font.split(text, width);
         this.maxLines = lines.size();
 
@@ -78,7 +78,7 @@ public class GuiTextBox extends EditBox {
 				break;
 			}
 
-			graphics.drawString(this.font, line, startX, lineY, textColour);
+			graphics.text(this.font, line, startX, lineY, 0xff000000 | textColour);
 			lineY += this.font.lineHeight;
 
 			count++;

@@ -12,10 +12,10 @@ import forestry.core.content.resources.EnumElectronTube;
 import forestry.core.content.energy.circuits.CircuitEngineUpgrade;
 import forestry.core.content.machines.circuits.CircuitMachineUpgrade;
 import forestry.core.content.sorting.DefaultFilterRuleType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class DefaultForestryPlugin implements IForestryPlugin {
-	public static final ResourceLocation ID = ForestryConstants.forestry("default");
+	public static final Identifier ID = ForestryConstants.forestry("default");
 
 	@Override
 	public void registerGenetics(IGeneticRegistration genetics) {
@@ -55,7 +55,7 @@ public class DefaultForestryPlugin implements IForestryPlugin {
 	}
 
 	@Override
-	public ResourceLocation id() {
+	public Identifier id() {
 		return ID;
 	}
 }

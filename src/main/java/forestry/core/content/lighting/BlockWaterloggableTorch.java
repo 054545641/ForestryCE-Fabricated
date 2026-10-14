@@ -18,7 +18,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import org.joml.Vector3f;
 
 public class BlockWaterloggableTorch extends TorchBlock implements SimpleWaterloggedBlock {
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -28,7 +27,7 @@ public class BlockWaterloggableTorch extends TorchBlock implements SimpleWaterlo
 	 * phosphor dust can no longer be handed to super. Super gets a vanilla flame purely to satisfy the block codec,
 	 * and animateTick below is overridden to spawn this instead, which keeps the original look.
 	 */
-	private static final DustParticleOptions PHOSPHOR_PARTICLE = new DustParticleOptions(new Vector3f(0.68f, 1.0f, 0.89f), 0.8f);
+	private static final DustParticleOptions PHOSPHOR_PARTICLE = new DustParticleOptions(0xADFFE2, 0.8f);
 
 	public BlockWaterloggableTorch(BlockBehaviour.Properties properties) {
 		// Deviation from 1.20.1: the properties now come from the feature registry rather than being built here.
@@ -63,10 +62,10 @@ public class BlockWaterloggableTorch extends TorchBlock implements SimpleWaterlo
 	}
 
 	@Override
-	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+	public BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, net.minecraft.util.RandomSource random) {
 		if (state.getValue(WATERLOGGED)) {
-			level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+			ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
 		}
-		return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+		return super.updateShape(state, level, ticks, pos, direction, neighborPos, neighborState, random);
 	}
 }

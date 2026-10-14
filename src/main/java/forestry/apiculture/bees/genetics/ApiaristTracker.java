@@ -40,9 +40,9 @@ public class ApiaristTracker extends BreedingTracker implements IApiaristTracker
 	public void load(CompoundTag nbt) {
 		super.load(nbt);
 
-		this.queensTotal = nbt.getInt("QueensTotal");
-		this.princessesTotal = nbt.getInt("PrincessesTotal");
-		this.dronesTotal = nbt.getInt("DronesTotal");
+		this.queensTotal = nbt.getIntOr("QueensTotal", 0);
+		this.princessesTotal = nbt.getIntOr("PrincessesTotal", 0);
+		this.dronesTotal = nbt.getIntOr("DronesTotal", 0);
 	}
 
 	@Override

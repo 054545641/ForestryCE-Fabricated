@@ -13,22 +13,16 @@
   "inputs": [
     {
       "count": 3,
-      "ingredient": {
-        "tag": "c:gems/quartz"
-      }
+      "ingredient": "#c:gems/quartz"
     },
     {
       "count": 1,
-      "ingredient": {
-        "tag": "c:coal_coke"
-      }
+      "ingredient": "#c:coal_coke"
     }
   ],
   "output": {
     "count": 3,
-    "ingredient": {
-      "tag": "c:silicon"
-    }
+    "ingredient": "#c:silicon"
   },
   "processingTime": 1200
 }

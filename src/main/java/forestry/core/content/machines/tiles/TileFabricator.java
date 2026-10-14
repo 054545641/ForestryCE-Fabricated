@@ -1,5 +1,12 @@
 package forestry.core.content.machines.tiles;
 
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+
+import java.util.Optional;
+
+import forestry.core.platform.fluids.FluidHelper;
 import forestry.api.core.ForestryError;
 import forestry.api.core.IErrorLogic;
 import forestry.api.core.machines.IFabricatorRecipe;
@@ -38,9 +45,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 
 import javax.annotation.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public class TileFabricator extends TilePowered implements ISlotPickupWatcher, ILiquidTankTile, WorldlyContainer {
 	public static final int MAX_HEAT = 5000;
@@ -50,6 +60,13 @@ public class TileFabricator extends TilePowered implements ISlotPickupWatcher, I
 	private final FilteredTank moltenTank;
 	private int heat = 0;
 	private int meltingPoint = 0;
+	private record ProcessingState(int heat, int meltingPoint) {}
+	@Override protected Object captureProcessingState() { return new ProcessingState(this.heat, this.meltingPoint); }
+	@Override protected void restoreProcessingState(Object value) {
+		var previous = (ProcessingState) value;
+		this.heat = previous.heat();
+		this.meltingPoint = previous.meltingPoint();
+	}
 
 	public TileFabricator(BlockPos pos, BlockState state) {
 		super(FactoryTiles.FABRICATOR.tileType(), pos, state, 1100, 3300);
@@ -65,21 +82,27 @@ public class TileFabricator extends TilePowered implements ISlotPickupWatcher, I
 	/* SAVING & LOADING */
 
 	@Override
-	public void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-		super.saveAdditional(compound, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag compound = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
 
 		compound.putInt("Heat", this.heat);
 		compound.putInt("MeltingPont", this.meltingPoint);
-        this.tankManager.write(compound, registries);
-        this.craftingInventory.write(compound, registries);
+        this.tankManager.write(output);
+        this.craftingInventory.write(output);
+
+		ValueIOUtil.mergeInto(output, compound);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-		super.loadAdditional(compound, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compound = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
 
-        this.heat = compound.getInt("Heat");
-		this.meltingPoint = compound.getInt("MeltingPont");
+        this.heat = compound.getIntOr("Heat", 0);
+		this.meltingPoint = compound.getIntOr("MeltingPont", 0);
         this.tankManager.read(compound, registries);
         this.craftingInventory.read(compound, registries);
 	}
@@ -113,21 +136,24 @@ public class TileFabricator extends TilePowered implements ISlotPickupWatcher, I
 	public void serverTick(Level level, BlockPos pos, BlockState state) {
 		super.serverTick(level, pos, state);
 
-		if (!this.moltenTank.isFull()) {
-			trySmelting();
-		}
-
-		if (!this.moltenTank.isEmpty()) {
-			// Remove smelt if we have gone below melting point
-			if (this.heat < getMeltingPoint() - 100) {
-                this.moltenTank.drain(5, IFluidHandler.FluidAction.EXECUTE);
+		try (var transaction = beginWorkTransaction()) {
+			if (!this.moltenTank.isFull()) {
+				trySmelting();
 			}
-		}
 
-		if (this.heat > 2500) {
-			this.heat -= 2;
-		} else if (this.heat > 0) {
-			this.heat--;
+			if (!this.moltenTank.isEmpty()) {
+				// Remove smelt if we have gone below melting point
+				if (this.heat < getMeltingPoint() - 100) {
+	                FluidHelper.drain(this.moltenTank, 5);
+				}
+			}
+
+			if (this.heat > 2500) {
+				this.heat -= 2;
+			} else if (this.heat > 0) {
+				this.heat--;
+			}
+			transaction.commit();
 		}
 	}
 
@@ -139,29 +165,29 @@ public class TileFabricator extends TilePowered implements ISlotPickupWatcher, I
 			return;
 		}
 
-		IFabricatorSmeltingRecipe smelt = RecipeUtils.getFabricatorMeltingRecipe(this.level.getRecipeManager(), smeltResource);
+		IFabricatorSmeltingRecipe smelt = RecipeUtils.getFabricatorMeltingRecipe(RecipeUtils.getRecipeMap(this.level), smeltResource);
 		if (smelt == null || smelt.getMeltingPoint() > this.heat) {
 			return;
 		}
 
 		FluidStack smeltFluid = smelt.getResultFluid();
-		if (this.moltenTank.fillInternal(smeltFluid, IFluidHandler.FluidAction.SIMULATE) == smeltFluid.getAmount()) {
-			this.removeItem(InventoryFabricator.SLOT_METAL, 1);
-            this.moltenTank.fillInternal(smeltFluid, IFluidHandler.FluidAction.EXECUTE);
-            this.meltingPoint = smelt.getMeltingPoint();
+		try (var tx = beginWorkTransaction()) {
+			if (this.moltenTank.insertInternal(FluidResource.of(smeltFluid), smeltFluid.getAmount(), tx) != smeltFluid.getAmount()) return;
+			ItemStack metal = getItem(InventoryFabricator.SLOT_METAL);
+			if (metal.isEmpty() || getTransferHandler().extract(InventoryFabricator.SLOT_METAL, ItemResource.of(metal), 1, tx) != 1) return;
+			this.meltingPoint = smelt.getMeltingPoint();
+			tx.commit();
 		}
 	}
 
 	@Override
 	public boolean workCycle() {
-		this.heat += 100;
-		if (this.heat > MAX_HEAT) {
-			this.heat = MAX_HEAT;
+		try (var transaction = beginWorkTransaction()) {
+			this.heat = Math.min(MAX_HEAT, this.heat + 100);
+			craftResult();
+			transaction.commit();
+			return true;
 		}
-
-		craftResult();
-
-		return true;
 	}
 
 	@Nullable
@@ -169,7 +195,7 @@ public class TileFabricator extends TilePowered implements ISlotPickupWatcher, I
 		IInventoryAdapter inventory = getInternalInventory();
 		ItemStack plan = inventory.getItem(InventoryFabricator.SLOT_PLAN);
 		FluidStack liquid = this.moltenTank.getFluid();
-		IFabricatorRecipe recipe = RecipeUtils.getFabricatorRecipe(this.level.getRecipeManager(), this.level, liquid, plan, this.craftingInventory);
+		IFabricatorRecipe recipe = RecipeUtils.getFabricatorRecipe(RecipeUtils.getRecipeMap(this.level), this.level, liquid, plan, this.craftingInventory);
 		if (!liquid.isEmpty() && recipe != null && !(FluidStack.isSameFluidSameComponents(liquid, recipe.getResultFluid()) && liquid.getAmount() >= recipe.getResultFluid().getAmount())) {
 			return null;
 		}
@@ -181,7 +207,7 @@ public class TileFabricator extends TilePowered implements ISlotPickupWatcher, I
 			return ItemStack.EMPTY;
 		}
 
-		return myRecipe.getCraftingGridRecipe().getResultItem(this.level.registryAccess()).copy();
+		return myRecipe.getResultItem(this.level.registryAccess()).copy();
 	}
 
 	/* ISlotPickupWatcher */
@@ -193,37 +219,27 @@ public class TileFabricator extends TilePowered implements ISlotPickupWatcher, I
 	}
 
 	private void craftResult() {
-		IFabricatorRecipe myRecipe = getRecipe();
-		ItemStack craftResult = getResult(myRecipe);
-
-		if (myRecipe != null && !craftResult.isEmpty() && getItem(InventoryFabricator.SLOT_RESULT).isEmpty()) {
-			FluidStack liquid = myRecipe.getResultFluid();
-
-			// Remove resources
-			if (removeFromInventory(myRecipe, false)) {
-				FluidStack drained = this.moltenTank.drainInternal(liquid, IFluidHandler.FluidAction.SIMULATE);
-				if (!drained.isEmpty() && FluidStack.matches(drained, liquid)) {
-					removeFromInventory(myRecipe, true);
-                    this.moltenTank.drain(liquid.getAmount(), IFluidHandler.FluidAction.EXECUTE);
-
-					// Damage plan
-					if (!getItem(InventoryFabricator.SLOT_PLAN).isEmpty()) {
-						Item planItem = getItem(InventoryFabricator.SLOT_PLAN).getItem();
-						if (planItem instanceof ICraftingPlan) {
-							ItemStack planUsed = ((ICraftingPlan) planItem).planUsed(getItem(InventoryFabricator.SLOT_PLAN), craftResult);
-							setItem(InventoryFabricator.SLOT_PLAN, planUsed);
-						}
-					}
-
-					setItem(InventoryFabricator.SLOT_RESULT, craftResult);
-				}
+		IFabricatorRecipe recipe = getRecipe();
+		ItemStack result = getResult(recipe);
+		if (recipe == null || result.isEmpty() || !getItem(InventoryFabricator.SLOT_RESULT).isEmpty()) return;
+		try (var tx = beginWorkTransaction()) {
+			FluidStack liquid = recipe.getResultFluid();
+			if (!liquid.isEmpty() && this.moltenTank.extractInternal(FluidResource.of(liquid), liquid.getAmount(), tx) != liquid.getAmount()) return;
+			if (!removeFromInventory(recipe, true)) return;
+			ItemStack plan = getItem(InventoryFabricator.SLOT_PLAN).copy();
+			if (!plan.isEmpty() && plan.getItem() instanceof ICraftingPlan craftingPlan) {
+				ItemStack used = craftingPlan.planUsed(plan.copy(), result.copy());
+				if (getTransferHandler().extract(InventoryFabricator.SLOT_PLAN, ItemResource.of(plan), plan.getCount(), tx) != plan.getCount()) return;
+				if (!used.isEmpty() && getTransferHandler().insert(InventoryFabricator.SLOT_PLAN, ItemResource.of(used), used.getCount(), tx) != used.getCount()) return;
 			}
+			if (!InventoryUtil.tryAddStack(this, result, InventoryFabricator.SLOT_RESULT, 1, true)) return;
+			tx.commit();
 		}
 	}
 
 	private boolean removeFromInventory(IFabricatorRecipe recipe, boolean doRemove) {
 		Container inventory = new InventoryMapper(this, InventoryFabricator.SLOT_INVENTORY_1, InventoryFabricator.SLOT_INVENTORY_COUNT);
-		return InventoryUtil.consumeIngredients(inventory, recipe.getCraftingGridRecipe().getIngredients(), null, true, false, doRemove);
+		return InventoryUtil.consumeIngredients(inventory, recipe.getCraftingGridRecipe().getIngredients().stream().flatMap(Optional::stream).toList(), null, true, false, doRemove);
 	}
 
 	@Override
@@ -233,14 +249,14 @@ public class TileFabricator extends TilePowered implements ISlotPickupWatcher, I
 		boolean hasResources = true;
 
 		ItemStack plan = getItem(InventoryFabricator.SLOT_PLAN);
-		IFabricatorRecipe recipe = RecipeUtils.getFabricatorRecipe(this.level.getRecipeManager(), this.level, this.moltenTank.getFluid(), plan, this.craftingInventory);
+		IFabricatorRecipe recipe = RecipeUtils.getFabricatorRecipe(RecipeUtils.getRecipeMap(this.level), this.level, this.moltenTank.getFluid(), plan, this.craftingInventory);
 		if (recipe != null) {
 			hasResources = removeFromInventory(recipe, false);
 			FluidStack toDrain = recipe.getResultFluid();
-			FluidStack drained = this.moltenTank.drainInternal(toDrain, IFluidHandler.FluidAction.SIMULATE);
+			FluidStack drained = FluidHelper.simulateDrain(this.moltenTank.internal(), toDrain);
 			hasLiquidResources = !drained.isEmpty() && FluidStack.matches(drained, toDrain);
 		} else {
-			hasRecipe = RecipeUtils.getFabricatorMeltingRecipe(this.level.getRecipeManager(), getItem(InventoryFabricator.SLOT_METAL)) != null;
+			hasRecipe = RecipeUtils.getFabricatorMeltingRecipe(RecipeUtils.getRecipeMap(this.level), getItem(InventoryFabricator.SLOT_METAL)) != null;
 		}
 
 		IErrorLogic errorLogic = getErrorLogic();
@@ -261,7 +277,7 @@ public class TileFabricator extends TilePowered implements ISlotPickupWatcher, I
 
 	public int getMeltingPoint() {
 		if (!this.getItem(InventoryFabricator.SLOT_METAL).isEmpty()) {
-			IFabricatorSmeltingRecipe meltingRecipe = RecipeUtils.getFabricatorMeltingRecipe(getLevel().getRecipeManager(), this.getItem(InventoryFabricator.SLOT_METAL));
+			IFabricatorSmeltingRecipe meltingRecipe = RecipeUtils.getFabricatorMeltingRecipe(RecipeUtils.getRecipeMap(getLevel()), this.getItem(InventoryFabricator.SLOT_METAL));
 			return meltingRecipe == null ? 0 : meltingRecipe.getMeltingPoint();
 		} else if (this.moltenTank.getFluidAmount() > 0) {
 			return this.meltingPoint;
@@ -306,7 +322,7 @@ public class TileFabricator extends TilePowered implements ISlotPickupWatcher, I
 		return this.tankManager;
 	}
 
-	public IFluidHandler getFluidHandler(@Nullable Direction facing) {
+	public ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction facing) {
 		return this.tankManager;
 	}
 

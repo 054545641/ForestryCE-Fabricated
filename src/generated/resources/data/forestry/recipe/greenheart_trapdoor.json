@@ -4,12 +4,8 @@
   "group": "wooden_trapdoor",
   "key": {
     "#": [
-      {
-        "item": "forestry:greenheart_planks"
-      },
-      {
-        "item": "forestry:greenheart_fireproof_planks"
-      }
+      "forestry:greenheart_planks",
+      "forestry:greenheart_fireproof_planks"
     ]
   },
   "pattern": [

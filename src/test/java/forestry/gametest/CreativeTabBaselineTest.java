@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -92,12 +92,12 @@ public class CreativeTabBaselineTest {
 		var params = new CreativeModeTab.ItemDisplayParameters(level.enabledFeatures(), true, level.registryAccess());
 		List<String> lines = new ArrayList<>();
 
-		List<ResourceLocation> tabIds = BuiltInRegistries.CREATIVE_MODE_TAB.keySet().stream()
+		List<Identifier> tabIds = BuiltInRegistries.CREATIVE_MODE_TAB.keySet().stream()
 				.filter(id -> ForestryConstants.MOD_ID.equals(id.getNamespace()))
 				.sorted()
 				.toList();
 
-		for (ResourceLocation tabId : tabIds) {
+		for (Identifier tabId : tabIds) {
 			CreativeModeTab tab = BuiltInRegistries.CREATIVE_MODE_TAB.get(tabId);
 			if (tab == null) {
 				lines.add(tabId + " !! not resolvable from the registry");

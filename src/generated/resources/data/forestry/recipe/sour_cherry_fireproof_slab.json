@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_slab",
   "key": {
-    "#": {
-      "item": "forestry:sour_cherry_fireproof_planks"
-    }
+    "#": "forestry:sour_cherry_fireproof_planks"
   },
   "pattern": [
     "###"

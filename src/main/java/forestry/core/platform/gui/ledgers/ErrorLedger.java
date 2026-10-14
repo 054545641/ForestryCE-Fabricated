@@ -3,7 +3,7 @@ package forestry.core.platform.gui.ledgers;
 import forestry.api.core.IError;
 import forestry.core.platform.gui.GuiForestry;
 import forestry.core.platform.util.StringUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 
@@ -37,7 +37,7 @@ public class ErrorLedger extends Ledger {
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int y, int x) {
+	public void draw(GuiGraphicsExtractor graphics, int y, int x) {
 		if (this.state == null) {
 			return;
 		}

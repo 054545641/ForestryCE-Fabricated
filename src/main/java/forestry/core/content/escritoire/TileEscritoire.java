@@ -27,6 +27,9 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import forestry.core.platform.tile.IItemStackDisplay;
 import forestry.core.platform.tile.TileBase;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public class TileEscritoire extends TileBase implements WorldlyContainer, ISlotPickupWatcher, IStreamableGui, IItemStackDisplay {
 	private final EscritoireGame game = new EscritoireGame();
@@ -39,16 +42,22 @@ public class TileEscritoire extends TileBase implements WorldlyContainer, ISlotP
 
 	/* SAVING & LOADING */
 	@Override
-	public void loadAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.loadAdditional(compoundNBT, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compoundNBT = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
         this.game.read(compoundNBT, registries);
 	}
 
 
 	@Override
-	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-		super.saveAdditional(nbt, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag nbt = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
         this.game.write(nbt, registries);
+	
+		ValueIOUtil.mergeInto(output, nbt);
 	}
 
 	/* GAME */
@@ -91,7 +100,7 @@ public class TileEscritoire extends TileBase implements WorldlyContainer, ISlotP
 	}
 
 	public void probe() {
-		if (this.level.isClientSide) {
+		if (this.level.isClientSide()) {
 			return;
 		}
 
@@ -141,7 +150,7 @@ public class TileEscritoire extends TileBase implements WorldlyContainer, ISlotP
 	public void setItem(int slotIndex, ItemStack itemstack) {
 		super.setItem(slotIndex, itemstack);
 		if (slotIndex == InventoryEscritoire.SLOT_ANALYZE) {
-			if (this.level != null && !this.level.isClientSide) {
+			if (this.level != null && !this.level.isClientSide()) {
 				PacketItemStackDisplay packet = new PacketItemStackDisplay(this, getIndividualOnDisplay());
 				NetworkUtil.sendNetworkPacket(packet, this.worldPosition, this.level);
 			}
@@ -161,7 +170,7 @@ public class TileEscritoire extends TileBase implements WorldlyContainer, ISlotP
 	}
 
 	public ItemStack getIndividualOnDisplay() {
-		if (this.level == null || this.level.isClientSide) {
+		if (this.level == null || this.level.isClientSide()) {
 			return this.individualOnDisplayClient;
 		}
 		return getItem(InventoryAnalyzer.SLOT_ANALYZE);

@@ -1,5 +1,6 @@
 package forestry.core.content.machines.recipes;
 
+import forestry.api.core.machines.IForestryRecipe;
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -12,8 +13,9 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -37,27 +39,30 @@ public class SqueezerContainerRecipe implements ISqueezerContainerRecipe {
 	};
 
 	private static final MapCodec<SqueezerContainerRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-		ResourceLocation.CODEC.fieldOf("id").forGetter(SqueezerContainerRecipe::getId),
-		ItemStack.STRICT_CODEC.fieldOf("container").forGetter(SqueezerContainerRecipe::getEmptyContainer),
+		Identifier.CODEC.fieldOf("id").forGetter(SqueezerContainerRecipe::getId),
+		ItemStackTemplate.CODEC.fieldOf("container").forGetter(r -> r.emptyContainer),
 		Codec.INT.fieldOf("time").forGetter(SqueezerContainerRecipe::getProcessingTime),
-		ItemStack.STRICT_CODEC.fieldOf("remnants").forGetter(SqueezerContainerRecipe::getRemnants),
-		Codec.FLOAT.fieldOf("remnantsChance").forGetter(SqueezerContainerRecipe::getRemnantsChance)
+		ItemStackTemplate.CODEC.fieldOf("remnants").forGetter(r -> r.remnants),
+		Codec.FLOAT.fieldOf("remnantsChance").forGetter(r -> r.remnantsChance)
 	).apply(instance, SqueezerContainerRecipe::new));
 	private static final StreamCodec<RegistryFriendlyByteBuf, SqueezerContainerRecipe> STREAM_CODEC = StreamCodec.of(
-		Serializer::toNetwork,
-		Serializer::fromNetwork
+		NetworkCodecs::toNetwork,
+		NetworkCodecs::fromNetwork
 	);
 
-	private final ResourceLocation id;
-	private final ItemStack emptyContainer;
+	private final Identifier id;
+	private final ItemStackTemplate emptyContainer;
 	private final int processingTime;
-	private final ItemStack remnants;
+	private final ItemStackTemplate remnants;
 	private final float remnantsChance;
 
-	public SqueezerContainerRecipe(ResourceLocation id, ItemStack emptyContainer, int processingTime, ItemStack remnants, float remnantsChance) {
+	public SqueezerContainerRecipe(Identifier id, ItemStack emptyContainer, int processingTime, ItemStack remnants, float remnantsChance) {
+		this(id, ItemStackTemplate.fromNonEmptyStack(emptyContainer), processingTime, ItemStackTemplate.fromNonEmptyStack(remnants), remnantsChance);
+	}
+
+	public SqueezerContainerRecipe(Identifier id, ItemStackTemplate emptyContainer, int processingTime, ItemStackTemplate remnants, float remnantsChance) {
 		this.id = id;
 		Preconditions.checkNotNull(emptyContainer);
-		Preconditions.checkArgument(!emptyContainer.isEmpty());
 		Preconditions.checkNotNull(remnants);
 
 		this.emptyContainer = emptyContainer;
@@ -68,7 +73,7 @@ public class SqueezerContainerRecipe implements ISqueezerContainerRecipe {
 
 	@Override
 	public ItemStack getEmptyContainer() {
-		return this.emptyContainer;
+		return this.emptyContainer.create();
 	}
 
 	@Override
@@ -83,7 +88,7 @@ public class SqueezerContainerRecipe implements ISqueezerContainerRecipe {
 
 	@Override
 	public ItemStack getRemnants() {
-		return this.remnants;
+		return this.remnants.create();
 	}
 
 	@Override
@@ -98,50 +103,43 @@ public class SqueezerContainerRecipe implements ISqueezerContainerRecipe {
 
 	@Override
 	public ItemStack getResultItem(HolderLookup.Provider lookupProvider) {
-		return this.remnants;
+		return this.remnants.create();
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return this.id;
 	}
 
 	@Override
-	public RecipeSerializer<?> getSerializer() {
+	public RecipeSerializer<? extends IForestryRecipe> getSerializer() {
 		return FactoryRecipeTypes.SQUEEZER_CONTAINER.serializer();
 	}
 
 	@Override
-	public RecipeType<?> getType() {
+	public RecipeType<? extends IForestryRecipe> getType() {
 		return FactoryRecipeTypes.SQUEEZER_CONTAINER.type();
 	}
 
-	public static class Serializer implements RecipeSerializer<SqueezerContainerRecipe> {
-		@Override
-		public MapCodec<SqueezerContainerRecipe> codec() {
-			return CODEC;
-		}
+	public static final RecipeSerializer<SqueezerContainerRecipe> SERIALIZER = new RecipeSerializer<>(CODEC, STREAM_CODEC);
 
-		@Override
-		public StreamCodec<RegistryFriendlyByteBuf, SqueezerContainerRecipe> streamCodec() {
-			return STREAM_CODEC;
-		}
+	private static class NetworkCodecs {
 
 		private static SqueezerContainerRecipe fromNetwork(RegistryFriendlyByteBuf buffer) {
-			ResourceLocation recipeId = ResourceLocation.STREAM_CODEC.decode(buffer);
-			ItemStack emptyContainer = ItemStack.STREAM_CODEC.decode(buffer);
+			Identifier recipeId = Identifier.STREAM_CODEC.decode(buffer);
+			ItemStackTemplate emptyContainer = ItemStackTemplate.STREAM_CODEC.decode(buffer);
 			int processingTime = ByteBufCodecs.VAR_INT.decode(buffer);
-			ItemStack remnants = ItemStack.STREAM_CODEC.decode(buffer);
+			ItemStackTemplate remnants = ItemStackTemplate.STREAM_CODEC.decode(buffer);
 			float remnantsChance = ByteBufCodecs.FLOAT.decode(buffer);
 
 			return new SqueezerContainerRecipe(recipeId, emptyContainer, processingTime, remnants, remnantsChance);
 		}
 
 		private static void toNetwork(RegistryFriendlyByteBuf buffer, SqueezerContainerRecipe recipe) {
-			ResourceLocation.STREAM_CODEC.encode(buffer, recipe.id);
-			ItemStack.STREAM_CODEC.encode(buffer, recipe.emptyContainer);
+			Identifier.STREAM_CODEC.encode(buffer, recipe.id);
+			ItemStackTemplate.STREAM_CODEC.encode(buffer, recipe.emptyContainer);
 			ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTime);
-			ItemStack.STREAM_CODEC.encode(buffer, recipe.remnants);
+			ItemStackTemplate.STREAM_CODEC.encode(buffer, recipe.remnants);
 			ByteBufCodecs.FLOAT.encode(buffer, recipe.remnantsChance);
 		}
 	}

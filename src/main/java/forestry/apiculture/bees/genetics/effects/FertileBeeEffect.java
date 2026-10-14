@@ -6,7 +6,7 @@ import forestry.api.core.genetics.IGenome;
 import forestry.apiculture.bees.genetics.Bee;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -27,8 +27,8 @@ public class FertileBeeEffect extends ThrottledBeeEffect {
 		BlockPos housingCoordinates = housing.getBlockPos();
 		Vec3i area = Bee.getParticleArea(genome, housing);
 
-		int blockX = getRandomOffset(level.random, housingCoordinates.getX(), area.getX());
-		int blockZ = getRandomOffset(level.random, housingCoordinates.getZ(), area.getZ());
+		int blockX = getRandomOffset(level.getRandom(), housingCoordinates.getX(), area.getX());
+		int blockZ = getRandomOffset(level.getRandom(), housingCoordinates.getZ(), area.getZ());
 		int blockMaxY = housingCoordinates.getY() + area.getY() / 2 + 1;
 		int blockMinY = housingCoordinates.getY() - area.getY() / 2 - 1;
 
@@ -37,8 +37,8 @@ public class FertileBeeEffect extends ThrottledBeeEffect {
 				if (tryTickColumn(level, blockX, blockZ, blockMaxY, blockMinY)) {
 					break;
 				}
-				blockX = getRandomOffset(level.random, housingCoordinates.getX(), area.getX());
-				blockZ = getRandomOffset(level.random, housingCoordinates.getZ(), area.getZ());
+				blockX = getRandomOffset(level.getRandom(), housingCoordinates.getX(), area.getX());
+				blockZ = getRandomOffset(level.getRandom(), housingCoordinates.getZ(), area.getZ());
 			}
 		}
 
@@ -53,7 +53,7 @@ public class FertileBeeEffect extends ThrottledBeeEffect {
 		for (int y = maxY; y >= minY; --y) {
 			BlockState state = level.getBlockState(new BlockPos(x, y, z));
 			Block block = state.getBlock();
-			if (state.isRandomlyTicking() && (block instanceof BonemealableBlock || state.is(BlockTags.SAPLINGS))) {
+			if (state.isRandomlyTicking() && (block instanceof BonemealableBlock || state.is(BlockItemTags.SAPLINGS.block()))) {
 				level.scheduleTick(new BlockPos(x, y, z), block, 5);
 				return true;
 			}

@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "#": {
-      "item": "minecraft:stone"
-    },
-    "X": {
-      "item": "forestry:beeswax"
-    }
+    "#": "minecraft:stone",
+    "X": "forestry:beeswax"
   },
   "pattern": [
     "###",

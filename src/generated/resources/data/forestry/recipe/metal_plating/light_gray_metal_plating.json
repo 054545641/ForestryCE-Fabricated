@@ -8,12 +8,8 @@
   "recipe": {
     "category": "building",
     "key": {
-      "#": {
-        "tag": "forestry:metal_plating"
-      },
-      "D": {
-        "tag": "c:dyes/light_gray"
-      }
+      "#": "#forestry:metal_plating",
+      "D": "#c:dyes/light_gray"
     },
     "pattern": [
       "###",

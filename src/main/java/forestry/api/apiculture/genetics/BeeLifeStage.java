@@ -3,7 +3,7 @@ package forestry.api.apiculture.genetics;
 import forestry.api.ForestryConstants;
 import forestry.api.core.genetics.ILifeStage;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 
 import java.util.Locale;
@@ -17,9 +17,9 @@ public enum BeeLifeStage implements ILifeStage {
 	private final String name;
 	// resolved on demand, not held: apiculture registers these items and builds them from
 	// these same constants, so holding the item would be a class-init cycle
-	private final ResourceLocation itemId;
+	private final Identifier itemId;
 
-	BeeLifeStage(ResourceLocation itemId) {
+	BeeLifeStage(Identifier itemId) {
 		this.name = name().toLowerCase(Locale.ENGLISH);
 		this.itemId = itemId;
 	}
@@ -28,7 +28,7 @@ public enum BeeLifeStage implements ILifeStage {
 	 * @return The registry id of this life stage's item form. Apiculture registers the item
 	 * under this id, so the two cannot drift
 	 */
-	public ResourceLocation itemId() {
+	public Identifier itemId() {
 		return this.itemId;
 	}
 
@@ -39,6 +39,6 @@ public enum BeeLifeStage implements ILifeStage {
 
 	@Override
 	public Item getItemForm() {
-		return BuiltInRegistries.ITEM.get(this.itemId);
+		return BuiltInRegistries.ITEM.getValue(this.itemId);
 	}
 }

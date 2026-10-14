@@ -1,7 +1,7 @@
 package forestry.core.platform.render;
 
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.IFluidTank;
+import forestry.core.platform.fluids.StandardTank;
 
 public class TankRenderInfo {
 	public static final TankRenderInfo EMPTY = new TankRenderInfo(FluidStack.EMPTY, EnumTankLevel.EMPTY);
@@ -9,7 +9,7 @@ public class TankRenderInfo {
 	private final FluidStack fluidStack;
 	private final EnumTankLevel level;
 
-	public TankRenderInfo(IFluidTank fluidTank) {
+	public TankRenderInfo(StandardTank fluidTank) {
 		this(fluidTank.getFluid(), EnumTankLevel.rateTankLevel(fluidTank));
 	}
 

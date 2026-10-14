@@ -21,12 +21,12 @@ public class GuardianBeeEffect extends ThrottledBeeEffect {
 	IEffectData doEffectThrottled(IGenome genome, IEffectData storedData, IBeeHousing housing) {
 		List<Player> list = getEntitiesInRange(genome, housing, Player.class);
 		for (Player player : list) {
-			if (!player.hasEffect(MobEffects.DIG_SLOWDOWN)) {
+			if (!player.hasEffect(MobEffects.MINING_FATIGUE)) {
 				int count = BeeManager.armorApiaristHelper.wearsItems(player, this, true);
 				if (count >= 4) {
 					continue;
 				}
-				player.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 6000 - 1500 * count, 2));
+				player.addEffect(new MobEffectInstance(MobEffects.MINING_FATIGUE, 6000 - 1500 * count, 2));
 				((ServerPlayer) player).connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.GUARDIAN_ELDER_EFFECT, 1F));
 			}
 		}

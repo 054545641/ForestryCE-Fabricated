@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/teak_planks"
-  }
+  "parent": "forestry:block/teak_sign_rot_0"
 }

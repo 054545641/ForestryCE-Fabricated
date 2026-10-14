@@ -8,8 +8,8 @@ import net.minecraft.world.item.ItemStack;
 public class ItemHoneyComb extends ItemForestry implements ITintedItem {
 	private final EnumHoneyComb type;
 
-	public ItemHoneyComb(EnumHoneyComb type) {
-		super(new Item.Properties());
+	public ItemHoneyComb(EnumHoneyComb type, Properties properties) {
+		super(properties);
 
 		this.type = type;
 	}

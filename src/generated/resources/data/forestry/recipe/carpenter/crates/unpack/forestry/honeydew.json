@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/crates/unpack/forestry/honeydew",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:crated_honeydew"
-      }
+      "forestry:crated_honeydew"
     ],
     "result": {
       "count": 9,

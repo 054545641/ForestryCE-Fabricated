@@ -1,4 +1,3 @@
 {
-  "parent": "neoforge:block/default",
-  "loader": "forestry:sapling_ge"
+  "parent": "forestry:block/oak_sapling"
 }

@@ -18,7 +18,7 @@ public class InventoryCentrifuge extends InventoryAdapterTile<TileCentrifuge> {
 
 	@Override
 	public boolean canSlotAccept(int slotIndex, ItemStack stack) {
-		return slotIndex == SLOT_RESOURCE && RecipeUtils.getCentrifugeRecipe(this.tile.getLevel().getRecipeManager(), stack) != null;
+		return slotIndex == SLOT_RESOURCE && RecipeUtils.getCentrifugeRecipe(RecipeUtils.getRecipeMap(this.tile.getLevel()), stack) != null;
 	}
 
 	@Override

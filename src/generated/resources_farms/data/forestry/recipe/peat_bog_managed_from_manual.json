@@ -1,13 +1,9 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "item": "forestry:peat_bog_manual"
-    }
+    "forestry:peat_bog_manual"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:peat_bog_managed"
   }
 }

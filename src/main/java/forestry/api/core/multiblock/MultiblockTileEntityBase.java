@@ -10,6 +10,8 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import com.mojang.serialization.MapCodec;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -110,18 +112,14 @@ public abstract class MultiblockTileEntityBase<T extends IMultiblockLogic> exten
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public final void onDataPacket(Connection network, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
-		super.onDataPacket(network, packet, registries);
-		CompoundTag nbtData = packet.getTag();
-		if (nbtData != null) {
-			this.decodeDescriptionPacket(nbtData);
-		}
+	public final void onDataPacket(Connection network, ValueInput valueInput) {
+		handleUpdateTag(valueInput);
 	}
 
 	@Override
-	public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
-		super.handleUpdateTag(tag, registries);
-		this.decodeDescriptionPacket(tag);
+	public void handleUpdateTag(ValueInput input) {
+		this.decodeDescriptionPacket(input.read(MapCodec.assumeMapUnsafe(CompoundTag.CODEC))
+			.map(CompoundTag::copy).orElseGet(CompoundTag::new));
 	}
 
 	/**

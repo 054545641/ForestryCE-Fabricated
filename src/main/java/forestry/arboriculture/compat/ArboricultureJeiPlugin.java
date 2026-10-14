@@ -14,19 +14,19 @@ import forestry.core.platform.util.SpeciesUtil;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 @JeiPlugin
 public class ArboricultureJeiPlugin implements IModPlugin {
-	public static final RecipeType<ICharcoalPileWall> CHARCOAL_PILE_TYPE = RecipeType.create(ForestryConstants.MOD_ID, "charcoal.pile", ICharcoalPileWall.class);
+	public static final IRecipeType<ICharcoalPileWall> CHARCOAL_PILE_TYPE = IRecipeType.create(ForestryConstants.MOD_ID, "charcoal.pile", ICharcoalPileWall.class);
 
 	@Override
-	public ResourceLocation getPluginUid() {
+	public Identifier getPluginUid() {
 		return ForestryModuleIds.ARBORICULTURE;
 	}
 

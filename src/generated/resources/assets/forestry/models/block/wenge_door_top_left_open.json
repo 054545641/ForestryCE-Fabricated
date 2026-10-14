@@ -1,5 +1,6 @@
 {
   "parent": "minecraft:block/door_top_left_open",
+  "render_type": "cutout",
   "textures": {
     "bottom": "forestry:block/wenge_door_bottom",
     "top": "forestry:block/wenge_door_top"

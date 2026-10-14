@@ -6,7 +6,5 @@
     "amount": 100,
     "id": "forestry:wax"
   },
-  "resource": {
-    "item": "forestry:beeswax"
-  }
+  "resource": "forestry:beeswax"
 }

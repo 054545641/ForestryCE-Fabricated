@@ -3,7 +3,7 @@ package forestry.core.content.resources;
 import forestry.api.IForestryApi;
 import forestry.core.platform.network.packets.PacketRefractoryWax;
 import forestry.core.platform.util.NetworkUtil;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -17,6 +17,10 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import forestry.core.platform.item.ItemForestry;
 
 public class ItemRefractoryWax extends ItemForestry {
+	public ItemRefractoryWax(Properties properties) {
+		super(properties);
+	}
+
 	public InteractionResult useOn(UseOnContext context) {
 		Level level = context.getLevel();
 		BlockPos pos = context.getClickedPos();
@@ -35,11 +39,11 @@ public class ItemRefractoryWax extends ItemForestry {
 			stack.shrink(1);
 			level.setBlock(pos, waxedState, 11);
 			level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, waxedState));
-			if (!level.isClientSide) {
+			if (!level.isClientSide()) {
 				NetworkUtil.sendNetworkPacket(new PacketRefractoryWax(pos), pos, level);
 			}
 
-			return InteractionResult.sidedSuccess(level.isClientSide);
+			return (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
 		}
 
 		return InteractionResult.PASS;

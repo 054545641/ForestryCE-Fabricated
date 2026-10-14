@@ -3,16 +3,11 @@
   "category": "redstone",
   "ingredients": [
     [
-      {
-        "item": "forestry:teak_planks"
-      },
-      {
-        "item": "forestry:teak_fireproof_planks"
-      }
+      "forestry:teak_planks",
+      "forestry:teak_fireproof_planks"
     ]
   ],
   "result": {
-    "count": 1,
     "id": "forestry:teak_button"
   }
 }

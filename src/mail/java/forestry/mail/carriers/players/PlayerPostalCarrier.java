@@ -12,7 +12,7 @@ import forestry.mail.letters.MailAddress;
 import forestry.mail.network.packets.PacketPOBoxInfoResponse;
 import forestry.mail.letters.EnumDeliveryState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,7 +22,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 public class PlayerPostalCarrier implements IPostalCarrier {
-	private final ResourceLocation iconID;
+	private final Identifier iconID;
 
 	public PlayerPostalCarrier() {
 		this.iconID = ForestryConstants.forestry("mail/carrier.player");
@@ -40,24 +40,23 @@ public class PlayerPostalCarrier implements IPostalCarrier {
 	}
 
 	@Override
-	public IPostalState deliverLetter(ServerLevel level, IPostOffice office, IMailAddress recipient, ItemStack letterStack, boolean doDeliver) {
-		POBox pobox = POBoxRegistry.getOrCreate(level).getOrCreatePOBox(recipient);
-
-		if (!pobox.storeLetter(letterStack.copy())) {
-			return EnumDeliveryState.MAILBOX_FULL;
-		} else {
-			Player player = PlayerUtil.getPlayer(level, recipient.getPlayerProfile());
-			if (player instanceof ServerPlayer) {
-				NetworkUtil.sendToPlayer(new PacketPOBoxInfoResponse(pobox.getPOBoxInfo(), false), (ServerPlayer) player);
-			}
-		}
-
-		return EnumDeliveryState.OK;
+	public IPostalState deliverLetter(ServerLevel level, IPostOffice office, IMailAddress recipient, ItemStack letterStack, net.neoforged.neoforge.transfer.transaction.TransactionContext transaction) {
+		return forestry.mail.postoffice.PostalTransactions.attempt(transaction, true, tx -> {
+			var registry = POBoxRegistry.getOrCreate(level);
+			if (!recipient.isValid() || !registry.isValidPOBox(recipient)) return EnumDeliveryState.NO_MAILBOX;
+			POBox box = registry.getOrCreatePOBox(recipient, tx);
+			if (!box.storeLetter(letterStack, tx)) return EnumDeliveryState.MAILBOX_FULL;
+			new net.neoforged.neoforge.transfer.transaction.RootCommitJournal(() -> {
+				ServerPlayer serverPlayer = level.getServer().getPlayerList().getPlayer(recipient.getPlayerProfile().id());
+				if (serverPlayer != null) NetworkUtil.sendToPlayer(new PacketPOBoxInfoResponse(box.getPOBoxInfo(), false), serverPlayer);
+			}).updateSnapshots(tx);
+			return EnumDeliveryState.OK;
+		});
 	}
 
 	@Override
 	public IMailAddress getRecipient(MinecraftServer minecraftServer, String recipientName) {
-		return minecraftServer.getProfileCache().get(recipientName).map(MailAddress::new).orElse(MailAddress.INVALID);
+		return minecraftServer.services().nameToIdCache().get(recipientName).map(profile -> new MailAddress(new com.mojang.authlib.GameProfile(profile.id(), profile.name()))).orElse(MailAddress.INVALID);
 	}
 
 	@Override

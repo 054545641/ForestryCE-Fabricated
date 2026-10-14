@@ -3,9 +3,7 @@
   "category": "building",
   "group": "bark",
   "key": {
-    "#": {
-      "item": "forestry:giant_sequoia_fireproof_log"
-    }
+    "#": "forestry:giant_sequoia_fireproof_log"
   },
   "pattern": [
     "##",

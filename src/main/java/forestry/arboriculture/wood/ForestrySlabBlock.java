@@ -13,8 +13,8 @@ public class ForestrySlabBlock extends SlabBlock implements IWoodTyped {
 	private final boolean fireproof;
 	private final IWoodType woodType;
 
-	public ForestrySlabBlock(ForestryPlanksBlock plank) {
-		super(Block.Properties.ofFullCopy(plank));
+	public ForestrySlabBlock(Properties properties, ForestryPlanksBlock plank) {
+		super(properties);
 		this.fireproof = plank.isFireproof();
 		this.woodType = plank.getWoodType();
 	}

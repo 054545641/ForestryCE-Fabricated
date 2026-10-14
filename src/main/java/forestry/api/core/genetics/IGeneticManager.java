@@ -1,7 +1,7 @@
 package forestry.api.core.genetics;
 
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -49,7 +49,7 @@ public interface IGeneticManager {
 	 */
 	<S extends ISpecies<?>> IMutationManager<S> getMutations(ISpeciesType<?, ?> speciesType);
 
-	default <S extends ISpecies<?>> IMutationManager<S> getMutations(ResourceLocation speciesTypeId) {
+	default <S extends ISpecies<?>> IMutationManager<S> getMutations(Identifier speciesTypeId) {
 		return getMutations(getSpeciesType(speciesTypeId));
 	}
 
@@ -59,7 +59,7 @@ public interface IGeneticManager {
 	 * @return The {@link ISpeciesType} with the given ID.
 	 * @throws IllegalArgumentException If no species type was found with that ID.
 	 */
-	ISpeciesType<?, ?> getSpeciesType(ResourceLocation speciesTypeId);
+	ISpeciesType<?, ?> getSpeciesType(Identifier speciesTypeId);
 
 	/**
 	 * Gets a registered species type by its ID, or returns {@code null} if no species type was found.
@@ -67,13 +67,13 @@ public interface IGeneticManager {
 	 * @return The {@link ISpeciesType} with the given ID, or {@code null} if no species type was registered with that ID.
 	 */
 	@Nullable
-	ISpeciesType<?, ?> getSpeciesTypeSafe(ResourceLocation speciesTypeId);
+	ISpeciesType<?, ?> getSpeciesTypeSafe(Identifier speciesTypeId);
 
 	/**
 	 * @return The {@link ISpeciesType} with the given ID and type.
 	 * @throws IllegalArgumentException If no species type was found with that ID.
 	 */
-	default <T extends ISpeciesType<?, ?>> T getSpeciesType(ResourceLocation speciesTypeId, Class<T> typeClass) {
+	default <T extends ISpeciesType<?, ?>> T getSpeciesType(Identifier speciesTypeId, Class<T> typeClass) {
 		return typeClass.cast(getSpeciesType(speciesTypeId));
 	}
 
@@ -84,7 +84,7 @@ public interface IGeneticManager {
 	 * @param <I>    The generic type of individual. Unchecked cast.
 	 * @return The new individual with a default genome.
 	 */
-	default <I extends IIndividual> I createDefaultIndividual(ResourceLocation typeId) {
+	default <I extends IIndividual> I createDefaultIndividual(Identifier typeId) {
 		ISpeciesType<?, I> o = getSpeciesType(typeId).cast();
 
 		return o.getDefaultSpecies().createIndividual();

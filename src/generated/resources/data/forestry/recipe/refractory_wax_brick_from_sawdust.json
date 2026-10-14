@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "#": {
-      "tag": "c:sawdust"
-    },
-    "X": {
-      "item": "forestry:refractory_wax"
-    }
+    "#": "#c:sawdust",
+    "X": "forestry:refractory_wax"
   },
   "pattern": [
     "#X",

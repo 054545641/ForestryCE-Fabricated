@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "render_type": "cutout",
+  "textures": {
+    "end": "forestry:block/farm/gearbox",
+    "side": "forestry:block/farm/gearbox"
+  }
+}

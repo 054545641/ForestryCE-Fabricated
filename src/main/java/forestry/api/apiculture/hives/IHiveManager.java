@@ -5,7 +5,7 @@ import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeListener;
 import forestry.api.apiculture.IBeeModifier;
 import forestry.api.apiculture.IBeekeepingLogic;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public interface IHiveManager {
 	/**
 	 * @return A list of potential drops for the hive with the specified ID.
 	 */
-	List<IHiveDrop> getDrops(ResourceLocation id);
+	List<IHiveDrop> getDrops(Identifier id);
 
 	/**
 	 * Used to determine if an item is usable as fuel in an Alveary Swarmer for queen rearing.

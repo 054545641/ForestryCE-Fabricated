@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -79,7 +79,7 @@ public class BlockGeneticFilter extends BlockForestry implements EntityBlock {
 		TileGeneticFilter tile = TileUtil.getTile(worldIn, pos, TileGeneticFilter.class);
 		if (tile != null) {
 			if (TileUtil.isUsableByPlayer(playerIn, tile)) {
-				if (!worldIn.isClientSide) {
+				if (!worldIn.isClientSide()) {
 					ServerPlayer sPlayer = (ServerPlayer) playerIn;
 					sPlayer.openMenu(tile, pos);
 				}
@@ -90,10 +90,10 @@ public class BlockGeneticFilter extends BlockForestry implements EntityBlock {
 	}
 
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult rayTraceResult) {
+	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult rayTraceResult) {
 		return useWithoutItem(state, worldIn, pos, playerIn, rayTraceResult).consumesAction()
-			? ItemInteractionResult.sidedSuccess(worldIn.isClientSide)
-			: ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			? (worldIn.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME)
+			: InteractionResult.TRY_WITH_EMPTY_HAND;
 	}
 
 	@Override
@@ -110,7 +110,7 @@ public class BlockGeneticFilter extends BlockForestry implements EntityBlock {
 	@Override
 	@Nullable
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> actualType) {
-		if (level.isClientSide || actualType != SortingTiles.GENETIC_FILTER.tileType()) {
+		if (level.isClientSide() || actualType != SortingTiles.GENETIC_FILTER.tileType()) {
 			return null;
 		}
 		// IForestryTicker and not a bare lambda. It advances the TickHelper that updateOnInterval reads

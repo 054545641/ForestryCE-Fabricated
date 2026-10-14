@@ -4,12 +4,8 @@
   "group": "wooden_door",
   "key": {
     "#": [
-      {
-        "item": "forestry:feijoa_planks"
-      },
-      {
-        "item": "forestry:feijoa_fireproof_planks"
-      }
+      "forestry:feijoa_planks",
+      "forestry:feijoa_fireproof_planks"
     ]
   },
   "pattern": [

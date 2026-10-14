@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "building",
   "ingredients": [
-    {
-      "item": "forestry:plywood_block"
-    }
+    "forestry:plywood_block"
   ],
   "result": {
     "count": 9,

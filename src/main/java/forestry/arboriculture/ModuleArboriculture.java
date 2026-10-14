@@ -7,7 +7,7 @@ import forestry.api.ForestryConstants;
 import forestry.arboriculture.trees.genetics.TreeSpeciesManager;
 import forestry.arboriculture.network.TreeSpeciesSyncPacket;
 import forestry.core.platform.util.NetworkUtil;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import forestry.arboriculture.network.ArboriculturePacketIds;
 
@@ -26,21 +26,19 @@ import forestry.arboriculture.network.PacketRipeningUpdate;
 import forestry.arboriculture.villagers.ArboricultureVillagers;
 import forestry.modules.BlankForestryModule;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import forestry.arboriculture.tab.ArboricultureCreativeTab;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -67,22 +65,22 @@ public class ModuleArboriculture extends BlankForestryModule {
 	public static boolean doSelfPollination = false;
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return ForestryModuleIds.ARBORICULTURE;
 	}
 
 	// declared so the load order that carries the reload ordering is stated rather than incidental
 	@Override
-	public List<ResourceLocation> getModuleDependencies() {
+	public List<Identifier> getModuleDependencies() {
 		return List.of(ForestryModuleIds.CORE);
 	}
 
 	@Override
-	public void registerReloadListeners(AddReloadListenerEvent event) {
+	public void registerReloadListeners(AddServerReloadListenersEvent event) {
 		// Load tree species from the "tree_species" datapack folder and rebuild the live species map from
 		// them. Core registers the mutation rebuild after every module, and mutations must resolve
 		// species that already exist in the live map.
-		event.addListener(TreeSpeciesManager.INSTANCE);
+		event.addListener(ForestryConstants.forestry("tree_species"), TreeSpeciesManager.INSTANCE);
 	}
 
 	@Override
@@ -97,7 +95,6 @@ public class ModuleArboriculture extends BlankForestryModule {
 	public void registerEvents(IEventBus modBus) {
 		modBus.addListener(ModuleArboriculture::registerGlobalLootModifiers);
 		modBus.addListener(ArboricultureCreativeTab::addToForestryTab);
-		NeoForge.EVENT_BUS.addListener(ArboricultureVillagers::villagerTrades);
 
 		modBus.addListener(ModuleArboriculture::registerCapabilities);
 		modBus.addListener(ModuleArboriculture::commonSetup);
@@ -105,30 +102,18 @@ public class ModuleArboriculture extends BlankForestryModule {
 		NeoForge.EVENT_BUS.addListener(ModuleArboriculture::modifySnifferLoot);
 	}
 
-	/**
-	 * Adds Forestry's ceiling and wall hanging sign blocks to vanilla's
-	 * {@link BlockEntityType#HANGING_SIGN} valid-blocks set. This is required because
-	 * {@code HangingSignBlockEntity}'s public constructor hardcodes that vanilla type, so
-	 * any Forestry-owned BlockEntityType for hanging signs would never be used at runtime
-	 * (breaking save validation and tickers).
-	 */
+	// HangingSignBlockEntity hardcodes the vanilla type
 	private static void registerHangingSignBlocks(BlockEntityTypeAddBlocksEvent event) {
 		Block[] hangingSignBlocks = Stream.concat(
 			ArboricultureBlocks.HANGING_SIGN.getList().stream(),
 			ArboricultureBlocks.WALL_HANGING_SIGN.getList().stream()
 		).toArray(Block[]::new);
-		event.modify(BlockEntityType.HANGING_SIGN, hangingSignBlocks);
+		event.modify(BlockEntityTypes.HANGING_SIGN, hangingSignBlocks);
 	}
 
 	private static void modifySnifferLoot(LootTableLoadEvent event) {
 		if (event.getKey().equals(BuiltInLootTables.SNIFFER_DIGGING)) {
-			LootPool main = event.getTable().getPool("main");
-
-			if (main != null) {
-				List<LootPoolEntryContainer> entries = new ArrayList<>(main.entries);
-				entries.add(LootItem.lootTableItem(ArboricultureItems.AMBER_SAPLING_FOSSIL).build());
-				main.entries = entries;
-			}
+			forestry.core.platform.loot.LootPoolInjection.append(event, "main", LootItem.lootTableItem(ArboricultureItems.AMBER_SAPLING_FOSSIL).build());
 		}
 	}
 
@@ -138,7 +123,7 @@ public class ModuleArboriculture extends BlankForestryModule {
 	}
 
 	private static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerEntity(Capabilities.ItemHandler.ENTITY, ArboricultureEntities.CHEST_BOAT.entityType(), (boat, context) -> boat.isAlive() ? new InvWrapper(boat) : null);
+		forestry.arboriculture.entities.ForestryChestBoat.registerCapabilities(event, ArboricultureEntities.CHEST_BOAT.entityType());
 	}
 
 	private static void commonSetup(FMLCommonSetupEvent event) {
@@ -174,9 +159,9 @@ public class ModuleArboriculture extends BlankForestryModule {
 
 		// id-keyed: resolving a species happens at render time by id, so the (datapack-driven) species list is not
 		// needed to build the sprite/model maps below.
-		HashMap<ResourceLocation, ILeafSprite> spritesById = impl.getLeafSprites();
-		HashMap<ResourceLocation, ILeafTint> tintsById = impl.getTints();
-		HashMap<ResourceLocation, Pair<ResourceLocation, ResourceLocation>> modelsById = impl.getSaplingModels();
+		HashMap<Identifier, ILeafSprite> spritesById = impl.getLeafSprites();
+		HashMap<Identifier, ILeafTint> tintsById = impl.getTints();
+		HashMap<Identifier, Pair<Identifier, Identifier>> modelsById = impl.getSaplingModels();
 
 		// The escritoire-color tint fallback (for the ~40 built-in species that register no explicit client tint) is
 		// applied lazily at render time in TreeClientManager#getTint from the species object itself, so no species-list
@@ -184,13 +169,13 @@ public class ModuleArboriculture extends BlankForestryModule {
 
 		// For any species id that has a leaf sprite but no explicit sapling model, synthesize the default-path pair
 		// (removing the "tree_" prefix), exactly as the old per-species loop did.
-		Map<ResourceLocation, Pair<ResourceLocation, ResourceLocation>> models = new HashMap<>(modelsById);
-		for (ResourceLocation id : spritesById.keySet()) {
+		Map<Identifier, Pair<Identifier, Identifier>> models = new HashMap<>(modelsById);
+		for (Identifier id : spritesById.keySet()) {
 			models.computeIfAbsent(id, sid -> {
 				String path = sid.getPath().replace("tree_", "");
 				return Pair.of(
-					ResourceLocation.fromNamespaceAndPath(sid.getNamespace(), "block/" + path + "_sapling"),
-					ResourceLocation.fromNamespaceAndPath(sid.getNamespace(), "item/" + path + "_sapling")
+					Identifier.fromNamespaceAndPath(sid.getNamespace(), "block/" + path + "_sapling"),
+					Identifier.fromNamespaceAndPath(sid.getNamespace(), "item/" + path + "_sapling")
 				);
 			});
 		}

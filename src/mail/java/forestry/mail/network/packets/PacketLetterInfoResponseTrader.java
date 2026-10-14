@@ -33,8 +33,8 @@ public record PacketLetterInfoResponseTrader(@Nullable ITradeStationInfo info) i
 			buffer.writeUtf(msg.info.address().getName());
 
 			GameProfile profile = msg.info.owner();
-			buffer.writeUUID(profile.getId());
-			buffer.writeUtf(profile.getName());
+			buffer.writeUUID(profile.id());
+			buffer.writeUtf(profile.name());
 
 			ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, msg.info.tradegood());
 			NetworkUtil.writeItemStacks(buffer, msg.info.required());

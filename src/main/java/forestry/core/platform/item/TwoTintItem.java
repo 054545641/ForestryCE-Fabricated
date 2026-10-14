@@ -3,7 +3,6 @@ package forestry.core.platform.item;
 import forestry.api.core.IItemSubtype;
 import forestry.apiculture.bees.PollenClusterItem;
 import forestry.apiculture.bees.PropolisItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -22,10 +21,6 @@ public class TwoTintItem extends ItemForestry implements ITintedItem {
 	}
 
 	protected final ITwoTintItemSubtype type;
-
-	public TwoTintItem(ITwoTintItemSubtype type) {
-		this(type, new Item.Properties());
-	}
 
 	public TwoTintItem(ITwoTintItemSubtype type, Properties properties) {
 		super(properties);

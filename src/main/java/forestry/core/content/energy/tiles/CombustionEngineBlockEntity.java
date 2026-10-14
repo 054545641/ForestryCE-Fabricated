@@ -1,5 +1,6 @@
 package forestry.core.content.energy.tiles;
 
+import forestry.core.platform.fluids.FluidHelper;
 import forestry.api.ForestryDataMaps;
 import forestry.api.IForestryApi;
 import forestry.api.core.ForestryError;
@@ -21,7 +22,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -32,13 +33,29 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 
 import javax.annotation.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 import static net.neoforged.neoforge.fluids.FluidType.BUCKET_VOLUME;
 
 public class CombustionEngineBlockEntity extends EngineBlockEntity implements WorldlyContainer, ILiquidTankTile, IEngineUpgradeable, ISocketable {
+	private record FuelState(float burnTime, int coolantTime, float outputBoost, float outputMult, float efficiencyMult, float burnRate) {}
+	@Override protected Object captureFuelState() { return new FuelState(this.burnTime, this.coolantTime, this.outputBoost, this.outputMult, this.efficiencyMult, this.burnRate); }
+	@Override protected void restoreFuelState(Object value) {
+		var state = (FuelState) value;
+		this.burnTime = state.burnTime();
+		this.coolantTime = state.coolantTime();
+		this.outputBoost = state.outputBoost();
+		this.outputMult = state.outputMult();
+		this.efficiencyMult = state.efficiencyMult();
+		this.burnRate = state.burnRate();
+	}
+
 	private final StandardTank burnTank;
 	private final StandardTank waterTank;
 	private final FilteredTank fuelTank;
@@ -62,8 +79,8 @@ public class CombustionEngineBlockEntity extends EngineBlockEntity implements Wo
 
 		this.fuelTank = new FilteredTank(Constants.ENGINE_TANK_CAPACITY).setFilter(ForestryDataMaps.COMBUSTION_FUELS);
 		this.coolantTank = new FilteredTank(Constants.ENGINE_TANK_CAPACITY, true, false).setFilter(ForestryDataMaps.COMBUSTION_COOLANTS);
-		this.burnTank = new StandardTank(BUCKET_VOLUME, false, false);
-		this.waterTank = new StandardTank(BUCKET_VOLUME, false, false);
+		this.burnTank = StandardTank.variableCapacity(BUCKET_VOLUME);
+		this.waterTank = StandardTank.variableCapacity(BUCKET_VOLUME);
 		this.tankManager = new TankManager(this, this.fuelTank, this.coolantTank, this.burnTank, this.waterTank);
 	}
 
@@ -105,10 +122,10 @@ public class CombustionEngineBlockEntity extends EngineBlockEntity implements Wo
 		if (heatLevel > 0.85)
 			heatToCool += 2;
 
-		FluidStack water = this.waterTank.drainInternal(heatToCool, IFluidHandler.FluidAction.EXECUTE);
+		FluidStack water = FluidHelper.drain(this.waterTank.internal(), heatToCool);
 		this.heat -= water.getAmount();
-		if (this.waterTank.isEmpty()) {
-			FluidStack fluidStack = this.coolantTank.drainInternal(BUCKET_VOLUME, IFluidHandler.FluidAction.EXECUTE);
+		if (this.waterTank.isEmpty() && this.coolantTank.getFluidAmount() >= BUCKET_VOLUME) {
+			FluidStack fluidStack = FluidHelper.drain(this.coolantTank.internal(), BUCKET_VOLUME);
 			if (!fluidStack.isEmpty()) {
 				fluidStack.setAmount(determineCoolantTime(fluidStack));
 				this.waterTank.setCapacity(fluidStack.getAmount());
@@ -129,7 +146,7 @@ public class CombustionEngineBlockEntity extends EngineBlockEntity implements Wo
 	}
 
 	@Override
-	protected void burn() {
+	protected void burnFuel() {
 
 		this.currentOutput = 0;
 
@@ -138,17 +155,16 @@ public class CombustionEngineBlockEntity extends EngineBlockEntity implements Wo
 				this.currentOutput = (int) (determineFuelValue(this.burnTank.getFluid()) * this.outputMult);
 				if (this.energyStorage.getMaxEnergyStored() - this.energyStorage.getEnergyStored() >= this.currentOutput) {
 					this.burnTime -= this.burnRate;
-					setChanged();
 					this.energyStorage.generateEnergy(this.currentOutput);
 					FluidStack fuel = this.burnTank.getFluid();
 					fuel.setAmount((int) this.burnTime);
 					this.burnTank.setFluid(fuel);
-					this.level.updateNeighbourForOutputSignal(this.worldPosition, getBlockState().getBlock());
+					
 				} else {
 					this.currentOutput = 0;
 				}
-			} else if (this.fuelTank.getFluidAmount() >= BUCKET_VOLUME) {
-				FluidStack fuel = this.fuelTank.drainInternal(BUCKET_VOLUME, IFluidHandler.FluidAction.EXECUTE).copy();
+			} else if (this.burnTime <= 0 && this.fuelTank.getFluidAmount() >= BUCKET_VOLUME) {
+				FluidStack fuel = FluidHelper.drain(this.fuelTank.internal(), BUCKET_VOLUME).copy();
 				int time = determineBurnTime(fuel);
 				if (!fuel.isEmpty()) {
 					fuel.setAmount(time);
@@ -163,7 +179,7 @@ public class CombustionEngineBlockEntity extends EngineBlockEntity implements Wo
 
 	@Override
 	protected boolean isBurning() {
-		return mayBurn() && (this.level.isClientSide || (!this.burnTank.isEmpty() && this.currentOutput != 0));
+		return mayBurn() && (this.level.isClientSide() || (!this.burnTank.isEmpty() && this.currentOutput != 0));
 	}
 
 	/**
@@ -171,7 +187,7 @@ public class CombustionEngineBlockEntity extends EngineBlockEntity implements Wo
 	 */
 	private static int determineFuelValue(@Nullable FluidStack fluidStack) {
 		if (fluidStack != null) {
-			BiogasEngineFuel fuel = fluidStack.getFluidHolder().getData(ForestryDataMaps.COMBUSTION_FUELS);
+			BiogasEngineFuel fuel = fluidStack.typeHolder().getData(ForestryDataMaps.COMBUSTION_FUELS);
 			if (fuel != null) {
 				return fuel.powerPerCycle();
 			}
@@ -184,7 +200,7 @@ public class CombustionEngineBlockEntity extends EngineBlockEntity implements Wo
 	 */
 	private static int determineBurnTime(@Nullable FluidStack fluidStack) {
 		if (fluidStack != null) {
-			BiogasEngineFuel fuel = fluidStack.getFluidHolder().getData(ForestryDataMaps.COMBUSTION_FUELS);
+			BiogasEngineFuel fuel = fluidStack.typeHolder().getData(ForestryDataMaps.COMBUSTION_FUELS);
 			if (fuel != null) {
 				return fuel.burnDuration();
 			}
@@ -194,7 +210,7 @@ public class CombustionEngineBlockEntity extends EngineBlockEntity implements Wo
 
 	private static int determineCoolantTime(@Nullable FluidStack fluidStack) {
 		if (fluidStack != null) {
-			BiogasEngineFuel fuel = fluidStack.getFluidHolder().getData(ForestryDataMaps.COMBUSTION_COOLANTS);
+			BiogasEngineFuel fuel = fluidStack.typeHolder().getData(ForestryDataMaps.COMBUSTION_COOLANTS);
 			if (fuel != null) {
 				return fuel.burnDuration();
 			}
@@ -204,7 +220,7 @@ public class CombustionEngineBlockEntity extends EngineBlockEntity implements Wo
 
 	private static int determineCoolantModifier(@Nullable FluidStack fluidStack) {
 		if (fluidStack != null) {
-			BiogasEngineFuel fuel = fluidStack.getFluidHolder().getData(ForestryDataMaps.COMBUSTION_COOLANTS);
+			BiogasEngineFuel fuel = fluidStack.typeHolder().getData(ForestryDataMaps.COMBUSTION_COOLANTS);
 			if (fuel != null) {
 				return fuel.dissipationMultiplier();
 			}
@@ -219,21 +235,27 @@ public class CombustionEngineBlockEntity extends EngineBlockEntity implements Wo
 	// Deviation from 1.20.1: 1.21.1 block entities save through saveAdditional(CompoundTag, HolderLookup.Provider),
 	// and the tank manager and the socket inventory take the registry lookup too.
 	@Override
-	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-		super.saveAdditional(nbt, registries);
-		this.tankManager.write(nbt, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag nbt = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
+		this.tankManager.write(output);
 		nbt.putFloat("burnTime", this.burnTime);
 		nbt.putInt("coolantTime", this.coolantTime);
 		this.sockets.write(nbt, registries);
+	
+		ValueIOUtil.mergeInto(output, nbt);
 	}
 
 	// Deviation from 1.20.1: load(CompoundTag) became loadAdditional(CompoundTag, HolderLookup.Provider).
 	@Override
-	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-		super.loadAdditional(nbt, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag nbt = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
 		this.tankManager.read(nbt, registries);
-		this.burnTime = nbt.getFloat("burnTime");
-		this.coolantTime = nbt.getInt("coolantTime");
+		this.burnTime = nbt.getFloatOr("burnTime", 0.0f);
+		this.coolantTime = nbt.getIntOr("coolantTime", 0);
 		this.sockets.read(nbt, registries);
 
 		ItemStack chip = this.sockets.getItem(0);
@@ -266,7 +288,7 @@ public class CombustionEngineBlockEntity extends EngineBlockEntity implements Wo
 	// Deviation from 1.20.1: the fluid handler is exposed through RegisterCapabilitiesEvent in
 	// ModuleEnergy instead of an overridden getCapability.
 	@Nullable
-	public IFluidHandler getFluidHandler(@Nullable Direction facing) {
+	public ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction facing) {
 		return this.remove ? null : this.tankManager;
 	}
 
@@ -340,7 +362,7 @@ public class CombustionEngineBlockEntity extends EngineBlockEntity implements Wo
 	}
 
 	@Override
-	public ResourceLocation getSocketType() {
+	public Identifier getSocketType() {
 		return ForestryCircuitSocketTypes.ENGINE;
 	}
 }

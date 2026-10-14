@@ -1,9 +1,9 @@
 package forestry.core.platform.gui;
 
 import forestry.core.platform.render.ColourProperties;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
@@ -13,13 +13,21 @@ public abstract class GuiForestryTitled<C extends AbstractContainerMenu> extends
 	}
 
 	// For Forestry addons
-	protected GuiForestryTitled(ResourceLocation texture, C container, Inventory inv, Component title) {
+	protected GuiForestryTitled(Identifier texture, C container, Inventory inv, Component title) {
 		super(texture, container, inv, title);
 	}
 
+	protected GuiForestryTitled(String texture, C container, Inventory inv, Component title, int width, int height) {
+		super(texture, container, inv, title, width, height);
+	}
+
+	protected GuiForestryTitled(Identifier texture, C container, Inventory inv, Component title, int width, int height) {
+		super(texture, container, inv, title, width, height);
+	}
+
 	@Override
-	protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
-		super.renderBg(graphics, partialTicks, mouseX, mouseY);
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 
         this.textLayout.line = 6;
 		if (centeredTitle()) {
@@ -27,8 +35,6 @@ public abstract class GuiForestryTitled<C extends AbstractContainerMenu> extends
 		} else {
             this.textLayout.drawLine(graphics, this.title.getString(), 8, ColourProperties.INSTANCE.get("gui.title"));
 		}
-		// todo get rid of this and make sure nothing breaks
-		bindTexture(this.textureFile);
 	}
 
 	protected boolean centeredTitle() {

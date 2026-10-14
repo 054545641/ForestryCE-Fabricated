@@ -17,7 +17,7 @@ import forestry.apiculture.apiarist.ItemSmoker;
 import forestry.core.platform.item.ItemForestry;
 import forestry.core.platform.item.ItemForestryFood;
 import forestry.core.platform.registration.*;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.Item;
 
 @FeatureProvider
@@ -25,15 +25,15 @@ public class ApicultureItems {
 	// / BEES
 	public static final IFeatureRegistry REGISTRY = ModFeatureRegistry.get(ForestryModuleIds.APICULTURE);
 
-	public static final FeatureItem<ForestryBeeItem> BEE_QUEEN = REGISTRY.item(() -> new ForestryBeeItem(BeeLifeStage.QUEEN), BeeLifeStage.QUEEN.itemId().getPath());
-	public static final FeatureItem<ForestryBeeItem> BEE_DRONE = REGISTRY.item(() -> new ForestryBeeItem(BeeLifeStage.DRONE), BeeLifeStage.DRONE.itemId().getPath());
-	public static final FeatureItem<ForestryBeeItem> BEE_PRINCESS = REGISTRY.item(() -> new ForestryBeeItem(BeeLifeStage.PRINCESS), BeeLifeStage.PRINCESS.itemId().getPath());
-	public static final FeatureItem<ForestryBeeItem> BEE_LARVAE = REGISTRY.item(() -> new ForestryBeeItem(BeeLifeStage.LARVAE), BeeLifeStage.LARVAE.itemId().getPath());
+	public static final FeatureItem<ForestryBeeItem> BEE_QUEEN = REGISTRY.item(properties -> new ForestryBeeItem(BeeLifeStage.QUEEN, properties), BeeLifeStage.QUEEN.itemId().getPath());
+	public static final FeatureItem<ForestryBeeItem> BEE_DRONE = REGISTRY.item(properties -> new ForestryBeeItem(BeeLifeStage.DRONE, properties), BeeLifeStage.DRONE.itemId().getPath());
+	public static final FeatureItem<ForestryBeeItem> BEE_PRINCESS = REGISTRY.item(properties -> new ForestryBeeItem(BeeLifeStage.PRINCESS, properties), BeeLifeStage.PRINCESS.itemId().getPath());
+	public static final FeatureItem<ForestryBeeItem> BEE_LARVAE = REGISTRY.item(properties -> new ForestryBeeItem(BeeLifeStage.LARVAE, properties), BeeLifeStage.LARVAE.itemId().getPath());
 
 	// / COMB FRAMES
-	public static final FeatureItem<HiveFrameItem> FRAME_UNTREATED = REGISTRY.item(() -> new HiveFrameItem(80, 0.9f), "untreated_frame");
-	public static final FeatureItem<HiveFrameItem> FRAME_IMPREGNATED = REGISTRY.item(() -> new HiveFrameItem(240, 0.4f), "impregnated_frame");
-	public static final FeatureItem<HiveFrameItem> FRAME_PROVEN = REGISTRY.item(() -> new HiveFrameItem(720, 0.3f), "proven_frame");
+	public static final FeatureItem<HiveFrameItem> FRAME_UNTREATED = REGISTRY.item(properties -> new HiveFrameItem(80, 0.9f, properties), "untreated_frame");
+	public static final FeatureItem<HiveFrameItem> FRAME_IMPREGNATED = REGISTRY.item(properties -> new HiveFrameItem(240, 0.4f, properties), "impregnated_frame");
+	public static final FeatureItem<HiveFrameItem> FRAME_PROVEN = REGISTRY.item(properties -> new HiveFrameItem(720, 0.3f, properties), "proven_frame");
 	public static final FeatureItem<CreativeHiveFrameItem> FRAME_CREATIVE = REGISTRY.item(CreativeHiveFrameItem::new, "creative_frame");
 
 	// BEE RESOURCES
@@ -56,14 +56,14 @@ public class ApicultureItems {
 		.create();
 
 	// / BEE FOOD PRODUCTS
-	public static final FeatureItem<ItemForestryFood> HONEYED_SLICE = REGISTRY.item(() -> new ItemForestryFood(8, 0.6f), "honeyed_slice");
-	public static final FeatureItem<ItemForestryFood> AMBROSIA = REGISTRY.item(() -> new ItemAmbrosia().setIsDrink(), "ambrosia");
+	public static final FeatureItem<ItemForestryFood> HONEYED_SLICE = REGISTRY.item(properties -> new ItemForestryFood(8, 0.6f, properties), "honeyed_slice");
+	public static final FeatureItem<ItemForestryFood> AMBROSIA = REGISTRY.item(ItemAmbrosia::new, "ambrosia");
 
 	// / APIARIST'S CLOTHES
-	public static final FeatureItem<ItemArmorApiarist> APIARIST_HELMET = REGISTRY.item(() -> new ItemArmorApiarist(ArmorItem.Type.HELMET), "apiarists_hat");
-	public static final FeatureItem<ItemArmorApiarist> APIARIST_CHEST = REGISTRY.item(() -> new ItemArmorApiarist(ArmorItem.Type.CHESTPLATE), "apiarists_shirt");
-	public static final FeatureItem<ItemArmorApiarist> APIARIST_LEGS = REGISTRY.item(() -> new ItemArmorApiarist(ArmorItem.Type.LEGGINGS), "apiarists_pants");
-	public static final FeatureItem<ItemArmorApiarist> APIARIST_BOOTS = REGISTRY.item(() -> new ItemArmorApiarist(ArmorItem.Type.BOOTS), "apiarists_shoes");
+	public static final FeatureItem<ItemArmorApiarist> APIARIST_HELMET = REGISTRY.item(properties -> new ItemArmorApiarist(ArmorType.HELMET, properties), "apiarists_hat");
+	public static final FeatureItem<ItemArmorApiarist> APIARIST_CHEST = REGISTRY.item(properties -> new ItemArmorApiarist(ArmorType.CHESTPLATE, properties), "apiarists_shirt");
+	public static final FeatureItem<ItemArmorApiarist> APIARIST_LEGS = REGISTRY.item(properties -> new ItemArmorApiarist(ArmorType.LEGGINGS, properties), "apiarists_pants");
+	public static final FeatureItem<ItemArmorApiarist> APIARIST_BOOTS = REGISTRY.item(properties -> new ItemArmorApiarist(ArmorType.BOOTS, properties), "apiarists_shoes");
 
 	// TOOLS
 	public static final FeatureItem<ItemSmoker> SMOKER = REGISTRY.item(ItemSmoker::new, "bee_smoker");

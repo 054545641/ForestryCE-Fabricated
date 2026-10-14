@@ -2,16 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "#": {
-      "item": "minecraft:cobblestone"
-    },
+    "#": "minecraft:cobblestone",
     "X": [
-      {
-        "item": "forestry:honey_drop"
-      },
-      {
-        "item": "forestry:honeydew"
-      }
+      "forestry:honey_drop",
+      "forestry:honeydew"
     ]
   },
   "pattern": [

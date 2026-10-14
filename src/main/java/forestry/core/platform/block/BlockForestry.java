@@ -27,7 +27,7 @@ public abstract class BlockForestry extends Block {
 
 	@Override
 	public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		if (world.isClientSide) {
+		if (world.isClientSide()) {
 			return;
 		}
 

@@ -1,6 +1,6 @@
 package forestry.core.engine.genetics;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.core.genetics.IGenome;
 import forestry.api.core.genetics.alleles.IKaryotype;
@@ -18,7 +18,7 @@ public final class SpeciesProjection {
 	private SpeciesProjection() {
 	}
 
-	public static IGenome buildGenome(IKaryotype karyotype, ResourceLocation id, ISpeciesDefinition def) {
+	public static IGenome buildGenome(IKaryotype karyotype, Identifier id, ISpeciesDefinition def) {
 		IGenomeBuilder gb = SpeciesRegistration.createDefaultGenomeBuilder(karyotype, id, def.genus(), def.dominant());
 		GenomeProjection.applyOverrides(gb, karyotype, def.genome());
 		return gb.build();

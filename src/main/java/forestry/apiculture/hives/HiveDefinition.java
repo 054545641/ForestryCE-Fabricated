@@ -15,7 +15,7 @@ import forestry.core.platform.util.SpeciesUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
@@ -126,7 +126,7 @@ public enum HiveDefinition implements IHiveDefinition {
 
 		@Override
 		public void postGen(WorldGenLevel level, RandomSource rand, BlockPos pos) {
-			for (Direction direction : Direction.VALUES) {
+			for (Direction direction : Direction.values()) {
 				BlockPos pos2 = pos.relative(direction);
 				if (direction.getAxis().isHorizontal() && level.getBlockState(pos2).getBlock() == Blocks.WATER) {
 					level.setBlock(pos2, CORAL_FANS[rand.nextInt(5)].defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, direction), Block.UPDATE_CLIENTS);
@@ -158,11 +158,11 @@ public enum HiveDefinition implements IHiveDefinition {
 	}
 
 	private final BlockState blockState;
-	private final ResourceLocation speciesId;
+	private final Identifier speciesId;
 	private final IHivePlacement hiveGen;
 	private final float defaultGenChance;
 
-	HiveDefinition(BlockState hiveState, float defaultGenChance, ResourceLocation beeTemplate, IHivePlacement hiveGen) {
+	HiveDefinition(BlockState hiveState, float defaultGenChance, Identifier beeTemplate, IHivePlacement hiveGen) {
 		this.blockState = hiveState;
 		this.defaultGenChance = defaultGenChance;
 		this.speciesId = beeTemplate;

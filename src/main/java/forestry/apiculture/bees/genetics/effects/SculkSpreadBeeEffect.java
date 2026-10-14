@@ -22,10 +22,10 @@ public class SculkSpreadBeeEffect extends ThrottledBeeEffect {
 	@Override
 	IEffectData doEffectThrottled(IGenome genome, IEffectData storedData, IBeeHousing housing) {
 		Level level = housing.getLevel();
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return storedData;
 		}
-		RandomSource random = level.random;
+		RandomSource random = level.getRandom();
 		Vec3i area = Bee.getParticleArea(genome, housing);
 
 		BlockPos randomPos = VecUtil.getRandomPositionInArea(random, area);

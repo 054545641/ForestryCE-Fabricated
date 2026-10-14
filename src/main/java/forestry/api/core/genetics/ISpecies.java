@@ -3,7 +3,7 @@ package forestry.api.core.genetics;
 import forestry.api.core.genetics.alleles.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public interface ISpecies<I extends IIndividual> {
 	/**
 	 * @return The unique identifier of this species. Also the allele ID for this species.
 	 */
-	ResourceLocation id();
+	Identifier id();
 
 	/**
 	 * @return The scientific name of this species, including the genus and species.

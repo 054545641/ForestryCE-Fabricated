@@ -1,14 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "P": [
-      {
-        "item": "forestry:greenheart_planks"
-      },
-      {
-        "item": "forestry:greenheart_fireproof_planks"
-      }
+      "forestry:greenheart_planks",
+      "forestry:greenheart_fireproof_planks"
     ]
   },
   "pattern": [
@@ -16,7 +11,6 @@
     "PPP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:greenheart_boat"
   }
 }

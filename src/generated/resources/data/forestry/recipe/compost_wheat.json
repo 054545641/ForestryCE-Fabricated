@@ -1,13 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "item": "minecraft:dirt"
-    },
-    "X": {
-      "tag": "c:crops/wheat"
-    }
+    "#": "minecraft:dirt",
+    "X": "#c:crops/wheat"
   },
   "pattern": [
     " X ",

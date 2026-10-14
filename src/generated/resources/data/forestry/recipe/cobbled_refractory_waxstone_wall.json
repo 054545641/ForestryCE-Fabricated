@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "#": {
-      "item": "forestry:cobbled_refractory_waxstone"
-    }
+    "#": "forestry:cobbled_refractory_waxstone"
   },
   "pattern": [
     "###",

@@ -1,8 +1,7 @@
 package forestry.core.platform.gui.widgets;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import forestry.core.platform.gui.Drawable;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class WidgetSlider extends Widget {
 	private final Drawable texture;
@@ -31,8 +30,7 @@ public class WidgetSlider extends Widget {
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int startX, int startY) {
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+	public void draw(GuiGraphicsExtractor graphics, int startX, int startY) {
         this.texture.draw(graphics, startY + this.yPos + this.yOffset, startX + this.xPos + this.xOffset);
 	}
 

@@ -2,9 +2,9 @@ package forestry.api.modules;
 
 import forestry.api.client.IClientModuleHandler;
 import forestry.api.client.plugin.IClientRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 
 import java.util.List;
@@ -20,12 +20,12 @@ public interface IForestryModule {
 	/**
 	 * @return The unique identifier for this module. The namespace should be the modid of the mod adding this module.
 	 */
-	ResourceLocation getId();
+	Identifier getId();
 
 	/**
 	 * @return A list of identifiers of the modules this module requires in order to load (Apiculture, Mail, etc.)
 	 */
-	default List<ResourceLocation> getModuleDependencies() {
+	default List<Identifier> getModuleDependencies() {
 		return List.of();
 	}
 
@@ -69,7 +69,7 @@ public interface IForestryModule {
 	 *
 	 * @param event The reload listener registration event
 	 */
-	default void registerReloadListeners(AddReloadListenerEvent event) {
+	default void registerReloadListeners(AddServerReloadListenersEvent event) {
 	}
 
 	/**
@@ -85,9 +85,17 @@ public interface IForestryModule {
 	}
 
 	/**
-	 * Called after item registration, in module load order. Used to register IFlowerTypeManager, IFarmingManger, etc.
+	 * Called after item registration, in module load order, before datapack loading.
+	 * Register API types here without constructing ItemStacks; default item components are not bound yet.
 	 */
 	default void applyPluginRegistration() {
+	}
+
+	/**
+	 * Rebuilds data that needs bound item components, after server datapack loading or remote-client sync.
+	 * Called in module load order. Replace previous data rather than appending: this runs again on reload.
+	 */
+	default void applyLoadedDataRegistration() {
 	}
 
 	/**

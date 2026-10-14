@@ -4,13 +4,13 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import forestry.api.modules.ForestryModuleIds;
 import forestry.api.modules.IForestryModule;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
 public abstract class BlankForestryModule implements IForestryModule {
 	@Override
-	public List<ResourceLocation> getModuleDependencies() {
+	public List<Identifier> getModuleDependencies() {
 		// todo is this necessary? core module overriding isCore should be sufficient
 		return List.of(ForestryModuleIds.CORE);
 	}

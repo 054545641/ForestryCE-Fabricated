@@ -1,26 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "item": "minecraft:chiseled_stone_bricks"
-    },
-    "C": {
-      "item": "forestry:tin_electron_tube"
-    },
-    "I": {
-      "tag": "c:ingots/copper"
-    },
-    "W": {
-      "tag": "minecraft:wooden_slabs"
-    }
+    "#": "minecraft:chiseled_stone_bricks",
+    "C": "forestry:tin_electron_tube",
+    "I": "#c:ingots/copper",
+    "W": "#minecraft:wooden_slabs"
   },
   "pattern": [
     "I#I",
     "WCW"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:chiseled_stone_brick_farm_plain"
   }
 }

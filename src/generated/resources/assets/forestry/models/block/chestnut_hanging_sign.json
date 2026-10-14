@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/chestnut_planks"
-  }
+  "parent": "forestry:block/chestnut_hanging_sign_rot_0"
 }

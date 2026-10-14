@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -39,7 +39,7 @@ public class TreeSpeciesFallbackTest {
 
 		IChromosome.IReferenceResolver<ITreeSpecies> resolver =
 			(IChromosome.IReferenceResolver<ITreeSpecies>) TreeChromosomes.SPECIES.resolver();
-		ResourceLocation unknownId = ForestryConstants.forestry("does_not_exist");
+		Identifier unknownId = ForestryConstants.forestry("does_not_exist");
 		ITreeSpecies resolved = resolver.get(unknownId);
 
 		if (resolved != type.getDefaultSpecies()) {
@@ -66,12 +66,12 @@ public class TreeSpeciesFallbackTest {
 		ITreeSpeciesType type = SpeciesUtil.TREE_TYPE.get();
 
 		// Snapshot the live, full species map before mutating it, so it can be restored afterwards.
-		ImmutableMap<ResourceLocation, ITreeSpecies> snapshot = ImmutableMap.copyOf(
+		ImmutableMap<Identifier, ITreeSpecies> snapshot = ImmutableMap.copyOf(
 			type.getAllSpeciesIds().stream().collect(Collectors.toMap(id -> id, type::getSpecies))
 		);
 
-		Map<ResourceLocation, TreeSpeciesDefinition> defs = new LinkedHashMap<>(TreeSpeciesProvider.buildDefinitions());
-		ResourceLocation phantomId = ForestryConstants.forestry("phantom_no_bindings");
+		Map<Identifier, TreeSpeciesDefinition> defs = new LinkedHashMap<>(TreeSpeciesProvider.buildDefinitions());
+		Identifier phantomId = ForestryConstants.forestry("phantom_no_bindings");
 		defs.put(phantomId, TestSpeciesDefinitions.tree("Quercus", "phantom").build());
 
 		try {

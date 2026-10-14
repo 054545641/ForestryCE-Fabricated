@@ -1,138 +1,52 @@
 package forestry.core.platform.inventory;
 
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Predicate;
 
-/**
- * @author CovertJaguar <http://www.railcraft.info>
- */
 public class ItemHandlerInventoryManipulator implements Iterable<IInvSlot> {
-
-	private final IItemHandler inv;
-
-	public ItemHandlerInventoryManipulator(IItemHandler inv) {
-		this.inv = inv;
-	}
-
-	@Override
-	public Iterator<IInvSlot> iterator() {
-		return new InvIterator(this.inv);
-	}
-
-	/**
-	 * Simulate adding the stack to the inventory.
-	 *
-	 * @return the remainder
-	 */
-	@Nullable
-	public ItemStack tryAddStack(ItemStack stack) {
-		return addStack(stack, false);
-	}
-
-	/**
-	 * Attempt to add the stack to the inventory.
-	 *
-	 * @return The remainder
-	 */
-	@Nullable
-	public ItemStack addStack(ItemStack stack) {
-		return addStack(stack, true);
-	}
-
-	/**
-	 * Removed an item matching the filter.
-	 */
+	private final ResourceHandler<ItemResource> inv;
+	public ItemHandlerInventoryManipulator(ResourceHandler<ItemResource> inv) { this.inv = inv; }
+	@Override public Iterator<IInvSlot> iterator() { return new InvIterator(this.inv); }
+	public ItemStack tryAddStack(ItemStack stack) { return addStack(stack, false); }
+	public ItemStack addStack(ItemStack stack) { return addStack(stack, true); }
 	public ItemStack removeItem(Predicate<ItemStack> filter) {
-		for (IInvSlot slot : this) {
-			ItemStack stack = slot.getStackInSlot();
-			if (!stack.isEmpty() && slot.canTakeStackFromSlot(stack) && filter.test(stack)) {
-				return slot.decreaseStackInSlot();
-			}
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			var removed = ResourceHandlerUtil.extractFirst(this.inv, r -> filter.test(r.toStack()), 1, tx);
+			tx.commit();
+			return removed == null ? ItemStack.EMPTY : removed.resource().toStack(removed.amount());
 		}
-		return ItemStack.EMPTY;
 	}
-
-	public boolean transferOneStack(IItemHandler dest, Predicate<ItemStack> filter) {
-		return transferStacks(dest, filter, true);
-	}
-
-	public boolean transferStacks(IItemHandler dest, Predicate<ItemStack> filter) {
-		return transferStacks(dest, filter, false);
-	}
-
-	private boolean transferStacks(IItemHandler dest, Predicate<ItemStack> filter, boolean singleStack) {
-		ItemHandlerInventoryManipulator destManipulator = new ItemHandlerInventoryManipulator(dest);
-		boolean stacksMoved = false;
-		for (int slotIndex = 0; slotIndex < this.inv.getSlots(); slotIndex++) {
-			ItemStack targetStack = this.inv.extractItem(slotIndex, Integer.MAX_VALUE, true);
-			if (!targetStack.isEmpty() && filter.test(targetStack)) {
-				int extractStackSize = targetStack.getCount();
-				ItemStack remaining = destManipulator.tryAddStack(targetStack);
-				if (remaining != null) {
-					extractStackSize -= remaining.getCount();
-				}
-				if (extractStackSize > 0) {
-					ItemStack extracted = this.inv.extractItem(slotIndex, extractStackSize, false);
-					destManipulator.addStack(extracted);
-					stacksMoved = true;
-					if (singleStack) {
-						return true;
-					}
+	public boolean transferOneStack(ResourceHandler<ItemResource> dest, Predicate<ItemStack> filter) { return transferStacks(dest, filter, true); }
+	public boolean transferStacks(ResourceHandler<ItemResource> dest, Predicate<ItemStack> filter) { return transferStacks(dest, filter, false); }
+	private boolean transferStacks(ResourceHandler<ItemResource> dest, Predicate<ItemStack> filter, boolean singleStack) {
+		if (this.inv == dest) return false;
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			boolean moved = false;
+			for (int slot = 0; slot < this.inv.size(); slot++) {
+				var resource = this.inv.getResource(slot);
+				if (resource.isEmpty() || !filter.test(resource.toStack(this.inv.getAmountAsInt(slot)))) continue;
+				int index = slot;
+				var source = new InventoryTransferView(this.inv, 1, i -> index, (i, r) -> false, (i, r) -> true);
+				if (ResourceHandlerUtil.moveStacking(source, dest, r -> true, this.inv.getAmountAsInt(slot), tx) > 0) {
+					moved = true;
+					if (singleStack) break;
 				}
 			}
+			tx.commit();
+			return moved;
 		}
-		return stacksMoved;
 	}
-
-	@Nullable
 	protected ItemStack addStack(ItemStack stack, boolean doAdd) {
-		if (stack.isEmpty()) {
-			return null;
+		if (stack.isEmpty()) return ItemStack.EMPTY;
+		try (var tx = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			int added = ResourceHandlerUtil.insertStacking(this.inv, ItemResource.of(stack), stack.getCount(), tx);
+			if (doAdd) tx.commit();
+			return stack.copyWithCount(stack.getCount() - added);
 		}
-		stack = stack.copy();
-		List<IInvSlot> filledSlots = new ArrayList<>(this.inv.getSlots());
-		List<IInvSlot> emptySlots = new ArrayList<>(this.inv.getSlots());
-		for (IInvSlot slot : new ItemHandlerInventoryManipulator(this.inv)) {
-			if (slot.canPutStackInSlot(stack)) {
-				if (slot.getStackInSlot().isEmpty()) {
-					emptySlots.add(slot);
-				} else {
-					filledSlots.add(slot);
-				}
-			}
-		}
-
-		int injected = 0;
-		injected = tryPut(filledSlots, stack, injected, doAdd);
-		injected = tryPut(emptySlots, stack, injected, doAdd);
-		stack.shrink(injected);
-		return stack;
-	}
-
-	private int tryPut(List<IInvSlot> slots, ItemStack stack, int injected, boolean doAdd) {
-		if (injected >= stack.getCount()) {
-			return injected;
-		}
-		for (IInvSlot slot : slots) {
-			final ItemStack stackToInsert = stack.copy();
-			final int stackToInsertSize = stack.getCount() - injected;
-			stackToInsert.setCount(stackToInsertSize);
-
-			final ItemStack remainder = this.inv.insertItem(slot.getIndex(), stackToInsert, !doAdd);
-			if (remainder.isEmpty()) {
-				return stack.getCount();
-			}
-			injected += stackToInsertSize - remainder.getCount();
-			if (injected >= stack.getCount()) {
-				return injected;
-			}
-		}
-		return injected;
 	}
 }

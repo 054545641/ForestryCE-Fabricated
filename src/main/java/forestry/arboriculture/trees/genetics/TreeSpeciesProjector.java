@@ -2,7 +2,7 @@ package forestry.arboriculture.trees.genetics;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.Forestry;
 import forestry.api.arboriculture.genetics.ITreeSpeciesType;
@@ -22,7 +22,7 @@ public final class TreeSpeciesProjector {
 	}
 
 	@Nullable
-	public static TreeSpecies project(ITreeSpeciesType type, ResourceLocation id, TreeSpeciesDefinition def) {
+	public static TreeSpecies project(ITreeSpeciesType type, Identifier id, TreeSpeciesDefinition def) {
 		try {
 			TreeBlockBindings bindings = ((TreeSpeciesType) type).getBindings(id);
 			if (bindings == null) {

@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_slab",
   "key": {
-    "#": {
-      "item": "forestry:beech_planks"
-    }
+    "#": "forestry:beech_planks"
   },
   "pattern": [
     "###"

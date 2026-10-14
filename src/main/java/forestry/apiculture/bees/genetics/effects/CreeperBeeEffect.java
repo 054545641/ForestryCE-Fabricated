@@ -63,11 +63,11 @@ public class CreeperBeeEffect extends ThrottledBeeEffect {
 				storedData.setInteger(indexExplosionForce, 10);
 			}
 
-			if (world.random.nextInt(1000) >= chance) {
+			if (world.getRandom().nextInt(1000) >= chance) {
 				continue;
 			}
 
-			float pitch = (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F;
+			float pitch = (1.0F + (world.getRandom().nextFloat() - world.getRandom().nextFloat()) * 0.2F) * 0.7F;
 			world.playSound(null, housingCoords.getX(), housingCoords.getY(), housingCoords.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0F, pitch);
 			storedData.setInteger(indexExplosionTimer, 2); // Set explosion timer
 		}

@@ -3,16 +3,11 @@
   "category": "redstone",
   "ingredients": [
     [
-      {
-        "item": "forestry:olive_planks"
-      },
-      {
-        "item": "forestry:olive_fireproof_planks"
-      }
+      "forestry:olive_planks",
+      "forestry:olive_fireproof_planks"
     ]
   ],
   "result": {
-    "count": 1,
     "id": "forestry:olive_button"
   }
 }

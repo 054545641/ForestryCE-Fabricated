@@ -1,18 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "#": [
-      {
-        "item": "forestry:wenge_stripped_log"
-      },
-      {
-        "item": "forestry:wenge_fireproof_stripped_log"
-      }
+      "forestry:wenge_stripped_log",
+      "forestry:wenge_fireproof_stripped_log"
     ],
-    "X": {
-      "item": "minecraft:chain"
-    }
+    "X": "minecraft:iron_chain"
   },
   "pattern": [
     "X X",
@@ -20,7 +13,6 @@
     "###"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:wenge_hanging_sign"
   }
 }

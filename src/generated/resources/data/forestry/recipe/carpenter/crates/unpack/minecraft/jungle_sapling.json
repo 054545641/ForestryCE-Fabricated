@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/crates/unpack/minecraft/jungle_sapling",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:crated_jungle_sapling"
-      }
+      "forestry:crated_jungle_sapling"
     ],
     "result": {
       "count": 9,

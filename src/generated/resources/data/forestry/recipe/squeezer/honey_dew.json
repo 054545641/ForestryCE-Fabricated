@@ -9,9 +9,7 @@
     }
   },
   "resources": [
-    {
-      "item": "forestry:honeydew"
-    }
+    "forestry:honeydew"
   ],
   "time": 10
 }

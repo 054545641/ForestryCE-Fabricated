@@ -1,5 +1,3 @@
-modLoader = "javafml"
-loaderVersion = "{fmlVersionRange}"
 issueTrackerURL = "https://github.com/thedarkcolour/ForestryCE/issues"
 
 license = "GNU Lesser Public License v3"
@@ -9,7 +7,7 @@ modId = "forestry"
 version = "${version}"
 displayName = "Forestry"
 displayURL = "https://github.com/thedarkcolour/ForestryCE"
-logoFile = "forestry-ce-logo-banner.png"
+bannerFile = "forestry-ce-logo-banner.png"
 credits = "mistaqur, Binnie, CovertJaguar, MysteriousAges, Nirek, Temp1011, ramidzkh, EnderiumSmith, Spearkiller"
 authors = "thedarkcolour, SirSengir, mezz, Nedelosk"
 description ='''
@@ -18,15 +16,8 @@ Trees, bees and more.
 
 [[dependencies.forestry]]
 modId = "neoforge"
-mandatory = true
+type = "REQUIRED"
 versionRange = "${forgeVersionRange}"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.forestry]]
-modId = "patchouli"
-type = "OPTIONAL"
-versionRange = "${patchouliVersionRange}"
 ordering = "NONE"
 side = "BOTH"
 
@@ -36,3 +27,17 @@ type = "OPTIONAL"
 versionRange = "${jeiVersionRange}"
 ordering = "NONE"
 side = "CLIENT"
+
+[[dependencies.forestry]]
+modId = "curios"
+type = "OPTIONAL"
+versionRange = "${curiosVersionRange}"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.forestry]]
+modId = "minecraft"
+type = "REQUIRED"
+versionRange = "${minecraftVersionRange}"
+ordering = "NONE"
+side = "BOTH"

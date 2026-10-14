@@ -10,8 +10,8 @@ import net.minecraft.world.level.material.PushReaction;
 public class ForestryPressurePlateBlock extends PressurePlateBlock implements IWoodTyped {
 	private final ForestryWoodType type;
 
-	public ForestryPressurePlateBlock(ForestryWoodType type) {
-		super(type.getBlockSetType(), Properties.of().mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollission().strength(0.5f).ignitedByLava().pushReaction(PushReaction.DESTROY));
+	public ForestryPressurePlateBlock(Properties properties, ForestryWoodType type) {
+		super(type.getBlockSetType(), properties.mapColor(MapColor.WOOD).forceSolidOn().instrument(NoteBlockInstrument.BASS).noCollision().strength(0.5f).ignitedByLava().pushReaction(PushReaction.DESTROY));
 
 		this.type = type;
 	}

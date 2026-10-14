@@ -8,7 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -63,44 +63,36 @@ public class BlockBigCandle extends Block implements SimpleWaterloggedBlock {
 	@Override
 	public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
 		if (!state.getValue(LIT)) return;
-		BlockJumboCandle.addParticlesAndSound(level, pos.getCenter().add(0, 0.4375f, 0), random, this.flame);
+		BlockJumboCandle.addParticlesAndSound(level, net.minecraft.world.phys.Vec3.atCenterOf(pos).add(0, 0.4375f, 0), random, this.flame);
 	}
 
-	/**
-	 * Deviation from 1.20.1: Block#use became useItemOn, which returns an ItemInteractionResult and runs
-	 * for an empty hand too. Both branches stay here rather than moving the empty-handed one to
-	 * useWithoutItem, which would also fire while the player holds an unrelated item.
-	 */
+	// Item ignition and empty-hand extinguishing use separate native interaction entries.
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (!state.getValue(LIT)
 			&& !player.isShiftKeyDown()
 			&& !state.getValue(WATERLOGGED)) {
 
 			if (stack.is(Items.FLINT_AND_STEEL)) {
-				if (!level.isClientSide) {
+				if (!level.isClientSide()) {
 					level.setBlock(pos, state.setValue(LIT, true), 3);
-					stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+					stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
 				}
 				level.playSound(null, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS);
-				return ItemInteractionResult.sidedSuccess(level.isClientSide);
+				return (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
 			} else if (stack.is(Items.FIRE_CHARGE)) {
-				if (!level.isClientSide) {
+				if (!level.isClientSide()) {
 					level.setBlock(pos, state.setValue(LIT, true), 3);
 					if (!player.isCreative()) {
 						stack.shrink(1);
 					}
 				}
 				level.playSound(null, pos, SoundEvents.FIRECHARGE_USE, SoundSource.BLOCKS);
-				return ItemInteractionResult.sidedSuccess(level.isClientSide);
+				return (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
 			}
-		} else if (state.getValue(LIT) && stack.isEmpty()) {
-			level.setBlock(pos, state.setValue(LIT, false), 3);
-			level.playSound(null, pos, SoundEvents.CANDLE_EXTINGUISH, SoundSource.BLOCKS, 1.0F, 1.0F);
-			return ItemInteractionResult.sidedSuccess(level.isClientSide);
 		}
 
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.TRY_WITH_EMPTY_HAND;
 	}
 
 	@Override
@@ -110,17 +102,40 @@ public class BlockBigCandle extends Block implements SimpleWaterloggedBlock {
 	}
 
 	@Override
+	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+		if (state.getValue(LIT) && player.getMainHandItem().isEmpty()) {
+			if (!level.isClientSide()) {
+				level.setBlock(pos, state.setValue(LIT, false), 3);
+				level.playSound(null, pos, SoundEvents.CANDLE_EXTINGUISH, SoundSource.BLOCKS, 1, 1);
+			}
+			return InteractionResult.SUCCESS;
+		}
+		return InteractionResult.PASS;
+	}
+
+	@Override
+	public boolean placeLiquid(LevelAccessor level, BlockPos pos, BlockState state, FluidState fluid) {
+		if (state.getValue(WATERLOGGED) || !fluid.is(Fluids.WATER)) return false;
+		if (state.getValue(LIT)) {
+			level.playSound(null, pos, SoundEvents.CANDLE_EXTINGUISH, SoundSource.BLOCKS, 1, 1);
+		}
+		level.setBlock(pos, state.setValue(WATERLOGGED, true).setValue(LIT, false), 3);
+		level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+		return true;
+	}
+
+	@Override
 	protected FluidState getFluidState(BlockState state) {
 		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
 	}
 
 	@Override
-	protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+	protected BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, net.minecraft.util.RandomSource random) {
 		if (state.getValue(WATERLOGGED)) {
 			state = state.setValue(LIT, false);
-			level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+			ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
 		}
-		return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+		return super.updateShape(state, level, ticks, pos, direction, neighborPos, neighborState, random);
 	}
 
 	@Override

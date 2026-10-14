@@ -17,7 +17,6 @@
       "translate": "advancements.forestry.get_fabricator.description"
     },
     "icon": {
-      "count": 1,
       "id": "forestry:thermionic_fabricator"
     },
     "title": {

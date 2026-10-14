@@ -6,7 +6,8 @@ import forestry.api.mail.IPostalCarrier;
 import forestry.core.platform.config.Constants;
 import forestry.core.platform.config.SessionVars;
 import forestry.core.platform.gui.GuiForestry;
-import forestry.core.platform.gui.GuiTextBox;
+import net.minecraft.client.gui.components.MultiLineEditBox;
+import net.minecraft.client.input.KeyEvent;
 import forestry.core.platform.gui.widgets.ItemStackWidget;
 import forestry.core.platform.gui.widgets.Widget;
 import forestry.core.platform.render.ColourProperties;
@@ -14,11 +15,10 @@ import forestry.core.platform.util.NetworkUtil;
 import forestry.mail.carriers.PostalCarriers;
 import forestry.mail.inventory.LetterInventory;
 import forestry.mail.network.packets.PacketLetterInfoRequest;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -34,7 +34,7 @@ public class LetterScreen extends GuiForestry<LetterMenu> {
 	private boolean checkedSessionVars;
 
 	private EditBox address;
-	private GuiTextBox text;
+	private MultiLineEditBox text;
 
 	private boolean addressFocus;
 	private boolean textFocus;
@@ -45,12 +45,9 @@ public class LetterScreen extends GuiForestry<LetterMenu> {
 	private final ArrayList<Widget> tradeInfoWidgets;
 
 	public LetterScreen(LetterMenu container, Inventory inv, Component title) {
-		super(Constants.TEXTURE_PATH_GUI + "/letter.png", container, inv, title);
-		this.minecraft = Minecraft.getInstance(); //not 100% why this is needed, maybe side issues
+		super(Constants.TEXTURE_PATH_GUI + "/letter.png", container, inv, title, 194, 227);
 
 		this.itemInventory = container.getItemInventory();
-		this.imageWidth = 194;
-		this.imageHeight = 227;
 
 		this.isProcessedLetter = container.getLetter().isProcessed();
 		this.widgetManager.add(new AddresseeSlot(this.widgetManager, 16, 12, container));
@@ -59,88 +56,66 @@ public class LetterScreen extends GuiForestry<LetterMenu> {
 
 	@Override
 	public void init() {
+		String previousAddress = this.address == null ? null : this.address.getValue();
 		super.init();
 
         this.address = new EditBox(this.minecraft.font, this.leftPos + 46, this.topPos + 13, 93, 13, Component.translatable("for.gui.mail.to"));
         this.address.setEditable(!this.isProcessedLetter);
 		IMailAddress recipient = this.menu.getRecipient();
-		if (recipient != null) {
-            this.address.setValue(recipient.getName());
+		if (previousAddress != null) {
+			this.address.setValue(previousAddress);
+		} else if (recipient != null) {
+			this.address.setValue(recipient.getName());
 		}
         this.lastSyncedRecipient = this.address.getValue();
         this.lastSyncedCarrier = this.menu.getCarrier();
         this.address.setResponder(recipientName -> setRecipient(recipientName, this.menu.getCarrier()));
 
-        this.text = new GuiTextBox(this.minecraft.font, this.leftPos + 17, this.topPos + 31, 122, 57);
-        this.text.setMaxLength(128);
-        this.text.setEditable(!this.isProcessedLetter);
+        this.text = MultiLineEditBox.builder().setX(this.leftPos + 17).setY(this.topPos + 31)
+			.build(this.font, 122, 57, Component.translatable("for.gui.mail.letter"));
+        this.text.setCharacterLimit(128);
+        this.text.active = !this.isProcessedLetter;
 		if (!this.menu.getText().isEmpty()) {
             this.text.setValue(this.menu.getText());
 		}
         this.lastSyncedText = this.text.getValue();
-        this.text.setResponder(this::setText);
+        this.text.setValueListener(this::setText);
 
 		addWidget(this.address);
 		addWidget(this.text);
+		updateTextVisibility();
 	}
 
 	@Override
-	public boolean keyPressed(int key, int scanCode, int modifiers) {
-		if (this.isProcessedLetter) {
-			return super.keyPressed(key, scanCode, modifiers);
-		}
-
-		// Set focus or enter text into address
-		if (this.address.isFocused()) {
-			if (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_ESCAPE) {
-				this.address.setFocused(false);
-			} else if (key == GLFW.GLFW_KEY_TAB) {
-				// Name autocomplete
-				String currentValue = this.address.getValue().toLowerCase(Locale.ENGLISH);
-				Minecraft.getInstance().getConnection().getOnlinePlayers().stream()
-					.map(info -> info.getProfile().getName())
-					.filter(name -> name.toLowerCase(Locale.ENGLISH).contains(currentValue))
-					.findFirst()
-					.ifPresent(name -> this.address.setValue(name));
+	public boolean keyPressed(KeyEvent event) {
+		if (!this.isProcessedLetter && this.address.isFocused()) {
+			if (event.key() == GLFW.GLFW_KEY_ENTER || event.key() == GLFW.GLFW_KEY_ESCAPE) {
+				setFocused(null);
+			} else if (event.key() == GLFW.GLFW_KEY_TAB && this.minecraft.getConnection() != null) {
+				String value = this.address.getValue().toLowerCase(Locale.ROOT);
+				this.minecraft.getConnection().getOnlinePlayers().stream()
+					.map(info -> info.getProfile().name())
+					.filter(name -> name.toLowerCase(Locale.ROOT).contains(value))
+					.findFirst().ifPresent(this.address::setValue);
 			} else {
-				this.address.keyPressed(key, scanCode, modifiers);
+				this.address.keyPressed(event);
 			}
 			return true;
 		}
-
-		if (this.text.isFocused()) {
-			if (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_ESCAPE) {
-				if (hasShiftDown() && key != GLFW.GLFW_KEY_ESCAPE) {
-                    this.text.setValue(this.text.getValue() + "\n");
-				} else {
-					this.text.setFocused(false);
-				}
-			} else if (key == GLFW.GLFW_KEY_DOWN) {
-                this.text.advanceLine();
-			} else if (key == GLFW.GLFW_KEY_UP) {
-                this.text.regressLine();
-			} else if (this.text.moreLinesAllowed() || key == GLFW.GLFW_KEY_DELETE || key == GLFW.GLFW_KEY_BACKSLASH) {
-				this.text.keyPressed(key, scanCode, modifiers);
+		if (this.text.visible && this.text.isFocused()) {
+			if (event.key() == GLFW.GLFW_KEY_ESCAPE || (event.key() == GLFW.GLFW_KEY_ENTER && !event.hasShiftDown())) {
+				setFocused(null);
+			} else {
+				this.text.keyPressed(event);
 			}
 			return true;
 		}
-
-		return super.keyPressed(key, scanCode, modifiers);
+		return super.keyPressed(event);
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-		if (super.mouseClicked(mouseX, mouseY, mouseButton)) {
-			return true;
-		}
-		this.address.mouseClicked(mouseX, mouseY, mouseButton);
-		this.text.mouseClicked(mouseX, mouseY, mouseButton);
-		return true;
-	}
-
-	@Override
-	protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseY, int mouseX) {
-
+	public void containerTick() {
+		super.containerTick();
 		if (!this.isProcessedLetter && !this.checkedSessionVars) {
             this.checkedSessionVars = true;
 			setFromSessionVars();
@@ -153,12 +128,10 @@ public class LetterScreen extends GuiForestry<LetterMenu> {
 		if (this.addressFocus != this.address.isFocused()) {
 			String recipient = this.address.getValue();
 			IPostalCarrier carrier = this.menu.getCarrier();
-			if (StringUtils.isNotBlank(recipient)) {
-				setRecipient(recipient, carrier);
-			}
+			setRecipient(recipient, carrier);
 		}
         this.addressFocus = this.address.isFocused();
-		if (this.lastSyncedCarrier != this.menu.getCarrier() && StringUtils.isNotBlank(this.address.getValue())) {
+		if (this.lastSyncedCarrier != this.menu.getCarrier()) {
 			setRecipient(this.address.getValue(), this.menu.getCarrier());
 		}
 		if (this.textFocus != this.text.isFocused()) {
@@ -166,23 +139,37 @@ public class LetterScreen extends GuiForestry<LetterMenu> {
 		}
         this.textFocus = this.text.isFocused();
 
-		super.renderBg(graphics, partialTicks, mouseY, mouseX);
+		updateTextVisibility();
+	}
+
+	@Override
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		updateTextVisibility();
+		updateTradeInfoWidgets();
+		super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 
 		if (this.isProcessedLetter) {
-			graphics.drawString(this.font, this.address.getValue(), this.leftPos + 49, this.topPos + 16, ColourProperties.INSTANCE.get("gui.mail.lettertext"));
-			graphics.drawWordWrap(this.font, Component.literal(this.text.getValue()), this.leftPos + 20, this.topPos + 34, 119, ColourProperties.INSTANCE.get("gui.mail.lettertext"));
+			graphics.text(this.font, this.address.getValue(), this.leftPos + 49, this.topPos + 16, (0xff000000 | ColourProperties.INSTANCE.get("gui.mail.lettertext")));
+			graphics.textWithWordWrap(this.font, Component.literal(this.text.getValue()), this.leftPos + 20, this.topPos + 34, 119, (0xff000000 | ColourProperties.INSTANCE.get("gui.mail.lettertext")));
 		} else {
-			clearTradeInfoWidgets();
-            this.address.render(graphics, mouseX, mouseY, partialTicks);    //TODO correct?
+            this.address.extractRenderState(graphics, mouseX, mouseY, partialTicks);
 			if (this.menu.getCarrier().equals(PostalCarriers.TRADER.value())) {
 				drawTradePreview(graphics, 18, 32);
 			} else {
-                this.text.render(graphics, mouseX, mouseY, partialTicks);
+                this.text.extractRenderState(graphics, mouseX, mouseY, partialTicks);
 			}
 		}
 	}
 
-	private void drawTradePreview(GuiGraphics graphics, int x, int y) {
+	private void updateTextVisibility() {
+		this.address.visible = !this.isProcessedLetter;
+		this.text.visible = !this.isProcessedLetter && !this.menu.getCarrier().equals(PostalCarriers.TRADER.value());
+		if (!this.text.visible && this.text.isFocused()) {
+			setFocused(null);
+		}
+	}
+
+	private void drawTradePreview(GuiGraphicsExtractor graphics, int x, int y) {
 
 		Component infoString = null;
 		if (this.menu.getTradeInfo() == null) {
@@ -194,18 +181,25 @@ public class LetterScreen extends GuiForestry<LetterMenu> {
 		}
 
 		if (infoString != null) {
-			graphics.drawWordWrap(this.font, infoString, this.leftPos + x, this.topPos + y, 119, ColourProperties.INSTANCE.get("gui.mail.lettertext"));
+			graphics.textWithWordWrap(this.font, infoString, this.leftPos + x, this.topPos + y, 119, (0xff000000 | ColourProperties.INSTANCE.get("gui.mail.lettertext")));
 			return;
 		}
 
-		graphics.drawString(this.font, Component.translatable("for.gui.mail.pleasesend"), this.leftPos + x, this.topPos + y, ColourProperties.INSTANCE.get("gui.mail.lettertext"));
+		graphics.text(this.font, Component.translatable("for.gui.mail.pleasesend"), this.leftPos + x, this.topPos + y, (0xff000000 | ColourProperties.INSTANCE.get("gui.mail.lettertext")));
 
-		addTradeInfoWidget(new ItemStackWidget(this.widgetManager, x, y + 10, this.menu.getTradeInfo().tradegood()));
 
-		graphics.drawString(this.font, Component.translatable("for.gui.mail.foreveryattached"), this.leftPos + x, this.topPos + y + 28, ColourProperties.INSTANCE.get("gui.mail.lettertext"));
+		graphics.text(this.font, Component.translatable("for.gui.mail.foreveryattached"), this.leftPos + x, this.topPos + y + 28, (0xff000000 | ColourProperties.INSTANCE.get("gui.mail.lettertext")));
 
-		for (int i = 0; i < this.menu.getTradeInfo().required().size(); i++) {
-			addTradeInfoWidget(new ItemStackWidget(this.widgetManager, x + i * 18, y + 38, this.menu.getTradeInfo().required().get(i)));
+	}
+
+	private void updateTradeInfoWidgets() {
+		clearTradeInfoWidgets();
+		var info = this.menu.getTradeInfo();
+		if (this.isProcessedLetter || !this.menu.getCarrier().equals(PostalCarriers.TRADER.value())
+			|| info == null || info.tradegood().isEmpty() || !info.state().isOk()) return;
+		addTradeInfoWidget(new ItemStackWidget(this.widgetManager, 18, 42, info.tradegood()));
+		for (int i = 0; i < info.required().size(); i++) {
+			addTradeInfoWidget(new ItemStackWidget(this.widgetManager, 18 + i * 18, 70, info.required().get(i)));
 		}
 	}
 
@@ -237,8 +231,8 @@ public class LetterScreen extends GuiForestry<LetterMenu> {
 
 		String recipient = SessionVars.getStringVar("mail.letter.recipient");
 		String typeName = SessionVars.getStringVar("mail.letter.carrier");
-		ResourceLocation carrierId = ResourceLocation.tryParse(typeName);
-		IPostalCarrier carrier = ForestryRegistries.POSTAL_CARRIER.get(carrierId);
+		Identifier carrierId = typeName == null ? null : Identifier.tryParse(typeName);
+		IPostalCarrier carrier = carrierId == null ? null : ForestryRegistries.POSTAL_CARRIER.getValue(carrierId);
 
 		if (StringUtils.isNotBlank(recipient) && carrier != null) {
             this.menu.setCarrier(carrier);
@@ -250,7 +244,7 @@ public class LetterScreen extends GuiForestry<LetterMenu> {
 	}
 
 	private void setRecipient(String recipientName, IPostalCarrier carrier) {
-		if (this.isProcessedLetter || StringUtils.isBlank(recipientName)) {
+		if (this.isProcessedLetter) {
 			return;
 		}
 		if (recipientName.equals(this.lastSyncedRecipient) && carrier == this.lastSyncedCarrier) {

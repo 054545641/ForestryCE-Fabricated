@@ -9,7 +9,7 @@ import forestry.api.core.genetics.ForestrySpeciesTypes;
 import forestry.arboriculture.client.BiomeLeafTint;
 import forestry.arboriculture.client.FixedLeafTint;
 import forestry.arboriculture.client.plugin.TreeAnalyzerPlugin;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import forestry.api.client.plugin.IClientRegistration;
 
 /**
@@ -99,12 +99,12 @@ public class ArboricultureClientRegistration implements Consumer<IClientRegistra
 		client.setLeafTint(ForestryTreeSpecies.IPE, FixedLeafTint.NONE);
 	}
 
-	private static void registerSapling(IClientRegistration registration, String modId, ResourceLocation speciesId) {
+	private static void registerSapling(IClientRegistration registration, String modId, Identifier speciesId) {
 		// add "_sapling" (no longer need to remove "tree_" prefix)
 		String path = speciesId.getPath() + "_sapling";
 
-		ResourceLocation blockModel = ResourceLocation.fromNamespaceAndPath(modId, "block/" + path);
-		ResourceLocation itemModel = ResourceLocation.fromNamespaceAndPath(modId, "item/" + path);
+		Identifier blockModel = Identifier.fromNamespaceAndPath(modId, "block/" + path);
+		Identifier itemModel = Identifier.fromNamespaceAndPath(modId, "item/" + path);
 		registration.setSaplingModel(speciesId, blockModel, itemModel);
 	}
 }

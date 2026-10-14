@@ -24,13 +24,13 @@ public class Fruit extends DummyFruit {
 
 	@Override
 	public List<ItemStack> getFruits(@Nullable IGenome genome, Level level, int ripeningTime) {
-		RandomSource rand = level.random;
+		RandomSource rand = level.getRandom();
 
 		if (ripeningTime >= this.ripeningPeriod) {
 			ArrayList<ItemStack> stacks = new ArrayList<>(this.products.size());
 
 			for (IProduct product : this.products) {
-				if (product.chance() == 1.0f || product.chance() < level.random.nextFloat()) {
+				if (product.chance() == 1.0f || product.chance() < level.getRandom().nextFloat()) {
 					stacks.add(product.createRandomStack(rand));
 				}
 			}

@@ -100,11 +100,13 @@ public class ArboricultureCreativeTab {
 		items.accept(access.getStack(type, WoodBlockKind.SLAB, fireproof));
 		items.accept(access.getStack(type, WoodBlockKind.FENCE, fireproof));
 		items.accept(access.getStack(type, WoodBlockKind.FENCE_GATE, fireproof));
-		items.accept(access.getStack(type, WoodBlockKind.DOOR, fireproof));
-		// one day...
-		items.accept(access.getStack(type, WoodBlockKind.TRAPDOOR, fireproof));
-		items.accept(access.getStack(type, WoodBlockKind.PRESSURE_PLATE, fireproof));
-		items.accept(access.getStack(type, WoodBlockKind.BUTTON, fireproof));
+		// These shapes are intrinsically non-burning; WoodAccess returns the same item for both flags.
+		if (!fireproof) {
+			items.accept(access.getStack(type, WoodBlockKind.DOOR, false));
+			items.accept(access.getStack(type, WoodBlockKind.TRAPDOOR, false));
+			items.accept(access.getStack(type, WoodBlockKind.PRESSURE_PLATE, false));
+			items.accept(access.getStack(type, WoodBlockKind.BUTTON, false));
+		}
 	}
 
 	/**

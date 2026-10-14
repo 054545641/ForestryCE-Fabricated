@@ -3,133 +3,99 @@ package forestry.core.platform.item;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
-import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.ToolMaterial;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * Tools that leave a broken remnant item in the player's inventory when they break.
+ * 26.2: pickaxes, shovels and swords are plain {@link Item}s configured through
+ * {@link Item.Properties#pickaxe}/{@link Item.Properties#shovel}/{@link Item.Properties#sword};
+ * only axes and hoes still have dedicated item classes.
+ */
 public interface HasRemnants {
-	// 1.21: tool item constructors are now (Tier, Properties); damage/speed modifiers must be baked into
-	// the Item.Properties via ItemAttributeModifiers. The damageItem() override signature also tightened
-	// from Consumer<T extends LivingEntity> to Consumer<Item> (matches IItemExtension default).
-
-	static Item.Properties withDiggerAttributes(Tier tier, float damage, float speed, Item.Properties properties) {
-		return properties.attributes(DiggerItem.createAttributes(tier, damage, speed));
+	static int damageWithRemnants(ItemStack stack, int amount, LivingEntity entity, Supplier<ItemStack> remnants) {
+		if (stack.getDamageValue() + amount >= stack.getMaxDamage()) {
+			if (entity instanceof Player player) {
+				// make sure it's really broken
+				stack.shrink(1);
+				player.getInventory().add(remnants.get());
+			}
+		}
+		return amount;
 	}
 
-	static Item.Properties withSwordAttributes(Tier tier, int damage, float speed, Item.Properties properties) {
-		return properties.attributes(SwordItem.createAttributes(tier, damage, speed));
-	}
-
-	class Pickaxe extends PickaxeItem implements HasRemnants {
+	class Pickaxe extends Item implements HasRemnants {
 		private final Supplier<ItemStack> remnants;
 
-		public Pickaxe(Tier tier, int damageBonus, float speedModifier, Properties properties, Supplier<ItemStack> remnants) {
-			super(tier, withDiggerAttributes(tier, damageBonus, speedModifier, properties));
+		public Pickaxe(ToolMaterial material, int damageBonus, float speedModifier, Properties properties, Supplier<ItemStack> remnants) {
+			super(properties.pickaxe(material, damageBonus, speedModifier));
 			this.remnants = remnants;
 		}
 
 		@Override
 		public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, T entity, Consumer<Item> onBroken) {
-			if (stack.getDamageValue() + amount >= stack.getMaxDamage()) {
-				if (entity instanceof Player player) {
-					// make sure it's really broken
-					stack.shrink(1);
-					player.getInventory().add(this.remnants.get());
-				}
-			}
-			return super.damageItem(stack, amount, entity, onBroken);
+			return HasRemnants.damageWithRemnants(stack, super.damageItem(stack, amount, entity, onBroken), entity, this.remnants);
 		}
 	}
 
-	class Shovel extends ShovelItem implements HasRemnants {
+	class Shovel extends Item implements HasRemnants {
 		private final Supplier<ItemStack> remnants;
 
-		public Shovel(Tier tier, float damageBonus, float speedModifier, Properties properties, Supplier<ItemStack> remnants) {
-			super(tier, withDiggerAttributes(tier, damageBonus, speedModifier, properties));
+		public Shovel(ToolMaterial material, float damageBonus, float speedModifier, Properties properties, Supplier<ItemStack> remnants) {
+			super(properties.shovel(material, damageBonus, speedModifier));
 			this.remnants = remnants;
 		}
 
 		@Override
 		public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, T entity, Consumer<Item> onBroken) {
-			if (stack.getDamageValue() + amount >= stack.getMaxDamage()) {
-				if (entity instanceof Player player) {
-					// make sure it's really broken
-					stack.shrink(1);
-					player.getInventory().add(this.remnants.get());
-				}
-			}
-			return super.damageItem(stack, amount, entity, onBroken);
+			return HasRemnants.damageWithRemnants(stack, super.damageItem(stack, amount, entity, onBroken), entity, this.remnants);
 		}
 	}
 
 	class Axe extends AxeItem implements HasRemnants {
 		private final Supplier<ItemStack> remnants;
 
-		public Axe(Tier tier, float damageBonus, float speedModifier, Properties properties, Supplier<ItemStack> remnants) {
-			super(tier, withDiggerAttributes(tier, damageBonus, speedModifier, properties));
+		public Axe(ToolMaterial material, float damageBonus, float speedModifier, Properties properties, Supplier<ItemStack> remnants) {
+			super(material, damageBonus, speedModifier, properties);
 			this.remnants = remnants;
 		}
 
 		@Override
 		public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, T entity, Consumer<Item> onBroken) {
-			if (stack.getDamageValue() + amount >= stack.getMaxDamage()) {
-				if (entity instanceof Player player) {
-					// make sure it's really broken
-					stack.shrink(1);
-					player.getInventory().add(this.remnants.get());
-				}
-			}
-			return super.damageItem(stack, amount, entity, onBroken);
+			return HasRemnants.damageWithRemnants(stack, super.damageItem(stack, amount, entity, onBroken), entity, this.remnants);
 		}
 	}
 
-	class Sword extends SwordItem implements HasRemnants {
+	class Sword extends Item implements HasRemnants {
 		private final Supplier<ItemStack> remnants;
 
-		public Sword(Tier tier, int damageBonus, float speedModifier, Properties properties, Supplier<ItemStack> remnants) {
-			super(tier, withSwordAttributes(tier, damageBonus, speedModifier, properties));
+		public Sword(ToolMaterial material, int damageBonus, float speedModifier, Properties properties, Supplier<ItemStack> remnants) {
+			super(properties.sword(material, damageBonus, speedModifier));
 			this.remnants = remnants;
 		}
 
 		@Override
 		public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, T entity, Consumer<Item> onBroken) {
-			if (stack.getDamageValue() + amount >= stack.getMaxDamage()) {
-				if (entity instanceof Player player) {
-					// make sure it's really broken
-					stack.shrink(1);
-					player.getInventory().add(this.remnants.get());
-				}
-			}
-			return super.damageItem(stack, amount, entity, onBroken);
+			return HasRemnants.damageWithRemnants(stack, super.damageItem(stack, amount, entity, onBroken), entity, this.remnants);
 		}
 	}
 
 	class Hoe extends HoeItem implements HasRemnants {
 		private final Supplier<ItemStack> remnants;
 
-		public Hoe(Tier tier, int damageBonus, float speedModifier, Properties properties, Supplier<ItemStack> remnants) {
-			super(tier, withDiggerAttributes(tier, damageBonus, speedModifier, properties));
+		public Hoe(ToolMaterial material, int damageBonus, float speedModifier, Properties properties, Supplier<ItemStack> remnants) {
+			super(material, damageBonus, speedModifier, properties);
 			this.remnants = remnants;
 		}
 
 		@Override
 		public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, T entity, Consumer<Item> onBroken) {
-			if (stack.getDamageValue() + amount >= stack.getMaxDamage()) {
-				if (entity instanceof Player player) {
-					// make sure it's really broken
-					stack.shrink(1);
-					player.getInventory().add(this.remnants.get());
-				}
-			}
-			return super.damageItem(stack, amount, entity, onBroken);
+			return HasRemnants.damageWithRemnants(stack, super.damageItem(stack, amount, entity, onBroken), entity, this.remnants);
 		}
 	}
 }

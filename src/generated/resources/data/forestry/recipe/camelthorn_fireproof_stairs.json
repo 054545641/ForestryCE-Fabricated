@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_stairs",
   "key": {
-    "#": {
-      "item": "forestry:camelthorn_fireproof_planks"
-    }
+    "#": "forestry:camelthorn_fireproof_planks"
   },
   "pattern": [
     "#  ",

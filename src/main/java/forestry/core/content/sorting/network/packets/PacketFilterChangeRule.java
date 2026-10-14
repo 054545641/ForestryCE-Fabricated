@@ -27,13 +27,13 @@ public record PacketFilterChangeRule(BlockPos pos, Direction facing,
 	}
 
 	public static PacketFilterChangeRule decode(RegistryFriendlyByteBuf buffer) {
-		return new PacketFilterChangeRule(buffer.readBlockPos(), Direction.VALUES[buffer.readShort()], Objects.requireNonNull(IForestryApi.INSTANCE.getFilterManager().getRule(buffer.readShort())));
+		return new PacketFilterChangeRule(buffer.readBlockPos(), Direction.values()[buffer.readShort()], Objects.requireNonNull(IForestryApi.INSTANCE.getFilterManager().getRule(buffer.readShort())));
 	}
 
 	public static void handle(PacketFilterChangeRule msg, ServerPlayer player) {
 		TileUtil.getInterface(player.level(), msg.pos(), ForestryCapabilities.FILTER_LOGIC, null).ifPresent(logic -> {
 			if (logic.setRule(msg.facing(), msg.rule())) {
-				logic.getNetworkHandler().sendToPlayers(logic, player.serverLevel(), player);
+				logic.getNetworkHandler().sendToPlayers(logic, player.level(), player);
 			}
 		});
 	}

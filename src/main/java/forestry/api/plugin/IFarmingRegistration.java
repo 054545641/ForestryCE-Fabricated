@@ -2,7 +2,7 @@ package forestry.api.plugin;
 
 import forestry.api.agriculture.IFarmLogic;
 import forestry.api.agriculture.IFarmType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -23,7 +23,7 @@ public interface IFarmingRegistration {
 	 * @param icon         The item
 	 * @return A builder to customize the properties of this farm type.
 	 */
-	IFarmTypeBuilder createFarmType(ResourceLocation id, BiFunction<IFarmType, Boolean, IFarmLogic> logicFactory, ItemStack icon);
+	IFarmTypeBuilder createFarmType(Identifier id, BiFunction<IFarmType, Boolean, IFarmLogic> logicFactory, ItemStack icon);
 
 	/**
 	 * Modifies an existing farm type.
@@ -31,5 +31,5 @@ public interface IFarmingRegistration {
 	 * @param id     The ID of the farm type to modify. See {@link forestry.api.agriculture.ForestryFarmTypes} for defaults.
 	 * @param action The modifications to this farm type.
 	 */
-	void modifyFarmType(ResourceLocation id, Consumer<IFarmTypeBuilder> action);
+	void modifyFarmType(Identifier id, Consumer<IFarmTypeBuilder> action);
 }

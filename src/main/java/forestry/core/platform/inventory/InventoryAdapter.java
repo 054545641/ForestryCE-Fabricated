@@ -1,10 +1,13 @@
 package forestry.core.platform.inventory;
 
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.minecraft.world.level.storage.ValueOutput;
+
 import forestry.api.core.IInventoryAdapter;
-import forestry.core.platform.config.Constants;
 import forestry.core.platform.network.IStreamable;
 import forestry.core.platform.util.InventoryUtil;
-import forestry.core.platform.util.NetworkUtil;
+import forestry.core.platform.util.InventoryData;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -21,6 +24,9 @@ public class InventoryAdapter implements IInventoryAdapter, IStreamable {
 
 	private final InventoryPlain inventory;
 	private boolean allowAutomation = true;
+	private Runnable inventoryOwner = () -> {};
+
+	public void setInventoryOwner(Runnable owner) { this.inventoryOwner = owner; }
 	@Nullable
 	private int[] slotMap;
 
@@ -34,6 +40,10 @@ public class InventoryAdapter implements IInventoryAdapter, IStreamable {
 
 	public InventoryAdapter(InventoryPlain inventory) {
 		this.inventory = inventory;
+		inventory.addCommitListener(slots -> {
+			for (int slot : slots) setItem(slot, getItem(slot));
+			setChanged();
+		});
 		configureSided();
 	}
 
@@ -58,6 +68,11 @@ public class InventoryAdapter implements IInventoryAdapter, IStreamable {
 	}
 
 	/* IINVENTORY */
+	@Override
+	public ResourceHandler<ItemResource> getTransferHandler() {
+		return this.inventory.getTransferHandler();
+	}
+
 	@Override
 	public boolean isEmpty() {
 		return this.inventory.isEmpty();
@@ -91,6 +106,7 @@ public class InventoryAdapter implements IInventoryAdapter, IStreamable {
 	@Override
 	public void setChanged() {
         this.inventory.setChanged();
+		this.inventoryOwner.run();
 	}
 
 	@Override
@@ -124,7 +140,7 @@ public class InventoryAdapter implements IInventoryAdapter, IStreamable {
 		if (this.allowAutomation && this.slotMap != null) {
 			return this.slotMap;
 		}
-		return Constants.SLOTS_NONE;
+		return new int[0];
 	}
 
 	private void configureSided() {
@@ -148,23 +164,28 @@ public class InventoryAdapter implements IInventoryAdapter, IStreamable {
 	/* SAVING & LOADING */
 	@Override
 	public void read(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		InventoryUtil.readFromNBT(this, this.inventory.getName(), compoundNBT);
+		InventoryUtil.readFromNBT(this, this.inventory.getName(), compoundNBT, registries);
 	}
 
 	@Override
 	public CompoundTag write(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		InventoryUtil.writeToNBT(this, this.inventory.getName(), compoundNBT);
+		InventoryUtil.writeToNBT(this, this.inventory.getName(), compoundNBT, registries);
 		return compoundNBT;
 	}
 
 	@Override
+	public void write(ValueOutput output) {
+		forestry.core.platform.util.InventoryData.write(this, this.inventory.getName(), output);
+	}
+
+	@Override
 	public void writeData(RegistryFriendlyByteBuf data) {
-		NetworkUtil.writeInventory(data, this.inventory);
+		InventoryData.writeStream(data, this.inventory);
 	}
 
 	@Override
 	public void readData(RegistryFriendlyByteBuf data) {
-		NetworkUtil.readInventory(data, this.inventory);
+		InventoryData.readStream(data, this.inventory);
 	}
 
 	/* FIELDS */

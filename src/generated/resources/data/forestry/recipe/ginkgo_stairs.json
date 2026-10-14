@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_stairs",
   "key": {
-    "#": {
-      "item": "forestry:ginkgo_planks"
-    }
+    "#": "forestry:ginkgo_planks"
   },
   "pattern": [
     "#  ",

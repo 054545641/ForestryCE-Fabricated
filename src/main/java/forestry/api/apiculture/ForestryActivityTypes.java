@@ -1,7 +1,7 @@
 package forestry.api.apiculture;
 
 import forestry.api.ForestryConstants;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * IDs for all activity types available in base Forestry.
@@ -12,25 +12,25 @@ public class ForestryActivityTypes {
 	 * Diurnal bees work during daytime, and sleep during nighttime.
 	 * Active during ticks 0 to 12000.
 	 */
-	public static final ResourceLocation DIURNAL = ForestryConstants.forestry("activity_diurnal");
+	public static final Identifier DIURNAL = ForestryConstants.forestry("activity_diurnal");
 	/**
 	 * Nocturnal bees work during nighttime, and sleep during daytime.
 	 * Active during ticks 12000 to 24000.
 	 */
-	public static final ResourceLocation NOCTURNAL = ForestryConstants.forestry("activity_nocturnal");
+	public static final Identifier NOCTURNAL = ForestryConstants.forestry("activity_nocturnal");
 	/**
 	 * Crepuscular bees work during the sunrise and sunset.
 	 * Active during ticks 0 to 1000 and 12000 to 13000.
 	 */
-	public static final ResourceLocation CREPUSCULAR = ForestryConstants.forestry("activity_crepuscular");
+	public static final Identifier CREPUSCULAR = ForestryConstants.forestry("activity_crepuscular");
 	/**
 	 * Metaturnal bees work during both sunrise and sunset. They never sleep.
 	 * Active during ticks 0 to 24000.
 	 */
-	public static final ResourceLocation METATURNAL = ForestryConstants.forestry("activity_metaturnal");
+	public static final Identifier METATURNAL = ForestryConstants.forestry("activity_metaturnal");
 	/**
 	 * Cathemeral bees have an unpredictable sleep pattern.
 	 * Activity period varies according to position, but always 12000 ticks long.
 	 */
-	public static final ResourceLocation CATHEMERAL = ForestryConstants.forestry("activity_cathemeral");
+	public static final Identifier CATHEMERAL = ForestryConstants.forestry("activity_cathemeral");
 }

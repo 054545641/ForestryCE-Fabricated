@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/mellow_comb",
-  "input": {
-    "item": "forestry:mellow_comb"
-  },
+  "input": "forestry:mellow_comb",
   "products": [
     {
       "chance": 0.6,

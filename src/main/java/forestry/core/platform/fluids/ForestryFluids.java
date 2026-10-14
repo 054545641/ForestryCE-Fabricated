@@ -7,7 +7,7 @@ import forestry.core.platform.item.DrinkProperties;
 import forestry.core.platform.util.ModUtil;
 import forestry.core.platform.registration.*;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -83,7 +83,7 @@ public enum ForestryFluids {
 		.luminosity(15)
 	);
 
-	private static final Map<ResourceLocation, ForestryFluids> BY_ID = new HashMap<>();
+	private static final Map<Identifier, ForestryFluids> BY_ID = new HashMap<>();
 
 	static {
 		for (ForestryFluids fluidDefinition : ForestryFluids.values()) {
@@ -91,7 +91,7 @@ public enum ForestryFluids {
 		}
 	}
 
-	private final ResourceLocation tag;
+	private final Identifier tag;
 	private final FeatureFluid feature;
 	private final FeatureItem<BucketItem> bucket;
 
@@ -109,7 +109,7 @@ public enum ForestryFluids {
 			.bucket(this::getBucket)
 			.create();
 		this.bucket = registry
-			.item(() -> new BucketItem(getFluid(), new Item.Properties()
+			.item(itemProperties -> new BucketItem(getFluid(), itemProperties
 					.craftRemainder(Items.BUCKET)
 					.stacksTo(1)),
 				"bucket_" + fluidId
@@ -121,7 +121,7 @@ public enum ForestryFluids {
 		return 295;
 	}
 
-	public final ResourceLocation getTag() {
+	public final Identifier getTag() {
 		return this.tag;
 	}
 

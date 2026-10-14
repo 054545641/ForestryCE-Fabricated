@@ -1,7 +1,6 @@
 package forestry.core.platform.block;
 
 import com.mojang.authlib.GameProfile;
-import forestry.api.core.multiblock.IMultiblockComponent;
 import forestry.api.core.multiblock.IMultiblockController;
 import forestry.core.platform.multiblock.MultiblockTileEntityForestry;
 import forestry.core.platform.multiblock.MultiblockValidation;
@@ -9,9 +8,8 @@ import forestry.core.platform.tile.TileUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -65,22 +63,22 @@ public abstract class BlockStructure extends BlockForestry {
 			return InteractionResult.PASS;
 		}
 
-		if (!worldIn.isClientSide) {
+		if (!worldIn.isClientSide()) {
 			part.openGui((ServerPlayer) playerIn, pos);
 		}
 		return InteractionResult.SUCCESS;
 	}
 
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
+	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		return useWithoutItem(state, worldIn, pos, playerIn, hit).consumesAction()
-			? ItemInteractionResult.sidedSuccess(worldIn.isClientSide)
-			: ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			? (worldIn.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME)
+			: InteractionResult.TRY_WITH_EMPTY_HAND;
 	}
 
 	@Override
 	public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		if (world.isClientSide) {
+		if (world.isClientSide()) {
 			return;
 		}
 
@@ -91,14 +89,5 @@ public abstract class BlockStructure extends BlockForestry {
 				tile.setOwner(gameProfile);
 			});
 		}
-	}
-
-	@Override
-	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-		if (level.getBlockEntity(pos) instanceof IMultiblockComponent.HasInventory component) {
-			Containers.dropContents(level, pos, component.getInternalInventory());
-		}
-
-		super.onRemove(state, level, pos, newState, isMoving);
 	}
 }

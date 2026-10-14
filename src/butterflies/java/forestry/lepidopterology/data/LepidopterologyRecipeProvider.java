@@ -19,7 +19,7 @@ import forestry.lepidopterology.recipe.ButterflyMatingRecipe;
  * but its recipe names a butterfly, so it ships from here rather than from core.
  */
 public class LepidopterologyRecipeProvider {
-	public static void addRecipes(RecipeOutput output, MKRecipeProvider recipes) {
+	public static void addRecipes(RecipeOutput output, MKRecipeProvider recipes, net.minecraft.core.HolderLookup.Provider registries) {
 		recipes.shapedCrafting(RecipeCategory.MISC, CoreBlocks.NATURALIST_CHEST.get(NaturalistChestBlockType.LEPIDOPTERIST_CHEST), recipe -> {
 			recipe.define('#', Tags.Items.GLASS_BLOCKS_COLORLESS);
 			recipe.define('X', LepidopterologyItems.BUTTERFLY_GE);
@@ -28,7 +28,7 @@ public class LepidopterologyRecipeProvider {
 			recipe.pattern("XYX");
 			recipe.pattern("XXX");
 		});
-		recipes.special("butterfly_mating", category -> new ButterflyMatingRecipe(category));
+		recipes.special("butterfly_mating", () -> new ButterflyMatingRecipe(net.minecraft.world.item.crafting.CraftingBookCategory.MISC));
 
 		recipes.shapelessCrafting("foresters_manual_butterfly", RecipeCategory.MISC, CoreItems.FORESTERS_MANUAL, 1, Items.BOOK, LepidopterologyItems.BUTTERFLY_GE);
 	}

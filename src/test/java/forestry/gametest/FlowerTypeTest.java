@@ -2,7 +2,7 @@ package forestry.gametest;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -19,7 +19,7 @@ import forestry.core.engine.genetics.FlowerTypeManager;
 @GameTestHolder(ForestryConstants.MOD_ID)
 @PrefixGameTestTemplate(false)
 public class FlowerTypeTest {
-	private static final ResourceLocation[] ALL = {
+	private static final Identifier[] ALL = {
 		ForestryFlowerTypes.VANILLA, ForestryFlowerTypes.NETHER, ForestryFlowerTypes.CACTI,
 		ForestryFlowerTypes.MUSHROOMS, ForestryFlowerTypes.END, ForestryFlowerTypes.JUNGLE,
 		ForestryFlowerTypes.SNOW, ForestryFlowerTypes.WHEAT, ForestryFlowerTypes.GOURD,
@@ -32,7 +32,7 @@ public class FlowerTypeTest {
 	// without apiculture could not project a single butterfly
 	@GameTest(template = "empty")
 	public static void flowerTypesResolveWithoutBeeSpeciesType(GameTestHelper helper) {
-		for (ResourceLocation id : ALL) {
+		for (Identifier id : ALL) {
 			if (IForestryApi.INSTANCE.getFlowerTypeManager().getFlowerType(id) == null) {
 				helper.fail("Flower type did not resolve from the core manager: " + id);
 			}
@@ -43,7 +43,7 @@ public class FlowerTypeTest {
 	@GameTest(template = "empty")
 	public static void allBuiltinsResolve(GameTestHelper helper) {
 		IFlowerTypeManager bees = IForestryApi.INSTANCE.getFlowerTypeManager();
-		for (ResourceLocation id : ALL) {
+		for (Identifier id : ALL) {
 			IFlowerType type = bees.getFlowerTypeSafe(id);
 			if (type == null) {
 				helper.fail("Built-in flower type did not load from datapack: " + id);
@@ -99,9 +99,9 @@ public class FlowerTypeTest {
 	@GameTest(template = "empty")
 	public static void datapackOverrideWinsAndUnionSwaps(GameTestHelper helper) {
 		IFlowerTypeManager bees = IForestryApi.INSTANCE.getFlowerTypeManager();
-		ResourceLocation probe = ForestryConstants.forestry("gametest_probe_flower");
+		Identifier probe = ForestryConstants.forestry("gametest_probe_flower");
 		// A synthetic datapack map that overlays the code base.
-		java.util.Map<ResourceLocation, IFlowerType> data = new java.util.HashMap<>();
+		java.util.Map<Identifier, IFlowerType> data = new java.util.HashMap<>();
 		data.put(probe, new PhotosynthesisFlowerType());
 		data.put(ForestryFlowerTypes.VANILLA, new TagFlowerType(net.minecraft.tags.BlockTags.FLOWERS, false)); // override: recessive
 		// This mutation of the shared live flower-type map is safe only because mutate -> assert -> restore all run

@@ -1,6 +1,5 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/cork",
   "liquid": {
     "amount": 200,
@@ -9,9 +8,7 @@
   "recipe": {
     "category": "building",
     "key": {
-      "*": {
-        "tag": "c:sawdust"
-      }
+      "*": "#c:sawdust"
     },
     "pattern": [
       "**",

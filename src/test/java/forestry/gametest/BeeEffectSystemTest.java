@@ -22,7 +22,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -67,7 +67,7 @@ import forestry.core.platform.util.SpeciesUtil;
 @PrefixGameTestTemplate(false)
 public class BeeEffectSystemTest {
 	/** The effect a species' default genome resolves to, via the reference {@code bee_effect} chromosome. */
-	private static IBeeEffect effectOf(ResourceLocation speciesId) {
+	private static IBeeEffect effectOf(Identifier speciesId) {
 		return SpeciesUtil.BEE_TYPE.get().getSpecies(speciesId).getDefaultGenome().resolveActive(BeeChromosomes.EFFECT);
 	}
 
@@ -80,7 +80,7 @@ public class BeeEffectSystemTest {
 	public static void allEffectPrimitiveTypesRegistered(GameTestHelper helper) {
 		String[] types = {"apply_potion", "damage_entities", "transform_block", "resurrect", "aging"};
 		for (String type : types) {
-			ResourceLocation id = ForestryConstants.forestry(type);
+			Identifier id = ForestryConstants.forestry(type);
 			if (!ForestryRegistries.BEE_EFFECT_TYPE.containsKey(id)) {
 				helper.fail("bee effect primitive type not registered: " + id);
 				return;
@@ -189,8 +189,8 @@ public class BeeEffectSystemTest {
 	@GameTest(template = "empty")
 	public static void datapackEffectsMergeOntoBuiltins(GameTestHelper helper) {
 		IBeeSpeciesType beeType = SpeciesUtil.BEE_TYPE.get();
-		Map<ResourceLocation, IBeeEffect> original = BeeEffectManager.INSTANCE.getDefinitions();
-		ResourceLocation testId = ForestryConstants.forestry("gametest_transform");
+		Map<Identifier, IBeeEffect> original = BeeEffectManager.INSTANCE.getDefinitions();
+		Identifier testId = ForestryConstants.forestry("gametest_transform");
 		IBeeEffect testEffect = new TransformBlockBeeEffect(
 			new ThrottleSettings(true, 30, false, false),
 			List.of(new TransformBlockBeeEffect.Transform(
@@ -233,7 +233,7 @@ public class BeeEffectSystemTest {
 	@GameTest(template = "empty")
 	public static void potionBuiltinsAreDatapackDefined(GameTestHelper helper) {
 		IBeeSpeciesType beeType = SpeciesUtil.BEE_TYPE.get();
-		for (ResourceLocation id : new ResourceLocation[]{
+		for (Identifier id : new Identifier[]{
 			ForestryBeeEffects.BEATIFIC, ForestryBeeEffects.MIASMIC, ForestryBeeEffects.DRUNKARD, ForestryBeeEffects.DARKNESS
 		}) {
 			if (!(beeType.getBeeEffect(id) instanceof PotionBeeEffect)) {
@@ -243,7 +243,7 @@ public class BeeEffectSystemTest {
 		}
 		// ...and the bees that carry them resolve their genome's effect to that datapack instance: IMPERIAL/BEATIFIC,
 		// AQUATIC/MIASMIC, ABYSSAL/DARKNESS, TIPSY/DRUNKARD.
-		for (ResourceLocation speciesId : new ResourceLocation[]{
+		for (Identifier speciesId : new Identifier[]{
 			ForestryBeeSpecies.IMPERIAL, ForestryBeeSpecies.AQUATIC, ForestryBeeSpecies.ABYSSAL, ForestryBeeSpecies.TIPSY
 		}) {
 			if (!(effectOf(speciesId) instanceof PotionBeeEffect)) {
@@ -267,7 +267,7 @@ public class BeeEffectSystemTest {
 			return;
 		}
 		IBeeSpeciesType beeType = SpeciesUtil.BEE_TYPE.get();
-		for (ResourceLocation id : new ResourceLocation[]{ForestryBeeEffects.REANIMATION, ForestryBeeEffects.RESURRECTION}) {
+		for (Identifier id : new Identifier[]{ForestryBeeEffects.REANIMATION, ForestryBeeEffects.RESURRECTION}) {
 			if (!(beeType.getBeeEffect(id) instanceof ResurrectionBeeEffect)) {
 				helper.fail("datapack-defined built-in " + id + " did not resolve to a ResurrectionBeeEffect");
 				return;
@@ -305,7 +305,7 @@ public class BeeEffectSystemTest {
 			return;
 		}
 		IBeeSpeciesType beeType = SpeciesUtil.BEE_TYPE.get();
-		for (ResourceLocation id : new ResourceLocation[]{ForestryBeeEffects.REJUVENATION, ForestryBeeEffects.CHRONOPHAGE}) {
+		for (Identifier id : new Identifier[]{ForestryBeeEffects.REJUVENATION, ForestryBeeEffects.CHRONOPHAGE}) {
 			if (!(beeType.getBeeEffect(id) instanceof AgingBeeEffect)) {
 				helper.fail("datapack-defined built-in " + id + " did not resolve to an AgingBeeEffect");
 				return;
@@ -342,7 +342,7 @@ public class BeeEffectSystemTest {
 			return;
 		}
 		IBeeSpeciesType beeType = SpeciesUtil.BEE_TYPE.get();
-		for (ResourceLocation id : new ResourceLocation[]{
+		for (Identifier id : new Identifier[]{
 			ForestryBeeEffects.AGGRESSIVE, ForestryBeeEffects.MISANTHROPE, ForestryBeeEffects.HEROIC
 		}) {
 			if (!(beeType.getBeeEffect(id) instanceof DamageBeeEffect)) {
@@ -352,7 +352,7 @@ public class BeeEffectSystemTest {
 		}
 		// All three are non-combinable; the code default for damage_entities is combinable, so the migrated built-ins
 		// must keep that flag off (the JSON sets "combinable": false).
-		for (ResourceLocation id : new ResourceLocation[]{
+		for (Identifier id : new Identifier[]{
 			ForestryBeeEffects.AGGRESSIVE, ForestryBeeEffects.MISANTHROPE, ForestryBeeEffects.HEROIC
 		}) {
 			if (beeType.getBeeEffect(id).isCombinable()) {
@@ -495,7 +495,7 @@ public class BeeEffectSystemTest {
 			return;
 		}
 		IBeeSpeciesType beeType = SpeciesUtil.BEE_TYPE.get();
-		for (ResourceLocation id : new ResourceLocation[]{
+		for (Identifier id : new Identifier[]{
 			ForestryBeeEffects.SIFTER, ForestryBeeEffects.GLACIAL, ForestryBeeEffects.GLOW_BERRY_GROW
 		}) {
 			if (!(beeType.getBeeEffect(id) instanceof TransformBlockBeeEffect)) {
@@ -507,7 +507,7 @@ public class BeeEffectSystemTest {
 		// None of transform_block's codec defaults match what these three effects need — chance in particular
 		// defaults to 0.06, and all three must be always-on. Every migrated effect states chance explicitly, so
 		// assert it: a silent fallback to the default would drop them to ~6% activation and nothing else would notice.
-		for (ResourceLocation id : new ResourceLocation[]{
+		for (Identifier id : new Identifier[]{
 			ForestryBeeEffects.SIFTER, ForestryBeeEffects.GLACIAL, ForestryBeeEffects.GLOW_BERRY_GROW
 		}) {
 			float chance = ((TransformBlockBeeEffect) beeType.getBeeEffect(id)).chance();

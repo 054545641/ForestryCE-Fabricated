@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec;
 import forestry.api.ForestryConstants;
 import forestry.core.platform.advancements.AdvancementHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -25,7 +25,7 @@ public class AshBlock extends FallingBlock {
 	public static final MapCodec<AshBlock> CODEC = simpleCodec(AshBlock::new);
 	public static final IntegerProperty AMOUNT = IntegerProperty.create("amount", 0, 63);
 
-	private static final ResourceLocation BREAK_ASH_BLOCK = ForestryConstants.forestry("break_ash_block");
+	private static final Identifier BREAK_ASH_BLOCK = ForestryConstants.forestry("break_ash_block");
 
 	public AshBlock(Block.Properties properties) {
 		super(properties.sound(SoundType.SAND).strength(0.6F).mapColor(MapColor.COLOR_LIGHT_GRAY));

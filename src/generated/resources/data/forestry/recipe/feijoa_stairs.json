@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_stairs",
   "key": {
-    "#": {
-      "item": "forestry:feijoa_planks"
-    }
+    "#": "forestry:feijoa_planks"
   },
   "pattern": [
     "#  ",

@@ -5,7 +5,7 @@ import forestry.api.core.genetics.pollen.IPollen;
 import forestry.api.core.genetics.pollen.IPollenManager;
 import forestry.api.core.genetics.pollen.IPollenType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 
 import javax.annotation.Nullable;
@@ -14,9 +14,9 @@ import java.util.Set;
 
 
 public class PollenManager implements IPollenManager {
-	private final ImmutableMap<ResourceLocation, IPollenType<?>> types;
+	private final ImmutableMap<Identifier, IPollenType<?>> types;
 
-	public PollenManager(ImmutableMap<ResourceLocation, IPollenType<?>> types) {
+	public PollenManager(ImmutableMap<Identifier, IPollenType<?>> types) {
 		this.types = types;
 	}
 
@@ -47,8 +47,8 @@ public class PollenManager implements IPollenManager {
 
 	@Nullable
 	@Override
-	public IPollen<?> getPollenOfType(LevelAccessor level, BlockPos pos, @Nullable Object pollinator, Set<ResourceLocation> pollenTypes) {
-		for (ResourceLocation id : pollenTypes) {
+	public IPollen<?> getPollenOfType(LevelAccessor level, BlockPos pos, @Nullable Object pollinator, Set<Identifier> pollenTypes) {
+		for (Identifier id : pollenTypes) {
 			IPollenType<?> type = this.types.get(id);
 
 			if (type != null) {
@@ -65,7 +65,7 @@ public class PollenManager implements IPollenManager {
 
 	@Nullable
 	@Override
-	public IPollenType<?> getPollenType(ResourceLocation id) {
+	public IPollenType<?> getPollenType(Identifier id) {
 		return this.types.get(id);
 	}
 

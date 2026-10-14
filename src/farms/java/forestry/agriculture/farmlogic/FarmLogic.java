@@ -97,7 +97,7 @@ public abstract class FarmLogic implements IFarmLogic {
 	}
 
 	protected final BlockPos translateWithOffset(BlockPos pos, Direction farmDirection, int step) {
-		return VecUtil.scale(farmDirection.getNormal(), step).offset(pos);
+		return VecUtil.scale(farmDirection.getUnitVec3i(), step).offset(pos);
 	}
 
 	private static AABB getHarvestBox(Level world, IFarmHousing farmHousing, boolean toWorldHeight) {
@@ -110,7 +110,7 @@ public abstract class FarmLogic implements IFarmLogic {
 
 		int maxY = max.getY();
 		if (toWorldHeight) {
-			maxY = world.getMaxBuildHeight();
+			maxY = world.getMaxY() + 1;
 		}
 
 		return new AABB(min.getX(), min.getY(), min.getZ(), max.getX(), maxY, max.getZ());
@@ -152,7 +152,7 @@ public abstract class FarmLogic implements IFarmLogic {
 			}
 
 			// Fixes grabbing items from Immersive Engineering belts.
-			if (entity.getPersistentData().getBoolean(MAGNET_PREVENT_NBT)) {
+			if (entity.getPersistentData().getBooleanOr(MAGNET_PREVENT_NBT, false)) {
 				return false;
 			}
 

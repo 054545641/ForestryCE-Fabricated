@@ -4,7 +4,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 public class FeatureCreativeTab extends ModFeature {
 	private final DeferredHolder<CreativeModeTab, CreativeModeTab> creativeTabObject;
 
-	public FeatureCreativeTab(IFeatureRegistry registry, ResourceLocation moduleId, String name, Consumer<CreativeModeTab.Builder> builder) {
+	public FeatureCreativeTab(IFeatureRegistry registry, Identifier moduleId, String name, Consumer<CreativeModeTab.Builder> builder) {
 		super(moduleId, name);
 
 		this.creativeTabObject = registry.getRegistry(Registries.CREATIVE_MODE_TAB).register(name, () -> {

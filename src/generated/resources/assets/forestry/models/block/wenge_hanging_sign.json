@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/wenge_planks"
-  }
+  "parent": "forestry:block/wenge_hanging_sign_rot_0"
 }

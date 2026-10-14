@@ -6,7 +6,7 @@ import forestry.core.platform.gui.widgets.ReservoirWidget;
 import forestry.core.platform.gui.widgets.WidgetManager;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.IFluidTank;
+import forestry.core.platform.fluids.StandardTank;
 
 public class BiogasSlot extends ReservoirWidget {
 	public BiogasSlot(WidgetManager manager, int xPos, int yPos, int slot) {
@@ -16,7 +16,7 @@ public class BiogasSlot extends ReservoirWidget {
 	@Override
 	public ToolTip getToolTip(int mouseX, int mouseY) {
 		ToolTip toolTip = new ToolTip();
-		IFluidTank tank = getTank();
+		StandardTank tank = getTank();
 		if (tank != null) {
 			FluidStack fluid = tank.getFluid();
 			if (fluid.isEmpty()) {

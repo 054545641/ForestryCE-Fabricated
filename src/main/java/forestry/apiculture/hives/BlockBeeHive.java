@@ -11,11 +11,11 @@ import forestry.api.core.genetics.alleles.BeeChromosomes;
 import forestry.apiculture.features.ApicultureTiles;
 import forestry.core.platform.tile.TileUtil;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
@@ -45,14 +45,14 @@ import forestry.api.apiculture.ForestryActivityTypes;
 
 // Hives where wild bees live
 public class BlockBeeHive extends Block implements EntityBlock {
-	private final ResourceLocation speciesId;
+	private final Identifier speciesId;
 
-	public BlockBeeHive(HiveBlockType type) {
-		this(type.getSpeciesId());
+	public BlockBeeHive(Properties properties, HiveBlockType type) {
+		this(properties, type.getSpeciesId());
 	}
 
-	public BlockBeeHive(ResourceLocation speciesId) {
-		super(Properties.of().sound(SoundType.WOOD).lightLevel(state -> 7).strength(2.5f));
+	public BlockBeeHive(Properties properties, Identifier speciesId) {
+		super(properties.sound(SoundType.WOOD).lightLevel(state -> 7).strength(2.5f));
 		this.speciesId = speciesId;
 	}
 
@@ -93,7 +93,7 @@ public class BlockBeeHive extends Block implements EntityBlock {
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
 		BlockPos pos = BlockPos.containing(builder.getParameter(LootContextParams.ORIGIN));
-		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
+		net.minecraft.world.item.ItemInstance tool = builder.getParameter(LootContextParams.TOOL);
 
 		if (tool.is(ForestryTags.Items.SCOOPS)) {
 			HolderLookup.RegistryLookup<Enchantment> enchantments = builder.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
@@ -116,7 +116,7 @@ public class BlockBeeHive extends Block implements EntityBlock {
 		if (hiveDrops == null) {
 			return drops;
 		} else {
-			Util.shuffle(hiveDrops, level.random);
+			Util.shuffle(hiveDrops, level.getRandom());
 		}
 
 		// Grab a princess (10 tries)
@@ -164,7 +164,7 @@ public class BlockBeeHive extends Block implements EntityBlock {
 		return drops;
 	}
 
-	public ResourceLocation getSpeciesId() {
+	public Identifier getSpeciesId() {
 		return this.speciesId;
 	}
 
@@ -184,7 +184,7 @@ public class BlockBeeHive extends Block implements EntityBlock {
 	}
 
 	public IBee adjustForDimension(ServerLevel level, BlockPos pos, IBee bee){
-		if(level.dimension().location().toString().equals("twilightforest:twilight_forest")){
+		if(level.dimension().identifier().toString().equals("twilightforest:twilight_forest")){
 			return bee.copyWithGenome(bee.getGenome().copyWith(Map.of(BeeChromosomes.ACTIVITY, Allele.reference(ForestryActivityTypes.CREPUSCULAR))));
 		}
 		return bee;

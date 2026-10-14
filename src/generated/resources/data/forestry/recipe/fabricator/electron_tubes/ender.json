@@ -6,14 +6,9 @@
     "id": "forestry:liquid_glass"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "item": "minecraft:ender_eye"
-      },
-      "X": {
-        "item": "minecraft:end_stone"
-      }
+      "#": "minecraft:ender_eye",
+      "X": "minecraft:end_stone"
     },
     "pattern": [
       " X ",

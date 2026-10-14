@@ -6,7 +6,7 @@ import forestry.api.core.ISpecialtyProducer;
 import forestry.api.core.genetics.IGenome;
 import forestry.api.core.genetics.alleles.TreeChromosomes;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
@@ -86,13 +86,13 @@ public interface IFruit extends IProductProducer, ISpecialtyProducer {
 
 	/**
 	 * @param ripeningTime Elapsed ripening time for the fruit.
-	 * @return ResourceLocation of the texture to overlay on the leaf block.
+	 * @return Identifier of the texture to overlay on the leaf block.
 	 */
 	@Nullable
-	ResourceLocation getSprite(IGenome genome, BlockGetter world, BlockPos pos, int ripeningTime);
+	Identifier getSprite(IGenome genome, BlockGetter world, BlockPos pos, int ripeningTime);
 
 	@Nullable
-	default ResourceLocation getDecorativeSprite() {
+	default Identifier getDecorativeSprite() {
 		return null;
 	}
 

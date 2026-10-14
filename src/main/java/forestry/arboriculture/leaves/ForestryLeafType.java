@@ -7,7 +7,7 @@ import forestry.api.arboriculture.genetics.ITree;
 import forestry.api.core.IBlockSubtype;
 import forestry.api.core.genetics.alleles.TreeChromosomes;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
@@ -73,14 +73,14 @@ public final class ForestryLeafType implements IBlockSubtype {
 	public static final ForestryLeafType PEAR = new ForestryLeafType(ForestryTreeSpecies.PEAR);
 	public static final ForestryLeafType KAURI = new ForestryLeafType(ForestryTreeSpecies.KAURI);
 
-	private final ResourceLocation speciesId;
+	private final Identifier speciesId;
 
 	// These fields are initialized later in setSpecies
 	private IFruit fruit;
 	private ITree individual;
 
 	// Take care not to create duplicates...
-	public ForestryLeafType(ResourceLocation speciesId) {
+	public ForestryLeafType(Identifier speciesId) {
 		this.speciesId = speciesId;
 		VALUES.add(this);
 	}
@@ -103,7 +103,7 @@ public final class ForestryLeafType implements IBlockSubtype {
 		return this.individual;
 	}
 
-	public ResourceLocation getSpeciesId() {
+	public Identifier getSpeciesId() {
 		return this.speciesId;
 	}
 

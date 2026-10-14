@@ -14,7 +14,7 @@ import java.util.function.Function;
  * Objects are stored in registration order, which should be consistent as plugins are always loaded in the same order.
  * If two objects with the same key are registered, an exception is thrown.
  *
- * @param <K> The type of key object used to uniquely identify an object. Typically ResourceLocation.
+ * @param <K> The type of key object used to uniquely identify an object. Typically Identifier.
  * @param <I> The interface type of the object. If no interface exists, can be the same as T.
  * @param <V> The concrete type of the object. If there is more than one concrete type, can be the same as I.
  */

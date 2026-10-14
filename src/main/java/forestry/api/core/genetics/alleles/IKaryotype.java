@@ -9,7 +9,7 @@ import forestry.api.core.genetics.IGenome;
 import forestry.api.plugin.IGenomeBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 
@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
  * Genomes serialize their allele values inline via each chromosome's value codec, so no global allele registry exists.
  */
 public interface IKaryotype {
-	Codec<IKaryotype> CODEC = ResourceLocation.CODEC.comapFlatMap(id -> {
+	Codec<IKaryotype> CODEC = Identifier.CODEC.comapFlatMap(id -> {
 		var type = IForestryApi.INSTANCE.getGeneticManager().getSpeciesTypeSafe(id);
 		return type != null ? DataResult.success(type.getKaryotype()) : DataResult.error(() -> "Unknown karyotype: " + id);
 	}, IKaryotype::id);
@@ -27,7 +27,7 @@ public interface IKaryotype {
 	/**
 	 * @return The stable ID used to serialize this karyotype.
 	 */
-	ResourceLocation id();
+	Identifier id();
 
 	/**
 	 * @return All chromosome types of this karyotype, in the order they were defined.
@@ -43,13 +43,13 @@ public interface IKaryotype {
 	/**
 	 * @return The chromosome that determines this individual's species. The genome stores the species' ID.
 	 */
-	IChromosome<ResourceLocation> getSpeciesChromosome();
+	IChromosome<Identifier> getSpeciesChromosome();
 
 	/**
 	 * @return The chromosome in this karyotype with the given ID, or {@code null} if no such chromosome exists.
 	 */
 	@Nullable
-	IChromosome<?> getChromosome(ResourceLocation id);
+	IChromosome<?> getChromosome(Identifier id);
 
 	/**
 	 * @return A codec mapping a chromosome ID to its {@link IChromosome} in this karyotype, erroring on unknown IDs.
@@ -82,7 +82,7 @@ public interface IKaryotype {
 	/**
 	 * @return The default species ID for this species type.
 	 */
-	ResourceLocation getDefaultSpecies();
+	Identifier getDefaultSpecies();
 
 	/**
 	 * @return The codec used to serialize/deserialize genomes of this karyotype (values stored inline).

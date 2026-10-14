@@ -8,6 +8,7 @@ import forestry.api.arboriculture.genetics.ITreeSpeciesType;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
@@ -60,7 +61,12 @@ public interface ITreeSpeciesBuilder extends ISpeciesBuilder<ITreeSpeciesType, I
 	 * @param stack The item form of the decorative leaves for this species.
 	 * @return The decorative form of this species's leaves block.
 	 */
-	ITreeSpeciesBuilder setDecorativeLeaves(ItemStack stack);
+	default ITreeSpeciesBuilder setDecorativeLeaves(ItemStack stack) {
+		return setDecorativeLeaves(stack.isEmpty() ? null : ItemStackTemplate.fromStack(stack));
+	}
+
+	/** Safe during early registration, before default item components bind. Null means no decorative leaves. */
+	ITreeSpeciesBuilder setDecorativeLeaves(@Nullable ItemStackTemplate template);
 
 	/**
 	 * Overrides the wood type set in {@link IArboricultureRegistration#registerSpecies}.
@@ -91,7 +97,14 @@ public interface ITreeSpeciesBuilder extends ISpeciesBuilder<ITreeSpeciesType, I
 
 	List<Item> getVanillaSaplingItems();
 
-	ItemStack getDecorativeLeaves();
+	@Nullable
+	ItemStackTemplate getDecorativeLeavesTemplate();
+
+	/** Materializes the leaves only after default item components have bound. */
+	default ItemStack getDecorativeLeaves() {
+		ItemStackTemplate template = getDecorativeLeavesTemplate();
+		return template == null ? ItemStack.EMPTY : template.create();
+	}
 
 	float getRarity();
 }

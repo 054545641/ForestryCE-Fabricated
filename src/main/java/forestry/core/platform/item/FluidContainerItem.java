@@ -1,6 +1,7 @@
 package forestry.core.platform.item;
 
 import forestry.core.platform.fluids.ForestryFluids;
+import forestry.core.features.CoreDataComponents;
 import forestry.core.platform.models.FluidContainerModel;
 import forestry.core.platform.util.ModUtil;
 import forestry.core.platform.util.Translator;
@@ -10,41 +11,33 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.fluids.FluidActionResult;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.fluids.SimpleFluidContent;
 
 import javax.annotation.Nullable;
 
 public class FluidContainerItem extends ItemForestry implements ITintedItem {
 	private final FluidContainerType type;
 
-	public FluidContainerItem(FluidContainerType type) {
-		super(new Item.Properties());
+	public FluidContainerItem(FluidContainerType type, Properties properties) {
+		super(properties);
 		this.type = type;
 	}
 
-	protected FluidStack getContained(ItemStack itemStack) {
-		if (itemStack.getCount() != 1) {
-			itemStack = itemStack.copy();
-			itemStack.setCount(1);
-		}
-		IFluidHandler fluidHandler = new FluidHandlerItemForestry(itemStack, this.type);
-		return fluidHandler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
+	public static FluidStack getContained(ItemStack itemStack) {
+		return itemStack.getOrDefault(CoreDataComponents.FLUID_CONTENT, SimpleFluidContent.EMPTY).copy();
 	}
 
 	@Override
@@ -71,10 +64,10 @@ public class FluidContainerItem extends ItemForestry implements ITintedItem {
 					stack.shrink(1);
 				}
 
-				if (!worldIn.isClientSide) {
+				if (!worldIn.isClientSide()) {
 					FoodData foodStats = player.getFoodData();
 					foodStats.eat(drinkProperties.getHealAmount(), drinkProperties.getSaturationModifier());
-					worldIn.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.5F, worldIn.random.nextFloat() * 0.1F + 0.9F);
+					worldIn.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.5F, worldIn.getRandom().nextFloat() * 0.1F + 0.9F);
 				}
 
 				player.awardStat(Stats.ITEM_USED.get(this));
@@ -106,55 +99,52 @@ public class FluidContainerItem extends ItemForestry implements ITintedItem {
 	}
 
 	@Override
-	public UseAnim getUseAnimation(ItemStack itemstack) {
+	public ItemUseAnimation getUseAnimation(ItemStack itemstack) {
 		DrinkProperties drinkProperties = getDrinkProperties(itemstack);
 		if (drinkProperties != null) {
-			return UseAnim.DRINK;
+			return ItemUseAnimation.DRINK;
 		} else {
-			return UseAnim.NONE;
+			return ItemUseAnimation.NONE;
 		}
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand handIn) {
+	public InteractionResult use(Level world, Player player, InteractionHand handIn) {
 		ItemStack heldItem = player.getItemInHand(handIn);
 		DrinkProperties drinkProperties = getDrinkProperties(heldItem);
 		if (drinkProperties != null) {
 			if (player.canEat(false)) {
 				player.startUsingItem(handIn);
-				return new InteractionResultHolder<>(InteractionResult.SUCCESS, heldItem);
+				return InteractionResult.SUCCESS;
 			} else {
-				return new InteractionResultHolder<>(InteractionResult.FAIL, heldItem);
+				return InteractionResult.FAIL;
 			}
 		} else {
 			BlockHitResult target = getPlayerPOVHitResult(world, player, ClipContext.Fluid.SOURCE_ONLY);
 			if (target.getType() != HitResult.Type.BLOCK) {
-				return InteractionResultHolder.pass(heldItem);
+				return InteractionResult.PASS;
 			}
-			ItemStack singleBucket = heldItem.copy();
-			singleBucket.setCount(1);
-
-			FluidActionResult filledResult = FluidUtil.tryPickUpFluid(singleBucket, player, world, target.getBlockPos(), target.getDirection());
-			if (filledResult.isSuccess()) {
-				ItemHandlerHelper.giveItemToPlayer(player, filledResult.result);
-
-				if (!player.isCreative()) {
-					// Remove consumed empty container
-					heldItem.shrink(1);
-				}
-
-				return InteractionResultHolder.success(heldItem);
+			if (!world.mayInteract(player, target.getBlockPos())
+				|| !player.mayUseItemAt(target.getBlockPos().relative(target.getDirection()), target.getDirection(), heldItem)) {
+				return InteractionResult.FAIL;
+			}
+			if (world.isClientSide()) {
+				return InteractionResult.SUCCESS;
+			}
+			var handler = createFluidHandler(ItemAccess.forPlayerInteraction(player, handIn).oneByOne());
+			if (!FluidUtil.tryPickupFluid(handler, player, world, target.getBlockPos(), target.getDirection()).isEmpty()) {
+				return InteractionResult.SUCCESS;
 			}
 			return super.use(world, player, handIn);
 		}
 	}
 
-	public IFluidHandlerItem createFluidHandler(ItemStack stack) {
-		return new FluidHandlerItemForestry(stack, this.type);
+	public FluidHandlerItemForestry createFluidHandler(ItemAccess access) {
+		return new FluidHandlerItemForestry(access, CoreDataComponents.FLUID_CONTENT.get(), this.type);
 	}
 
 	@Override
 	public int getColorFromItemStack(ItemStack stack, int tintIndex) {
-		return FluidContainerModel.DYNAMIC_COLOR.getColor(stack, tintIndex);
+		return tintIndex == 1 ? net.neoforged.neoforge.client.color.item.FluidContentsTint.INSTANCE.calculate(stack, null, null) : -1;
 	}
 }

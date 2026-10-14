@@ -1,0 +1,26 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 1.0
+  },
+  "gives": {
+    "id": "forestry:tree_sapling",
+    "count": 1
+  },
+  "max_uses": 8.0,
+  "xp": 2.0,
+  "given_item_modifiers": [
+    {
+      "function": "forestry:random_tree_species",
+      "stage": "sapling",
+      "max_complexity": 4
+    },
+    {
+      "function": "minecraft:set_count",
+      "count": {
+        "min": 1.0,
+        "max": 3.0
+      }
+    }
+  ]
+}

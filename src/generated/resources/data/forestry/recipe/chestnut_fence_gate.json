@@ -3,19 +3,14 @@
   "category": "building",
   "group": "wooden_fence_gate",
   "key": {
-    "#": {
-      "tag": "c:rods/wooden"
-    },
-    "W": {
-      "item": "forestry:chestnut_planks"
-    }
+    "#": "#c:rods/wooden",
+    "W": "forestry:chestnut_planks"
   },
   "pattern": [
     "#W#",
     "#W#"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:chestnut_fence_gate"
   }
 }

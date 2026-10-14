@@ -9,9 +9,7 @@
     }
   },
   "resources": [
-    {
-      "item": "minecraft:honey_block"
-    }
+    "minecraft:honey_block"
   ],
   "time": 60
 }

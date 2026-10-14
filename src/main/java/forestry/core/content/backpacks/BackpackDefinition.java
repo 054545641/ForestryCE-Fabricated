@@ -3,6 +3,7 @@ package forestry.core.content.backpacks;
 import forestry.api.core.backpacks.IBackpackDefinition;
 import forestry.core.platform.util.NBTUtilForestry;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -27,15 +28,19 @@ public class BackpackDefinition implements IBackpackDefinition {
 
 	@Override
 	public Component getName(ItemStack backpack) {
+		Component customName = backpack.get(DataComponents.CUSTOM_NAME);
+		if (customName != null) {
+			return customName;
+		}
 		Item item = backpack.getItem();
-		Component display = Component.translatable((item.getDescriptionId(backpack)).trim());
+		Component display = Component.translatable(item.getDescriptionId());
 
 		CompoundTag tagCompound = NBTUtilForestry.getItemStackTag(backpack);
-		if (tagCompound != null && tagCompound.contains("display", 10)) {
-			CompoundTag nbt = tagCompound.getCompound("display");
+		if (tagCompound != null && tagCompound.getCompound("display").isPresent()) {
+			CompoundTag nbt = tagCompound.getCompoundOrEmpty("display");
 
-			if (nbt.contains("Name", 8)) {
-				display = Component.literal(nbt.getString("Name"));
+			if (nbt.getString("Name").isPresent()) {
+				display = Component.literal(nbt.getStringOr("Name", ""));
 			}
 		}
 

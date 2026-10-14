@@ -1,19 +1,10 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "B": {
-      "item": "forestry:basic_circuit_board"
-    },
-    "C": {
-      "item": "forestry:flexible_casing"
-    },
-    "G": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "T": {
-      "item": "forestry:bronze_electron_tube"
-    }
+    "B": "forestry:basic_circuit_board",
+    "C": "forestry:flexible_casing",
+    "G": "#c:glass_blocks/colorless",
+    "T": "forestry:bronze_electron_tube"
   },
   "pattern": [
     "GTG",
@@ -21,7 +12,6 @@
     "GBG"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:farm_crops_managed"
   }
 }

@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/greenheart_planks"
-  }
+  "parent": "forestry:block/greenheart_hanging_sign_rot_0"
 }

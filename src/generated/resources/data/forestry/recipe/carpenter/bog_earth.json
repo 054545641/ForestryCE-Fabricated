@@ -1,23 +1,15 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/bog_earth",
   "liquid": {
     "amount": 1000,
     "id": "minecraft:water"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "item": "minecraft:dirt"
-      },
-      "X": {
-        "tag": "c:sands"
-      },
-      "Y": {
-        "item": "forestry:mulch"
-      }
+      "#": "minecraft:dirt",
+      "X": "#c:sands",
+      "Y": "forestry:mulch"
     },
     "pattern": [
       "#X#",

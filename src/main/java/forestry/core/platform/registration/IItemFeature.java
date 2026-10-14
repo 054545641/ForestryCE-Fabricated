@@ -3,7 +3,7 @@ package forestry.core.platform.registration;
 import forestry.api.core.IItemProvider;
 import forestry.api.core.IItemSubtype;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 
 import java.util.function.Supplier;
@@ -19,5 +19,5 @@ public interface IItemFeature<I extends Item> extends IModFeature, IItemProvider
 		return item();
 	}
 
-	ResourceLocation id();
+	Identifier id();
 }

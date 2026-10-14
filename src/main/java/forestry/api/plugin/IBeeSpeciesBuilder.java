@@ -8,7 +8,7 @@ import forestry.api.core.Product;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 
@@ -80,7 +80,7 @@ public interface IBeeSpeciesBuilder extends ISpeciesBuilder<IBeeSpeciesType, IBe
 	 *
 	 * @param id The ID of a jubilance registered with {@link IApicultureRegistration#registerBeeJubilance}
 	 */
-	IBeeSpeciesBuilder setJubilance(ResourceLocation id);
+	IBeeSpeciesBuilder setJubilance(Identifier id);
 
 	List<IProduct> buildProducts();
 
@@ -92,5 +92,5 @@ public interface IBeeSpeciesBuilder extends ISpeciesBuilder<IBeeSpeciesType, IBe
 
 	int getOutline();
 
-	ResourceLocation getJubilance();
+	Identifier getJubilance();
 }

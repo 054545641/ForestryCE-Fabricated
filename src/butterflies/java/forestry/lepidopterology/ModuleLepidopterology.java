@@ -1,11 +1,12 @@
 package forestry.lepidopterology;
 
+import forestry.api.ForestryConstants;
 import forestry.lepidopterology.network.LepidopterologyPacketIds;
 import forestry.api.modules.IPacketRegistry;
 import forestry.lepidopterology.butterflies.genetics.ButterflySpeciesManager;
 import forestry.lepidopterology.network.ButterflySpeciesSyncPacket;
 import forestry.core.platform.util.NetworkUtil;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import forestry.api.client.IClientModuleHandler;
@@ -19,7 +20,7 @@ import forestry.lepidopterology.proxy.LepidopterologyClientHandler;
 import forestry.modules.BlankForestryModule;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
@@ -56,21 +57,21 @@ public class ModuleLepidopterology extends BlankForestryModule {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return ForestryModuleIds.LEPIDOPTEROLOGY;
 	}
 
 	@Override
-	public List<ResourceLocation> getModuleDependencies() {
+	public List<Identifier> getModuleDependencies() {
 		return List.of(ForestryModuleIds.CORE, ForestryModuleIds.ARBORICULTURE);
 	}
 
 	@Override
-	public void registerReloadListeners(AddReloadListenerEvent event) {
+	public void registerReloadListeners(AddServerReloadListenersEvent event) {
 		// Load butterfly species from the "butterfly_species" datapack folder and rebuild the live species
 		// map from them. Core registers the mutation rebuild after every module, and mutations must
 		// resolve species that already exist in the live map.
-		event.addListener(ButterflySpeciesManager.INSTANCE);
+		event.addListener(ForestryConstants.forestry("butterfly_species"), ButterflySpeciesManager.INSTANCE);
 	}
 
 	@Override

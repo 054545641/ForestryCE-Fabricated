@@ -92,7 +92,7 @@ public class DamageBeeEffect extends ThrottledBeeEffect {
 
 			@Override
 			public boolean matches(LivingEntity entity) {
-				return entity.getType().is(this.tag);
+				return entity.getType().builtInRegistryHolder().is(this.tag);
 			}
 		}
 	}
@@ -133,7 +133,7 @@ public class DamageBeeEffect extends ThrottledBeeEffect {
 	@Override
 	public IEffectData doEffectThrottled(IGenome genome, IEffectData storedData, IBeeHousing housing) {
 		Level level = housing.getLevel();
-		RandomSource rand = level.random;
+		RandomSource rand = level.getRandom();
 		List<? extends LivingEntity> entities = ThrottledBeeEffect.getEntitiesInRange(genome, housing, this.target.entityClass());
 		DamageSource source = CoreDamageTypes.source(level, this.damageType);
 

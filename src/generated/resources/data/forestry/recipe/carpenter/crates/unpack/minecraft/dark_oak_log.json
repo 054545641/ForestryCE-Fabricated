@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/crates/unpack/minecraft/dark_oak_log",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:crated_dark_oak_log"
-      }
+      "forestry:crated_dark_oak_log"
     ],
     "result": {
       "count": 9,

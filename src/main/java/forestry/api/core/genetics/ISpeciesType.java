@@ -11,7 +11,7 @@ import forestry.api.plugin.IForestryPlugin;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -32,7 +32,7 @@ public interface ISpeciesType<S extends ISpecies<I>, I extends IIndividual> exte
 	/**
 	 * @return The unique ID of this species type.
 	 */
-	ResourceLocation id();
+	Identifier id();
 
 	/**
 	 * @return The karyotype for all members of this species type.
@@ -59,13 +59,13 @@ public interface ISpeciesType<S extends ISpecies<I>, I extends IIndividual> exte
 	 * @return The species of this type registered with the given ID.
 	 * @throws RuntimeException If no species was found with that ID.
 	 */
-	S getSpecies(ResourceLocation id);
+	S getSpecies(Identifier id);
 
 	/**
 	 * @return The species of this type registered with the given ID, or {@code null} if no species was found with that ID.
 	 */
 	@Nullable
-	S getSpeciesSafe(ResourceLocation id);
+	S getSpeciesSafe(Identifier id);
 
 	/**
 	 * @return A random species from all registered species of this type.
@@ -75,7 +75,7 @@ public interface ISpeciesType<S extends ISpecies<I>, I extends IIndividual> exte
 	/**
 	 * @return A collection of IDs for all species of this type, including secret species. Used for commands.
 	 */
-	ImmutableSet<ResourceLocation> getAllSpeciesIds();
+	ImmutableSet<Identifier> getAllSpeciesIds();
 
 	/**
 	 * @return The number of species of this type, <i>including secret species.</i>
@@ -138,7 +138,7 @@ public interface ISpeciesType<S extends ISpecies<I>, I extends IIndividual> exte
 
 	ItemStack createStack(I individual, ILifeStage type);
 
-	ItemStack createStack(ResourceLocation speciesId, ILifeStage stage);
+	ItemStack createStack(Identifier speciesId, ILifeStage stage);
 
 	/**
 	 * @return The codec used to serialize/deserialize individuals of this species.
@@ -226,14 +226,14 @@ public interface ISpeciesType<S extends ISpecies<I>, I extends IIndividual> exte
 	 * to {@link #onSpeciesRegistered}.
 	 * @see IForestryPlugin#registerApiculture(IApicultureRegistration) for an example of what data is registered.
 	 */
-	ImmutableMap<ResourceLocation, S> handleSpeciesRegistration(List<IForestryPlugin> plugins);
+	ImmutableMap<Identifier, S> handleSpeciesRegistration(List<IForestryPlugin> plugins);
 
 	/**
 	 * Called when all species of this type have been registered and modified.
 	 *
 	 * @param allSpecies The map of every species ID to its species.
 	 */
-	void onSpeciesRegistered(ImmutableMap<ResourceLocation, S> allSpecies);
+	void onSpeciesRegistered(ImmutableMap<Identifier, S> allSpecies);
 
 	/**
 	 * @return This species type casted to a subclass of ISpeciesType.

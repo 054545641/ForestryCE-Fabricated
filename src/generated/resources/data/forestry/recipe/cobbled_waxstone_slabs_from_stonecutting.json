@@ -1,8 +1,6 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "forestry:cobbled_waxstone"
-  },
+  "ingredient": "forestry:cobbled_waxstone",
   "result": {
     "count": 2,
     "id": "forestry:cobbled_waxstone_slab"

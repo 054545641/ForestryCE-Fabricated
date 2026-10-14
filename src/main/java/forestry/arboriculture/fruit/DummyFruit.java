@@ -7,7 +7,7 @@ import forestry.api.core.genetics.IGenome;
 import forestry.api.core.genetics.alleles.TreeChromosomes;
 import forestry.core.platform.util.SpeciesUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -86,7 +86,7 @@ public class DummyFruit implements IFruit {
 
 	@Nullable
 	@Override
-	public ResourceLocation getSprite(IGenome genome, BlockGetter world, BlockPos pos, int ripeningTime) {
+	public Identifier getSprite(IGenome genome, BlockGetter world, BlockPos pos, int ripeningTime) {
 		return getDecorativeSprite();
 	}
 

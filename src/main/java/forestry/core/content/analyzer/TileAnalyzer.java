@@ -33,12 +33,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 
 import javax.annotation.Nullable;
 import forestry.core.platform.tile.IItemStackDisplay;
 import forestry.core.platform.tile.ILiquidTankTile;
 import forestry.core.platform.tile.TilePowered;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public class TileAnalyzer extends TilePowered implements WorldlyContainer, ILiquidTankTile, IItemStackDisplay {
 	private static final int TIME_TO_ANALYZE = 125;
@@ -54,6 +58,8 @@ public class TileAnalyzer extends TilePowered implements WorldlyContainer, ILiqu
 	@Nullable
 	private IIndividual specimenToAnalyze;
 	private ItemStack individualOnDisplayClient = ItemStack.EMPTY;
+	@Override protected Object captureProcessingState() { return this.specimenToAnalyze; }
+	@Override protected void restoreProcessingState(Object state) { this.specimenToAnalyze = (IIndividual) state; }
 
 	/* CONSTRUCTOR */
 	public TileAnalyzer(BlockPos pos, BlockState state) {
@@ -68,20 +74,25 @@ public class TileAnalyzer extends TilePowered implements WorldlyContainer, ILiqu
 	/* SAVING & LOADING */
 
 	@Override
-	public void saveAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.saveAdditional(compoundNBT, registries);
-        this.tankManager.write(compoundNBT, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag compoundNBT = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
+        this.tankManager.write(output);
+
+		ValueIOUtil.mergeInto(output, compoundNBT);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.loadAdditional(compoundNBT, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compoundNBT = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
         this.tankManager.read(compoundNBT, registries);
 
 		ItemStack stackToAnalyze = getItem(InventoryAnalyzer.SLOT_ANALYZE);
-		if (!stackToAnalyze.isEmpty()) {
-            this.specimenToAnalyze = IIndividualHandlerItem.getIndividual(stackToAnalyze);
-		}
+		this.specimenToAnalyze = IIndividualHandlerItem.getIndividual(stackToAnalyze);
+		if (this.specimenToAnalyze != null) configureSpecimen();
 	}
 
 	@Override
@@ -97,33 +108,23 @@ public class TileAnalyzer extends TilePowered implements WorldlyContainer, ILiqu
 	/* WORKING */
 	@Override
 	public boolean workCycle() {
-		ItemStack stackToAnalyze = getItem(InventoryAnalyzer.SLOT_ANALYZE);
-		if (stackToAnalyze.isEmpty() || this.specimenToAnalyze == null) {
-			return false;
-		}
-
-		if (!this.specimenToAnalyze.isAnalyzed()) {
-			FluidStack drained = this.resourceTank.drain(HONEY_REQUIRED, IFluidHandler.FluidAction.SIMULATE);
-			if (drained.isEmpty() || drained.getAmount() != HONEY_REQUIRED) {
-				return false;
+		try (var transaction = beginWorkTransaction()) {
+			ItemStack input = getItem(InventoryAnalyzer.SLOT_ANALYZE);
+			ItemStack output = input.copy();
+			IIndividual specimen = IIndividualHandlerItem.getIndividual(output);
+			if (specimen == null) return false;
+			if (!specimen.isAnalyzed()) {
+				if (FluidHelper.drain(this.resourceTank.internal(), HONEY_REQUIRED, transaction).getAmount() != HONEY_REQUIRED) return false;
+				specimen.analyze();
+				specimen.saveToStack(output);
 			}
-            this.resourceTank.drain(HONEY_REQUIRED, IFluidHandler.FluidAction.EXECUTE);
-
-            this.specimenToAnalyze.analyze();
-
-            this.specimenToAnalyze.saveToStack(stackToAnalyze);
+			if (!InventoryUtil.tryAddStack(this.invOutput, output, true)) return false;
+			if (getTransferHandler().extract(InventoryAnalyzer.SLOT_ANALYZE, net.neoforged.neoforge.transfer.item.ItemResource.of(input), input.getCount(), transaction) != input.getCount()) return false;
+			this.specimenToAnalyze = null;
+			afterWorkCommit(() -> NetworkUtil.sendNetworkPacket(new PacketItemStackDisplay(this, getIndividualOnDisplay()), this.worldPosition, this.level));
+			transaction.commit();
+			return true;
 		}
-
-		boolean added = InventoryUtil.tryAddStack(this.invOutput, stackToAnalyze, true);
-		if (!added) {
-			return false;
-		}
-
-		setItem(InventoryAnalyzer.SLOT_ANALYZE, ItemStack.EMPTY);
-		PacketItemStackDisplay packet = new PacketItemStackDisplay(this, getIndividualOnDisplay());
-		NetworkUtil.sendNetworkPacket(packet, this.worldPosition, this.level);
-
-		return true;
 	}
 
 	@Nullable
@@ -160,7 +161,7 @@ public class TileAnalyzer extends TilePowered implements WorldlyContainer, ILiqu
             this.individualOnDisplayClient = itemStack;
 			//TODO
 			BlockPos pos = getBlockPos();
-			Minecraft.getInstance().levelRenderer.setSectionDirty(pos.getX(), pos.getY(), pos.getZ());
+			forestry.core.platform.client.ClientsideCode.markForUpdate(pos);
 			//			world.markForRerender(getPos());
 		}
 	}
@@ -177,10 +178,16 @@ public class TileAnalyzer extends TilePowered implements WorldlyContainer, ILiqu
 		boolean hasSpace = true;
 
 		if (hasSpecimen) {
-			hasSpace = InventoryUtil.tryAddStack(this.invOutput, specimen, true, false);
+			ItemStack result = specimen.copy();
+			IIndividual analyzed = IIndividualHandlerItem.getIndividual(result);
+			if (analyzed != null && !analyzed.isAnalyzed()) {
+				analyzed.analyze();
+				analyzed.saveToStack(result);
+			}
+			hasSpace = InventoryUtil.tryAddStack(this.invOutput, result, true, false);
 
 			if (this.specimenToAnalyze != null && !this.specimenToAnalyze.isAnalyzed()) {
-				FluidStack drained = this.resourceTank.drain(HONEY_REQUIRED, IFluidHandler.FluidAction.SIMULATE);
+				FluidStack drained = FluidHelper.simulateDrain(this.resourceTank, HONEY_REQUIRED);
 				hasResource = !drained.isEmpty() && drained.getAmount() == HONEY_REQUIRED;
 			}
 		}
@@ -202,7 +209,8 @@ public class TileAnalyzer extends TilePowered implements WorldlyContainer, ILiqu
 			return;
 		}
 
-		ItemStack inputStack = this.invInput.getItem(slotIndex);
+		ItemStack original = this.invInput.getItem(slotIndex);
+		ItemStack inputStack = original.copy();
 		if (inputStack.isEmpty()) {
 			return;
 		}
@@ -211,29 +219,31 @@ public class TileAnalyzer extends TilePowered implements WorldlyContainer, ILiqu
 			inputStack = GeneticsUtil.convertToGeneticEquivalent(inputStack);
 		}
 
+		try (var transaction = beginWorkTransaction()) {
         this.specimenToAnalyze = IIndividualHandlerItem.getIndividual(inputStack);
 		if (this.specimenToAnalyze == null) {
 			return;
 		}
 
-		setItem(InventoryAnalyzer.SLOT_ANALYZE, inputStack);
-        this.invInput.setItem(slotIndex, ItemStack.EMPTY);
-
-		if (this.specimenToAnalyze.isAnalyzed()) {
-			setStepsPerWorkCycle(1);
-			setEnergyPerWorkCycle(0);
-		} else {
-			setStepsPerWorkCycle(TIME_TO_ANALYZE);
-			setEnergyPerWorkCycle(analyzerEnergyPerWork);
+		if (getTransferHandler().extract(InventoryAnalyzer.SLOT_INPUT_1 + slotIndex, net.neoforged.neoforge.transfer.item.ItemResource.of(original), original.getCount(), transaction) != original.getCount()) return;
+		if (getTransferHandler().insert(InventoryAnalyzer.SLOT_ANALYZE, net.neoforged.neoforge.transfer.item.ItemResource.of(inputStack), inputStack.getCount(), transaction) != inputStack.getCount()) return;
+		configureSpecimen();
+		afterWorkCommit(() -> NetworkUtil.sendNetworkPacket(new PacketItemStackDisplay(this, getIndividualOnDisplay()), this.worldPosition, this.level));
+		transaction.commit();
 		}
+	}
 
-		PacketItemStackDisplay packet = new PacketItemStackDisplay(this, getIndividualOnDisplay());
-		NetworkUtil.sendNetworkPacket(packet, this.worldPosition, this.level);
+	private void configureSpecimen() {
+		if (this.specimenToAnalyze.isAnalyzed()) {
+			configureWork("forestry:analyzed", 1, 0);
+		} else {
+			configureWork("forestry:analyze", TIME_TO_ANALYZE, analyzerEnergyPerWork);
+		}
 	}
 
 	public ItemStack getIndividualOnDisplay() {
 		// null in BEWLR
-		if (this.level == null || this.level.isClientSide) {
+		if (this.level == null || this.level.isClientSide()) {
 			return this.individualOnDisplayClient;
 		}
 		return getItem(InventoryAnalyzer.SLOT_ANALYZE);

@@ -10,7 +10,7 @@ import forestry.api.core.genetics.ISpecies;
 import forestry.api.core.genetics.alleles.IChromosome;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -46,10 +46,10 @@ public interface IAnalyzerGraphics<S extends ISpecies<I>, I extends IIndividual>
 	 * @param chromosome      The fertility chromosome to display, containing alleles representing fertility values.
 	 * @param offspringSprite The visual representation of the offspring associated with the chromosome.
 	 */
-	void drawFertilityRow(IChromosome<Integer> chromosome, ResourceLocation offspringSprite);
+	void drawFertilityRow(IChromosome<Integer> chromosome, Identifier offspringSprite);
 
 	/**
-	 * Draws temperature preference & tolerance in two rows, then humidity preference and tolerance in two more rows.
+	 * Draws temperature preference and tolerance in two rows, then humidity preference and tolerance in two more rows.
 	 *
 	 * @param temperatureTolerance The chromosome to use for temperature tolerance.
 	 * @param humidityTolerance    The chromosome to use for humidity tolerance.

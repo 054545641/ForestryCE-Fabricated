@@ -7,9 +7,9 @@ import forestry.api.core.genetics.*;
 import forestry.api.core.genetics.alleles.IKaryotype;
 import forestry.api.plugin.ISpeciesTypeBuilder;
 import it.unimi.dsi.fastutil.objects.Reference2FloatOpenHashMap;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 public abstract class SpeciesType<S extends ISpecies<I>, I extends IIndividual> implements ISpeciesType<S, I> {
-	protected final ResourceLocation id;
+	protected final Identifier id;
 	protected final IKaryotype karyotype;
 	private final ILifeStage defaultStage;
 	private final String translationKey;
@@ -32,12 +32,12 @@ public abstract class SpeciesType<S extends ISpecies<I>, I extends IIndividual> 
 
 	// Empty until species are loaded (datapack on the server, sync packet on the client). Never null. Volatile:
 	// swapped by setSpecies from the reload/sync path, read by gameplay/JEI/GUI on many threads.
-	private volatile ImmutableMap<ResourceLocation, S> allSpecies = ImmutableMap.of();
+	private volatile ImmutableMap<Identifier, S> allSpecies = ImmutableMap.of();
 	// Empty until the mutation recipes are loaded by the reload handler. Never null. Volatile: rebuilt from the server
-	// game executor (AddReloadListenerEvent) and the client thread (RecipesUpdatedEvent), read by gameplay/JEI/GUI.
+	// game executor (AddServerReloadListenersEvent) and the client thread (RecipesUpdatedEvent), read by gameplay/JEI/GUI.
 	private volatile IMutationManager<S> mutations = new MutationManager<>(com.google.common.collect.ImmutableList.of());
 
-	public SpeciesType(ResourceLocation id, IKaryotype karyotype, ISpeciesTypeBuilder builder) {
+	public SpeciesType(Identifier id, IKaryotype karyotype, ISpeciesTypeBuilder builder) {
 		this.id = id;
 		this.karyotype = karyotype;
 		this.defaultStage = builder.getDefaultStage();
@@ -54,7 +54,7 @@ public abstract class SpeciesType<S extends ISpecies<I>, I extends IIndividual> 
 		builder.buildResearchMaterials(this.researchMaterials);
 	}
 
-	public ResourceLocation id() {
+	public Identifier id() {
 		return this.id;
 	}
 
@@ -91,12 +91,12 @@ public abstract class SpeciesType<S extends ISpecies<I>, I extends IIndividual> 
 
 	@OverridingMethodsMustInvokeSuper
 	@Override
-	public void onSpeciesRegistered(ImmutableMap<ResourceLocation, S> allSpecies) {
+	public void onSpeciesRegistered(ImmutableMap<Identifier, S> allSpecies) {
 		setSpecies(allSpecies);
 	}
 
 	@ApiStatus.Internal
-	public void setSpecies(ImmutableMap<ResourceLocation, S> allSpecies) {
+	public void setSpecies(ImmutableMap<Identifier, S> allSpecies) {
 		this.allSpecies = allSpecies;
 	}
 
@@ -116,7 +116,7 @@ public abstract class SpeciesType<S extends ISpecies<I>, I extends IIndividual> 
 	}
 
 	@Override
-	public S getSpecies(ResourceLocation id) {
+	public S getSpecies(Identifier id) {
 		S species = this.allSpecies.get(id);
 		if (species == null) {
 			throw new RuntimeException("No species was found with that ID: " + id);
@@ -125,7 +125,7 @@ public abstract class SpeciesType<S extends ISpecies<I>, I extends IIndividual> 
 	}
 
 	@Override
-	public S getSpeciesSafe(ResourceLocation id) {
+	public S getSpeciesSafe(Identifier id) {
 		return this.allSpecies.get(id);
 	}
 
@@ -136,7 +136,7 @@ public abstract class SpeciesType<S extends ISpecies<I>, I extends IIndividual> 
 	}
 
 	@Override
-	public ImmutableSet<ResourceLocation> getAllSpeciesIds() {
+	public ImmutableSet<Identifier> getAllSpeciesIds() {
 		return this.allSpecies.keySet();
 	}
 
@@ -148,7 +148,7 @@ public abstract class SpeciesType<S extends ISpecies<I>, I extends IIndividual> 
 	}
 
 	// registry map getter with logging
-	protected static <V> V getMapValue(@Nullable ImmutableMap<ResourceLocation, V> map, ResourceLocation id, String what) {
+	protected static <V> V getMapValue(@Nullable ImmutableMap<Identifier, V> map, Identifier id, String what) {
 		if (map == null) {
 			throw new IllegalStateException(what + " have not been registered yet (looking up " + id + ").");
 		}
@@ -160,7 +160,7 @@ public abstract class SpeciesType<S extends ISpecies<I>, I extends IIndividual> 
 	}
 
 	@Nullable
-	protected static <V> V getMapValueSafe(@Nullable ImmutableMap<ResourceLocation, V> map, ResourceLocation id) {
+	protected static <V> V getMapValueSafe(@Nullable ImmutableMap<Identifier, V> map, Identifier id) {
 		return map == null ? null : map.get(id);
 	}
 
@@ -173,7 +173,7 @@ public abstract class SpeciesType<S extends ISpecies<I>, I extends IIndividual> 
 	public List<ItemStack> getResearchBounty(S species, Level level, GameProfile researcher, I individual, int bountyLevel) {
 		ArrayList<ItemStack> list = new ArrayList<>();
 
-		if (level.random.nextFloat() < bountyLevel / 16f) {
+		if (level.getRandom().nextFloat() < bountyLevel / 16f) {
 			List<IMutation<S>> mutationsFrom = getMutations().getMutationsFrom(species);
 
 			if (!mutationsFrom.isEmpty()) {
@@ -188,9 +188,9 @@ public abstract class SpeciesType<S extends ISpecies<I>, I extends IIndividual> 
 
 				IMutation<?> chosenMutation;
 				if (!unresearchedMutations.isEmpty()) {
-					chosenMutation = unresearchedMutations.get(level.random.nextInt(unresearchedMutations.size()));
+					chosenMutation = unresearchedMutations.get(level.getRandom().nextInt(unresearchedMutations.size()));
 				} else {
-					chosenMutation = mutationsFrom.get(level.random.nextInt(mutationsFrom.size()));
+					chosenMutation = mutationsFrom.get(level.getRandom().nextInt(mutationsFrom.size()));
 				}
 
 				ItemStack researchNote = chosenMutation.getMutationNote(researcher);
@@ -211,7 +211,7 @@ public abstract class SpeciesType<S extends ISpecies<I>, I extends IIndividual> 
 	}
 
 	@Override
-	public ItemStack createStack(ResourceLocation speciesId, ILifeStage stage) {
+	public ItemStack createStack(Identifier speciesId, ILifeStage stage) {
 		S species = getSpecies(speciesId);
 		return createStack(species.createIndividual(), stage);
 	}

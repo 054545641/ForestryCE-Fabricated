@@ -21,8 +21,8 @@ import mezz.jei.api.gui.ingredient.ICraftingGridHelper;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
-import net.minecraft.resources.ResourceLocation;
+import mezz.jei.api.recipe.types.IRecipeType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.ShapedRecipe;
@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public class FabricatorRecipeCategory extends ForestryRecipeCategory<IFabricatorRecipe> {
-	private final static ResourceLocation guiTexture = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/thermionic_fabricator.png");
+	private final static Identifier guiTexture = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/thermionic_fabricator.png");
 	private final IDrawable icon;
 	@Nullable
 	private final ICraftingGridHelper craftingGridHelper;
@@ -49,7 +49,7 @@ public class FabricatorRecipeCategory extends ForestryRecipeCategory<IFabricator
 
 	private static Map<Fluid, List<IFabricatorSmeltingRecipe>> getSmeltingInputs() {
 		Map<Fluid, List<IFabricatorSmeltingRecipe>> smeltingInputs = new HashMap<>();
-		RecipeUtils.getRecipes(RecipeUtils.getRecipeManager(), FactoryRecipeTypes.FABRICATOR_SMELTING)
+		RecipeUtils.getRecipes(RecipeUtils.getRecipeMap(), FactoryRecipeTypes.FABRICATOR_SMELTING)
 			.forEach(smelting -> {
 				Fluid fluid = smelting.getResultFluid().getFluid();
 				if (!smeltingInputs.containsKey(fluid)) {
@@ -63,7 +63,7 @@ public class FabricatorRecipeCategory extends ForestryRecipeCategory<IFabricator
 	}
 
 	@Override
-	public RecipeType<IFabricatorRecipe> getRecipeType() {
+	public IRecipeType<IFabricatorRecipe> getRecipeType() {
 		return ForestryRecipeType.FABRICATOR;
 	}
 
@@ -76,9 +76,9 @@ public class FabricatorRecipeCategory extends ForestryRecipeCategory<IFabricator
 	public void setRecipe(IRecipeLayoutBuilder builder, IFabricatorRecipe recipe, IFocusGroup focuses) {
 		FluidStack recipeLiquid = recipe.getResultFluid();
 		Fluid recipeFluid = recipeLiquid.getFluid();
-		List<IFabricatorSmeltingRecipe> smeltingRecipes = getSmeltingInputs().get(recipeFluid);
+		List<IFabricatorSmeltingRecipe> smeltingRecipes = getSmeltingInputs().getOrDefault(recipeFluid, List.of());
 		List<ItemStack> smeltingInput = smeltingRecipes.stream()
-			.flatMap(s -> Arrays.stream(s.getInput().getItems()))
+			.flatMap(s -> JeiUtil.ingredientStacks(s.getInput()).stream())
 			.toList();
 
 		builder.addSlot(RecipeIngredientRole.INPUT, 6, 32)
@@ -89,16 +89,14 @@ public class FabricatorRecipeCategory extends ForestryRecipeCategory<IFabricator
 		List<IRecipeSlotBuilder> craftingSlots = JeiUtil.layoutSlotGrid(builder, RecipeIngredientRole.INPUT, 3, 3, 47, 1, 18);
 		JeiUtil.setCraftingItems(craftingSlots, craftingGridRecipe, this.craftingGridHelper);
 
-		// using Catalyst tells JEI that it is not actually part of the recipe
-		builder.addSlot(RecipeIngredientRole.CATALYST, 6, 5)
+		// Smelting alternatives are shown separately from the nine ghost inputs.
+		builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 6, 5)
 			.addItemStacks(smeltingInput);
 
-		// todo why is plan unused
-		//Ingredient plan = recipe.getPlan();
-		//builder.addSlot(RecipeIngredientRole.INPUT, 119, 1)
-		//		.addIngredients(plan);
+		recipe.getPlan().ifPresent(plan -> builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 119, 1)
+			.add(VanillaTypes.ITEM_STACK, plan));
 
 		builder.addSlot(RecipeIngredientRole.OUTPUT, 119, 37)
-			.addItemStack(craftingGridRecipe.getResultItem(RecipeUtils.getRegistryAccess()));
+			.addItemStack(recipe.getResultItem(RecipeUtils.getRegistryAccess()));
 	}
 }

@@ -1,7 +1,7 @@
 package forestry.api.core;
 
 import forestry.api.ForestryConstants;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * All errors used by base Forestry for its blocks and items.
@@ -83,8 +83,8 @@ public enum ForestryError implements IError {
 	NO_LIQUID_FARM("no_liquid"), // Depending on rainfall, temperature and humidity farms need to be supplied with varying amounts of water.
 	;
 
-	private final ResourceLocation id;
-	private final ResourceLocation sprite;
+	private final Identifier id;
+	private final Identifier sprite;
 	private final String descriptionKey;
 	private final String helpKey;
 
@@ -112,12 +112,12 @@ public enum ForestryError implements IError {
 	}
 
 	@Override
-	public ResourceLocation getSprite() {
+	public Identifier getSprite() {
 		return this.sprite;
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return this.id;
 	}
 }

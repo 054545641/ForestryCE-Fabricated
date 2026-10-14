@@ -1,6 +1,6 @@
 package forestry.core.content.energy.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -32,7 +32,7 @@ public class EngineScreen<M extends AbstractContainerMenu, E extends EngineBlock
 		}
 
 		@Override
-		public void draw(GuiGraphics graphics, int y, int x) {
+		public void draw(GuiGraphicsExtractor graphics, int y, int x) {
 			drawBackground(graphics, y, x);
 
 			drawSprite(graphics, IForestryClientApi.INSTANCE.getTextureManager().getSprite(ForestryConstants.forestry("misc/energy")), x + 3, y + 4);

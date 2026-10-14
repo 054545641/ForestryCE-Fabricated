@@ -6,7 +6,7 @@ import forestry.api.core.genetics.IGenome;
 import forestry.api.core.genetics.ISpecies;
 import forestry.api.core.genetics.ISpeciesType;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 
@@ -140,6 +140,6 @@ public interface ISpeciesBuilder<T extends ISpeciesType<S, ?>, S extends ISpecie
 
 	@FunctionalInterface
 	interface ISpeciesFactory<T extends ISpeciesType<S, ?>, S extends ISpecies<?>, B extends ISpeciesBuilder<T, S, B>> {
-		S create(ResourceLocation id, T speciesType, IGenome defaultGenome, B builder);
+		S create(Identifier id, T speciesType, IGenome defaultGenome, B builder);
 	}
 }

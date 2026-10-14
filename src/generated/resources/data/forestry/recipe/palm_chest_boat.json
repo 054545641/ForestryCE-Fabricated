@@ -1,16 +1,10 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "item": "forestry:palm_boat"
-    },
-    {
-      "tag": "c:chests/wooden"
-    }
+    "forestry:palm_boat",
+    "#c:chests/wooden"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:palm_chest_boat"
   }
 }

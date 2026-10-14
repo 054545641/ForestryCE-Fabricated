@@ -1,10 +1,7 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "forestry:wax_bricks"
-  },
+  "ingredient": "forestry:wax_bricks",
   "result": {
-    "count": 1,
     "id": "forestry:chiseled_wax_bricks"
   }
 }

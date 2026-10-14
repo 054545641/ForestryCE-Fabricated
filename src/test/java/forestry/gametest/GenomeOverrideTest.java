@@ -9,7 +9,7 @@ import com.google.gson.JsonParser;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -51,7 +51,7 @@ public class GenomeOverrideTest {
 			return;
 		}
 
-		Allele<ResourceLocation> expected = Allele.reference(ForestryBeeEffects.MYCOPHILIC);
+		Allele<Identifier> expected = Allele.reference(ForestryBeeEffects.MYCOPHILIC);
 		if (!expected.equals(override.active()) || !expected.equals(override.inactive())) {
 			helper.fail("Expected both sides set to " + expected + " but got " + override);
 			return;
@@ -163,7 +163,7 @@ public class GenomeOverrideTest {
 			return;
 		}
 
-		AllelePair<ResourceLocation> pair = species.getDefaultGenome().getAllelePair(BeeChromosomes.EFFECT);
+		AllelePair<Identifier> pair = species.getDefaultGenome().getAllelePair(BeeChromosomes.EFFECT);
 		if (!ForestryBeeEffects.MYCOPHILIC.equals(pair.active().value()) || !ForestryBeeEffects.BEATIFIC.equals(pair.inactive().value())) {
 			helper.fail("Expected mycophilic over beatific but got " + pair);
 			return;
@@ -191,7 +191,7 @@ public class GenomeOverrideTest {
 		recorder.setInactive(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_1);
 		recorder.setInactive(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORT);
 
-		Map<ResourceLocation, AlleleOverride<?>> expected = Map.of(
+		Map<Identifier, AlleleOverride<?>> expected = Map.of(
 			BeeChromosomes.SPEED.id(), AlleleOverride.both(ForestryAlleles.SPEED_FASTEST),
 			BeeChromosomes.FERTILITY.id(), new AlleleOverride<>(ForestryAlleles.FERTILITY_4, ForestryAlleles.FERTILITY_1),
 			BeeChromosomes.LIFESPAN.id(), AlleleOverride.onlyInactive(ForestryAlleles.LIFESPAN_SHORT)
@@ -216,7 +216,7 @@ public class GenomeOverrideTest {
 				"forestry:fertility": {"active": {"value": 1, "dominant": true}, "inactive": {"value": 4}},
 				"forestry:lifespan": {"inactive": {"value": 30, "dominant": true}}
 			}""";
-		Map<ResourceLocation, AlleleOverride<?>> overrides = Map.of(
+		Map<Identifier, AlleleOverride<?>> overrides = Map.of(
 			BeeChromosomes.EFFECT.id(), AlleleOverride.both(Allele.reference(ForestryBeeEffects.MYCOPHILIC)),
 			BeeChromosomes.FERTILITY.id(), new AlleleOverride<>(ForestryAlleles.FERTILITY_1, ForestryAlleles.FERTILITY_4),
 			BeeChromosomes.LIFESPAN.id(), AlleleOverride.onlyInactive(ForestryAlleles.LIFESPAN_SHORT)
@@ -236,9 +236,9 @@ public class GenomeOverrideTest {
 
 	// Parses a whole override map from JSON and returns the one entry the caller names, failing the test if the
 	// map does not parse or does not hold it.
-	private static AlleleOverride<?> parseOne(GameTestHelper helper, String json, ResourceLocation chromosome) {
+	private static AlleleOverride<?> parseOne(GameTestHelper helper, String json, Identifier chromosome) {
 		IKaryotype karyotype = SpeciesUtil.BEE_TYPE.get().getKaryotype();
-		Map<ResourceLocation, AlleleOverride<?>> parsed = GenomeCodecs.overrideMapCodec(karyotype)
+		Map<Identifier, AlleleOverride<?>> parsed = GenomeCodecs.overrideMapCodec(karyotype)
 			.parse(JsonOps.INSTANCE, JsonParser.parseString(json))
 			.getOrThrow();
 
@@ -250,7 +250,7 @@ public class GenomeOverrideTest {
 	}
 
 	// Projects a bee species carrying the given overrides and returns its default fertility pair.
-	private static AllelePair<Integer> projectFertility(GameTestHelper helper, String id, Map<ResourceLocation, AlleleOverride<?>> genome) {
+	private static AllelePair<Integer> projectFertility(GameTestHelper helper, String id, Map<Identifier, AlleleOverride<?>> genome) {
 		IBeeSpeciesType type = SpeciesUtil.BEE_TYPE.get();
 		BeeSpeciesDefinition def = TestSpeciesDefinitions.bee(ForestryTaxa.GENUS_HONEY, ForestryTaxa.SPECIES_FOREST)
 			.genome(genome)

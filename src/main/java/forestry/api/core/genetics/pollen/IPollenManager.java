@@ -1,7 +1,7 @@
 package forestry.api.core.genetics.pollen;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 
 import javax.annotation.Nullable;
@@ -45,10 +45,10 @@ public interface IPollenManager {
 	 * @return The pollen at the position, or {@code null} if no pollen of the given types was found.
 	 */
 	@Nullable
-	IPollen<?> getPollenOfType(LevelAccessor level, BlockPos pos, @Nullable Object pollinator, Set<ResourceLocation> pollenTypes);
+	IPollen<?> getPollenOfType(LevelAccessor level, BlockPos pos, @Nullable Object pollinator, Set<Identifier> pollenTypes);
 
 	@Nullable
-	default IPollen<?> getPollenOfType(LevelAccessor level, BlockPos pos, @Nullable Object pollinator, ResourceLocation pollenType) {
+	default IPollen<?> getPollenOfType(LevelAccessor level, BlockPos pos, @Nullable Object pollinator, Identifier pollenType) {
 		return getPollenOfType(level, pos, pollinator, Collections.singleton(pollenType));
 	}
 
@@ -56,7 +56,7 @@ public interface IPollenManager {
 	 * @return The pollen type registered with the given ID, or {@code null} if none was found.
 	 */
 	@Nullable
-	IPollenType<?> getPollenType(ResourceLocation id);
+	IPollenType<?> getPollenType(Identifier id);
 
 	/**
 	 * @return A collection of all registered pollen types.

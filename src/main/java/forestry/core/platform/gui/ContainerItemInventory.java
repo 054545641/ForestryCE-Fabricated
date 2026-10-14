@@ -4,7 +4,7 @@ import forestry.core.platform.gui.slots.SlotLocked;
 import forestry.core.platform.inventory.ItemInventory;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +42,7 @@ public abstract class ContainerItemInventory<I extends ItemInventory> extends Co
 	}
 
 	@Override
-	public void clicked(int slotId, int button, ClickType clickTypeIn, Player player) {
+	public void clicked(int slotId, int button, ContainerInput clickTypeIn, Player player) {
 		super.clicked(slotId, button, clickTypeIn, player);
 
 		if (slotId > 0) {

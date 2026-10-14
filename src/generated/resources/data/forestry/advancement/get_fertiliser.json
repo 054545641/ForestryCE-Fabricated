@@ -17,7 +17,6 @@
       "translate": "advancements.forestry.get_fertiliser.description"
     },
     "icon": {
-      "count": 1,
       "id": "forestry:fertilizer"
     },
     "title": {

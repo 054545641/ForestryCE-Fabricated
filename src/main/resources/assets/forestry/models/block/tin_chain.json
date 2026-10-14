@@ -1,5 +1,5 @@
 {
-    "parent": "block/chain",
+    "parent": "minecraft:block/iron_chain",
     "textures": {
         "particle": "forestry:block/tin_chain",
         "all": "forestry:block/tin_chain"

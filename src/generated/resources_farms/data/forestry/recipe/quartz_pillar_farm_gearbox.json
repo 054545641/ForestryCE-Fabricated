@@ -1,20 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "item": "minecraft:quartz_pillar"
-    },
-    "T": {
-      "tag": "c:gears/tin"
-    }
+    "#": "minecraft:quartz_pillar",
+    "T": "#c:gears/tin"
   },
   "pattern": [
     " # ",
     "TTT"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:quartz_pillar_farm_gearbox"
   }
 }

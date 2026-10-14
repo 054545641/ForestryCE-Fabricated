@@ -9,9 +9,7 @@
     }
   },
   "resources": [
-    {
-      "item": "forestry:experience_drop"
-    }
+    "forestry:experience_drop"
   ],
   "time": 10
 }

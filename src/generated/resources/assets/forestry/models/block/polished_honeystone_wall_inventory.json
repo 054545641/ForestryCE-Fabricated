@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:block/wall_inventory",
   "textures": {
+    "texture": "forestry:block/polished_honeystone",
     "wall": "forestry:block/polished_honeystone"
   }
 }

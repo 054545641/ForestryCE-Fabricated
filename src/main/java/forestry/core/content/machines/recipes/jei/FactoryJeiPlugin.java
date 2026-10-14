@@ -38,11 +38,12 @@ import mezz.jei.api.registration.*;
 import mezz.jei.api.runtime.IClickableIngredient;
 import mezz.jei.api.runtime.IIngredientManager;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.minecraft.world.item.crafting.RecipeMap;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
 
 import java.util.Comparator;
 import java.util.List;
@@ -54,7 +55,7 @@ import forestry.core.content.machines.recipes.jei.rainmaker.RainmakerJeiRecipe;
 @JeiPlugin
 public class FactoryJeiPlugin implements IModPlugin {
 	@Override
-	public ResourceLocation getPluginUid() {
+	public Identifier getPluginUid() {
 		return ForestryModuleIds.FACTORY;
 	}
 
@@ -78,7 +79,7 @@ public class FactoryJeiPlugin implements IModPlugin {
 
 	@Override
 	public void registerRecipes(IRecipeRegistration registry) {
-		RecipeManager manager = ClientsideCode.getRecipeManager();
+		RecipeMap manager = ClientsideCode.getRecipeMap();
 
 		registry.addRecipes(ForestryRecipeType.CARPENTER, RecipeUtils.getRecipes(manager, FactoryRecipeTypes.CARPENTER).toList());
 		registry.addRecipes(ForestryRecipeType.CENTRIFUGE, RecipeUtils.getRecipes(manager, FactoryRecipeTypes.CENTRIFUGE).toList());
@@ -140,10 +141,10 @@ public class FactoryJeiPlugin implements IModPlugin {
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistration subtypeRegistry) {
 		ISubtypeInterpreter<ItemStack> subtypeInterpreter = new ISubtypeInterpreter<>() {
-			private Optional<ResourceLocation> currentFluidId(ItemStack itemStack) {
-				return FluidUtil.getFluidHandler(itemStack)
-					.map(handler -> handler.getFluidInTank(0))
-					.map(fluid -> ModUtil.getRegistryName(fluid.getFluid()));
+			private Optional<Identifier> currentFluidId(ItemStack itemStack) {
+				var handler = ItemAccess.forStack(itemStack.copyWithCount(1)).getCapability(Capabilities.Fluid.ITEM);
+				return handler == null || handler.size() == 0 || handler.getResource(0).isEmpty()
+					? Optional.empty() : Optional.of(ModUtil.getRegistryName(handler.getResource(0).getFluid()));
 			}
 
 			@Override
@@ -151,10 +152,6 @@ public class FactoryJeiPlugin implements IModPlugin {
 				return currentFluidId(itemStack).orElse(null);
 			}
 
-			@Override
-			public String getLegacyStringSubtypeInfo(ItemStack itemStack, UidContext context) {
-				return currentFluidId(itemStack).map(ResourceLocation::toString).orElse("");
-			}
 		};
 
 		for (Item container : FluidsItems.CONTAINERS.itemArray()) {

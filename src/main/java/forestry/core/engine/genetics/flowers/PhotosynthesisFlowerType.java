@@ -21,7 +21,7 @@ public class PhotosynthesisFlowerType implements IFlowerType {
 
 	@Override
 	public boolean isAcceptableFlower(Level level, BlockPos pos) {
-		return level.isDay() && level.getBrightness(LightLayer.SKY, pos) >= 15;
+		return level.isBrightOutside() && level.getBrightness(LightLayer.SKY, pos) >= 15;
 	}
 
 	@Override

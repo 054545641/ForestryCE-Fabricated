@@ -1,16 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "tag": "c:glass_blocks/colorless"
-    },
-    "X": {
-      "item": "forestry:can"
-    },
-    "Y": {
-      "item": "forestry:sturdy_casing"
-    }
+    "#": "#c:glass_blocks/colorless",
+    "X": "forestry:can",
+    "Y": "forestry:sturdy_casing"
   },
   "pattern": [
     "X#X",
@@ -18,7 +11,6 @@
     "X#X"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:bottler"
   }
 }

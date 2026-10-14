@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -44,7 +44,7 @@ public class TreeSpeciesReloadTest {
 		ITreeSpecies oak = type.getSpecies(ForestryTreeSpecies.OAK);
 
 		// Snapshot the live, full species map before mutating it, so it can be restored afterwards.
-		ImmutableMap<ResourceLocation, ITreeSpecies> snapshot = ImmutableMap.copyOf(
+		ImmutableMap<Identifier, ITreeSpecies> snapshot = ImmutableMap.copyOf(
 			type.getAllSpeciesIds().stream().collect(java.util.stream.Collectors.toMap(id -> id, type::getSpecies))
 		);
 
@@ -53,7 +53,7 @@ public class TreeSpeciesReloadTest {
 			.genome(Map.of(TreeChromosomes.HEIGHT.id(), AlleleOverride.both(ForestryAlleles.HEIGHT_AVERAGE)))
 			.build();
 
-		Map<ResourceLocation, TreeSpeciesDefinition> defs = Map.of(ForestryTreeSpecies.OAK, def);
+		Map<Identifier, TreeSpeciesDefinition> defs = Map.of(ForestryTreeSpecies.OAK, def);
 
 		try {
 			ArboricultureReloadHandler.rebuildTreeSpecies(defs);
@@ -85,7 +85,7 @@ public class TreeSpeciesReloadTest {
 	public static void managerLoadedAllSpeciesAtServerStart(GameTestHelper helper) {
 		ITreeSpeciesType type = SpeciesUtil.TREE_TYPE.get();
 
-		Map<ResourceLocation, TreeSpeciesDefinition> definitions = TreeSpeciesManager.INSTANCE.getDefinitions();
+		Map<Identifier, TreeSpeciesDefinition> definitions = TreeSpeciesManager.INSTANCE.getDefinitions();
 		if (definitions.size() != 50) {
 			helper.fail("Expected TreeSpeciesManager to have loaded 50 tree species from the datapack at server start, got " + definitions.size());
 			return;
@@ -93,7 +93,7 @@ public class TreeSpeciesReloadTest {
 
 		// Snapshot the live, full species map before re-deriving it from the manager's definitions, so it can be
 		// restored afterwards (mirrors rebuildRepopulatesSpecies above).
-		ImmutableMap<ResourceLocation, ITreeSpecies> snapshot = ImmutableMap.copyOf(
+		ImmutableMap<Identifier, ITreeSpecies> snapshot = ImmutableMap.copyOf(
 			type.getAllSpeciesIds().stream().collect(java.util.stream.Collectors.toMap(id -> id, type::getSpecies))
 		);
 

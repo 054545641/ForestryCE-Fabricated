@@ -8,7 +8,5 @@
   "id": "forestry:fermenter/wheat_honey",
   "modifier": 1.5,
   "output": "forestry:biomass",
-  "resource": {
-    "tag": "c:crops/wheat"
-  }
+  "resource": "#c:crops/wheat"
 }

@@ -1,10 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "item": "forestry:silicon_block"
-    }
+    "forestry:silicon_block"
   ],
   "result": {
     "count": 4,

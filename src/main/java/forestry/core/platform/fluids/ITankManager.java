@@ -2,15 +2,13 @@ package forestry.core.platform.fluids;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.IFluidTank;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 
 import javax.annotation.Nullable;
 
-public interface ITankManager extends IFluidHandler {
+public interface ITankManager extends ResourceHandler<FluidResource> {
 	// Used to send all tanks to the player upon first opening the screen
 	void sendAllTanks(AbstractContainerMenu container, ServerPlayer player);
 
@@ -21,13 +19,14 @@ public interface ITankManager extends IFluidHandler {
 	void onClosed(AbstractContainerMenu container);
 
 	@Nullable
-	IFluidTank getTank(int tankIndex);
+	StandardTank getTank(int tankIndex);
 
 	boolean canFillFluidType(FluidStack fluidStack);
 
 	/**
 	 * For updating tanks on the client
 	 */
-	@OnlyIn(Dist.CLIENT)
 	void processTankUpdate(int tankIndex, @Nullable FluidStack contents);
+
+	void processTankUpdate(int tankIndex, FluidStack contents, int capacity);
 }

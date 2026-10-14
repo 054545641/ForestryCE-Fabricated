@@ -1,16 +1,11 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/reclaim_bronze_sword",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:broken_survivalists_sword"
-      }
+      "forestry:broken_survivalists_sword"
     ],
     "result": {
-      "count": 1,
       "id": "forestry:bronze_ingot"
     }
   },

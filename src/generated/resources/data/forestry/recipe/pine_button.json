@@ -3,16 +3,11 @@
   "category": "redstone",
   "ingredients": [
     [
-      {
-        "item": "forestry:pine_planks"
-      },
-      {
-        "item": "forestry:pine_fireproof_planks"
-      }
+      "forestry:pine_planks",
+      "forestry:pine_fireproof_planks"
     ]
   ],
   "result": {
-    "count": 1,
     "id": "forestry:pine_button"
   }
 }

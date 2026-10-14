@@ -1,16 +1,10 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "tag": "forestry:jumbo_candles"
-    },
-    {
-      "tag": "c:dyes/purple"
-    }
+    "#forestry:jumbo_candles",
+    "#c:dyes/purple"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:jumbo_candle_purple"
   }
 }

@@ -1,6 +1,6 @@
 package forestry.api.modules;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,7 +21,7 @@ public interface IModuleManager {
 	 * @return {@code true} if a module with the given ID is loaded,
 	 * or {@code false} if the module does not exist or is missing module dependencies.
 	 */
-	boolean isModuleLoaded(ResourceLocation id);
+	boolean isModuleLoaded(Identifier id);
 
 	List<IForestryModule> getModulesForMod(String modId);
 }

@@ -3,12 +3,8 @@
   "category": "building",
   "group": "alveary",
   "key": {
-    "#": {
-      "item": "forestry:scented_paneling"
-    },
-    "X": {
-      "item": "forestry:impregnated_casing"
-    }
+    "#": "forestry:scented_paneling",
+    "X": "forestry:impregnated_casing"
   },
   "pattern": [
     "###",
@@ -16,7 +12,6 @@
     "###"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:alveary_block"
   }
 }

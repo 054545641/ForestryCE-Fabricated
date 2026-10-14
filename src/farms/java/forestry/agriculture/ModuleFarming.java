@@ -13,7 +13,7 @@ import forestry.api.plugin.IForestryPlugin;
 import forestry.apiimpl.ForestryApiImpl;
 import forestry.apiimpl.plugin.PluginManager;
 import forestry.modules.BlankForestryModule;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 @ForestryModule
 public class ModuleFarming extends BlankForestryModule {
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return ForestryModuleIds.FARMING;
 	}
 
@@ -35,9 +35,9 @@ public class ModuleFarming extends BlankForestryModule {
 	}
 
 	private static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, MultifarmBlockEntities.GEARBOX.tileType(), (tile, side) -> tile.getEnergyHandler(side));
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, MultifarmBlockEntities.HATCH.tileType(), (tile, side) -> tile.getItemHandler(side));
-		event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, MultifarmBlockEntities.VALVE.tileType(), (tile, side) -> tile.getFluidHandler(side));
+		event.registerBlockEntity(Capabilities.Energy.BLOCK, MultifarmBlockEntities.GEARBOX.tileType(), (tile, side) -> tile.getEnergyHandler(side));
+		event.registerBlockEntity(Capabilities.Item.BLOCK, MultifarmBlockEntities.HATCH.tileType(), (tile, side) -> tile.getItemHandler(side));
+		event.registerBlockEntity(Capabilities.Fluid.BLOCK, MultifarmBlockEntities.VALVE.tileType(), (tile, side) -> tile.getFluidHandler(side));
 	}
 
 	private static void registerDataMaps(RegisterDataMapTypesEvent event) {
@@ -45,7 +45,7 @@ public class ModuleFarming extends BlankForestryModule {
 	}
 
 	@Override
-	public void applyPluginRegistration() {
+	public void applyLoadedDataRegistration() {
 		FarmingRegistration registration = new FarmingRegistration();
 
 		for (IForestryPlugin plugin : PluginManager.getLoadedPlugins()) {

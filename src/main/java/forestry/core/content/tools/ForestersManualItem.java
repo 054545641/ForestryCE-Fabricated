@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -16,15 +15,15 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-public class ForestersManualItem extends Item {
+public class ForestersManualItem extends forestry.core.platform.item.ItemForestry {
 	private static final String MISSING_KEY = "item.forestry.foresters_manual.missing_patchouli";
 
-	public ForestersManualItem() {
-		super(new Item.Properties().stacksTo(1));
+	public ForestersManualItem(Properties properties) {
+		super(properties.stacksTo(1));
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+	public InteractionResult use(Level world, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
 
 		if (player instanceof ServerPlayer serverPlayer) {
@@ -33,11 +32,11 @@ public class ForestersManualItem extends Item {
 				player.playSound(SoundEvents.BOOK_PAGE_TURN, 1F, (float) (0.7 + Math.random() * 0.4));
 			} else {
 				// no provider: one hint per use, no page sound, the stack is not consumed
-				serverPlayer.displayClientMessage(Component.translatable(MISSING_KEY), true);
+				serverPlayer.sendOverlayMessage(Component.translatable(MISSING_KEY));
 			}
 		}
 
-		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override

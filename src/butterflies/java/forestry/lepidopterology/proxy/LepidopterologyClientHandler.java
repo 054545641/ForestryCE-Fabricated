@@ -13,8 +13,6 @@ import forestry.lepidopterology.render.ButterflyEntityRenderer;
 import forestry.lepidopterology.render.ButterflyItemModel;
 import forestry.lepidopterology.render.ButterflyModel;
 import forestry.core.platform.registration.ModFeatureRegistry;
-import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.core.registries.Registries;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
@@ -23,20 +21,15 @@ import net.neoforged.bus.api.IEventBus;
 public class LepidopterologyClientHandler implements IClientModuleHandler {
 	@Override
 	public void registerEvents(IEventBus modBus) {
-		modBus.addListener(LepidopterologyClientHandler::registerItemColors);
 		modBus.addListener(LepidopterologyClientHandler::setupRenderers);
 		modBus.addListener(LepidopterologyClientHandler::setupLayers);
 		modBus.addListener(LepidopterologyClientHandler::registerModelLoaders);
 		modBus.addListener(LepidopterologyClientHandler::registerItemProperties);
 	}
 
-	@SuppressWarnings("deprecation")
-	private static void registerItemProperties(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
-		event.enqueueWork(() -> {
-			ItemPropertyFunction itemPropertyFunction = (stack, clientLevel, holder, idk) -> ItemButterflyGE.getAge(stack);
-			ItemProperties.register(LepidopterologyItems.COCOON_GE.get(), ForestryConstants.forestry("age"), itemPropertyFunction);
-		});
-	}
+    private static void registerItemProperties(net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyEvent event) {
+        event.register(ForestryConstants.forestry("age"), forestry.lepidopterology.render.CocoonAgeProperty.CODEC);
+    }
 
 	public static void setupRenderers(EntityRenderersEvent.RegisterRenderers event) {
 		event.registerEntityRenderer(LepidopterologyEntities.BUTTERFLY.entityType(), ButterflyEntityRenderer::new);
@@ -46,13 +39,9 @@ public class LepidopterologyClientHandler implements IClientModuleHandler {
 		event.registerLayerDefinition(ForestryModelLayers.BUTTERFLY_LAYER, ButterflyModel::createLayer);
 	}
 
-	public static void registerModelLoaders(ModelEvent.RegisterGeometryLoaders event) {
-		event.register(ForestryConstants.forestry("butterfly_ge"), new ButterflyItemModel.Loader());
+	public static void registerModelLoaders(net.neoforged.neoforge.client.event.RegisterItemModelsEvent event) {
+		event.register(ForestryConstants.forestry("butterfly_ge"), ButterflyItemModel.CODEC);
 	}
 
-	private static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-		event.register(ClientManager.FORESTRY_ITEM_COLOR, LepidopterologyItems.CATERPILLAR_GE.item());
-		event.register(ClientManager.FORESTRY_ITEM_COLOR, LepidopterologyItems.SERUM_GE.item());
-	}
 
 }

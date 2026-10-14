@@ -37,8 +37,8 @@ public class EngineBlock extends BlockBase<EngineBlockType> {
 		SHAPE_FOR_DIRECTIONS[Direction.DOWN.ordinal()] = Shapes.or(Block.box(0, 10, 0, 16, 16, 16), Block.box(2, 6, 2, 14, 10, 14), Block.box(4, 0, 4, 12, 6, 12));
 	}
 
-	public EngineBlock(EngineBlockType blockType) {
-		super(Properties.of().sound(SoundType.METAL), blockType);
+	public EngineBlock(Properties properties, EngineBlockType blockType) {
+		super(properties.sound(SoundType.METAL), blockType);
 
 		registerDefaultState(getStateDefinition().any().setValue(VERTICAL_FACING, Direction.UP));
 	}
@@ -68,7 +68,7 @@ public class EngineBlock extends BlockBase<EngineBlockType> {
 	private static BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos) {
 		Direction blockFacing = state.getValue(VERTICAL_FACING);
 		for (int i = blockFacing.ordinal() + 1; i <= blockFacing.ordinal() + 6; ++i) {
-			Direction orientation = Direction.VALUES[i % 6];
+			Direction orientation = Direction.values()[i % 6];
 			if (isOrientedAtEnergyReciever(world, pos, orientation)) {
 				return state.setValue(VERTICAL_FACING, orientation);
 			}
@@ -94,7 +94,7 @@ public class EngineBlock extends BlockBase<EngineBlockType> {
 	}
 
 	@Override
-	public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+	public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, net.minecraft.core.Direction direction) {
 		EngineBlockEntity tileEngine = TileUtil.getTile(level, pos, EngineBlockEntity.class);
 		if (tileEngine != null) {
 			ForestryEnergyStorage energyStorage = tileEngine.getEnergyManager();

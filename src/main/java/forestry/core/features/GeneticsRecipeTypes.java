@@ -2,7 +2,7 @@ package forestry.core.features;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.core.genetics.ForestrySpeciesTypes;
 import forestry.api.modules.ForestryModuleIds;
@@ -17,14 +17,14 @@ public class GeneticsRecipeTypes {
 	private static final IFeatureRegistry REGISTRY = ModFeatureRegistry.get(ForestryModuleIds.CORE);
 
 	public static final FeatureRecipeType<MutationRecipe> BEE_MUTATION =
-		REGISTRY.recipeType("bee_mutation", () -> new MutationRecipe.Serializer(ForestrySpeciesTypes.BEE));
+		REGISTRY.recipeType("bee_mutation", () -> MutationRecipe.createSerializer(ForestrySpeciesTypes.BEE));
 	public static final FeatureRecipeType<MutationRecipe> TREE_MUTATION =
-		REGISTRY.recipeType("tree_mutation", () -> new MutationRecipe.Serializer(ForestrySpeciesTypes.TREE));
+		REGISTRY.recipeType("tree_mutation", () -> MutationRecipe.createSerializer(ForestrySpeciesTypes.TREE));
 	public static final FeatureRecipeType<MutationRecipe> BUTTERFLY_MUTATION =
-		REGISTRY.recipeType("butterfly_mutation", () -> new MutationRecipe.Serializer(ForestrySpeciesTypes.BUTTERFLY));
+		REGISTRY.recipeType("butterfly_mutation", () -> MutationRecipe.createSerializer(ForestrySpeciesTypes.BUTTERFLY));
 
 	@Nullable
-	public static FeatureRecipeType<MutationRecipe> forType(ResourceLocation speciesTypeId) {
+	public static FeatureRecipeType<MutationRecipe> forType(Identifier speciesTypeId) {
 		if (speciesTypeId.equals(ForestrySpeciesTypes.BEE)) {
 			return BEE_MUTATION;
 		}

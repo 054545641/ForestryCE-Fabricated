@@ -21,7 +21,7 @@ import forestry.core.platform.compat.kubejs.apiculture.KubeHiveDefinition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -56,36 +56,36 @@ public class ApicultureEventJS implements KubeEvent {
 	 * @param outline  The color of the bee's outline. Stripe and body colors can be customized using the returned {@link IBeeSpeciesBuilder}.
 	 * @return A bee species builder which you can further customize with mutations, products, and other properties.
 	 */
-	public IBeeSpeciesBuilder registerSpecies(ResourceLocation id, String genus, String species, boolean dominant, TextColor outline) {
+	public IBeeSpeciesBuilder registerSpecies(Identifier id, String genus, String species, boolean dominant, TextColor outline) {
 		return this.wrapped.registerSpecies(id, genus, species, dominant, outline);
 	}
 
-	public void modifySpecies(ResourceLocation id, Consumer<IBeeSpeciesBuilder> action) {
+	public void modifySpecies(Identifier id, Consumer<IBeeSpeciesBuilder> action) {
 		this.wrapped.modifySpecies(id, action);
 	}
 
-	public void addVillageBee(ResourceLocation speciesId, boolean rare, Map<IChromosome<?>, Allele<?>> alleles) {
+	public void addVillageBee(Identifier speciesId, boolean rare, Map<IChromosome<?>, Allele<?>> alleles) {
 		this.wrapped.addVillageBee(speciesId, rare, alleles);
 	}
 
-	public IHiveBuilder registerCustomHive(ResourceLocation id, IHivePlacement placement, BlockState hiveState, Predicate<Holder<Biome>> isGoodBiome, Predicate<HumidityType> isGoodHumidity, Predicate<TemperatureType> isGoodTemperature, float genChance, KubeHiveDefinition.PostGenFunction postGen) {
+	public IHiveBuilder registerCustomHive(Identifier id, IHivePlacement placement, BlockState hiveState, Predicate<Holder<Biome>> isGoodBiome, Predicate<HumidityType> isGoodHumidity, Predicate<TemperatureType> isGoodTemperature, float genChance, KubeHiveDefinition.PostGenFunction postGen) {
 		IHiveBuilder builder = this.wrapped.registerHive(id, new KubeHiveDefinition(placement, hiveState, isGoodBiome, isGoodHumidity, isGoodTemperature, postGen));
 		builder.setGenerationChance(genChance);
 		return builder;
 	}
 
-	public void modifyHive(ResourceLocation id, Consumer<IHiveBuilder> action) {
+	public void modifyHive(Identifier id, Consumer<IHiveBuilder> action) {
 		this.wrapped.modifyHive(id, action);
 	}
 
-	public void registerBeeEffect(ResourceLocation id, UnaryOperator<IEffectData> validateStorage, boolean combinable,
+	public void registerBeeEffect(Identifier id, UnaryOperator<IEffectData> validateStorage, boolean combinable,
 								  Function3<IGenome, IEffectData, IBeeHousing, IEffectData> doEffect,
 								  Function3<IGenome, IEffectData, IBeeHousing, IEffectData> doClientEffect,
 								  boolean dominant) {
 		this.wrapped.registerBeeEffect(id, new KubeBeeEffect(validateStorage, combinable, doEffect, doClientEffect, dominant));
 	}
 
-	public void registerCustomActivityType(ResourceLocation id, KubeActivityType.IsActiveFunction isActive, KubeActivityType.InactiveErrorFunction inactiveErrorFunction, LightPreference lightPreference, boolean dominant) {
+	public void registerCustomActivityType(Identifier id, KubeActivityType.IsActiveFunction isActive, KubeActivityType.InactiveErrorFunction inactiveErrorFunction, LightPreference lightPreference, boolean dominant) {
 		this.wrapped.registerActivityType(id, new KubeActivityType(isActive, inactiveErrorFunction, lightPreference, dominant));
 	}
 }

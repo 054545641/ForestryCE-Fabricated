@@ -6,14 +6,9 @@
     "id": "forestry:liquid_glass"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "tag": "c:dusts/redstone"
-      },
-      "X": {
-        "tag": "c:gems/apatite"
-      }
+      "#": "#c:dusts/redstone",
+      "X": "#c:gems/apatite"
     },
     "pattern": [
       " X ",

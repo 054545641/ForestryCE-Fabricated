@@ -1,6 +1,10 @@
 package forestry.core.platform.inventory.wrappers;
 
 import net.minecraft.world.Container;
+import forestry.api.core.ITransactionalContainer;
+import forestry.core.platform.inventory.InventoryTransferView;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -40,13 +44,24 @@ public class InventoryMapper extends InvWrapperBase implements Container {
 	public InventoryMapper(Container inv, int start, int size, boolean checkItems) {
 		super(inv, checkItems);
 		this.inv = inv;
+		java.util.Objects.checkFromIndexSize(start, size, inv.getContainerSize());
 		this.start = start;
 		this.size = size;
 	}
 
 	@Override
+	public ResourceHandler<ItemResource> getTransferHandler() {
+		return new InventoryTransferView(super.getTransferHandler(), this.size, i -> this.start + i,
+			(i, resource) -> true, (i, resource) -> true);
+	}
+
+	@Override
+	public ItemStack removeItemNoUpdate(int slot) { return this.inv.removeItemNoUpdate(this.start + java.util.Objects.checkIndex(slot, this.size)); }
+
+	@Override
 	public boolean isEmpty() {
-		return this.inv.isEmpty();
+		for (int i = 0; i < this.size; i++) if (!getItem(i).isEmpty()) return false;
+		return true;
 	}
 
 	@Override
@@ -67,6 +82,11 @@ public class InventoryMapper extends InvWrapperBase implements Container {
 	@Override
 	public void setItem(int slot, ItemStack itemstack) {
         this.inv.setItem(this.start + slot, itemstack);
+	}
+
+	@Override
+	public void clearContent() {
+		for (int i = 0; i < this.size; i++) setItem(i, ItemStack.EMPTY);
 	}
 
 	@Override

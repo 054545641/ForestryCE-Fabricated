@@ -1,6 +1,6 @@
 package forestry.api.agriculture;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
@@ -19,7 +19,7 @@ public interface IFarmingManager {
 		return true;
 	}
 
-	default List<IFarmable> getFarmables(ResourceLocation farmTypeId) {
+	default List<IFarmable> getFarmables(Identifier farmTypeId) {
 		IFarmType farmType = getFarmType(farmTypeId);
 		return farmType == null ? List.of() : farmType.getFarmables();
 	}
@@ -30,5 +30,5 @@ public interface IFarmingManager {
 	int getFertilizeValue(ItemStack stack);
 
 	@Nullable
-	IFarmType getFarmType(ResourceLocation id);
+	IFarmType getFarmType(Identifier id);
 }

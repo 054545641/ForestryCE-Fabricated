@@ -1,13 +1,11 @@
 package forestry.arboriculture.wood;
 
-import forestry.arboriculture.wood.ForestryWoodType;
 import forestry.arboriculture.entities.ForestryBoat;
 import forestry.arboriculture.entities.ForestryChestBoat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -28,7 +26,7 @@ public class ForestryBoatDispenserBehavior extends DefaultDispenseItemBehavior {
 		Direction direction = source.state().getValue(DispenserBlock.FACING);
 		Level level = source.level();
 		Vec3 center = source.center();
-		double offset = 0.5625D + (double) EntityType.BOAT.getWidth() / 2.0D;
+		double offset = 0.5625D + (double) forestry.arboriculture.features.ArboricultureEntities.BOAT.entityType().getWidth() / 2.0D;
 		double x = center.x() + (double) direction.getStepX() * offset;
 		double y = center.y() + (double) ((float) direction.getStepY() * 1.125F);
 		double z = center.z() + (double) direction.getStepZ() * offset;
@@ -48,8 +46,7 @@ public class ForestryBoatDispenserBehavior extends DefaultDispenseItemBehavior {
 		}
 
 		boat.setPos(x, y + yOffset, z);
-		level.addFreshEntity(boat);
-		stack.shrink(1);
+		if (level.addFreshEntity(boat)) stack.shrink(1);
 		return stack;
 	}
 

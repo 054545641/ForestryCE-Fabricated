@@ -15,7 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 
 import javax.annotation.Nullable;
 
@@ -44,17 +44,17 @@ public class MailboxMenu extends ContainerTile<MailboxBlockEntity> {
 
 		for (int i = 0; i < 7; i++) {
 			for (int j = 0; j < 12; j++) {
-				addSlot(new SlotOutput(inventory, j + i * 9, 8 + j * 18, 8 + i * 18));
+				addSlot(new SlotOutput(inventory, j + i * 12, 8 + j * 18, 8 + i * 18));
 			}
 		}
 	}
 
 	@Override
-	public void clicked(int slotId, int button, ClickType clickTypeIn, Player player) {
+	public void clicked(int slotId, int button, ContainerInput clickTypeIn, Player player) {
 		super.clicked(slotId, button, clickTypeIn, player);
 
-		if (SlotUtil.isSlotInRange(slotId, SLOT_LETTERS, SLOT_LETTERS_COUNT)) {
-			if (!player.level().isClientSide && this.mailInventory != null) {
+		if (SlotUtil.isSlotInRange(slotId, PLAYER_INV_SLOTS + SLOT_LETTERS, SLOT_LETTERS_COUNT)) {
+			if (!player.level().isClientSide() && this.mailInventory != null) {
 				POBoxInfo info = this.mailInventory.getPOBoxInfo();
 				NetworkUtil.sendToPlayer(new PacketPOBoxInfoResponse(info, true), (ServerPlayer) player);
 			}

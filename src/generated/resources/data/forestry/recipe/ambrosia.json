@@ -1,16 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "item": "forestry:honeydew"
-    },
-    "X": {
-      "item": "forestry:royal_jelly"
-    },
-    "Y": {
-      "item": "forestry:wax_capsule"
-    }
+    "#": "forestry:honeydew",
+    "X": "forestry:royal_jelly",
+    "Y": "forestry:wax_capsule"
   },
   "pattern": [
     "#Y#",
@@ -18,7 +11,6 @@
     "###"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:ambrosia"
   }
 }

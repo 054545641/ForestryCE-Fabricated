@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/dripping_comb",
-  "input": {
-    "item": "forestry:dripping_comb"
-  },
+  "input": "forestry:dripping_comb",
   "products": [
     {
       "chance": 1.0,

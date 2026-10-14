@@ -3,7 +3,7 @@ package forestry.arboriculture.client;
 import forestry.api.client.arboriculture.ILeafTint;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 
 import javax.annotation.Nullable;
 import java.awt.*;

@@ -3,9 +3,9 @@ package forestry.agriculture.farmlogic;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import forestry.api.agriculture.*;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,7 +16,7 @@ import java.util.function.BiFunction;
 import java.util.function.ToIntFunction;
 
 public final class FarmType implements IFarmType {
-	private final ResourceLocation id;
+	private final Identifier id;
 	private final ImmutableSet<Soil> soils;
 	private final ItemStack icon;
 	private final ImmutableList<IFarmable> farmables;
@@ -26,7 +26,7 @@ public final class FarmType implements IFarmType {
 	private final IFarmLogic manualLogic;
 	private final IFarmLogic managedLogic;
 
-	public FarmType(ResourceLocation id, ItemStack icon, BiFunction<IFarmType, Boolean, IFarmLogic> logicFactory, ImmutableList<IFarmable> farmables, ToIntFunction<IFarmHousing> fertilizerConsumption, IWaterConsumption waterConsumption, ImmutableSet<Soil> soils) {
+	public FarmType(Identifier id, ItemStack icon, BiFunction<IFarmType, Boolean, IFarmLogic> logicFactory, ImmutableList<IFarmable> farmables, ToIntFunction<IFarmHousing> fertilizerConsumption, IWaterConsumption waterConsumption, ImmutableSet<Soil> soils) {
 		this.id = id;
 		this.icon = icon;
 		this.soils = soils;

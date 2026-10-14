@@ -1,5 +1,6 @@
 package forestry.core.content.machines.tiles;
 
+import forestry.core.platform.util.InventoryData;
 import forestry.api.core.ForestryError;
 import forestry.api.core.IErrorLogic;
 import forestry.api.core.machines.fuels.MoistenerFuel;
@@ -15,7 +16,6 @@ import forestry.core.platform.tile.ILiquidTankTile;
 import forestry.core.platform.tile.IRenderableTile;
 import forestry.core.platform.tile.TileBase;
 import forestry.core.platform.util.InventoryUtil;
-import forestry.core.platform.util.ItemStackUtil;
 import forestry.core.platform.util.RecipeUtils;
 import forestry.core.content.machines.blocks.BlockFactoryPlain;
 import forestry.core.content.machines.features.FactoryTiles;
@@ -32,16 +32,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import forestry.api.ForestryDataMaps;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public class TileMoistener extends TileBase implements WorldlyContainer, ILiquidTankTile, IRenderableTile {
 	private final FilteredTank resourceTank;
@@ -58,6 +65,20 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 	@Nullable
 	private ItemStack pendingProduct;
 
+	private String activeRecipe = "";
+	private record WorkState(int burn, int total, int production, int time, String id, IMoistenerRecipe recipe, ItemStack current, ItemStack pending) {}
+	private final SnapshotJournal<WorkState> workJournal = new SnapshotJournal<>() {
+		@Override protected WorkState createSnapshot() {
+			return new WorkState(burnTime, totalTime, productionTime, timePerItem, activeRecipe, currentRecipe,
+				currentProduct == null ? null : currentProduct.copy(), pendingProduct == null ? null : pendingProduct.copy());
+		}
+		@Override protected void revertToSnapshot(WorkState previous) {
+			burnTime = previous.burn(); totalTime = previous.total(); productionTime = previous.production(); timePerItem = previous.time();
+			activeRecipe = previous.id(); currentRecipe = previous.recipe(); currentProduct = previous.current(); pendingProduct = previous.pending();
+		}
+		@Override protected void onRootCommit(WorkState previous) { setChanged(); }
+	};
+
 	public TileMoistener(BlockPos pos, BlockState state) {
 		super(FactoryTiles.MOISTENER.tileType(), pos, state);
 		setInternalInventory(new InventoryMoistener(this));
@@ -67,47 +88,43 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 
 	/* LOADING & SAVING */
 	@Override
-	public void saveAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.saveAdditional(compoundNBT, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag compoundNBT = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
 
 		compoundNBT.putInt("BurnTime", this.burnTime);
 		compoundNBT.putInt("TotalTime", this.totalTime);
 		compoundNBT.putInt("ProductionTime", this.productionTime);
+		compoundNBT.putInt("TimePerItem", this.timePerItem);
+		compoundNBT.putString("ActiveRecipe", this.activeRecipe);
 
-        this.tankManager.write(compoundNBT, registries);
+        this.tankManager.write(output);
 
-		// Write pending product
-		if (this.pendingProduct != null) {
-			CompoundTag CompoundNBTP = (CompoundTag) this.pendingProduct.saveOptional(registries);
-			compoundNBT.put("PendingProduct", CompoundNBTP);
-		}
-		if (this.currentProduct != null) {
-			CompoundTag CompoundNBTP = (CompoundTag) this.currentProduct.saveOptional(registries);
-			compoundNBT.put("CurrentProduct", CompoundNBTP);
-		}
+		output.storeNullable("PendingProduct", ItemStack.OPTIONAL_CODEC, this.pendingProduct);
+		output.storeNullable("CurrentProduct", ItemStack.OPTIONAL_CODEC, this.currentProduct);
+
+		ValueIOUtil.mergeInto(output, compoundNBT);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.loadAdditional(compoundNBT, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compoundNBT = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
 
-        this.burnTime = compoundNBT.getInt("BurnTime");
-        this.totalTime = compoundNBT.getInt("TotalTime");
-        this.productionTime = compoundNBT.getInt("ProductionTime");
+        this.burnTime = compoundNBT.getIntOr("BurnTime", 0);
+        this.totalTime = compoundNBT.getIntOr("TotalTime", 0);
+        this.productionTime = compoundNBT.getIntOr("ProductionTime", 0);
+		this.timePerItem = compoundNBT.getIntOr("TimePerItem", 0);
+		this.activeRecipe = compoundNBT.getStringOr("ActiveRecipe", "");
 
         this.tankManager.read(compoundNBT, registries);
 
-		// Load pending product
-		if (compoundNBT.contains("PendingProduct")) {
-			CompoundTag compoundNBTP = compoundNBT.getCompound("PendingProduct");
-            this.pendingProduct = ItemStack.parse(registries, compoundNBTP).orElse(ItemStack.EMPTY);
-		}
-		if (compoundNBT.contains("CurrentProduct")) {
-			CompoundTag compoundNBTP = compoundNBT.getCompound("CurrentProduct");
-            this.currentProduct = ItemStack.parse(registries, compoundNBTP).orElse(ItemStack.EMPTY);
-		}
+		this.pendingProduct = InventoryData.readNullableStack(compoundNBT, "PendingProduct", registries);
+		this.currentProduct = InventoryData.readNullableStack(compoundNBT, "CurrentProduct", registries);
 
-		checkRecipe();
+		this.currentRecipe = null;
 	}
 
 	@Override
@@ -170,54 +187,65 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 			speed = 4;
 		}
 
-		// Already running
-		if (this.burnTime > 0 && this.pendingProduct == null) {
-			// Not working if there is no water available.
-			boolean hasLiquid = this.resourceTank.getFluidAmount() > 0;
-			if (errorLogic.setCondition(!hasLiquid, ForestryError.NO_RESOURCE_LIQUID)) {
-				return;
-			}
+		processWorkStep(speed);
+	}
 
-			checkRecipe();
-
-			if (this.currentRecipe == null) {
-				return;
-			}
-
-            this.resourceTank.drain(1, IFluidHandler.FluidAction.EXECUTE);
-            this.burnTime -= speed;
-            this.productionTime -= speed;
-
-			if (this.productionTime <= 0) {
-                this.pendingProduct = this.currentProduct;
-				removeItem(InventoryMoistener.SLOT_RESOURCE, 1);
-				resetRecipe();
-				tryAddPending();
-			}
-
-		} else if (this.pendingProduct != null) {
-			tryAddPending();
-		}
-		// Try to start process
-		else { // Make sure we have a new item in the working slot.
-			if (rotateWorkingSlot()) {
-				checkRecipe();
-
-				// Let's see if we have a valid resource in the working slot
-				if (getItem(InventoryMoistener.SLOT_WORKING).isEmpty()) {
+	/** One moistening step, including fuel rotation and pending output, is transactional. */
+	public void processWorkStep(int speed) {
+		if (speed <= 0) throw new IllegalArgumentException("Non-positive moistener speed");
+		IErrorLogic errorLogic = getErrorLogic();
+		try (var transaction = Transaction.open(Transaction.getCurrentOpenedTransaction())) {
+			this.workJournal.updateSnapshots(transaction);
+			// Already running
+			if (this.burnTime > 0 && this.pendingProduct == null) {
+				// Not working if there is no water available.
+				boolean hasLiquid = this.resourceTank.getFluidAmount() > 0;
+				if (errorLogic.setCondition(!hasLiquid, ForestryError.NO_RESOURCE_LIQUID)) {
 					return;
 				}
 
-				MoistenerFuel res = getItem(InventoryMoistener.SLOT_WORKING).getItemHolder().getData(ForestryDataMaps.MOISTENER_FUELS);
-				if (res != null) {
-                    this.burnTime = this.totalTime = res.moistenerValue();
-				}
-			} else {
-				rotateReservoir();
-			}
-		}
+				checkRecipe();
 
-		errorLogic.setCondition(this.currentRecipe == null, ForestryError.NO_RECIPE);
+				if (this.currentRecipe == null) {
+					return;
+				}
+
+	            FluidHelper.drain(this.resourceTank, 1);
+	            this.burnTime -= speed;
+	            this.productionTime -= speed;
+
+				if (this.productionTime <= 0) {
+	                this.pendingProduct = this.currentProduct;
+					getTransferHandler().extract(InventoryMoistener.SLOT_RESOURCE, ItemResource.of(getItem(InventoryMoistener.SLOT_RESOURCE)), 1, transaction);
+					resetRecipe();
+					tryAddPending();
+				}
+
+			} else if (this.pendingProduct != null) {
+				tryAddPending();
+			}
+			// Try to start process
+			else { // Make sure we have a new item in the working slot.
+				if (rotateWorkingSlot()) {
+					checkRecipe();
+
+					// Let's see if we have a valid resource in the working slot
+					if (getItem(InventoryMoistener.SLOT_WORKING).isEmpty()) {
+						return;
+					}
+
+					MoistenerFuel res = getItem(InventoryMoistener.SLOT_WORKING).typeHolder().getData(ForestryDataMaps.MOISTENER_FUELS);
+					if (res != null) {
+	                    this.burnTime = this.totalTime = res.moistenerValue();
+					}
+				} else {
+					rotateReservoir();
+				}
+			}
+
+			errorLogic.setCondition(this.currentRecipe == null, ForestryError.NO_RECIPE);
+			transaction.commit();
+		}
 	}
 
 	private boolean tryAddPending() {
@@ -236,14 +264,16 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 	}
 
 	public void checkRecipe() {
-		RecipeManager manager = RecipeUtils.getRecipeManager();
+		RecipeMap manager = RecipeUtils.getRecipeMap();
 		IMoistenerRecipe sameRec = null;
 		if (manager != null) {
 			sameRec = RecipeUtils.getMoistenerRecipe(manager, getInternalInventory().getItem(InventoryMoistener.SLOT_RESOURCE));
 		}
 		if (this.currentRecipe != sameRec) {
-            this.currentRecipe = sameRec;
-			resetRecipe();
+			this.currentRecipe = sameRec;
+			String id = sameRec == null ? "" : sameRec.getId().toString();
+			if (!this.activeRecipe.equals(id) || sameRec != null && this.timePerItem != sameRec.getTimePerItem()) resetRecipe();
+			this.activeRecipe = id;
 		}
 
 		getErrorLogic().setCondition(this.currentRecipe == null, ForestryError.NO_RECIPE);
@@ -279,7 +309,7 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 			}
 
 			// Wrong item or full
-			if (!ItemStack.isSameItem(slotStack, deposit) || slotStack.getCount() >= slotStack.getMaxStackSize()) {
+			if (!ItemStack.isSameItemSameComponents(slotStack, deposit) || slotStack.getCount() + deposit.getCount() > slotStack.getMaxStackSize()) {
 				continue;
 			}
 
@@ -310,7 +340,7 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 				continue;
 			}
 
-			MoistenerFuel res = slotStack.getItemHolder().getData(ForestryDataMaps.MOISTENER_FUELS);
+			MoistenerFuel res = slotStack.typeHolder().getData(ForestryDataMaps.MOISTENER_FUELS);
 			if (res == null) {
 				continue;
 			}
@@ -331,7 +361,7 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 		if (!getItem(InventoryMoistener.SLOT_WORKING).isEmpty()) {
 			// Get the result of the consumed item in the working slot
 			ItemStack deposit;
-			MoistenerFuel res = getItem(InventoryMoistener.SLOT_WORKING).getItemHolder().getData(ForestryDataMaps.MOISTENER_FUELS);
+			MoistenerFuel res = getItem(InventoryMoistener.SLOT_WORKING).typeHolder().getData(ForestryDataMaps.MOISTENER_FUELS);
 			if (res != null) {
 				deposit = res.product().copy();
 			} else {
@@ -344,13 +374,9 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 				return false;
 			}
 
-			if (getItem(targetSlot).isEmpty()) {
-				setItem(targetSlot, deposit);
-			} else {
-				getItem(targetSlot).grow(1);
-			}
-
-			removeItem(InventoryMoistener.SLOT_WORKING, 1);
+			var transaction = Transaction.getCurrentOpenedTransaction();
+			getTransferHandler().insert(targetSlot, ItemResource.of(deposit), deposit.getCount(), transaction);
+			getTransferHandler().extract(InventoryMoistener.SLOT_WORKING, ItemResource.of(getItem(InventoryMoistener.SLOT_WORKING)), 1, transaction);
 		}
 
 		if (!getItem(InventoryMoistener.SLOT_WORKING).isEmpty()) {
@@ -364,7 +390,7 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 			return false;
 		}
 
-		setItem(InventoryMoistener.SLOT_WORKING, removeItem(resourceSlot, 1));
+		moveItems(resourceSlot, InventoryMoistener.SLOT_WORKING, 1);
 		return true;
 	}
 
@@ -376,7 +402,7 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 				continue;
 			}
 
-			if (getItem(i).getItemHolder().getData(ForestryDataMaps.MOISTENER_FUELS) == null) {
+			if (getItem(i).typeHolder().getData(ForestryDataMaps.MOISTENER_FUELS) == null) {
 				slotsToShift.add(i);
 			}
 		}
@@ -390,8 +416,7 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 				continue;
 			}
 
-			setItem(targetSlot, slotStack);
-			setItem(slot, ItemStack.EMPTY);
+			moveItems(slot, targetSlot, slotStack.getCount());
 			shiftedSlots++;
 		}
 
@@ -407,14 +432,16 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 			if (targetSlot < 0) {
 				break;
 			}
-			// Else shift
-			if (getItem(targetSlot).isEmpty()) {
-				setItem(targetSlot, getItem(resourceSlot));
-				setItem(resourceSlot, ItemStack.EMPTY);
-			} else {
-				ItemStackUtil.mergeStacks(getItem(resourceSlot), getItem(targetSlot));
-			}
+			moveItems(resourceSlot, targetSlot, getItem(resourceSlot).getCount());
 		}
+	}
+
+	private void moveItems(int source, int target, int amount) {
+		var inventory = getTransferHandler();
+		var resource = ItemResource.of(getItem(source));
+		var transaction = Transaction.getCurrentOpenedTransaction();
+		int moved = inventory.insert(target, resource, amount, transaction);
+		inventory.extract(source, resource, moved, transaction);
 	}
 
 	public boolean isWorking() {
@@ -431,7 +458,7 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 				max += 64;
 				continue;
 			}
-			if (inventory.getItem(i).getItemHolder().getData(ForestryDataMaps.MOISTENER_FUELS) != null) {
+			if (inventory.getItem(i).typeHolder().getData(ForestryDataMaps.MOISTENER_FUELS) != null) {
 				max += 64;
 				avail += inventory.getItem(i).getCount();
 			}
@@ -514,7 +541,7 @@ public class TileMoistener extends TileBase implements WorldlyContainer, ILiquid
 		return new ContainerMoistener(windowId, inv, this);
 	}
 
-	public IFluidHandler getFluidHandler(@Nullable Direction facing) {
+	public ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction facing) {
 		return this.tankManager;
 	}
 }

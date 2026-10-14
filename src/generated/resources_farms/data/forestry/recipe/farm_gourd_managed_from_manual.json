@@ -1,13 +1,9 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "item": "forestry:farm_gourd_manual"
-    }
+    "forestry:farm_gourd_manual"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:farm_gourd_managed"
   }
 }

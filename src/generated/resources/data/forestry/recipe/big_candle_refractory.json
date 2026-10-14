@@ -1,13 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "item": "forestry:refractory_wax"
-    },
-    "|": {
-      "tag": "c:strings"
-    }
+    "#": "forestry:refractory_wax",
+    "|": "#c:strings"
   },
   "pattern": [
     " | ",
@@ -15,7 +10,6 @@
     "###"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:big_candle_refractory"
   }
 }

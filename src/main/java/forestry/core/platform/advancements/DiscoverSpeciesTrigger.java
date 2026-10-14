@@ -3,11 +3,11 @@ package forestry.core.platform.advancements;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.ContextAwarePredicate;
-import net.minecraft.advancements.critereon.EntityPredicate;
-import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.advancements.triggers.Criterion;
+import net.minecraft.advancements.predicates.ContextAwarePredicate;
+import net.minecraft.advancements.predicates.entity.EntityPredicate;
+import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -34,7 +34,7 @@ public class DiscoverSpeciesTrigger extends SimpleCriterionTrigger<DiscoverSpeci
 	 * @param profile   The profile of the discovering player
 	 * @param speciesId The species that was discovered
 	 */
-	public void trigger(Level level, GameProfile profile, ResourceLocation speciesId) {
+	public void trigger(Level level, GameProfile profile, Identifier speciesId) {
 		if (level.getServer() == null) {
 			return;
 		}
@@ -43,7 +43,7 @@ public class DiscoverSpeciesTrigger extends SimpleCriterionTrigger<DiscoverSpeci
 			return;
 		}
 
-		Player player = serverLevel.getPlayerByUUID(profile.getId());
+		Player player = serverLevel.getPlayerByUUID(profile.id());
 		if (player instanceof ServerPlayer serverPlayer) {
 			trigger(serverPlayer, instance -> instance.check(speciesId));
 		}
@@ -52,10 +52,10 @@ public class DiscoverSpeciesTrigger extends SimpleCriterionTrigger<DiscoverSpeci
 	// Deviation from 1.20.1: a trigger instance is a record with a codec, not a class with a
 	// serializeToJson method. The field keeps the name "tag" that 1.20.1 wrote it under
 	public record TriggerInstance(Optional<ContextAwarePredicate> player,
-								  ResourceLocation species) implements SimpleCriterionTrigger.SimpleInstance {
+								  Identifier species) implements SimpleCriterionTrigger.SimpleInstance {
 		public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 				EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
-				ResourceLocation.CODEC.fieldOf("tag").forGetter(TriggerInstance::species)
+				Identifier.CODEC.fieldOf("tag").forGetter(TriggerInstance::species)
 			)
 			.apply(instance, TriggerInstance::new));
 
@@ -63,7 +63,7 @@ public class DiscoverSpeciesTrigger extends SimpleCriterionTrigger<DiscoverSpeci
 		 * @param species The species the advancement asks for
 		 * @return The criterion this trigger is added to an advancement with
 		 */
-		public static Criterion<TriggerInstance> checkDiscovered(ResourceLocation species) {
+		public static Criterion<TriggerInstance> checkDiscovered(Identifier species) {
 			return ForestryAdvancementTriggers.DISCOVER_SPECIES.createCriterion(new TriggerInstance(Optional.empty(), species));
 		}
 
@@ -71,7 +71,7 @@ public class DiscoverSpeciesTrigger extends SimpleCriterionTrigger<DiscoverSpeci
 		 * @param speciesId The species that was discovered
 		 * @return Whether the discovered species is the one the advancement asks for
 		 */
-		public boolean check(ResourceLocation speciesId) {
+		public boolean check(Identifier speciesId) {
 			return speciesId.equals(this.species);
 		}
 	}

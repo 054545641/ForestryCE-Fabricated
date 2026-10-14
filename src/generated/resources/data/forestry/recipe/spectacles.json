@@ -2,19 +2,14 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "X": {
-      "tag": "c:ingots/bronze"
-    },
-    "Y": {
-      "tag": "c:glass_panes"
-    }
+    "X": "#c:ingots/bronze",
+    "Y": "#c:glass_panes"
   },
   "pattern": [
     " X ",
     "Y Y"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:spectacles"
   }
 }

@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
  *
  * Ex. the bee, tree, and butterfly items
  *
- * @see IIndividualHandlerItem For the stack helpers that dispatch through this interface
+ * @see IIndividual
  */
 public interface IIndividualItem {
 	/**

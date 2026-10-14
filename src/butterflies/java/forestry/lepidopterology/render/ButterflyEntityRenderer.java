@@ -3,36 +3,30 @@ package forestry.lepidopterology.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import forestry.core.platform.render.ForestryModelLayers;
 import forestry.lepidopterology.entities.EntityButterfly;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.resources.Identifier;
 
-public class ButterflyEntityRenderer extends MobRenderer<EntityButterfly, ButterflyModel> {
+public class ButterflyEntityRenderer extends MobRenderer<EntityButterfly, ButterflyRenderState, ButterflyModel> {
 	public ButterflyEntityRenderer(EntityRendererProvider.Context context) {
 		super(context, new ButterflyModel(context.bakeLayer(ForestryModelLayers.BUTTERFLY_LAYER)), 0.25f);
 	}
-
-	@Override
-	public void render(EntityButterfly entity, float entityYaw, float partialTickTime, PoseStack transform, MultiBufferSource buffer, int packedLight) {
-		if (!entity.isRenderable()) {
-			return;
-		}
-
-		transform.pushPose();
-		transform.translate(0, 0.2, 0);
-        this.model.setScale(entity.getSize());
-		super.render(entity, entityYaw, partialTickTime, transform, buffer, packedLight);
-		transform.popPose();
+	@Override public ButterflyRenderState createRenderState() { return new ButterflyRenderState(); }
+	@Override public void extractRenderState(EntityButterfly entity, ButterflyRenderState state, float partialTick) {
+		super.extractRenderState(entity, state, partialTick);
+		state.renderable = entity.isRenderable();
+		state.size = entity.getSize();
+		state.wingFlap = state.renderable ? entity.getWingFlap(partialTick) : 0;
+		if (state.renderable) state.texture = entity.getTexture();
 	}
-
-	@Override
-	public ResourceLocation getTextureLocation(EntityButterfly entity) {
-		return entity.getTexture();
+	@Override public void submit(ButterflyRenderState state, PoseStack stack, SubmitNodeCollector collector, CameraRenderState camera) {
+		if (!state.renderable) return;
+		stack.pushPose();
+		stack.translate(0, 0.2, 0);
+		super.submit(state, stack, collector, camera);
+		stack.popPose();
 	}
-
-	@Override
-	protected float getBob(EntityButterfly entity, float partialTickTime) {
-		return entity.getWingFlap(partialTickTime);
-	}
+	@Override public Identifier getTextureLocation(ButterflyRenderState state) { return state.texture; }
 }

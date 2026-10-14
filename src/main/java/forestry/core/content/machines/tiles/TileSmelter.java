@@ -22,7 +22,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
@@ -31,11 +31,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public class TileSmelter extends TilePowered implements WorldlyContainer, ISocketable, IItemStackDisplay {
 	private static final int STEPS_PER_RECIPE_TIME = 1;
@@ -51,6 +54,13 @@ public class TileSmelter extends TilePowered implements WorldlyContainer, ISocke
 
 	@Nullable
 	private ISmelterRecipe currentRecipe;
+	private record ProcessingState(ISmelterRecipe recipe, ItemStack preview) {}
+	@Override protected Object captureProcessingState() { return new ProcessingState(this.currentRecipe, this.craftPreviewInventory.getItem(0).copy()); }
+	@Override protected void restoreProcessingState(Object state) {
+		var previous = (ProcessingState) state;
+		this.currentRecipe = previous.recipe();
+		this.craftPreviewInventory.setItem(0, previous.preview());
+	}
 
 	public TileSmelter(BlockPos pos, BlockState state) {
 		super(FactoryTiles.SMELTER.tileType(), pos, state, 1100, Constants.MACHINE_MAX_ENERGY);
@@ -101,21 +111,27 @@ public class TileSmelter extends TilePowered implements WorldlyContainer, ISocke
 	}
 
 	@Override
-	public ResourceLocation getSocketType() {
+	public Identifier getSocketType() {
 		return ForestryCircuitSocketTypes.MACHINE;
 	}
 
 	/* LOADING & SAVING */
 	@Override
-	public void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-		super.saveAdditional(compound, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag compound = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
 
 		this.sockets.write(compound, registries);
+	
+		ValueIOUtil.mergeInto(output, compound);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-		super.loadAdditional(compound, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compound = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
 
 		this.sockets.read(compound, registries);
 
@@ -123,7 +139,7 @@ public class TileSmelter extends TilePowered implements WorldlyContainer, ISocke
 		if (!chip.isEmpty()) {
 			ICircuitBoard chipset = IForestryApi.INSTANCE.getCircuitManager().getCircuitBoard(chip);
 			if (chipset != null) {
-				chipset.onLoad(this);
+				loadMachineUpgrade(chipset);
 			}
 		}
 	}
@@ -220,7 +236,7 @@ public class TileSmelter extends TilePowered implements WorldlyContainer, ISocke
 	}
 
 	public boolean checkRecipe() {
-		RecipeManager manager = RecipeUtils.getRecipeManager();
+		RecipeMap manager = RecipeUtils.getRecipeMap();
 
 		// Look for a recipe if the manager exists
 		if (manager != null) {
@@ -234,8 +250,7 @@ public class TileSmelter extends TilePowered implements WorldlyContainer, ISocke
 					handleItemStackForDisplay(this.currentRecipe.getOutput());
 
 					int recipeTime = this.currentRecipe.getProcessingTime();
-					setStepsPerWorkCycle(recipeTime * STEPS_PER_RECIPE_TIME);
-					setEnergyPerWorkCycle(recipeTime * ENERGY_PER_RECIPE_TIME);
+					configureWork(this.currentRecipe.getId().toString(), recipeTime * STEPS_PER_RECIPE_TIME, recipeTime * ENERGY_PER_RECIPE_TIME);
 				} else {
 					this.craftPreviewInventory.clearContent();
 					setStepsPerWorkCycle(0);
@@ -253,12 +268,12 @@ public class TileSmelter extends TilePowered implements WorldlyContainer, ISocke
 			return false;
 		}
 
-		if (!this.inventory.removeResources(this.currentRecipe.getInputs())) {
-			return false;
+		try (var transaction = beginWorkTransaction()) {
+			if (!this.inventory.removeResources(this.currentRecipe.getInputs())) return false;
+			if (this.currentRecipe.getOutput().isEmpty() || !this.inventory.addResult(this.currentRecipe.getOutput(), true)) return false;
+			transaction.commit();
+			return true;
 		}
-
-		this.inventory.addResult(this.currentRecipe.getOutput(), true);
-		return true;
 	}
 
 	public Container getCraftPreviewInventory() {

@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/honey_comb",
-  "input": {
-    "item": "forestry:honey_comb"
-  },
+  "input": "forestry:honey_comb",
   "products": [
     {
       "chance": 1.0,

@@ -1,52 +1,39 @@
 package forestry.core.platform.item;
 
-import forestry.core.features.CoreDataComponents;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraft.core.component.DataComponentType;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStackSimple;
+import net.neoforged.neoforge.fluids.SimpleFluidContent;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.fluid.ItemAccessFluidHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
-/**
- * Fluid handler that consumes the container item after it was used.
- */
-public class FluidHandlerItemForestry extends FluidHandlerItemStackSimple.Consumable {
+import javax.annotation.Nullable;
+
+public class FluidHandlerItemForestry extends ItemAccessFluidHandler {
 	private final FluidContainerType containerType;
 
-	public FluidHandlerItemForestry(ItemStack container, FluidContainerType containerType) {
-		super(CoreDataComponents.FLUID_CONTENT, container, FluidType.BUCKET_VOLUME);
+	public FluidHandlerItemForestry(ItemAccess access, DataComponentType<SimpleFluidContent> component, FluidContainerType containerType) {
+		super(access, component, FluidType.BUCKET_VOLUME);
 		this.containerType = containerType;
 	}
 
-	/**
-	 * Checks if the given fluid can be contained in this handler. This property gets defined by the container type of
-	 * this handler.
-	 * <p>
-	 * Capsules can't contain fluid that are hotter or equal to the melting point of wax
-	 */
-	private boolean contentsAllowed(FluidStack fluidStack) {
-		Fluid fluid = fluidStack.getFluid();
+	@Override
+	public boolean isValid(int index, FluidResource resource) {
+		return super.isValid(index, resource) && (this.containerType != FluidContainerType.WAX_CAPSULE
+			|| resource.getFluidType().getTemperature(resource.toStack(FluidType.BUCKET_VOLUME)) < 310.15);
+	}
 
-		if (this.containerType == FluidContainerType.WAX_CAPSULE) {
-			return fluid.getFluidType().getTemperature(fluidStack) < 310.15; // melting point of wax in kelvin
+	@Override
+	@Nullable
+	protected ItemResource update(ItemResource container, int index, FluidResource resource, int amount) {
+		if (amount == 0) {
+			// ItemAccess consumes the capsule in the same transaction as its contents.
+			return null;
 		}
-		return true;
-	}
-
-	@Override
-	public boolean canFillFluidType(FluidStack fluid) {
-		return contentsAllowed(fluid);
-	}
-
-	@Override
-	public boolean canDrainFluidType(FluidStack fluid) {
-		return contentsAllowed(fluid);
-	}
-
-	@Override
-	protected void setFluid(FluidStack fluid) {
-		super.setFluid(fluid);
-		// show the filled container model
-		this.container.setDamageValue(1);
+		if (amount != FluidType.BUCKET_VOLUME) {
+			return ItemResource.EMPTY;
+		}
+		return super.update(container, index, resource, amount);
 	}
 }

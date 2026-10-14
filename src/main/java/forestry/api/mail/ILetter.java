@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public interface ILetter extends Container {
+public interface ILetter extends forestry.api.core.ITransactionalContainer {
 
 	NonNullList<ItemStack> getPostage();
 

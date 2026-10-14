@@ -8,7 +8,5 @@
   "id": "forestry:fermenter/mushroom",
   "modifier": 1.0,
   "output": "forestry:biomass",
-  "resource": {
-    "tag": "c:mushrooms"
-  }
+  "resource": "#c:mushrooms"
 }

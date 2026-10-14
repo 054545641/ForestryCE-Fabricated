@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_slab",
   "key": {
-    "#": {
-      "item": "forestry:mahoe_fireproof_planks"
-    }
+    "#": "forestry:mahoe_fireproof_planks"
   },
   "pattern": [
     "###"

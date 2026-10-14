@@ -6,7 +6,7 @@ import forestry.api.modules.IForestryModule;
 import forestry.api.modules.IModuleManager;
 import forestry.core.platform.network.PacketRegistry;
 import forestry.core.platform.util.ModUtil;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -18,7 +18,7 @@ import org.objectweb.asm.Type;
 import java.util.*;
 
 public class ForestryModuleManager implements IModuleManager {
-	private final LinkedHashMap<ResourceLocation, IForestryModule> loadedModules = new LinkedHashMap<>();
+	private final LinkedHashMap<Identifier, IForestryModule> loadedModules = new LinkedHashMap<>();
 	private final LinkedHashMap<String, List<IForestryModule>> loadedModulesByMod = new LinkedHashMap<>();
 
 	@Override
@@ -27,81 +27,38 @@ public class ForestryModuleManager implements IModuleManager {
 	}
 
 	@Override
-	public boolean isModuleLoaded(ResourceLocation id) {
+	public boolean isModuleLoaded(Identifier id) {
 		return this.loadedModules.containsKey(id);
 	}
 
 	@Override
 	public List<IForestryModule> getModulesForMod(String modId) {
-		return Collections.unmodifiableList(this.loadedModulesByMod.get(modId));
+		return Collections.unmodifiableList(this.loadedModulesByMod.getOrDefault(modId, List.of()));
 	}
 
 	private void loadModules() {
-		LinkedHashMap<String, List<IForestryModule>> discoveredModules = discoverModules();
-		HashSet<ResourceLocation> discoveredIds = new HashSet<>();
-		LinkedList<IForestryModule> modulesToLoad = new LinkedList<>();
-
-		for (List<IForestryModule> modModules : discoveredModules.values()) {
-			for (IForestryModule module : modModules) {
-				discoveredIds.add(module.getId());
-				modulesToLoad.add(module);
+		LinkedHashMap<Identifier, IForestryModule> discovered = new LinkedHashMap<>();
+		List<ModuleLoadOrder.Entry<Identifier>> entries = new ArrayList<>();
+		for (List<IForestryModule> modules : discoverModules().values()) {
+			for (IForestryModule module : modules) {
+				discovered.put(module.getId(), module);
+				entries.add(new ModuleLoadOrder.Entry<>(module.getId(), module.getModuleDependencies(), module.getModDependencies()));
 			}
 		}
-
-		// check dependencies and skip loading of modules whose dependencies are missing
-		Iterator<IForestryModule> iterator;
-		boolean changed;
-		do {
-			changed = false;
-			iterator = modulesToLoad.iterator();
-
-			while (iterator.hasNext()) {
-				IForestryModule module = iterator.next();
-				List<ResourceLocation> dependencies = module.getModuleDependencies();
-				List<String> modDependencies = module.getModDependencies();
-
-				if (discoveredIds.containsAll(dependencies)) {
-					for (String modId : modDependencies) {
-						if (!ModList.get().isLoaded(modId)) {
-							Forestry.LOGGER.warn("Module {} is missing mod dependencies: {}", module.getId(), modDependencies);
-						}
-					}
-					// if all dependency mods are loaded, skip removal code
-					continue;
-				} else {
-					Forestry.LOGGER.warn("Module {} is missing dependencies: {}", module.getId(), dependencies);
-				}
-
-				// remove from loaded modules
-				iterator.remove();
-				changed = true;
-				discoveredIds.remove(module.getId());
-			}
-		} while (changed);
-
-		// sort modules in LOAD order
-		do {
-			changed = false;
-			iterator = modulesToLoad.iterator();
-			while (iterator.hasNext()) {
-				IForestryModule module = iterator.next();
-
-				if (this.loadedModules.keySet().containsAll(module.getModuleDependencies())) {
-					iterator.remove();
-					this.loadedModules.put(module.getId(), module);
-					this.loadedModulesByMod.computeIfAbsent(module.getId().getNamespace(), modId -> new ArrayList<>()).add(module);
-					changed = true;
-					break;
-				}
-			}
-		} while (changed);
+		List<Identifier> order = ModuleLoadOrder.resolve(entries, ModList.get()::isLoaded,
+			(id, missing) -> Forestry.LOGGER.warn("Skipping module {} with missing dependencies: {}", id, missing));
+		for (Identifier id : order) {
+			IForestryModule module = discovered.get(id);
+			this.loadedModules.put(id, module);
+			this.loadedModulesByMod.computeIfAbsent(id.getNamespace(), key -> new ArrayList<>()).add(module);
+		}
 	}
 
 	// Called during mod construction by Forestry
 	public void init() {
 		loadModules();
 
-		for (Map.Entry<ResourceLocation, IForestryModule> entry : this.loadedModules.entrySet()) {
+		for (Map.Entry<Identifier, IForestryModule> entry : this.loadedModules.entrySet()) {
 			String modId = entry.getKey().getNamespace();
 			IEventBus modBus = ModuleUtil.getModBus(modId);
 			ModContainer mod = ModList.get().getModContainerById(modId).orElseThrow();
@@ -110,7 +67,7 @@ public class ForestryModuleManager implements IModuleManager {
 			module.registerEvents(modBus);
 			modBus.addListener((RegisterPayloadHandlersEvent event) -> module.registerPackets(new PacketRegistry(event.registrar(mod.getModInfo().getVersion().toString()))));
 
-			if (FMLEnvironment.dist == Dist.CLIENT) {
+			if (FMLEnvironment.getDist() == Dist.CLIENT) {
 				module.registerClientHandler(handler -> handler.registerEvents(modBus));
 			}
 		}
@@ -147,11 +104,7 @@ public class ForestryModuleManager implements IModuleManager {
 			}
 		});
 
-		// Discovery order comes from FML's annotation scan, which follows the mod's classpath entries.
-		// Phase 9a split those from one directory into six, which reordered the modules and with them
-		// the reload listeners ModuleCore dispatches: butterflies began projecting before apiculture
-		// had registered the flower types their karyotype defaults to. Sort so that load order depends
-		// on the module ids and nothing else. Core modules still come first
+		// classpath order must not change module and reload ordering
 		modules.values().forEach(modModules -> modModules.sort(
 				Comparator.comparing((IForestryModule module) -> !module.isCore())
 						.thenComparing(module -> module.getId().toString())));

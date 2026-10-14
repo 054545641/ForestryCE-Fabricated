@@ -1,18 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "#": [
-      {
-        "item": "forestry:zebrano_stripped_log"
-      },
-      {
-        "item": "forestry:zebrano_fireproof_stripped_log"
-      }
+      "forestry:zebrano_stripped_log",
+      "forestry:zebrano_fireproof_stripped_log"
     ],
-    "X": {
-      "item": "minecraft:chain"
-    }
+    "X": "minecraft:iron_chain"
   },
   "pattern": [
     "X X",
@@ -20,7 +13,6 @@
     "###"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:zebrano_hanging_sign"
   }
 }

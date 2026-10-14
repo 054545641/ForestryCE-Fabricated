@@ -20,22 +20,16 @@
   "inputs": [
     {
       "count": 1,
-      "ingredient": {
-        "tag": "c:raw_materials/copper"
-      }
+      "ingredient": "#c:raw_materials/copper"
     },
     {
       "count": 1,
-      "ingredient": {
-        "tag": "c:raw_materials/nickel"
-      }
+      "ingredient": "#c:raw_materials/nickel"
     }
   ],
   "output": {
     "count": 2,
-    "ingredient": {
-      "tag": "c:ingots/constantan"
-    }
+    "ingredient": "#c:ingots/constantan"
   },
   "processingTime": 40
 }

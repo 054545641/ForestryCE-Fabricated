@@ -12,7 +12,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -23,7 +23,7 @@ public class MutationConditionBiome implements IMutationCondition {
 		TagKey.codec(Registries.BIOME).fieldOf("biome").forGetter(MutationConditionBiome::getBiome)
 	).apply(instance, MutationConditionBiome::new));
 	public static final StreamCodec<RegistryFriendlyByteBuf, MutationConditionBiome> STREAM_CODEC = StreamCodec.composite(
-		ResourceLocation.STREAM_CODEC.map(location -> TagKey.create(Registries.BIOME, location), TagKey::location),
+		Identifier.STREAM_CODEC.map(location -> TagKey.create(Registries.BIOME, location), TagKey::location),
 		MutationConditionBiome::getBiome,
 		MutationConditionBiome::new
 	);

@@ -5,6 +5,7 @@ import net.minecraft.world.item.Item;
 
 import java.util.ArrayList;
 import java.util.function.Function;
+import java.util.function.BiFunction;
 
 public class FeatureItemGroup<I extends Item, S extends IItemSubtype> extends FeatureGroup<FeatureItemGroup.Builder<I, S>, FeatureItem<I>, S> {
 	public FeatureItemGroup(Builder<I, S> builder) {
@@ -25,7 +26,7 @@ public class FeatureItemGroup<I extends Item, S extends IItemSubtype> extends Fe
 
 	@Override
 	protected FeatureItem<I> createFeature(Builder<I, S> builder, S type) {
-		return builder.registry.item(() -> builder.constructor.apply(type), builder.getIdentifier(type));
+		return builder.registry.item(properties -> builder.constructor.apply(type, properties), () -> builder.properties.apply(type), builder.getIdentifier(type));
 	}
 
 	public I item(S variant) {
@@ -34,12 +35,14 @@ public class FeatureItemGroup<I extends Item, S extends IItemSubtype> extends Fe
 
 	public static class Builder<I extends Item, S extends IItemSubtype> extends FeatureGroup.Builder<S, FeatureItemGroup<I, S>> {
 		private final FeatureRegistry registry;
-		private final Function<S, I> constructor;
+		private final BiFunction<S, Item.Properties, I> constructor;
+		private final Function<S, Item.Properties> properties;
 
-		public Builder(FeatureRegistry registry, Function<S, I> constructor) {
+		public Builder(FeatureRegistry registry, BiFunction<S, Item.Properties, I> constructor, Function<S, Item.Properties> properties) {
 			super(registry, java.util.List.of());
 			this.registry = registry;
 			this.constructor = constructor;
+			this.properties = properties;
 		}
 
 		@Override

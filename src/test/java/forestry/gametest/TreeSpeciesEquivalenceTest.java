@@ -17,7 +17,7 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -60,7 +60,7 @@ public class TreeSpeciesEquivalenceTest {
 		}
 
 		for (ITreeSpecies expected : type.getAllSpecies()) {
-			ResourceLocation id = expected.id();
+			Identifier id = expected.id();
 
 			JsonElement json = readGeneratedJson(helper, id);
 			if (json == null) {
@@ -166,12 +166,12 @@ public class TreeSpeciesEquivalenceTest {
 	}
 
 	@Nullable
-	private static JsonElement readGeneratedJson(GameTestHelper helper, ResourceLocation id) {
+	private static JsonElement readGeneratedJson(GameTestHelper helper, Identifier id) {
 		// Read through the server's ResourceManager rather than the classloader. Since phase 9b each
 		// jar is its own mod with its own classloader, so getResourceAsStream from a core class cannot
 		// see a species JSON that ships in the apiculture jar. Datapacks merge across mods, which is
 		// how the game loads these, so this reads them the same way the game does.
-		ResourceLocation path = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "tree_species/" + id.getPath() + ".json");
+		Identifier path = Identifier.fromNamespaceAndPath(id.getNamespace(), "tree_species/" + id.getPath() + ".json");
 		Optional<Resource> resource = helper.getLevel().getServer().getResourceManager().getResource(path);
 		if (resource.isEmpty()) {
 			return null;

@@ -10,14 +10,14 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import forestry.api.core.genetics.ISpecies;
 import forestry.api.core.genetics.ISpeciesType;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.concurrent.CompletableFuture;
 
 public record SpeciesArgument(ISpeciesType<?, ?> type) implements ISpeciesArgumentType<ISpecies<?>> {
 	@Override
 	public ISpecies<?> parse(final StringReader reader) throws CommandSyntaxException {
-		ResourceLocation location = ResourceLocation.read(reader);
+		Identifier location = Identifier.read(reader);
 
 		ISpecies<?> species = this.type.getSpeciesSafe(location);
 

@@ -8,70 +8,40 @@ import net.neoforged.fml.ModList;
 import net.neoforged.neoforgespi.language.ModFileScanData;
 import org.objectweb.asm.Type;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 
 public class ModuleUtil {
-	private static final HashMap<Class<?>, Field> MOD_BUS_FIELDS = new HashMap<>();
-	private static final HashMap<String, IEventBus> MOD_BUSES = new HashMap<>();
 
 	public static void loadFeatureProviders() {
 		forEachAnnotated(Type.getType(FeatureProvider.class), klass -> Forestry.LOGGER.debug("Loaded feature provider {}", klass));
 	}
 
 	static void forEachAnnotated(Type annotationType, Consumer<Class<?>> action) {
+		TreeSet<String> classes = new TreeSet<>();
 		for (ModFileScanData scanData : ModList.get().getAllScanData()) {
-			Set<ModFileScanData.AnnotationData> annotationData = scanData.getAnnotations();
-
-			for (ModFileScanData.AnnotationData data : annotationData) {
-				if (!data.annotationType().equals(annotationType)) {
-					continue;
+			for (ModFileScanData.AnnotationData data : scanData.getAnnotations()) {
+				if (data.annotationType().equals(annotationType)) {
+					classes.add(data.clazz().getClassName());
 				}
-
-				String className = data.memberName();
-				try {
-					Class<?> klass = Class.forName(className);
-					action.accept(klass);
-				} catch (ReflectiveOperationException | ExceptionInInitializerError e) {
-					throw new RuntimeException("Failed to load annotated member " + className, e);
-				}
+			}
+		}
+		for (String className : classes) {
+			try {
+				action.accept(Class.forName(className));
+			} catch (ReflectiveOperationException | ExceptionInInitializerError e) {
+				throw new RuntimeException("Failed to load annotated class " + className, e);
 			}
 		}
 	}
 
-	// Since Forge/Neo doesn't offer a unified way to get the mod bus, we have to do this ugly hack.
-	// Kotlin for Forge, JavaFML, and ScalableCatsForce all name their fields eventBus.
-	// GroovyModLoader calls its field modBus.
 	public static IEventBus getModBus(String modid) {
-		return MOD_BUSES.computeIfAbsent(modid, key -> {
-			ModContainer modContainer = ModList.get().getModContainerById(modid).orElseThrow();
-
-			// look up which field in the mod container class contains the mod bus
-			Field modBusField = MOD_BUS_FIELDS.computeIfAbsent(modContainer.getClass(), type -> {
-				// iterate class hierarchy in case of anonymous or subclass weirdness of JVM languages
-				for (Class<?> klass = type; klass != ModContainer.class; klass = klass.getSuperclass()) {
-					// getDeclaredFields is required to read private members
-					for (Field field : klass.getDeclaredFields()) {
-						String name = field.getName();
-
-						if (name.equals("eventBus") || name.equals("modBus")) {
-							if (IEventBus.class.isAssignableFrom(field.getType())) {
-								field.setAccessible(true);
-								return field;
-							}
-						}
-					}
-				}
-				throw new RuntimeException("Failed to find eventBus or modBus field in mod container: " + type);
-			});
-
-			try {
-				return (IEventBus) modBusField.get(modContainer);
-			} catch (IllegalAccessException | ClassCastException e) {
-				throw new RuntimeException("Failed to obtain mod-specific event bus for '" + modid + "'", e);
-			}
-		});
+		ModContainer container = ModList.get().getModContainerById(modid)
+			.orElseThrow(() -> new IllegalStateException("Missing mod container for " + modid));
+		IEventBus bus = container.getEventBus();
+		if (bus == null) {
+			throw new IllegalStateException("Mod container has no event bus: " + modid);
+		}
+		return bus;
 	}
 }

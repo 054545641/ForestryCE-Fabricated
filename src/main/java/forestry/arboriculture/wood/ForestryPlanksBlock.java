@@ -10,15 +10,15 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ForestryPlanksBlock extends Block implements IWoodTyped {
-	public static Properties createWoodProperties(IWoodType woodType) {
-		return Block.Properties.of().strength(woodType.getHardness(), woodType.getHardness() * 1.5F).sound(SoundType.WOOD);
+	public static Properties createWoodProperties(IWoodType woodType, Properties properties) {
+		return properties.strength(woodType.getHardness(), woodType.getHardness() * 1.5F).sound(SoundType.WOOD);
 	}
 
 	private final boolean fireproof;
 	private final IWoodType woodType;
 
-	public ForestryPlanksBlock(boolean fireproof, IWoodType woodType) {
-		super(createWoodProperties(woodType));
+	public ForestryPlanksBlock(Properties properties, boolean fireproof, IWoodType woodType) {
+		super(createWoodProperties(woodType, properties));
 		this.fireproof = fireproof;
 		this.woodType = woodType;
 	}

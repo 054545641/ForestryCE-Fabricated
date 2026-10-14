@@ -3,16 +3,11 @@
   "category": "redstone",
   "ingredients": [
     [
-      {
-        "item": "forestry:kapok_planks"
-      },
-      {
-        "item": "forestry:kapok_fireproof_planks"
-      }
+      "forestry:kapok_planks",
+      "forestry:kapok_fireproof_planks"
     ]
   ],
   "result": {
-    "count": 1,
     "id": "forestry:kapok_button"
   }
 }

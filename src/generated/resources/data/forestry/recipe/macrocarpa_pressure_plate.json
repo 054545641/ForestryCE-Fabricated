@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:macrocarpa_planks"
-      },
-      {
-        "item": "forestry:macrocarpa_fireproof_planks"
-      }
+      "forestry:macrocarpa_planks",
+      "forestry:macrocarpa_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:macrocarpa_pressure_plate"
   }
 }

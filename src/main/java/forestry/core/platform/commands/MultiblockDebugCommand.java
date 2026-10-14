@@ -211,8 +211,7 @@ public final class MultiblockDebugCommand {
 			for (BlockPos m : members) {
 				MultiblockTileEntityForestry<?> be = TileUtil.getTile(level, m, MultiblockTileEntityForestry.class);
 				if (be != null) {
-					CompoundTag tag = new CompoundTag();
-					be.saveAdditional(tag, level.registryAccess());
+					CompoundTag tag = be.saveCustomOnly(level.registryAccess());
 					captured.put(m, tag);
 				}
 			}
@@ -246,7 +245,7 @@ public final class MultiblockDebugCommand {
 				MultiblockTileEntityForestry<?> be = TileUtil.getTile(level, m, MultiblockTileEntityForestry.class);
 				CompoundTag tag = captured.get(m);
 				if (be != null && tag != null) {
-					be.loadAdditional(tag, level.registryAccess());
+					forestry.core.platform.util.ValueIOUtil.readTag(tag, level.registryAccess(), be::loadCustomOnly);
 					be.onLoad();
 				}
 			}
@@ -355,7 +354,7 @@ public final class MultiblockDebugCommand {
 					send(source, Component.literal("round " + round + ": ABORTED (no block entity at member " + str(m) + ")").withStyle(ChatFormatting.RED));
 					break;
 				}
-				CompoundTag tag = be.saveWithId(level.registryAccess());
+				CompoundTag tag = be.saveWithFullMetadata(level.registryAccess());
 				BlockState state = level.getBlockState(m);
 				BlockEntity recreated = BlockEntity.loadStatic(m, state, tag, level.registryAccess());
 				if (recreated == null) {
@@ -493,8 +492,7 @@ public final class MultiblockDebugCommand {
 		for (BlockPos m : members) {
 			MultiblockTileEntityForestry<?> be = TileUtil.getTile(level, m, MultiblockTileEntityForestry.class);
 			if (be != null) {
-				CompoundTag tag = new CompoundTag();
-				be.saveAdditional(tag, level.registryAccess());
+				CompoundTag tag = be.saveCustomOnly(level.registryAccess());
 				if (tag.contains(MultiblockTileEntityForestry.PAYLOAD_KEY)) {
 					carriers++;
 				}

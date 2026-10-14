@@ -39,8 +39,10 @@ import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import forestry.core.features.CoreDataComponents;
 
 import javax.annotation.Nullable;
 
@@ -109,7 +111,6 @@ public class ForestryCreativeTabs {
 		FactoryBlocks.TESR.getItems().forEach(items::accept);
 		items.accept(CoreBlocks.BURN_BARREL);
 		// Circuit boards
-		items.accept(FactoryBlocks.PLAIN.get(BlockTypeFactoryPlain.FABRICATOR));
 		CoreItems.CIRCUITBOARDS.getItems().forEach(items::accept);
 		CoreItems.ELECTRON_TUBES.getItems().forEach(items::accept);
 
@@ -144,7 +145,6 @@ public class ForestryCreativeTabs {
 		// Misc machine parts
 		items.accept(CoreItems.SOLAR_CELL);
 
-		items.accept(CoreItems.FERTILIZER_COMPOUND);
 		items.accept(CoreItems.CARTON);
 		items.accept(CoreItems.SURVIVALISTS_PICKAXE);
 		items.accept(CoreItems.SURVIVALISTS_SHOVEL);
@@ -156,12 +156,6 @@ public class ForestryCreativeTabs {
 		items.accept(CoreItems.AXE_KIT);
 		items.accept(CoreItems.SWORD_KIT);
 		items.accept(CoreItems.HOE_KIT);
-		items.accept(CoreItems.GEAR_TIN);
-		items.accept(CoreItems.GEAR_COPPER);
-		items.accept(CoreItems.GEAR_BRONZE);
-		items.accept(CoreItems.GEAR_IRON);
-		items.accept(CoreItems.SOLDERING_IRON);
-		items.accept(CoreItems.SPECTACLES);
 		items.accept(CoreItems.ASH);
 		items.accept(CoreItems.ASH_BRICK);
 		items.accept(CoreItems.PEAT);
@@ -312,10 +306,17 @@ public class ForestryCreativeTabs {
 
 				ItemStack itemStack = FluidsItems.CONTAINERS.stack(type);
 
-				IFluidHandlerItem fluidHandler = new FluidHandlerItemForestry(itemStack, type);
-				if (fluidHandler.fill(new FluidStack(fluid, FluidType.BUCKET_VOLUME), IFluidHandler.FluidAction.EXECUTE) == FluidType.BUCKET_VOLUME) {
-					ItemStack filled = fluidHandler.getContainer();
-					items.accept(filled);
+				if (fluid == net.minecraft.world.level.material.Fluids.EMPTY) {
+					continue;
+				}
+				var access = ItemAccess.forStack(itemStack);
+				var fluidHandler = new FluidHandlerItemForestry(access, CoreDataComponents.FLUID_CONTENT.get(), type);
+				try (var transaction = Transaction.openRoot()) {
+					if (fluidHandler.insert(FluidResource.of(fluid), FluidType.BUCKET_VOLUME, transaction) == FluidType.BUCKET_VOLUME) {
+						transaction.commit();
+						// Filling replaces the resource in ItemAccess; the original stack stays empty.
+						items.accept(access.getResource().toStack(access.getAmount()));
+					}
 				}
 			}
 		}

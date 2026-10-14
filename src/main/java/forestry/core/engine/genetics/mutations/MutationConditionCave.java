@@ -21,7 +21,7 @@ public class MutationConditionCave implements IMutationCondition {
 
 	@Override
 	public float modifyChance(Level level, BlockPos pos, IMutation<?> mutation, IGenome firstGenome, IGenome secondGenome, IClimateProvider climate, float currentChance) {
-		for (Direction direction : Direction.VALUES) {
+		for (Direction direction : Direction.values()) {
 			if (level.getBrightness(LightLayer.SKY, pos.relative(direction)) > 0) {
 				return 0;
 			}

@@ -78,7 +78,7 @@ public class Butterfly extends IndividualLiving<IButterflySpecies, IButterfly, I
 	}
 
 	private boolean canFly(Level world) {
-		return (!world.isRaining() || getGenome().getActiveValue(ButterflyChromosomes.TOLERATES_RAIN)) && isActiveThisTime(world.isDay());
+		return (!world.isRaining() || getGenome().getActiveValue(ButterflyChromosomes.TOLERATES_RAIN)) && isActiveThisTime(world.isBrightOutside());
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class Butterfly extends IndividualLiving<IButterflySpecies, IButterfly, I
 		}
 
 		SpeciesUtil.ISpeciesMutator mutator = (p1, p2) -> mutateSpecies(nursery, p1, p2);
-		return SpeciesUtil.createOffspring(nursery.getLevel().random, this.genome, this.mate, mutator, Butterfly::new);
+		return SpeciesUtil.createOffspring(nursery.getLevel().getRandom(), this.genome, this.mate, mutator, Butterfly::new);
 	}
 
 	@Nullable
@@ -128,7 +128,7 @@ public class Butterfly extends IndividualLiving<IButterflySpecies, IButterfly, I
 		PathfinderMob creature = entity.getEntity();
 		float metabolism = (float) getGenome().getActiveValue(ButterflyChromosomes.METABOLISM) / 10;
 		List<IProduct> products = this.species.getButterflyLoot();
-		RandomSource rand = creature.level().random;
+		RandomSource rand = creature.level().getRandom();
 
 		for (IProduct product : products) {
 			if (rand.nextFloat() < product.chance() * metabolism) {

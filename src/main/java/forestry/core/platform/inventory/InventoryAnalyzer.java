@@ -1,5 +1,6 @@
 package forestry.core.platform.inventory;
 
+
 import forestry.api.core.genetics.capability.IIndividualHandlerItem;
 import forestry.core.content.analyzer.TileAnalyzer;
 import forestry.core.platform.util.GeneticsUtil;
@@ -8,7 +9,7 @@ import forestry.core.platform.util.SpeciesUtil;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 
 import java.util.Optional;
 
@@ -29,7 +30,7 @@ public class InventoryAnalyzer extends InventoryAdapterTile<TileAnalyzer> {
 		if (SlotUtil.isSlotInRange(slotIndex, SLOT_INPUT_1, SLOT_INPUT_COUNT)) {
 			return IIndividualHandlerItem.isIndividual(stack);
 		} else if (slotIndex == SLOT_CAN) {
-			Optional<FluidStack> fluid = FluidUtil.getFluidContained(stack);
+			Optional<FluidStack> fluid = Optional.of(FluidUtil.getFirstStackContained(stack)).filter(fluidStack -> !fluidStack.isEmpty());
 			return fluid.map(f -> this.tile.getTankManager().canFillFluidType(f)).orElse(false);
 		}
 

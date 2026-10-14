@@ -1,7 +1,7 @@
 package forestry.api.core;
 
 import forestry.api.client.ITextureManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * An error describes when a certain working condition is not met and how to resolve the error.
@@ -10,7 +10,7 @@ public interface IError {
 	/**
 	 * @return The unique ID for this error.
 	 */
-	ResourceLocation getId();
+	Identifier getId();
 
 	/**
 	 * @return Translation key for a short name that succinctly describes the error. Ex. "Too Hot"
@@ -25,5 +25,5 @@ public interface IError {
 	/**
 	 * @return Location of an icon sprite registered to the Forestry texture manager at {@link ITextureManager}.
 	 */
-	ResourceLocation getSprite();
+	Identifier getSprite();
 }

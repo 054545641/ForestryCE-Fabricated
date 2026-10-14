@@ -15,7 +15,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.arboriculture.genetics.ITreeSpeciesType;
 import forestry.api.plugin.IArboricultureRegistration;
@@ -50,16 +50,16 @@ public class TreeSpeciesProvider implements DataProvider {
 		});
 	}
 
-	public static Map<ResourceLocation, TreeSpeciesDefinition> buildDefinitions(ITreeSpeciesType type, Consumer<IArboricultureRegistration> species) {
+	public static Map<Identifier, TreeSpeciesDefinition> buildDefinitions(ITreeSpeciesType type, Consumer<IArboricultureRegistration> species) {
 		ArboricultureRegistration reg = new ArboricultureRegistration(type);
 		species.accept(reg);
 
-		Map<ResourceLocation, TreeSpeciesDefinition> definitions = new LinkedHashMap<>();
+		Map<Identifier, TreeSpeciesDefinition> definitions = new LinkedHashMap<>();
 		reg.forEachSpeciesBuilder((id, builder) -> definitions.put(id, buildDefinition(builder)));
 		return definitions;
 	}
 
-	public static Map<ResourceLocation, TreeSpeciesDefinition> buildDefinitions() {
+	public static Map<Identifier, TreeSpeciesDefinition> buildDefinitions() {
 		return buildDefinitions(SpeciesUtil.TREE_TYPE.get(), DefaultTreeSpecies::register);
 	}
 
@@ -88,7 +88,7 @@ public class TreeSpeciesProvider implements DataProvider {
 		);
 	}
 
-	private CompletableFuture<?> saveSpecies(CachedOutput cache, RegistryOps<JsonElement> ops, ResourceLocation id, TreeSpeciesDefinition def) {
+	private CompletableFuture<?> saveSpecies(CachedOutput cache, RegistryOps<JsonElement> ops, Identifier id, TreeSpeciesDefinition def) {
 		JsonElement json = TreeSpeciesDefinition.codec().encodeStart(ops, def).getOrThrow();
 		return DataProvider.saveStable(cache, json, this.pathProvider.json(id));
 	}

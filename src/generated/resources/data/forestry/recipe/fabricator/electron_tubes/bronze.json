@@ -6,14 +6,9 @@
     "id": "forestry:liquid_glass"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "tag": "c:dusts/redstone"
-      },
-      "X": {
-        "tag": "c:ingots/bronze"
-      }
+      "#": "#c:dusts/redstone",
+      "X": "#c:ingots/bronze"
     },
     "pattern": [
       " X ",

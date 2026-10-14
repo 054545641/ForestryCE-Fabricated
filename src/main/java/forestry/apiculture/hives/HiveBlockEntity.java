@@ -36,7 +36,7 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.monster.ZombifiedPiglin;
+import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -51,6 +51,9 @@ import org.jetbrains.annotations.ApiStatus;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 // the naturally-spawning wild bee hive block entity
 public class HiveBlockEntity extends BlockEntity implements IHiveTile, IActivatable, IBeeHousing, ISpectacleBlock {
@@ -86,7 +89,7 @@ public class HiveBlockEntity extends BlockEntity implements IHiveTile, IActivata
 	public void tick(Level level) {
         this.tickHelper.onTick();
 
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			if (this.active && this.tickHelper.updateOnInterval(4)) {
 				if (this.beeLogic.canDoBeeFX()) {
                     this.beeLogic.doBeeFX();
@@ -145,18 +148,24 @@ public class HiveBlockEntity extends BlockEntity implements IHiveTile, IActivata
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.loadAdditional(compoundNBT, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compoundNBT = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
         this.contained.read(compoundNBT, registries);
         this.beeLogic.read(compoundNBT, registries);
 	}
 
 
 	@Override
-	public void saveAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.saveAdditional(compoundNBT, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag compoundNBT = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
         this.contained.write(compoundNBT, registries);
         this.beeLogic.write(compoundNBT, registries);
+
+		ValueIOUtil.mergeInto(output, compoundNBT);
 	}
 
 	@Override
@@ -195,12 +204,12 @@ public class HiveBlockEntity extends BlockEntity implements IHiveTile, IActivata
 
 	private static void attack(LivingEntity entity, int maxDamage) {
 		Level level = entity.level();
-		double attackAmount = level.random.nextDouble() / 2.0 + 0.5;
+		double attackAmount = level.getRandom().nextDouble() / 2.0 + 0.5;
 		int damage = (int) (attackAmount * maxDamage);
 		if (damage > 0) {
 			// Entities are not attacked if they wear a full set of apiarist's armor.
 			int count = BeeManager.armorApiaristHelper.wearsItems(entity, null, true);
-			if (level.random.nextInt(4) >= count) {
+			if (level.getRandom().nextInt(4) >= count) {
 				entity.hurt(CoreDamageTypes.source(level, CoreDamageTypes.HIVE), damage);
 			}
 		}
@@ -218,7 +227,7 @@ public class HiveBlockEntity extends BlockEntity implements IHiveTile, IActivata
 		}
 		this.active = active;
 
-		if (!this.level.isClientSide) {
+		if (!this.level.isClientSide()) {
 			NetworkUtil.sendNetworkPacket(new PacketActiveUpdate(this), this.worldPosition, this.level);
 		}
 	}
@@ -236,19 +245,17 @@ public class HiveBlockEntity extends BlockEntity implements IHiveTile, IActivata
 		return nbt;
 	}
 
-	// todo wtf are these two methods (loading from NBT several times per packet)
 	@Override
-	public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
-		super.handleUpdateTag(tag, registries);
-		setActive(tag.getBoolean("active"));
+	public void handleUpdateTag(ValueInput input) {
+		CompoundTag tag = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		setActive(tag.getBooleanOr("active", false));
 		this.beeLogic.read(tag, registries);
 	}
 
 	@Override
-	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider registries) {
-		super.onDataPacket(net, pkt, registries);
-		CompoundTag nbt = pkt.getTag();
-		handleUpdateTag(nbt, registries);
+	public void onDataPacket(Connection net, ValueInput input) {
+		handleUpdateTag(input);
 	}
 
 	@Override
@@ -283,7 +290,7 @@ public class HiveBlockEntity extends BlockEntity implements IHiveTile, IActivata
 
 	@Override
 	public int getBlockLightValue() {
-		return this.level.isDay() ? 15 : 0; // hives may have the sky obstructed but should still be active
+		return this.level.isBrightOutside() ? 15 : 0; // hives may have the sky obstructed but should still be active
 	}
 
 	@Override

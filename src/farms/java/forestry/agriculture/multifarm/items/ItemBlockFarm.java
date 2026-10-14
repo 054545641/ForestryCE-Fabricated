@@ -12,13 +12,13 @@ import net.minecraft.world.item.TooltipFlag;
 import java.util.List;
 
 public class ItemBlockFarm extends ItemBlockForestry<MultifarmBlock> {
-	public ItemBlockFarm(MultifarmBlock block) {
-		super(block, new Item.Properties());
+	public ItemBlockFarm(MultifarmBlock block, Properties properties) {
+		super(block, properties);
 	}
 
 	@Override
 	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-		if (Screen.hasShiftDown()) {
+		if (net.minecraft.client.Minecraft.getInstance().hasShiftDown()) {
 			tooltip.add(Component.translatable("block.forestry.farm.tooltip").withStyle(ChatFormatting.GRAY));
 		} else {
 			tooltip.add(Component.translatable(TranslationKeys.HOLD_SHIFT_FOR_DETAILS).withStyle(ChatFormatting.GRAY));

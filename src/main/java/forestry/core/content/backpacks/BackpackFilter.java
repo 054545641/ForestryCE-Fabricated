@@ -38,7 +38,7 @@ public class BackpackFilter implements Predicate<ItemStack> {
 	}
 
 	private static HolderSet<Item> getHolderSet(TagKey<Item> tagKey) {
-		return BuiltInRegistries.ITEM.getTag(tagKey)
+		return BuiltInRegistries.ITEM.get(tagKey)
 			.orElseThrow(() -> new IllegalArgumentException("No tag holder set found for tag key: " + tagKey));
 	}
 

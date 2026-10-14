@@ -30,6 +30,9 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public class TileBurnBarrel extends TileBase implements IStreamableGui {
 	// How many ticks it takes for ash to be produced. 100 ticks means there is a 1:1 ratio between ash produced and
@@ -92,7 +95,7 @@ public class TileBurnBarrel extends TileBase implements IStreamableGui {
 				hasResources = true;
 
 				ItemStack stack = getInternalInventory().getItem(nextInputIndex);
-				this.burnTime = stack.getBurnTime(null);
+				this.burnTime = stack.getBurnTime(null, level.fuelValues());
 				this.currentMaxBurnTime = this.burnTime;
 				getInternalInventory().setItem(nextInputIndex, stack.copyWithCount(stack.getCount() - 1));
 			}
@@ -143,12 +146,13 @@ public class TileBurnBarrel extends TileBase implements IStreamableGui {
 	}
 
 	public int hasInput() {
+		if (this.level == null) return -1;
 		// Loop backwards, consuming the last item first.
 		// Deviation from 1.20.1: the bound was a bare SLOT_INPUT_COUNT - 1, which only lands on the last input slot
 		// while SLOT_INPUT_1 is 0. Written the same way as canOutput below
 		for (int i = InventoryBurnBarrel.SLOT_INPUT_1 + InventoryBurnBarrel.SLOT_INPUT_COUNT - 1; i >= InventoryBurnBarrel.SLOT_INPUT_1; i--) {
 			ItemStack stack = getInternalInventory().getItem(i);
-			if (!stack.isEmpty() && stack.getBurnTime(null) > 0) {
+			if (!stack.isEmpty() && stack.getBurnTime(null, level.fuelValues()) > 0) {
 				return i;
 			}
 		}
@@ -236,21 +240,27 @@ public class TileBurnBarrel extends TileBase implements IStreamableGui {
 
 	/* LOADING & SAVING */
 	@Override
-	public void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-		super.saveAdditional(compound, registries);
+	protected void saveAdditional(ValueOutput output) {
+		CompoundTag compound = new CompoundTag();
+		HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+		super.saveAdditional(output);
 
 		compound.putInt("BurnTime", this.burnTime);
 		compound.putInt("MaxBurnTime", this.currentMaxBurnTime);
 		compound.putInt("AshTime", this.ashProductionTimer);
+
+		ValueIOUtil.mergeInto(output, compound);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-		super.loadAdditional(compound, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compound = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
 
-		this.burnTime = compound.getInt("BurnTime");
-		this.currentMaxBurnTime = compound.getInt("MaxBurnTime");
-		this.ashProductionTimer = compound.getInt("AshTime");
+		this.burnTime = compound.getIntOr("BurnTime", 0);
+		this.currentMaxBurnTime = compound.getIntOr("MaxBurnTime", 0);
+		this.ashProductionTimer = compound.getIntOr("AshTime", 0);
 	}
 
 	@Override

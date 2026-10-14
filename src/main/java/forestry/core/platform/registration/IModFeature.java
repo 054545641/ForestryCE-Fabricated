@@ -2,7 +2,7 @@ package forestry.core.platform.registration;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Fancy wrapper around a registry object.
@@ -16,7 +16,7 @@ public interface IModFeature {
 	/**
 	 * @return The ID of the module responsible for adding this feature.
 	 */
-	ResourceLocation getModuleId();
+	Identifier getModuleId();
 
 	/**
 	 * @return The ID of the mod which this feature is added by.

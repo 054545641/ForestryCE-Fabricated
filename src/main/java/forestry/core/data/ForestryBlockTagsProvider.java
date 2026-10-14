@@ -121,7 +121,7 @@ public final class ForestryBlockTagsProvider {
 			tags.tag(woodType.blockTag).add(woodType.getBurnables().map(FeatureBlock::block).toArray(Block[]::new));
 			tags.tag(woodType.fireproofBlockTag).add(woodType.getFireproof().map(FeatureBlock::block).toArray(Block[]::new));
 			tags.tag(BlockTags.LOGS).addTags(woodType.fireproofBlockTag);
-			tags.tag(BlockTags.LOGS_THAT_BURN).addTag(woodType.blockTag);
+			tags.tag(net.minecraft.tags.BlockItemTags.LOGS_THAT_BURN.block()).addTag(woodType.blockTag);
 			tags.tag(BlockTags.OVERWORLD_NATURAL_LOGS).add(ArboricultureBlocks.LOGS.get(woodType).block());
 		}
 		for (VanillaWoodType woodType : VanillaWoodType.VALUES) {
@@ -177,7 +177,7 @@ public final class ForestryBlockTagsProvider {
 		tags.tag(BlockTags.CEILING_HANGING_SIGNS).add(ArboricultureBlocks.HANGING_SIGN.blockArray());
 		tags.tag(BlockTags.WALL_HANGING_SIGNS).add(ArboricultureBlocks.WALL_HANGING_SIGN.blockArray());
 
-		tags.tag(BlockTags.SAPLINGS).add(ArboricultureBlocks.SAPLING_GE.block());
+		tags.tag(net.minecraft.tags.BlockItemTags.SAPLINGS.block()).add(ArboricultureBlocks.SAPLING_GE.block());
 		tags.tag(ForestryTags.Blocks.TREE_SAPLINGS).add(ArboricultureBlocks.SAPLING_GE.block());
 		tags.tag(BlockTags.LEAVES).add(ArboricultureBlocks.LEAVES.block()).add(ArboricultureBlocks.LEAVES_DEFAULT_FRUIT.blockArray()).add(ArboricultureBlocks.LEAVES_DEFAULT.blockArray()).add(ArboricultureBlocks.LEAVES_DECORATIVE.blockArray());
 
@@ -199,14 +199,14 @@ public final class ForestryBlockTagsProvider {
 		// Turf has to stand in for grass, so both blocks join the tags a grass block carries. Not every one of
 		// them: 1.20.1 left animals and wolves spawnable on out, and they stay out here
 		for (TagKey<Block> tag : List.of(
-			BlockTags.BIG_DRIPLEAF_PLACEABLE,
+			BlockTags.SUPPORTS_BIG_DRIPLEAF,
 			BlockTags.VALID_SPAWN,
-			BlockTags.BAMBOO_PLANTABLE_ON,
+			BlockTags.SUPPORTS_BAMBOO,
 			BlockTags.AZALEA_GROWS_ON,
 			BlockTags.SCULK_REPLACEABLE,
 			BlockTags.AZALEA_ROOT_REPLACEABLE,
 			BlockTags.ENDERMAN_HOLDABLE,
-			BlockTags.DEAD_BUSH_MAY_PLACE_ON,
+			BlockTags.SUPPORTS_DRY_VEGETATION,
 			BlockTags.LUSH_GROUND_REPLACEABLE,
 			BlockTags.MOSS_REPLACEABLE
 		)) {

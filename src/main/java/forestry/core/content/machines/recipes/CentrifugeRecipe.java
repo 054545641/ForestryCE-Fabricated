@@ -1,5 +1,6 @@
 package forestry.core.content.machines.recipes;
 
+import forestry.api.core.machines.IForestryRecipe;
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -12,7 +13,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -25,25 +26,25 @@ import forestry.core.content.machines.features.FactoryRecipeTypes;
 
 public class CentrifugeRecipe implements ICentrifugeRecipe {
 	private static final MapCodec<CentrifugeRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-		ResourceLocation.CODEC.fieldOf("id").forGetter(CentrifugeRecipe::getId),
+		Identifier.CODEC.fieldOf("id").forGetter(CentrifugeRecipe::getId),
 		Codec.INT.fieldOf("time").forGetter(CentrifugeRecipe::getProcessingTime),
-		Ingredient.CODEC_NONEMPTY.fieldOf("input").forGetter(CentrifugeRecipe::getInput),
+		Ingredient.CODEC.fieldOf("input").forGetter(CentrifugeRecipe::getInput),
 		IProduct.LIST_CODEC.fieldOf("products").forGetter(CentrifugeRecipe::getAllProducts)
 	).apply(instance, CentrifugeRecipe::new));
 	private static final StreamCodec<RegistryFriendlyByteBuf, CentrifugeRecipe> STREAM_CODEC = StreamCodec.composite(
-		ResourceLocation.STREAM_CODEC, CentrifugeRecipe::getId,
+		Identifier.STREAM_CODEC, CentrifugeRecipe::getId,
 		ByteBufCodecs.INT, CentrifugeRecipe::getProcessingTime,
 		Ingredient.CONTENTS_STREAM_CODEC, CentrifugeRecipe::getInput,
 		IProduct.LIST_STREAM_CODEC, CentrifugeRecipe::getAllProducts,
 		CentrifugeRecipe::new
 	);
 
-	private final ResourceLocation id;
+	private final Identifier id;
 	private final int processingTime;
 	private final Ingredient input;
 	private final List<IProduct> products;
 
-	public CentrifugeRecipe(ResourceLocation id, int processingTime, Ingredient input, List<IProduct> products) {
+	public CentrifugeRecipe(Identifier id, int processingTime, Ingredient input, List<IProduct> products) {
 		Preconditions.checkNotNull(id, "Recipe identifier cannot be null");
 
 		this.id = id;
@@ -92,29 +93,22 @@ public class CentrifugeRecipe implements ICentrifugeRecipe {
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return this.id;
 	}
 
 	@Override
-	public RecipeSerializer<?> getSerializer() {
+	public RecipeSerializer<? extends IForestryRecipe> getSerializer() {
 		return FactoryRecipeTypes.CENTRIFUGE.serializer();
 	}
 
 	@Override
-	public RecipeType<?> getType() {
+	public RecipeType<? extends IForestryRecipe> getType() {
 		return FactoryRecipeTypes.CENTRIFUGE.type();
 	}
 
-	public static class Serializer implements RecipeSerializer<CentrifugeRecipe> {
-		@Override
-		public MapCodec<CentrifugeRecipe> codec() {
-			return CODEC;
-		}
+	public static final RecipeSerializer<CentrifugeRecipe> SERIALIZER = new RecipeSerializer<>(CODEC, STREAM_CODEC);
 
-		@Override
-		public StreamCodec<RegistryFriendlyByteBuf, CentrifugeRecipe> streamCodec() {
-			return STREAM_CODEC;
-		}
+	private static class NetworkCodecs {
 	}
 }

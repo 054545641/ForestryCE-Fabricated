@@ -1,5 +1,3 @@
-modLoader = "javafml"
-loaderVersion = "{fmlVersionRange}"
 license = "GNU Lesser Public License v3"
 
 [[mods]]
@@ -18,4 +16,11 @@ modId = "forestry"
 type = "REQUIRED"
 versionRange = "[${version},]"
 ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.forestrygametest]]
+modId = "minecraft"
+type = "REQUIRED"
+versionRange = "${minecraftVersionRange}"
+ordering = "NONE"
 side = "BOTH"

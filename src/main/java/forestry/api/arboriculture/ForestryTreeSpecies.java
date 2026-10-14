@@ -1,6 +1,6 @@
 package forestry.api.arboriculture;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static forestry.api.ForestryConstants.forestry;
 
@@ -9,60 +9,60 @@ import static forestry.api.ForestryConstants.forestry;
  * The "" prefix avoids ID conflicts because all types of species share the same registry (alleles).
  */
 public class ForestryTreeSpecies {
-	public static final ResourceLocation OAK = forestry("oak");
-	public static final ResourceLocation DARK_OAK = forestry("dark_oak");
-	public static final ResourceLocation BIRCH = forestry("birch");
+	public static final Identifier OAK = forestry("oak");
+	public static final Identifier DARK_OAK = forestry("dark_oak");
+	public static final Identifier BIRCH = forestry("birch");
 	/**
 	 * The species for the Acacia trees added by Vanilla Minecraft.
 	 */
-	public static final ResourceLocation ACACIA_VANILLA = forestry("acacia");
-	public static final ResourceLocation SPRUCE = forestry("spruce");
-	public static final ResourceLocation JUNGLE = forestry("jungle");
+	public static final Identifier ACACIA_VANILLA = forestry("acacia");
+	public static final Identifier SPRUCE = forestry("spruce");
+	public static final Identifier JUNGLE = forestry("jungle");
 	/**
 	 * The species for the Cherry Blossom trees added by Vanilla Minecraft.
 	 */
-	public static final ResourceLocation CHERRY_VANILLA = forestry("cherry");
-	public static final ResourceLocation LIME = forestry("lime");
-	public static final ResourceLocation WALNUT = forestry("walnut");
-	public static final ResourceLocation CHESTNUT = forestry("chestnut");
-	public static final ResourceLocation SOUR_CHERRY = forestry("sour_cherry");
-	public static final ResourceLocation LEMON = forestry("lemon");
-	public static final ResourceLocation PLUM = forestry("plum");
-	public static final ResourceLocation MAPLE = forestry("maple");
-	public static final ResourceLocation LARCH = forestry("larch");
-	public static final ResourceLocation PINE = forestry("pine");
-	public static final ResourceLocation SEQUOIA = forestry("sequoia");
-	public static final ResourceLocation GIANT_SEQUOIA = forestry("giant_sequoia");
-	public static final ResourceLocation TEAK = forestry("teak");
-	public static final ResourceLocation IPE = forestry("ipe");
-	public static final ResourceLocation KAPOK = forestry("kapok");
-	public static final ResourceLocation EBONY = forestry("ebony");
-	public static final ResourceLocation ZEBRANO = forestry("zebrano");
-	public static final ResourceLocation MAHOGANY = forestry("mahogany");
-	public static final ResourceLocation CAMELTHORN = forestry("camelthorn");
-	public static final ResourceLocation PADAUK = forestry("padauk");
-	public static final ResourceLocation BALSA = forestry("balsa");
-	public static final ResourceLocation COCOBOLO = forestry("cocobolo");
-	public static final ResourceLocation WENGE = forestry("wenge");
-	public static final ResourceLocation BAOBAB = forestry("baobab");
-	public static final ResourceLocation MAHOE = forestry("mahoe");
-	public static final ResourceLocation WILLOW = forestry("willow");
-	public static final ResourceLocation GREENHEART = forestry("greenheart");
-	public static final ResourceLocation PAPAYA = forestry("papaya");
-	public static final ResourceLocation DATE = forestry("date");
-	public static final ResourceLocation POPLAR = forestry("poplar");
-	public static final ResourceLocation ELM = forestry("elm");
-	public static final ResourceLocation FIR = forestry("fir");
-	public static final ResourceLocation COCONUT = forestry("coconut");
-	public static final ResourceLocation BEECH = forestry("beech");
-	public static final ResourceLocation FEIJOA = forestry("feijoa");
-	public static final ResourceLocation DOGWOOD = forestry("dogwood");
-	public static final ResourceLocation GINKGO = forestry("ginkgo");
-	public static final ResourceLocation JACARANDA = forestry("jacaranda");
-	public static final ResourceLocation PEWEN = forestry("pewen");
-	public static final ResourceLocation MACROCARPA = forestry("macrocarpa");
-	public static final ResourceLocation OLIVE = forestry("olive");
-	public static final ResourceLocation ORANGE = forestry("orange");
-	public static final ResourceLocation PEAR = forestry("pear");
-	public static final ResourceLocation KAURI = forestry("kauri");
+	public static final Identifier CHERRY_VANILLA = forestry("cherry");
+	public static final Identifier LIME = forestry("lime");
+	public static final Identifier WALNUT = forestry("walnut");
+	public static final Identifier CHESTNUT = forestry("chestnut");
+	public static final Identifier SOUR_CHERRY = forestry("sour_cherry");
+	public static final Identifier LEMON = forestry("lemon");
+	public static final Identifier PLUM = forestry("plum");
+	public static final Identifier MAPLE = forestry("maple");
+	public static final Identifier LARCH = forestry("larch");
+	public static final Identifier PINE = forestry("pine");
+	public static final Identifier SEQUOIA = forestry("sequoia");
+	public static final Identifier GIANT_SEQUOIA = forestry("giant_sequoia");
+	public static final Identifier TEAK = forestry("teak");
+	public static final Identifier IPE = forestry("ipe");
+	public static final Identifier KAPOK = forestry("kapok");
+	public static final Identifier EBONY = forestry("ebony");
+	public static final Identifier ZEBRANO = forestry("zebrano");
+	public static final Identifier MAHOGANY = forestry("mahogany");
+	public static final Identifier CAMELTHORN = forestry("camelthorn");
+	public static final Identifier PADAUK = forestry("padauk");
+	public static final Identifier BALSA = forestry("balsa");
+	public static final Identifier COCOBOLO = forestry("cocobolo");
+	public static final Identifier WENGE = forestry("wenge");
+	public static final Identifier BAOBAB = forestry("baobab");
+	public static final Identifier MAHOE = forestry("mahoe");
+	public static final Identifier WILLOW = forestry("willow");
+	public static final Identifier GREENHEART = forestry("greenheart");
+	public static final Identifier PAPAYA = forestry("papaya");
+	public static final Identifier DATE = forestry("date");
+	public static final Identifier POPLAR = forestry("poplar");
+	public static final Identifier ELM = forestry("elm");
+	public static final Identifier FIR = forestry("fir");
+	public static final Identifier COCONUT = forestry("coconut");
+	public static final Identifier BEECH = forestry("beech");
+	public static final Identifier FEIJOA = forestry("feijoa");
+	public static final Identifier DOGWOOD = forestry("dogwood");
+	public static final Identifier GINKGO = forestry("ginkgo");
+	public static final Identifier JACARANDA = forestry("jacaranda");
+	public static final Identifier PEWEN = forestry("pewen");
+	public static final Identifier MACROCARPA = forestry("macrocarpa");
+	public static final Identifier OLIVE = forestry("olive");
+	public static final Identifier ORANGE = forestry("orange");
+	public static final Identifier PEAR = forestry("pear");
+	public static final Identifier KAURI = forestry("kauri");
 }

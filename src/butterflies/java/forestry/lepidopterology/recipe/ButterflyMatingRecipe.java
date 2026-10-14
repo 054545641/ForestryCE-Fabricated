@@ -16,8 +16,9 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
 public class ButterflyMatingRecipe extends CustomRecipe {
+	private final CraftingBookCategory category;
 	public ButterflyMatingRecipe(CraftingBookCategory category) {
-		super(category);
+		this.category = category;
 	}
 
 	@Override
@@ -30,7 +31,7 @@ public class ButterflyMatingRecipe extends CustomRecipe {
 			ItemStack stack = grid.getItem(i);
 
 			if (!stack.isEmpty()) {
-				ButterflyLifeStage stage = (ButterflyLifeStage) IIndividualHandlerItem.getLifeStage(stack);
+				ILifeStage stage = IIndividualHandlerItem.getLifeStage(stack);
 				if (stage == null) {
 					return false;
 				} else {
@@ -57,7 +58,7 @@ public class ButterflyMatingRecipe extends CustomRecipe {
 	}
 
 	@Override
-	public ItemStack assemble(CraftingInput grid, HolderLookup.Provider lookup) {
+	public ItemStack assemble(CraftingInput grid) {
 		IButterfly butterfly = null;
 		IIndividual serum = null;
 		int containerSize = grid.size();
@@ -88,12 +89,12 @@ public class ButterflyMatingRecipe extends CustomRecipe {
 	}
 
 	@Override
-	public boolean canCraftInDimensions(int width, int height) {
-		return width * height >= 2;
+	public CraftingBookCategory category() {
+		return this.category;
 	}
 
 	@Override
-	public RecipeSerializer<?> getSerializer() {
+	public RecipeSerializer<ButterflyMatingRecipe> getSerializer() {
 		return LepidopterologyRecipes.MATING_SERIALIZER.get();
 	}
 }

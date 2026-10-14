@@ -16,8 +16,8 @@ import java.util.List;
 public class HiveFrameItem extends ItemForestry implements IHiveFrame {
 	private final HiveFrameBeeModifier beeModifier;
 
-	public HiveFrameItem(int maxDamage, float geneticDecay) {
-		super(new Item.Properties().durability(maxDamage));
+	public HiveFrameItem(int maxDamage, float geneticDecay, Properties properties) {
+		super(properties.durability(maxDamage));
 
 		this.beeModifier = new HiveFrameBeeModifier(geneticDecay);
 	}

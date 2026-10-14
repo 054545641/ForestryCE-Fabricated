@@ -12,8 +12,8 @@ import net.minecraft.world.level.block.state.BlockState;
 public class MinifarmBlock extends BlockBase<MinifarmBlockType> {
 	private final boolean manual;
 
-	public MinifarmBlock(MinifarmBlockType type, boolean manual) {
-		super(Properties.of().noOcclusion(), type);
+	public MinifarmBlock(Properties properties, MinifarmBlockType type, boolean manual) {
+		super(properties.noOcclusion(), type);
 		this.manual = manual;
 	}
 

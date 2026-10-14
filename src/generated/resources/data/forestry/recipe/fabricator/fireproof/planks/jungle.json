@@ -8,12 +8,8 @@
   "recipe": {
     "category": "building",
     "key": {
-      "#": {
-        "item": "forestry:refractory_wax"
-      },
-      "X": {
-        "item": "minecraft:jungle_planks"
-      }
+      "#": "forestry:refractory_wax",
+      "X": "minecraft:jungle_planks"
     },
     "pattern": [
       "XXX",

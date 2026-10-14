@@ -3,7 +3,7 @@ package forestry.api.core.genetics.alleles;
 import com.mojang.serialization.Codec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 
@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
  *     <li><b>Data chromosomes</b> hold a literal value type ({@code Float}, {@code Integer}, {@code Boolean},
  *     an enum, {@code Vec3i}, ...). {@link #resolver()} is {@code null}.</li>
  *     <li><b>Reference chromosomes</b> (species, flower type, bee effect, activity, fruit, tree effect, cocoon,
- *     butterfly effect) have {@code V = ResourceLocation}: the genome stores the id, and {@link #resolver()}
+ *     butterfly effect) have {@code V = Identifier}: the genome stores the id, and {@link #resolver()}
  *     resolves the id to the behavior object on demand.</li>
  * </ul>
  *
@@ -25,10 +25,10 @@ public interface IChromosome<V> {
 	/**
 	 * @return Unique ID for this chromosome.
 	 */
-	ResourceLocation id();
+	Identifier id();
 
 	/**
-	 * @return Codec for the value stored inline in the genome. Reference chromosomes encode a {@link ResourceLocation}.
+	 * @return Codec for the value stored inline in the genome. Reference chromosomes encode a {@link Identifier}.
 	 */
 	Codec<V> valueCodec();
 
@@ -58,18 +58,18 @@ public interface IChromosome<V> {
 	IReferenceResolver<?> resolver();
 
 	/**
-	 * Resolves a reference chromosome's stored {@link ResourceLocation} to its behavior object and back.
+	 * Resolves a reference chromosome's stored {@link Identifier} to its behavior object and back.
 	 * Resolution is lazy: it reads the code registry at call time, after registries have been populated.
 	 *
 	 * @param <R> The resolved behavior object type.
 	 */
 	interface IReferenceResolver<R> {
-		R get(ResourceLocation id);
+		R get(Identifier id);
 
 		/**
 		 * @return The default dominance of the referenced value (its declared {@code isDominant()}). Used when a
 		 * reference allele is created from an id without an explicit dominance (default genomes, genome overrides).
 		 */
-		boolean isDominant(ResourceLocation id);
+		boolean isDominant(Identifier id);
 	}
 }

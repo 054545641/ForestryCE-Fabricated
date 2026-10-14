@@ -1,13 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "tag": "minecraft:sand"
-    },
-    "X": {
-      "tag": "c:gems/apatite"
-    }
+    "#": "#minecraft:sand",
+    "X": "#c:gems/apatite"
   },
   "pattern": [
     " # ",

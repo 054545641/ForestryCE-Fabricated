@@ -15,6 +15,11 @@ public class ClientBreedingHandler extends ServerBreedingHandler {
 	private final Map<ISpeciesType<?, ?>, IBreedingTracker> trackerByUID = new LinkedHashMap<>();
 
 	@Override
+	public void clearClientCache() {
+		this.trackerByUID.clear();
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends IBreedingTracker> T getTracker(ISpeciesType<?, ?> type, LevelAccessor level, @Nullable GameProfile profile) {
 		if (level instanceof ServerLevel) {

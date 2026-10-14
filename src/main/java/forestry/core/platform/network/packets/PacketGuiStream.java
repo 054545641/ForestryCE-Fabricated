@@ -38,9 +38,13 @@ public record PacketGuiStream(
 	}
 
 	public static void handle(PacketGuiStream msg, Player player) {
-		IStreamableGui tile = TileUtil.getTile(player.level(), msg.pos, IStreamableGui.class);
-		if (tile != null) {
-			tile.readGuiData(msg.payload);
+		try {
+			IStreamableGui tile = TileUtil.getTile(player.level(), msg.pos, IStreamableGui.class);
+			if (tile != null) {
+				tile.readGuiData(msg.payload);
+			}
+		} finally {
+			msg.payload.release();
 		}
 	}
 }

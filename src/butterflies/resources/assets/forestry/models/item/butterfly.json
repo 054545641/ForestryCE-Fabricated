@@ -1,3 +1,3 @@
 {
-  "loader": "forestry:butterfly_ge"
+  "parent": "forestry:item/butterfly_base"
 }

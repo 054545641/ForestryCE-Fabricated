@@ -7,9 +7,6 @@ import net.minecraft.world.item.ItemStack;
 
 public class ItemBlockHoneyComb extends ItemBlockForestry<BlockHoneyComb> implements ITintedItem {
 	@Deprecated
-	public ItemBlockHoneyComb(BlockHoneyComb block) {
-		this(block, new Item.Properties());
-	}
 
 	public ItemBlockHoneyComb(BlockHoneyComb block, Item.Properties properties) {
 		super(block, properties);

@@ -1,6 +1,7 @@
 package forestry.core.platform.inventory;
 
 import com.google.common.base.Preconditions;
+import net.minecraft.world.entity.ContainerUser;
 import forestry.core.features.CoreDataComponents;
 import forestry.api.core.IFilterSlotDelegate;
 import forestry.core.platform.util.InventoryUtil;
@@ -9,24 +10,24 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.Container;
+import forestry.api.core.ITransactionalContainer;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import javax.annotation.Nullable;
 import java.util.Random;
 
-public abstract class ItemInventory implements Container, IFilterSlotDelegate {
+public abstract class ItemInventory implements ITransactionalContainer, IFilterSlotDelegate {
 	private static final String KEY_SLOTS = "Slots";
 	private static final String KEY_UID = "UID";
 	private static final Random rand = new Random();
 
-	private final IItemHandler itemHandler = new InvWrapper(this);
+	private final ResourceHandler<ItemResource> itemHandler = new InventoryTransferHandler(this, slots -> setChanged());
 
 	protected final Player player;
 	private ItemStack parent;    //TODO not final any more. Is this a problem
@@ -70,12 +71,12 @@ public abstract class ItemInventory implements Container, IFilterSlotDelegate {
 		if (nbt == null) {
 			return;
 		}
-		CompoundTag nbtSlots = nbt.getCompound(KEY_SLOTS);
+		CompoundTag nbtSlots = nbt.getCompoundOrEmpty(KEY_SLOTS);
 		for (int i = 0; i < this.inventoryStacks.size(); i++) {
 			String slotKey = getSlotNBTKey(i);
 			if (nbtSlots.contains(slotKey)) {
-				CompoundTag itemNbt = nbtSlots.getCompound(slotKey);
-				ItemStack itemStack = InventoryUtil.deserializeItemStack(itemNbt);
+				CompoundTag itemNbt = nbtSlots.getCompoundOrEmpty(slotKey);
+				ItemStack itemStack = InventoryUtil.deserializeItemStack(itemNbt, this.player.registryAccess());
 				this.inventoryStacks.set(i, itemStack);
 			} else {
 				this.inventoryStacks.set(i, ItemStack.EMPTY);
@@ -86,11 +87,7 @@ public abstract class ItemInventory implements Container, IFilterSlotDelegate {
 	public static int getOccupiedSlotCount(ItemStack itemStack) {
 		ItemContainerContents container = itemStack.get(DataComponents.CONTAINER);
 		if (container != null) {
-			int occupied = 0;
-			for (ItemStack ignored : container.nonEmptyItemsCopy()) {
-				occupied++;
-			}
-			return occupied;
+			return (int) container.nonEmptyItemCopyStream().count();
 		}
 
 		CompoundTag nbt = NBTUtilForestry.getItemStackTag(itemStack);
@@ -98,7 +95,7 @@ public abstract class ItemInventory implements Container, IFilterSlotDelegate {
 			return 0;
 		}
 
-		CompoundTag slotNbt = nbt.getCompound(KEY_SLOTS);
+		CompoundTag slotNbt = nbt.getCompoundOrEmpty(KEY_SLOTS);
 		return slotNbt.size();
 	}
 
@@ -168,9 +165,7 @@ public abstract class ItemInventory implements Container, IFilterSlotDelegate {
 			return false;
 		}
 
-		int baseUID = baseTagCompound.getInt(KEY_UID);
-		int comparisonUID = comparisonTagCompound.getInt(KEY_UID);
-		return baseUID == comparisonUID;
+		return baseTagCompound.getInt(KEY_UID).filter(id -> comparisonTagCompound.getInt(KEY_UID).filter(id::equals).isPresent()).isPresent();
 	}
 
 	private void writeToParentNBT() {
@@ -194,7 +189,7 @@ public abstract class ItemInventory implements Container, IFilterSlotDelegate {
 			ItemStack itemStack = getItem(i);
 			if (!itemStack.isEmpty()) {
 				String slotKey = getSlotNBTKey(i);
-				CompoundTag itemNbt = InventoryUtil.serializeItemStack(itemStack);
+				CompoundTag itemNbt = InventoryUtil.serializeItemStack(itemStack, this.player.registryAccess());
 				slotsNbt.put(slotKey, itemNbt);
 			}
 		}
@@ -253,6 +248,15 @@ public abstract class ItemInventory implements Container, IFilterSlotDelegate {
 		writeSlotToParent(parent, index, itemstack);
 	}
 
+	@Override
+	public void setItem(int index, ItemStack stack, boolean insideTransaction) {
+		if (insideTransaction) this.inventoryStacks.set(index, stack);
+		else setItem(index, stack);
+	}
+
+	@Override
+	public ResourceHandler<ItemResource> getTransferHandler() { return this.itemHandler; }
+
 	protected void writeSlotToParent(ItemStack parent, int index, ItemStack itemstack) {
 		if (usesComponentInventoryStorage()) {
 			writeInventoryToParent(parent);
@@ -269,7 +273,7 @@ public abstract class ItemInventory implements Container, IFilterSlotDelegate {
 			slotNbt = new CompoundTag();
 			nbt.put(KEY_SLOTS, slotNbt);
 		} else {
-			slotNbt = nbt.getCompound(KEY_SLOTS);
+			slotNbt = nbt.getCompoundOrEmpty(KEY_SLOTS);
 		}
 
 		String slotKey = getSlotNBTKey(index);
@@ -277,7 +281,7 @@ public abstract class ItemInventory implements Container, IFilterSlotDelegate {
 		if (itemstack.isEmpty()) {
 			slotNbt.remove(slotKey);
 		} else {
-			slotNbt.put(slotKey, InventoryUtil.serializeItemStack(itemstack));
+			slotNbt.put(slotKey, InventoryUtil.serializeItemStack(itemstack, this.player.registryAccess()));
 		}
 		NBTUtilForestry.setItemStackTag(parent, nbt);
 	}
@@ -313,11 +317,11 @@ public abstract class ItemInventory implements Container, IFilterSlotDelegate {
 	}
 
 	@Override
-	public void startOpen(Player player) {
+	public void startOpen(ContainerUser user) {
 	}
 
 	@Override
-	public void stopOpen(Player player) {
+	public void stopOpen(ContainerUser user) {
 	}
 
 	@Override
@@ -344,8 +348,8 @@ public abstract class ItemInventory implements Container, IFilterSlotDelegate {
 
 	/* Fields */
 
-	public IItemHandler getItemHandler() {
-		return this.itemHandler;
+	public ResourceHandler<ItemResource> getItemHandler() {
+		return InventoryTransferView.automation(this, null);
 	}
 
 	@Override

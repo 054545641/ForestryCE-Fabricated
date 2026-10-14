@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_slab",
   "key": {
-    "#": {
-      "item": "forestry:kauri_fireproof_planks"
-    }
+    "#": "forestry:kauri_fireproof_planks"
   },
   "pattern": [
     "###"

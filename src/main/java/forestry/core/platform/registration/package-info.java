@@ -1,9 +1,7 @@
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-@FieldsAreNonnullByDefault
+@NullMarked
 package forestry.core.platform.registration;
 
-import forestry.core.platform.util.FieldsAreNonnullByDefault;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import forestry.core.platform.util.FieldsAreNonnullByDefault;
+

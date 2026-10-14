@@ -12,7 +12,7 @@ import forestry.core.platform.gui.widgets.WidgetManager;
 import forestry.core.platform.util.SoundUtil;
 import forestry.core.content.sorting.gui.GuiGeneticFilter;
 import forestry.core.content.sorting.gui.ISelectableProvider;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -32,7 +32,7 @@ public class RuleWidget extends Widget implements ISelectableProvider<IFilterRul
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int startX, int startY) {
+	public void draw(GuiGraphicsExtractor graphics, int startX, int startY) {
 		int x = this.xPos + startX;
 		int y = this.yPos + startY;
 		IFilterLogic logic = this.gui.getLogic();
@@ -40,7 +40,7 @@ public class RuleWidget extends Widget implements ISelectableProvider<IFilterRul
 		draw(this.manager.gui, rule, graphics, y, x);
 
 		if (this.gui.selection.isSame(this)) {
-			graphics.blit(SelectionWidget.TEXTURE, x - 1, y - 1, 212, 0, 18, 18);
+			graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, SelectionWidget.TEXTURE, x - 1, y - 1, 212, 0, 18, 18, 256, 256);
 		}
 	}
 
@@ -50,9 +50,9 @@ public class RuleWidget extends Widget implements ISelectableProvider<IFilterRul
 	}
 
 	@Override
-	public void draw(GuiForestry<?> gui, IFilterRuleType selectable, GuiGraphics graphics, int y, int x) {
+	public void draw(GuiForestry<?> gui, IFilterRuleType selectable, GuiGraphicsExtractor graphics, int y, int x) {
 		TextureAtlasSprite sprite = IForestryClientApi.INSTANCE.getTextureManager().getSprite(selectable.getSprite());
-		graphics.blit(x, y, 0, 16, 16, sprite);
+		graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, sprite, x, y, 16, 16);
 	}
 
 	@Override

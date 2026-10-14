@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
-      "model": "forestry:block/ebony_hanging_sign"
+    "facing=east": {
+      "model": "forestry:block/ebony_wall_hanging_sign",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "forestry:block/ebony_wall_hanging_sign",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "forestry:block/ebony_wall_hanging_sign"
+    },
+    "facing=west": {
+      "model": "forestry:block/ebony_wall_hanging_sign",
+      "y": 90
     }
   }
 }

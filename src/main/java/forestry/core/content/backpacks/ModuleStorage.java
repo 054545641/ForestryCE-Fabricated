@@ -10,7 +10,7 @@ import forestry.core.platform.client.ForestryColors;
 import forestry.core.platform.config.ForestryConfig;
 import forestry.modules.BlankForestryModule;
 import forestry.core.content.backpacks.client.StorageClientHandler;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
@@ -35,7 +35,7 @@ public class ModuleStorage extends BlankForestryModule {
 	public static final BackpackDefinition BREWER = new BackpackDefinition(0xBD7CBD, ForestryColors.WHITE, new BackpackFilter(ForestryTags.Items.BREWER_ALLOW, ForestryTags.Items.BREWER_REJECT));
 
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return ForestryModuleIds.STORAGE;
 	}
 
@@ -60,7 +60,7 @@ public class ModuleStorage extends BlankForestryModule {
 		if (PickupHandlerStorage.onItemPickup(event.getPlayer(), event.getItemEntity())) {
 			event.getPlayer().take(event.getItemEntity(), pickupCount);
 			event.getItemEntity().discard();
-			event.setCanPickup(net.neoforged.neoforge.common.util.TriState.FALSE);
+			event.setCanPickup(net.minecraft.util.TriState.FALSE);
 		}
 	}
 

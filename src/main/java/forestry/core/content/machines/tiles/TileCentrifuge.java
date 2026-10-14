@@ -1,5 +1,6 @@
 package forestry.core.content.machines.tiles;
 
+import forestry.core.platform.util.InventoryData;
 import forestry.api.IForestryApi;
 import forestry.api.core.circuits.ForestryCircuitSocketTypes;
 import forestry.api.core.circuits.ICircuitBoard;
@@ -23,7 +24,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -36,6 +37,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import javax.annotation.Nullable;
 import java.util.ArrayDeque;
 import java.util.Collection;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public class TileCentrifuge extends TilePowered implements ISocketable, WorldlyContainer, IItemStackDisplay {
 	private static final int STEPS_PER_RECIPE_TIME = 1;
@@ -47,6 +51,22 @@ public class TileCentrifuge extends TilePowered implements ISocketable, WorldlyC
 	private final ArrayDeque<ItemStack> pendingProducts = new ArrayDeque<>();
 	@Nullable
 	private ICentrifugeRecipe currentRecipe;
+	private record ProcessingState(ICentrifugeRecipe recipe, java.util.List<ItemStack> pending, ItemStack preview) {}
+	@Override protected Object captureProcessingState() {
+		return new ProcessingState(this.currentRecipe, this.pendingProducts.stream().map(ItemStack::copy).toList(), this.craftPreviewInventory.getItem(0).copy());
+	}
+	@Override protected void restoreProcessingState(Object value) {
+		var previous = (ProcessingState) value;
+		this.currentRecipe = previous.recipe();
+		this.pendingProducts.clear();
+		this.pendingProducts.addAll(previous.pending());
+		this.craftPreviewInventory.setItem(0, previous.preview());
+	}
+	@Override protected CycleResult completeWorkCycle() {
+		int before = this.pendingProducts.size();
+		if (workCycle()) return CycleResult.COMPLETE;
+		return this.pendingProducts.size() < before ? CycleResult.PROGRESS : CycleResult.BLOCKED;
+	}
 
 	public TileCentrifuge(BlockPos pos, BlockState state) {
 		super(FactoryTiles.CENTRIFUGE.tileType(), pos, state, 800, Constants.MACHINE_MAX_ENERGY);
@@ -57,31 +77,26 @@ public class TileCentrifuge extends TilePowered implements ISocketable, WorldlyC
 	/* LOADING & SAVING */
 
 	@Override
-	public void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-		super.saveAdditional(compound, registries);
-
-		this.sockets.write(compound, registries);
-
-		ItemStack[] offspring = this.pendingProducts.toArray(new ItemStack[0]);
-		compound.put("PendingProducts", TileUtil.saveItemsToList(registries, offspring));
+	protected void saveAdditional(ValueOutput output) {
+		super.saveAdditional(output);
+		this.sockets.write(output);
+		InventoryData.writeStacks(this.pendingProducts, "PendingProducts", output);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-		super.loadAdditional(compound, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compound = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
 
-		ListTag nbttaglist = compound.getList("PendingProducts", 10);
-		for (int i = 0; i < nbttaglist.size(); i++) {
-			CompoundTag CompoundNBT1 = nbttaglist.getCompound(i);
-			this.pendingProducts.add(ItemStack.parse(registries, CompoundNBT1).orElse(ItemStack.EMPTY));
-		}
+		InventoryData.replaceStacks(this.pendingProducts, compound.getListOrEmpty("PendingProducts"), registries);
 		this.sockets.read(compound, registries);
 
 		ItemStack chip = this.sockets.getItem(0);
 		if (!chip.isEmpty()) {
 			ICircuitBoard chipset = IForestryApi.INSTANCE.getCircuitManager().getCircuitBoard(chip);
 			if (chipset != null) {
-				chipset.onLoad(this);
+				loadMachineUpgrade(chipset);
 			}
 		}
 	}
@@ -100,39 +115,34 @@ public class TileCentrifuge extends TilePowered implements ISocketable, WorldlyC
 
 	@Override
 	public boolean workCycle() {
-		if (!this.pendingProducts.isEmpty()) {
-			tryAddPending();
-			return this.pendingProducts.isEmpty();
+		try (var transaction = beginWorkTransaction()) {
+			if (!this.pendingProducts.isEmpty()) {
+				if (!tryAddPending()) return false;
+				transaction.commit();
+				return this.pendingProducts.isEmpty();
+			}
+			if (this.currentRecipe == null) return false;
+			ItemStack input = getItem(InventoryCentrifuge.SLOT_RESOURCE);
+			if (input.isEmpty() || RecipeUtils.getCentrifugeRecipe(RecipeUtils.getRecipeMap(getLevel()), input) != this.currentRecipe) return false;
+			Collection<ItemStack> products = this.currentRecipe.getProducts(workRandom(), this.outputMultiplier);
+			for (ItemStack product : products) {
+				if (!InventoryUtil.tryAddStack(this, product, InventoryCentrifuge.SLOT_PRODUCT_1, InventoryCentrifuge.SLOT_PRODUCT_COUNT, true)) return false;
+			}
+			if (getTransferHandler().extract(InventoryCentrifuge.SLOT_RESOURCE, net.neoforged.neoforge.transfer.item.ItemResource.of(input), 1, transaction) != 1) return false;
+			transaction.commit();
+			return true;
 		}
-
-		if (this.currentRecipe == null) {
-			return false;
-		}
-
-		// We are done, add products to queue
-		Collection<ItemStack> products = this.currentRecipe.getProducts(level.random, this.outputMultiplier);
-		this.pendingProducts.addAll(products);
-
-		//Add Item to preview slot.
-		ItemStack previewStack = getInternalInventory().getItem(InventoryCentrifuge.SLOT_RESOURCE).copy();
-		previewStack.setCount(1);
-		this.craftPreviewInventory.setItem(0, previewStack);
-
-		getInternalInventory().removeItem(InventoryCentrifuge.SLOT_RESOURCE, 1);
-		tryAddPending();
-		return this.pendingProducts.isEmpty();
 	}
 
 	private void checkRecipe() {
 		ItemStack resource = getItem(InventoryCentrifuge.SLOT_RESOURCE);
-		ICentrifugeRecipe matchingRecipe = RecipeUtils.getCentrifugeRecipe(getLevel().getRecipeManager(), resource);
+		ICentrifugeRecipe matchingRecipe = RecipeUtils.getCentrifugeRecipe(RecipeUtils.getRecipeMap(getLevel()), resource);
 
 		if (this.currentRecipe != matchingRecipe) {
 			this.currentRecipe = matchingRecipe;
 			if (this.currentRecipe != null) {
 				int recipeTime = this.currentRecipe.getProcessingTime();
-				setStepsPerWorkCycle(recipeTime * STEPS_PER_RECIPE_TIME);
-				setEnergyPerWorkCycle(recipeTime * ENERGY_PER_RECIPE_TIME);
+				configureWork(this.currentRecipe.getId().toString(), recipeTime * STEPS_PER_RECIPE_TIME, recipeTime * ENERGY_PER_RECIPE_TIME);
 			}
 		}
 	}
@@ -170,6 +180,7 @@ public class TileCentrifuge extends TilePowered implements ISocketable, WorldlyC
 	@Override
 	public boolean hasWork() {
 		if (!this.pendingProducts.isEmpty()) {
+			configureWork("forestry:pending_centrifuge", 1, 0);
 			return true;
 		}
 		checkRecipe();
@@ -179,7 +190,17 @@ public class TileCentrifuge extends TilePowered implements ISocketable, WorldlyC
 		IErrorLogic errorLogic = getErrorLogic();
 		errorLogic.setCondition(!hasResource, ForestryError.NO_RESOURCE);
 
-		return hasResource;
+		if (!hasResource || this.currentRecipe == null) return false;
+		try (var transaction = net.neoforged.neoforge.transfer.transaction.Transaction.open(net.neoforged.neoforge.transfer.transaction.Transaction.getCurrentOpenedTransaction())) {
+			for (ItemStack product : this.currentRecipe.getProducts(previewWorkRandom(), this.outputMultiplier)) {
+				if (!InventoryUtil.tryAddStack(this, product, InventoryCentrifuge.SLOT_PRODUCT_1, InventoryCentrifuge.SLOT_PRODUCT_COUNT, true)) {
+					errorLogic.setCondition(true, ForestryError.NO_SPACE_INVENTORY);
+					return false;
+				}
+			}
+			errorLogic.setCondition(false, ForestryError.NO_SPACE_INVENTORY);
+			return true;
+		}
 	}
 
 	/* ISocketable */
@@ -224,7 +245,7 @@ public class TileCentrifuge extends TilePowered implements ISocketable, WorldlyC
 	}
 
 	@Override
-	public ResourceLocation getSocketType() {
+	public Identifier getSocketType() {
 		return ForestryCircuitSocketTypes.MACHINE;
 	}
 

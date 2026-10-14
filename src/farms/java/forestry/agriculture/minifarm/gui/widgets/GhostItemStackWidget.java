@@ -1,6 +1,5 @@
 package forestry.agriculture.minifarm.gui.widgets;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import forestry.api.core.tooltips.ToolTip;
 import forestry.api.agriculture.HorizontalDirection;
 import forestry.core.platform.gui.widgets.ItemStackWidget;
@@ -8,7 +7,7 @@ import forestry.core.platform.gui.widgets.WidgetManager;
 import forestry.core.platform.render.ColourProperties;
 import forestry.agriculture.minifarm.inventory.MinifarmInventory;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
@@ -25,33 +24,27 @@ public class GhostItemStackWidget extends ItemStackWidget {
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int startX, int startY) {
+	public void draw(GuiGraphicsExtractor graphics, int startX, int startY) {
 		if (!this.slot.hasItem()) {
 			super.draw(graphics, startX, startY);
 		}
-		// RenderSystem.disableLighting();
-		RenderSystem.disableDepthTest();
-		RenderSystem.enableBlend();
 
 		Component directionString = getDirectionString();
 		if (directionString != null) {
 			Font font = this.manager.minecraft.font;
-			graphics.drawString(font, directionString, this.xPos + startX + 5, this.yPos + startY + 4, ColourProperties.INSTANCE.get("gui.screen"));
+			graphics.text(font, directionString, this.xPos + startX + 5, this.yPos + startY + 4, 0xFF000000 | (ColourProperties.INSTANCE.get("gui.screen")));
 		}
 
-		graphics.setColor(1.0f, 1.0f, 1.0f, 0.5f);
+		graphics.nextStratum();
 
-		graphics.blit(this.manager.gui.textureFile, this.xPos + startX, this.yPos + startY, 206, 0, 16, 16);
+		graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.manager.gui.textureFile, this.xPos + startX, this.yPos + startY, 206, 0, 16, 16, 256, 256, 0x80FFFFFF);
 
-		RenderSystem.disableBlend();
-		RenderSystem.enableDepthTest();
-		// RenderSystem.enableLighting();
 	}
 
 	@Nullable
 	private Component getDirectionString() {
 		if (this.slot.getSlotIndex() >= MinifarmInventory.CONFIG.productionStart
-			|| this.slot.getSlotIndex() < MinifarmInventory.CONFIG.productionStart + MinifarmInventory.CONFIG.productionCount) {
+			&& this.slot.getSlotIndex() < MinifarmInventory.CONFIG.productionStart + MinifarmInventory.CONFIG.productionCount) {
 			return null;
 		}
 		int index = this.slot.getSlotIndex() % 4;

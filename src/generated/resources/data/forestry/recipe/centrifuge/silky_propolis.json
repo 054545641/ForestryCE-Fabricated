@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/silky_propolis",
-  "input": {
-    "item": "forestry:silky_propolis"
-  },
+  "input": "forestry:silky_propolis",
   "products": [
     {
       "chance": 0.6,

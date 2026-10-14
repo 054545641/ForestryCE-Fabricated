@@ -1,52 +1,42 @@
 package forestry.arboriculture.client;
 
-import com.mojang.datafixers.util.Pair;
-import forestry.arboriculture.wood.ForestryWoodType;
+import com.mojang.blaze3d.vertex.PoseStack;
 import forestry.arboriculture.entities.ForestryBoat;
-import net.minecraft.client.model.BoatModel;
-import net.minecraft.client.model.ChestBoatModel;
-import net.minecraft.client.model.ListModel;
-import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.entity.BoatRenderer;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 
-import java.util.EnumMap;
+public class ForestryBoatRenderer extends EntityRenderer<ForestryBoat, ForestryBoatRenderState> {
+	private final BoatRenderGeometry geometry;
+	private final boolean hasChest;
 
-import static forestry.api.ForestryConstants.forestry;
-
-public class ForestryBoatRenderer extends BoatRenderer {
-	private final EnumMap<ForestryWoodType, Pair<ResourceLocation, ListModel<Boat>>> boatResources;
-
-	public ForestryBoatRenderer(EntityRendererProvider.Context ctx, boolean hasChest) {
-		super(ctx, hasChest);
-
-		this.boatResources = new EnumMap<>(ForestryWoodType.class);
-		for (ForestryWoodType type : ForestryWoodType.VALUES) {
-			var pair = new Pair<>(forestry(getTextureLocation(type, hasChest)), createBoatModel(ctx, type, hasChest));
-			this.boatResources.put(type, pair);
-		}
+	public ForestryBoatRenderer(EntityRendererProvider.Context context, boolean hasChest) {
+		super(context);
+		this.hasChest = hasChest;
+		this.shadowRadius = 0.8f;
+		this.geometry = new BoatRenderGeometry(context.bakeLayer(hasChest ? BoatRenderGeometry.CHEST_BOAT : BoatRenderGeometry.BOAT),
+			context.bakeLayer(ModelLayers.BOAT_WATER_PATCH));
 	}
 
-	private static String getTextureLocation(ForestryWoodType type, boolean hasChest) {
-		return (hasChest ? "textures/entity/chest_boat/" : "textures/entity/boat/") + type.getSerializedName() + ".png";
+	@Override public ForestryBoatRenderState createRenderState() { return new ForestryBoatRenderState(); }
+
+	@Override public void extractRenderState(ForestryBoat entity, ForestryBoatRenderState state, float partialTicks) {
+		super.extractRenderState(entity, state, partialTicks);
+		state.texture = BoatRenderGeometry.texture(entity.getWoodType().getSerializedName(), this.hasChest);
+		state.yRot = entity.getYRot(partialTicks);
+		state.hurtTime = entity.getHurtTime() - partialTicks;
+		state.hurtDir = entity.getHurtDir();
+		state.damageTime = Math.max(entity.getDamage() - partialTicks, 0);
+		state.bubbleAngle = entity.getBubbleAngle(partialTicks);
+		state.isUnderWater = entity.isUnderWater();
+		state.rowingTimeLeft = entity.getRowingTime(0, partialTicks);
+		state.rowingTimeRight = entity.getRowingTime(1, partialTicks);
 	}
 
-	private static ListModel<Boat> createBoatModel(EntityRendererProvider.Context ctx, ForestryWoodType type, boolean hasChest) {
-		ModelLayerLocation modelLoc = createBoatModelLocation(type, hasChest);
-		ModelPart root = ctx.bakeLayer(modelLoc);
-
-		return hasChest ? new ChestBoatModel(root) : new BoatModel(root);
-	}
-
-	public static ModelLayerLocation createBoatModelLocation(ForestryWoodType type, boolean hasChest) {
-		return new ModelLayerLocation(forestry((hasChest ? "chest_boat/" : "boat/") + type.getSerializedName()), "main");
-	}
-
-	@Override
-	public Pair<ResourceLocation, ListModel<Boat>> getModelWithLocation(Boat boat) {
-		return boat instanceof ForestryBoat forestryBoat ? this.boatResources.get(forestryBoat.getWoodType()) : super.getModelWithLocation(boat);
+	@Override public void submit(ForestryBoatRenderState state, PoseStack stack, SubmitNodeCollector collector, CameraRenderState camera) {
+		this.geometry.submit(state, stack, collector);
+		super.submit(state, stack, collector, camera);
 	}
 }

@@ -1,5 +1,6 @@
 {
   "parent": "minecraft:block/door_top_left",
+  "render_type": "cutout",
   "textures": {
     "bottom": "forestry:block/giant_sequoia_door_bottom",
     "top": "forestry:block/giant_sequoia_door_top"

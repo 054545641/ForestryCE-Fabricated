@@ -8,8 +8,8 @@ import net.minecraft.world.level.material.PushReaction;
 public class ForestryButtonBlock extends ButtonBlock implements IWoodTyped {
 	private final ForestryWoodType type;
 
-	public ForestryButtonBlock(ForestryWoodType type) {
-		super(type.getBlockSetType(), 30, Properties.of().noCollission().strength(0.5f).pushReaction(PushReaction.DESTROY));
+	public ForestryButtonBlock(Properties properties, ForestryWoodType type) {
+		super(type.getBlockSetType(), 30, properties.noCollision().strength(0.5f).pushReaction(PushReaction.DESTROY));
 
 		this.type = type;
 	}

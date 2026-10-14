@@ -10,18 +10,18 @@ import forestry.api.plugin.ILepidopterologyRegistration;
 import forestry.apiimpl.plugin.Registrar;
 import forestry.apiimpl.plugin.SpeciesRegistration;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class LepidopterologyRegistration extends SpeciesRegistration<IButterflySpeciesBuilder, IButterflySpecies, ButterflySpeciesBuilder> implements ILepidopterologyRegistration {
-	private final Registrar<ResourceLocation, IButterflyCocoon, IButterflyCocoon> cocoons = new Registrar<>(IButterflyCocoon.class);
-	private final Registrar<ResourceLocation, IButterflyEffect, IButterflyEffect> effects = new Registrar<>(IButterflyEffect.class);
+	private final Registrar<Identifier, IButterflyCocoon, IButterflyCocoon> cocoons = new Registrar<>(IButterflyCocoon.class);
+	private final Registrar<Identifier, IButterflyEffect, IButterflyEffect> effects = new Registrar<>(IButterflyEffect.class);
 
 	public LepidopterologyRegistration(ISpeciesType<IButterflySpecies, ?> type) {
 		super(type);
 	}
 
 	@Override
-	public IButterflySpeciesBuilder registerSpecies(ResourceLocation id, String genus, String species, boolean dominant, TextColor serumColor, float rarity) {
+	public IButterflySpeciesBuilder registerSpecies(Identifier id, String genus, String species, boolean dominant, TextColor serumColor, float rarity) {
 		return register(id, genus, species)
 			.setDominant(dominant)
 			.setSerumColor(serumColor)
@@ -29,25 +29,25 @@ public class LepidopterologyRegistration extends SpeciesRegistration<IButterflyS
 	}
 
 	@Override
-	public void registerCocoon(ResourceLocation id, IButterflyCocoon cocoon) {
+	public void registerCocoon(Identifier id, IButterflyCocoon cocoon) {
 		this.cocoons.create(id, cocoon);
 	}
 
 	@Override
-	public void registerEffect(ResourceLocation id, IButterflyEffect effect) {
+	public void registerEffect(Identifier id, IButterflyEffect effect) {
 		this.effects.create(id, effect);
 	}
 
 	@Override
-	protected ButterflySpeciesBuilder createSpeciesBuilder(ResourceLocation id, String genus, String species) {
+	protected ButterflySpeciesBuilder createSpeciesBuilder(Identifier id, String genus, String species) {
 		return new ButterflySpeciesBuilder(id, genus, species);
 	}
 
-	public ImmutableMap<ResourceLocation, IButterflyCocoon> getCocoons() {
+	public ImmutableMap<Identifier, IButterflyCocoon> getCocoons() {
 		return this.cocoons.build();
 	}
 
-	public ImmutableMap<ResourceLocation, IButterflyEffect> getEffects() {
+	public ImmutableMap<Identifier, IButterflyEffect> getEffects() {
 		return this.effects.build();
 	}
 }

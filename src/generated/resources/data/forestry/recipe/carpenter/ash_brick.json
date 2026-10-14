@@ -1,23 +1,18 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/ash_brick",
   "liquid": {
     "amount": 50,
     "id": "minecraft:water"
   },
   "recipe": {
-    "category": "misc",
     "key": {
-      "#": {
-        "item": "forestry:ash"
-      }
+      "#": "forestry:ash"
     },
     "pattern": [
       "##"
     ],
     "result": {
-      "count": 1,
       "id": "forestry:ash_brick"
     }
   },

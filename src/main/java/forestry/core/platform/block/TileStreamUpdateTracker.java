@@ -21,9 +21,9 @@ public class TileStreamUpdateTracker {
 	public static void sendVisualUpdate(TileForestry tile) {
 		var level = tile.getLevel();
 
-		if (level != null && !level.isClientSide) {
+		if (level != null && !level.isClientSide()) {
 			Map<ChunkPos, Set<BlockPos>> chunkUpdates = UPDATES.computeIfAbsent(level.dimension(), key -> new HashMap<>());
-			chunkUpdates.computeIfAbsent(new ChunkPos(tile.getBlockPos()), key -> new HashSet<>()).add(tile.getBlockPos());
+			chunkUpdates.computeIfAbsent(ChunkPos.containing(tile.getBlockPos()), key -> new HashSet<>()).add(tile.getBlockPos());
 		}
 	}
 

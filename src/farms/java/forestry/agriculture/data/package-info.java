@@ -3,7 +3,8 @@
  * name covers the jar; a provider here takes the package name instead (ex.
  * {@code AgricultureRecipeProvider}).
  */
-@javax.annotation.ParametersAreNonnullByDefault
 @forestry.core.platform.util.FieldsAreNonnullByDefault
-@net.minecraft.MethodsReturnNonnullByDefault
+@NullMarked
 package forestry.agriculture.data;
+
+import org.jspecify.annotations.NullMarked;

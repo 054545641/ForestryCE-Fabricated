@@ -9,12 +9,8 @@
     }
   },
   "resources": [
-    {
-      "item": "forestry:phosphor"
-    },
-    {
-      "item": "minecraft:cobblestone"
-    }
+    "forestry:phosphor",
+    "minecraft:cobblestone"
   ],
   "time": 30
 }

@@ -22,12 +22,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
@@ -99,7 +102,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 	private float size = DEFAULT_BUTTERFLY_SIZE;
 	private EnumButterflyState state = DEFAULT_STATE;
 	@OnlyIn(Dist.CLIENT)
-	private ResourceLocation textureResource;
+	private Identifier textureResource;
 
 	public EntityButterfly(EntityType<EntityButterfly> type, Level world) {
 		super(type, world);
@@ -108,7 +111,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 	public static EntityButterfly create(EntityType<EntityButterfly> type, Level world, IButterfly butterfly, BlockPos homePos) {
 		EntityButterfly bf = new EntityButterfly(type, world);
 		bf.setIndividual(butterfly);
-		bf.restrictTo(homePos, ModuleLepidopterology.maxDistance);
+		bf.setHomeTo(homePos, ModuleLepidopterology.maxDistance);
 		return bf;
 	}
 
@@ -143,8 +146,9 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 
 	/* SAVING & LOADING */
 	@Override
-	public void addAdditionalSaveData(CompoundTag nbt) {
-		super.addAdditionalSaveData(nbt);
+	public void addAdditionalSaveData(ValueOutput output) {
+		super.addAdditionalSaveData(output);
+		CompoundTag nbt = new CompoundTag();
 
 		// Individual data
 		Tag containedNbt = SpeciesUtil.serializeIndividual(this.contained);
@@ -164,37 +168,41 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 		nbt.putByte(NBT_STATE, (byte) getState().ordinal());
 		nbt.putInt(NBT_EXHAUSTION, this.exhaustion);
 
-		nbt.putLong(NBT_HOME, getRestrictCenter().asLong());
+		nbt.putLong(NBT_HOME, getHomePosition().asLong());
+		ValueIOUtil.mergeInto(output, nbt);
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag nbt) {
-		super.readAdditionalSaveData(nbt);
+	public void readAdditionalSaveData(ValueInput input) {
+		super.readAdditionalSaveData(input);
+		CompoundTag nbt = ValueIOUtil.toTag(input);
 
 		IButterfly butterfly = null;
 		if (nbt.contains(NBT_BUTTERFLY)) {
-			butterfly = SpeciesUtil.deserializeIndividual(SpeciesUtil.BUTTERFLY_TYPE.get(), nbt.getCompound(NBT_BUTTERFLY));
+			butterfly = SpeciesUtil.deserializeIndividual(SpeciesUtil.BUTTERFLY_TYPE.get(), nbt.getCompoundOrEmpty(NBT_BUTTERFLY));
 		}
 		setIndividual(butterfly);
 
+		this.pollen = null;
 		Tag pollenNbt = nbt.get(NBT_POLLEN);
 		if (pollenNbt != null && nbt.contains(NBT_POLLEN_TYPE)) {
-			IPollenType<?> type = IForestryApi.INSTANCE.getPollenManager().getPollenType(ResourceLocation.parse(nbt.getString(NBT_POLLEN_TYPE)));
+			IPollenType<?> type = IForestryApi.INSTANCE.getPollenManager().getPollenType(Identifier.parse(nbt.getStringOr(NBT_POLLEN_TYPE, "")));
 
 			if (type != null) {
 				this.pollen = type.readNbt(pollenNbt);
 			}
 		}
 
-		EnumButterflyState butterflyState = EnumButterflyState.VALUES[nbt.getByte(NBT_STATE)];
+		int stateId = nbt.getByteOr(NBT_STATE, (byte) 0);
+		EnumButterflyState butterflyState = EnumButterflyState.VALUES[stateId >= 0 && stateId < EnumButterflyState.VALUES.length ? stateId : 0];
 		setState(butterflyState);
-        this.exhaustion = nbt.getInt(NBT_EXHAUSTION);
-		BlockPos home = BlockPos.of(nbt.getLong(NBT_HOME));
-		restrictTo(home, ModuleLepidopterology.maxDistance);
+        this.exhaustion = nbt.getIntOr(NBT_EXHAUSTION, 0);
+		BlockPos home = BlockPos.of(nbt.getLongOr(NBT_HOME, 0L));
+		setHomeTo(home, ModuleLepidopterology.maxDistance);
 	}
 
 	public float getWingFlap(float partialTickTime) {
-		int offset = this.species != null ? this.species.id().toString().hashCode() : level().random.nextInt();
+		int offset = this.species != null ? this.species.id().toString().hashCode() : level().getRandom().nextInt();
 		return getState().getWingFlap(this, offset, partialTickTime);
 	}
 
@@ -202,7 +210,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 	public void setState(EnumButterflyState state) {
 		if (this.state != state) {
 			this.state = state;
-			if (!level().isClientSide) {
+			if (!level().isClientSide()) {
                 this.entityData.set(DATAWATCHER_ID_STATE, (byte) state.ordinal());
 			}
 		}
@@ -244,7 +252,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 		}
 
 		float weight = 0.0f;
-		double distanceToHome = getRestrictCenter().distSqr(pos);
+		double distanceToHome = getHomePosition().distSqr(pos);
 
 		if (!isWithinHomeDistanceFromPosition(distanceToHome)) {
 			weight -= 7.5f + 0.005 * (distanceToHome / 4);
@@ -266,7 +274,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 			Block block = blockState.getBlock();
 			if (blockState.is(BlockTags.FLOWERS)) {
 				weight += 2.0f;
-			} else if (blockState.is(BlockTags.SAPLINGS)) {
+			} else if (blockState.is(net.minecraft.tags.BlockItemTags.SAPLINGS.block())) {
 				weight += 1.5f;
 			} else if (block instanceof BonemealableBlock) {
 				weight += 1.0f;
@@ -291,7 +299,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 	}
 
 	private boolean isWithinHomeDistanceFromPosition(double distanceToHome) {
-		return distanceToHome < this.getRestrictRadius() * this.getRestrictRadius();
+		return distanceToHome < this.getHomeRadius() * this.getHomeRadius();
 	}
 
 	// todo address the deprecated function
@@ -304,7 +312,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 
 		int highestFilledSection = chunk.getHighestFilledSectionIndex();
 		int top = highestFilledSection == -1
-				? chunk.getMinBuildHeight()
+				? chunk.getMinY()
 				: net.minecraft.core.SectionPos.sectionToBlockCoord(chunk.getSectionYFromSectionIndex(highestFilledSection));
 		for (int y = top + 15; y > 0; --y) {
 			BlockState blockState = chunk.getBlockState(cursor.setY(y));
@@ -358,7 +366,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 		this.size = genome.getActiveValue(ButterflyChromosomes.SIZE);
 		this.species = genome.resolveActive(ButterflyChromosomes.SPECIES);
 
-		if (!level().isClientSide) {
+		if (!level().isClientSide()) {
             this.entityData.set(DATAWATCHER_ID_SIZE, (int) (this.size * 100));
             this.entityData.set(DATAWATCHER_ID_SPECIES, this.species.id().toString());
 		} else {
@@ -397,8 +405,8 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 	}
 
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor worldIn, DifficultyInstance difficultyIn, MobSpawnType reason, @Nullable SpawnGroupData spawnDataIn) {
-		if (!level().isClientSide) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor worldIn, DifficultyInstance difficultyIn, EntitySpawnReason reason, @Nullable SpawnGroupData spawnDataIn) {
+		if (!level().isClientSide()) {
 			setIndividual(this.contained);
 		}
 		return spawnDataIn;
@@ -413,7 +421,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 	}
 
 	@Override
-	public boolean checkSpawnRules(LevelAccessor worldIn, MobSpawnType spawnReasonIn) {
+	public boolean checkSpawnRules(LevelAccessor worldIn, EntitySpawnReason spawnReasonIn) {
 		return true;
 	}
 
@@ -427,7 +435,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public ResourceLocation getTexture() {
+	public Identifier getTexture() {
 		return this.textureResource;
 	}
 
@@ -455,7 +463,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 		ItemStack stack = player.getItemInHand(hand);
 		if (stack.is(ForestryTags.Items.SCOOPS)) {
 			Level level = level();
-			if (!level.isClientSide) {
+			if (!level.isClientSide()) {
 				IButterflySpeciesType type = SpeciesUtil.BUTTERFLY_TYPE.get();
 				ILepidopteristTracker tracker = (ILepidopteristTracker) type.getBreedingTracker(level, player.getGameProfile());
 				ItemStack itemStack = this.contained.createStack(ButterflyLifeStage.BUTTERFLY);
@@ -466,7 +474,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 			} else {
 				player.swing(hand);
 			}
-			return InteractionResult.sidedSuccess(level.isClientSide);
+			return (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
 		}
 
 		return super.mobInteract(player, hand);
@@ -507,10 +515,10 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 		super.tick();
 
 		// Update stuff client side
-		if (level().isClientSide) {
+		if (level().isClientSide()) {
 			if (this.species == null) {
 				String speciesUid = this.entityData.get(DATAWATCHER_ID_SPECIES);
-				IButterflySpecies species = SpeciesUtil.BUTTERFLY_TYPE.get().getSpeciesSafe(ResourceLocation.parse(speciesUid));
+				IButterflySpecies species = SpeciesUtil.BUTTERFLY_TYPE.get().getSpeciesSafe(Identifier.parse(speciesUid));
 
 				if (species != null) {
 					this.species = species;
@@ -554,7 +562,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 	}
 
 	@Override
-	protected void customServerAiStep() {
+	protected void customServerAiStep(ServerLevel level) {
 		Vec3 flightTarget = this.flightTarget;
 		if (getState().doesMovement && flightTarget != null) {
 			Vec3 position = position();
@@ -579,7 +587,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 	}
 
 	@Override
-	public boolean causeFallDamage(float p_147187_, float p_147188_, DamageSource p_147189_) {
+	public boolean causeFallDamage(double p_147187_, float p_147188_, DamageSource p_147189_) {
 		return false;
 	}
 
@@ -598,7 +606,7 @@ public class EntityButterfly extends PathfinderMob implements IEntityButterfly {
 	}
 
 	@Override
-	public ItemStack getPickedResult(HitResult target) {
+	public ItemStack getPickResult() {
 		if (this.species == null) {
 			return ItemStack.EMPTY;
 		}

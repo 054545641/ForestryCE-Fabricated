@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -43,7 +43,7 @@ public class ButterflySpeciesReloadTest {
 		IButterflySpecies monarch = type.getSpecies(ForestryButterflySpecies.MONARCH);
 
 		// Snapshot the live, full species map before mutating it, so it can be restored afterwards.
-		ImmutableMap<ResourceLocation, IButterflySpecies> snapshot = ImmutableMap.copyOf(
+		ImmutableMap<Identifier, IButterflySpecies> snapshot = ImmutableMap.copyOf(
 			type.getAllSpeciesIds().stream().collect(java.util.stream.Collectors.toMap(id -> id, type::getSpecies))
 		);
 
@@ -51,7 +51,7 @@ public class ButterflySpeciesReloadTest {
 			.genome(Map.of(ButterflyChromosomes.SIZE.id(), AlleleOverride.both(ForestryAlleles.SIZE_AVERAGE)))
 			.build();
 
-		Map<ResourceLocation, ButterflySpeciesDefinition> defs = Map.of(ForestryButterflySpecies.MONARCH, def);
+		Map<Identifier, ButterflySpeciesDefinition> defs = Map.of(ForestryButterflySpecies.MONARCH, def);
 
 		try {
 			LepidopterologyReloadHandler.rebuildButterflySpecies(defs);
@@ -88,7 +88,7 @@ public class ButterflySpeciesReloadTest {
 	public static void managerLoadedAllSpeciesAtServerStart(GameTestHelper helper) {
 		IButterflySpeciesType type = SpeciesUtil.BUTTERFLY_TYPE.get();
 
-		Map<ResourceLocation, ButterflySpeciesDefinition> definitions = ButterflySpeciesManager.INSTANCE.getDefinitions();
+		Map<Identifier, ButterflySpeciesDefinition> definitions = ButterflySpeciesManager.INSTANCE.getDefinitions();
 		if (definitions.size() != 35) {
 			helper.fail("Expected ButterflySpeciesManager to have loaded 35 butterfly species from the datapack at server start, got " + definitions.size());
 			return;
@@ -96,7 +96,7 @@ public class ButterflySpeciesReloadTest {
 
 		// Snapshot the live, full species map before re-deriving it from the manager's definitions, so it can be
 		// restored afterwards (mirrors rebuildRepopulates above).
-		ImmutableMap<ResourceLocation, IButterflySpecies> snapshot = ImmutableMap.copyOf(
+		ImmutableMap<Identifier, IButterflySpecies> snapshot = ImmutableMap.copyOf(
 			type.getAllSpeciesIds().stream().collect(java.util.stream.Collectors.toMap(id -> id, type::getSpecies))
 		);
 

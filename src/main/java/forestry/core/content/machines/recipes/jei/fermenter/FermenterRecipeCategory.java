@@ -18,20 +18,20 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import mezz.jei.api.recipe.types.IRecipeType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 
-import java.util.Arrays;
+import forestry.core.platform.util.JeiUtil;
 import java.util.Collection;
 import java.util.List;
 import forestry.api.ForestryDataMaps;
 import forestry.core.platform.recipes.jei.JeiDataMaps;
 
 public class FermenterRecipeCategory extends ForestryRecipeCategory<IFermenterRecipe> {
-	private static final ResourceLocation TEXTURE = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/fermenter.png");
+	private static final Identifier TEXTURE = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/fermenter.png");
 
 	private final IDrawableAnimated progressBar0;
 	private final IDrawableAnimated progressBar1;
@@ -51,7 +51,7 @@ public class FermenterRecipeCategory extends ForestryRecipeCategory<IFermenterRe
 	}
 
 	@Override
-	public RecipeType<IFermenterRecipe> getRecipeType() {
+	public IRecipeType<IFermenterRecipe> getRecipeType() {
 		return ForestryRecipeType.FERMENTER;
 	}
 
@@ -62,8 +62,8 @@ public class FermenterRecipeCategory extends ForestryRecipeCategory<IFermenterRe
 
 	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, IFermenterRecipe recipe, IFocusGroup focuses) {
-		IRecipeSlotBuilder ingredientInputSlot = builder.addSlot(RecipeIngredientRole.INPUT, 51, 5)
-			.addIngredients(recipe.getInputItem());
+		IRecipeSlotBuilder ingredientInputSlot = builder.addSlot(RecipeIngredientRole.INPUT, 51, 5);
+		recipe.getInputItem().ifPresent(input -> ingredientInputSlot.add(VanillaTypes.ITEM_STACK, input));
 
 		builder.addSlot(RecipeIngredientRole.INPUT, 41, 39)
 			.addItemStacks(JeiDataMaps.stacks(ForestryDataMaps.FERMENTER_FUELS));
@@ -77,7 +77,7 @@ public class FermenterRecipeCategory extends ForestryRecipeCategory<IFermenterRe
 
 		final int baseAmount = Math.round(recipe.getFermentationValue() * recipe.getModifier());
 		List<FluidStack> outputs =
-			Arrays.stream(recipe.getInputItem().getItems())
+			recipe.getInputItem().map(JeiUtil::ingredientStacks).orElseGet(() -> List.of(ItemStack.EMPTY)).stream()
 				.map(fermentable -> {
 					int amount = baseAmount;
 					if (fermentable.getItem() instanceof IVariableFermentable variableFermentable) {
@@ -94,11 +94,11 @@ public class FermenterRecipeCategory extends ForestryRecipeCategory<IFermenterRe
 			fluidOutputSlot.addFluidStack(output.getFluid(), output.getAmount());
 		}
 
-		builder.createFocusLink(ingredientInputSlot, fluidOutputSlot);
+		if (recipe.getInputItem().isPresent()) builder.createFocusLink(ingredientInputSlot, fluidOutputSlot);
 	}
 
 	@Override
-	public void draw(IFermenterRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+	public void draw(IFermenterRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
 		super.draw(recipe, recipeSlotsView, graphics, mouseX, mouseY);
 		this.progressBar0.draw(graphics, 40, 14);
 		this.progressBar1.draw(graphics, 64, 28);

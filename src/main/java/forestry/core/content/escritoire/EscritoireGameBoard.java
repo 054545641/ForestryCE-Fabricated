@@ -35,8 +35,8 @@ public class EscritoireGameBoard implements INbtWritable, IStreamable {
 	}
 
 	public EscritoireGameBoard(CompoundTag nbt) {
-		if (nbt.contains(NBT_GAME_TOKENS, Tag.TAG_LIST)) {
-			ListTag list = nbt.getList(NBT_GAME_TOKENS, Tag.TAG_COMPOUND);
+		if (nbt.getList(NBT_GAME_TOKENS).isPresent()) {
+			ListTag list = nbt.getListOrEmpty(NBT_GAME_TOKENS);
 
 			this.tokenCount = Math.min(list.size(), TOKEN_COUNT_MAX);
 
@@ -44,8 +44,12 @@ public class EscritoireGameBoard implements INbtWritable, IStreamable {
 				EscritoireGameToken[] tokens = new EscritoireGameToken[this.tokenCount];
 
 				for (int j = 0; j < this.tokenCount; ++j) {
-					CompoundTag CompoundNBT2 = list.getCompound(j);
-					int index = CompoundNBT2.getByte("Slot");
+					CompoundTag CompoundNBT2 = list.getCompoundOrEmpty(j);
+					int index = CompoundNBT2.getIntOr("Slot", -1);
+					if (index < 0 || index >= tokens.length || tokens[index] != null) {
+						this.tokenCount = 0;
+						return;
+					}
 					tokens[index] = new EscritoireGameToken(CompoundNBT2);
 				}
 

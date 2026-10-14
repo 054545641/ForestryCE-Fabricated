@@ -3,7 +3,7 @@ package forestry.core.platform.registration;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -15,9 +15,9 @@ import java.util.function.Supplier;
 public class FeatureTileType<T extends BlockEntity> extends ModFeature implements ITileTypeFeature<T> {
 	private final DeferredHolder<BlockEntityType<?>, BlockEntityType<T>> blockEntityObject;
 
-	public FeatureTileType(IFeatureRegistry registry, ResourceLocation moduleId, String name, BlockEntityType.BlockEntitySupplier<T> constructorTileEntity, Supplier<Collection<? extends Block>> validBlocks) {
+	public FeatureTileType(IFeatureRegistry registry, Identifier moduleId, String name, BlockEntityType.BlockEntitySupplier<T> constructorTileEntity, Supplier<Collection<? extends Block>> validBlocks) {
 		super(moduleId, name);
-		this.blockEntityObject = registry.getRegistry(Registries.BLOCK_ENTITY_TYPE).register(name, () -> BlockEntityType.Builder.of(constructorTileEntity, validBlocks.get().toArray(Block[]::new)).build(null));
+		this.blockEntityObject = registry.getRegistry(Registries.BLOCK_ENTITY_TYPE).register(name, () -> new BlockEntityType<>(constructorTileEntity, validBlocks.get().toArray(Block[]::new)));
 	}
 
 	@Override

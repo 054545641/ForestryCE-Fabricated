@@ -1,13 +1,18 @@
 package forestry.core.platform.inventory.wrappers;
 
 import net.minecraft.world.Container;
+import forestry.api.core.ITransactionalContainer;
+import forestry.core.platform.inventory.InventoryTransferView;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 /**
  * Created by CovertJaguar on 3/6/2016 for Railcraft.
  */
-public abstract class InvWrapperBase implements Container {
+public abstract class InvWrapperBase implements ITransactionalContainer {
 
 	private final Container inv;
 	private boolean checkItems = true;
@@ -19,6 +24,11 @@ public abstract class InvWrapperBase implements Container {
 	public InvWrapperBase(Container inv, boolean checkItems) {
 		this.inv = inv;
 		this.checkItems = checkItems;
+	}
+
+	@Override
+	public ResourceHandler<ItemResource> getTransferHandler() {
+		return InventoryTransferView.internal(this.inv);
 	}
 
 	public Container getBaseInventory() {
@@ -66,13 +76,13 @@ public abstract class InvWrapperBase implements Container {
 	}
 
 	@Override
-	public void startOpen(Player player) {
-        this.inv.startOpen(player);
+	public void startOpen(ContainerUser user) {
+        this.inv.startOpen(user);
 	}
 
 	@Override
-	public void stopOpen(Player player) {
-        this.inv.stopOpen(player);
+	public void stopOpen(ContainerUser user) {
+        this.inv.stopOpen(user);
 	}
 
 	@Override

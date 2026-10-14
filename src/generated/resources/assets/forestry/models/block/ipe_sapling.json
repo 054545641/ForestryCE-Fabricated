@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:block/cross",
+  "render_type": "cutout",
   "textures": {
-    "cross": "forestry:item/ipe_sapling"
+    "cross": "forestry:block/saplings/ipe_sapling"
   }
 }

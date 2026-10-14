@@ -21,10 +21,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
+import forestry.core.features.CoreDataComponents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
@@ -36,7 +35,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -60,19 +60,19 @@ public class BackpackItem extends WithScreenItem implements ITintedItem {
 	}
 
 	@Override
-	protected void writeContainerData(ServerPlayer player, ItemStack stack, RegistryFriendlyByteBuf buffer) {
+	protected void writeContainerData(ServerPlayer player, ItemStack stack, InteractionHand hand, RegistryFriendlyByteBuf buffer) {
 		NetworkUtil.writeEnum(buffer, this.type == EnumBackpackType.WOVEN ? ContainerBackpack.Size.T2 : ContainerBackpack.Size.DEFAULT);
 		ItemStack.STREAM_CODEC.encode(buffer, stack);
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
+	public InteractionResult use(Level worldIn, Player playerIn, InteractionHand handIn) {
 		if (!playerIn.isShiftKeyDown()) {
 			return super.use(worldIn, playerIn, handIn);
 		} else {
 			ItemStack heldItem = playerIn.getItemInHand(handIn);
-			switchMode(heldItem);
-			return InteractionResultHolder.success(heldItem);
+			if (!worldIn.isClientSide()) switchMode(heldItem);
+			return InteractionResult.SUCCESS;
 		}
 	}
 
@@ -80,7 +80,7 @@ public class BackpackItem extends WithScreenItem implements ITintedItem {
 	public InteractionResult useOn(UseOnContext ctx) {
 		Level level = ctx.getLevel();
 		if (getInventoryHit(level, ctx.getClickedPos(), ctx.getClickedFace()) != null) {
-			return InteractionResult.sidedSuccess(level.isClientSide);
+			return (level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
 		}
 		return InteractionResult.PASS;
 	}
@@ -111,7 +111,7 @@ public class BackpackItem extends WithScreenItem implements ITintedItem {
 			return;
 		}
 
-		IItemHandler itemHandler = inventory.getItemHandler();
+		ResourceHandler<ItemResource> itemHandler = inventory.getItemHandler();
 		ItemHandlerInventoryManipulator manipulator = new ItemHandlerInventoryManipulator(itemHandler);
 		ItemStack remainder = manipulator.addStack(stack);
 
@@ -119,17 +119,12 @@ public class BackpackItem extends WithScreenItem implements ITintedItem {
 	}
 
 	private static void switchMode(ItemStack itemstack) {
-		BackpackMode mode = getMode(itemstack);
-		int nextMode = mode.ordinal() + 1;
-		if (!ForestryConfig.SERVER.enableBackpackResupply.get() && nextMode == BackpackMode.RESUPPLY.ordinal()) {
-			nextMode++;
-		}
-		nextMode %= BackpackMode.VALUES.length;
-		itemstack.setDamageValue(nextMode);
+		getMode(itemstack).next(ForestryConfig.SERVER.enableBackpackResupply.get())
+			.write(itemstack, CoreDataComponents.BACKPACK_MODE.get());
 	}
 
 	@Nullable
-	private static IItemHandler getInventoryHit(Level world, BlockPos pos, Direction side) {
+	private static ResourceHandler<ItemResource> getInventoryHit(Level world, BlockPos pos, Direction side) {
 		BlockEntity targeted = TileUtil.getTile(world, pos);
 		return TileUtil.getInventoryFromTile(targeted, side);
 	}
@@ -138,16 +133,16 @@ public class BackpackItem extends WithScreenItem implements ITintedItem {
 
 		// Shift right-clicking on an inventory tile will attempt to transfer
 		// items contained in the backpack
-		IItemHandler inventory = getInventoryHit(world, pos, side);
+		ResourceHandler<ItemResource> inventory = getInventoryHit(world, pos, side);
 		// Process only inventories
 		if (inventory != null) {
 
 			// Must have inventory slots
-			if (inventory.getSlots() <= 0) {
+			if (inventory.size() <= 0) {
 				return true;
 			}
 
-			if (!world.isClientSide) {
+			if (!world.isClientSide()) {
 				// Create our own backpack inventory
 				BackpackInventory backpackInventory = new BackpackInventory(player, getBackpackSize(), stack);
 
@@ -165,12 +160,12 @@ public class BackpackItem extends WithScreenItem implements ITintedItem {
 		return false;
 	}
 
-	private static void transferToChest(BackpackInventory backpackInventory, IItemHandler target) {
+	private static void transferToChest(BackpackInventory backpackInventory, ResourceHandler<ItemResource> target) {
 		ItemHandlerInventoryManipulator manipulator = new ItemHandlerInventoryManipulator(backpackInventory.getItemHandler());
 		manipulator.transferStacks(target, StandardStackFilters.ALL);
 	}
 
-	private void receiveFromChest(BackpackInventory backpackInventory, IItemHandler target) {
+	private void receiveFromChest(BackpackInventory backpackInventory, ResourceHandler<ItemResource> target) {
 		ItemHandlerInventoryManipulator manipulator = new ItemHandlerInventoryManipulator(target);
 		manipulator.transferStacks(backpackInventory.getItemHandler(), this.definition.getFilter());
 	}
@@ -223,9 +218,7 @@ public class BackpackItem extends WithScreenItem implements ITintedItem {
 			return BackpackMode.NEUTRAL;
 		}
 
-		int meta = Mth.clamp(backpack.getDamageValue(), 0, 3);
-
-		return BackpackMode.VALUES[meta];
+		return BackpackMode.read(backpack, CoreDataComponents.BACKPACK_MODE.get());
 	}
 
 	public static EnumBackpackType getType(ItemStack backpack) {

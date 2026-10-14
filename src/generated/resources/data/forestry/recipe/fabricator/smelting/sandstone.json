@@ -7,14 +7,8 @@
     "id": "forestry:liquid_glass"
   },
   "resource": [
-    {
-      "item": "minecraft:sandstone"
-    },
-    {
-      "item": "minecraft:smooth_sandstone"
-    },
-    {
-      "item": "minecraft:chiseled_sandstone"
-    }
+    "minecraft:sandstone",
+    "minecraft:smooth_sandstone",
+    "minecraft:chiseled_sandstone"
   ]
 }

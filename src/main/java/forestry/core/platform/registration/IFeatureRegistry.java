@@ -8,7 +8,7 @@ import forestry.core.platform.util.datastructures.TriFunction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -48,12 +48,6 @@ public interface IFeatureRegistry {
 
 	<B extends Block, I extends BlockItem> FeatureBlock<B, I> block(Function<BlockBehaviour.Properties, B> constructor, Supplier<BlockBehaviour.Properties> blockProperties, @Nullable BiFunction<B, Item.Properties, I> itemConstructor, Supplier<Item.Properties> itemProperties, String name);
 
-	default <B extends Block, S extends IBlockSubtype> FeatureBlockGroup.Builder<B, S> blockGroup(Function<S, B> constructor, S[] types) {
-		return blockGroup(constructor, Arrays.asList(types));
-	}
-
-	<B extends Block, S extends IBlockSubtype> FeatureBlockGroup.Builder<B, S> blockGroup(Function<S, B> constructor, Collection<S> types);
-
 	default <B extends Block, S extends IBlockSubtype> FeatureBlockGroup.Builder<B, S> blockGroup(BiFunction<BlockBehaviour.Properties, S, B> constructor, S[] types) {
 		return blockGroup(constructor, Arrays.asList(types));
 	}
@@ -64,7 +58,7 @@ public interface IFeatureRegistry {
 
 	<B extends Block, S extends IBlockSubtype> FeatureBlockGroup.Builder<B, S> blockGroup(S[] types);
 
-	<I extends Item> FeatureItem<I> item(Supplier<I> constructor, String name);
+	<I extends Item> FeatureItem<I> item(Function<Item.Properties, I> constructor, String name);
 
 	FeatureItem<Item> item(String name);
 
@@ -72,19 +66,17 @@ public interface IFeatureRegistry {
 
 	FeatureItem<Item> backpack(IBackpackDefinition definition, EnumBackpackType type, String identifier);
 
-	FeatureItem<Item> naturalistBackpack(IBackpackDefinition definition, ResourceLocation speciesTypeId, CreativeModeTab tab, String identifier);
+	FeatureItem<Item> naturalistBackpack(IBackpackDefinition definition, Identifier speciesTypeId, CreativeModeTab tab, String identifier);
 
-	<I extends Item, S extends IItemSubtype> FeatureItemGroup<I, S> itemGroup(Function<S, I> constructor, String identifier, S[] subTypes);
+	<I extends Item, S extends IItemSubtype> FeatureItemGroup<I, S> itemGroup(BiFunction<S, Item.Properties, I> constructor, String identifier, S[] subTypes);
 
-	<I extends Item, S extends IItemSubtype> FeatureItemGroup.Builder<I, S> itemGroup(Function<S, I> constructor, S[] subTypes);
+	<I extends Item, S extends IItemSubtype> FeatureItemGroup.Builder<I, S> itemGroup(BiFunction<S, Item.Properties, I> constructor, S[] subTypes);
 
 	<I extends Item, S extends IItemSubtype> FeatureItemGroup.Builder<I, S> itemGroup(BiFunction<S, Item.Properties, I> constructor, Function<S, Item.Properties> properties, S[] subTypes);
 
-	<I extends Item, R extends IItemSubtype, C extends IItemSubtype> FeatureItemTable<I, R, C> itemTable(BiFunction<R, C, I> constructor, R[] rowTypes, C[] columnTypes, String identifier);
+	<I extends Item, R extends IItemSubtype, C extends IItemSubtype> FeatureItemTable<I, R, C> itemTable(TriFunction<R, C, Item.Properties, I> constructor, R[] rowTypes, C[] columnTypes, String identifier);
 
-	<I extends Item, R extends IItemSubtype, C extends IItemSubtype> FeatureItemTable.Builder<I, R, C> itemTable(BiFunction<R, C, I> constructor, R[] rowTypes, C[] columnTypes);
-
-	<B extends Block, R extends IBlockSubtype, C extends IBlockSubtype> FeatureBlockTable.Builder<B, R, C> blockTable(BiFunction<R, C, B> constructor, R[] rowTypes, C[] columnTypes);
+	<I extends Item, R extends IItemSubtype, C extends IItemSubtype> FeatureItemTable.Builder<I, R, C> itemTable(TriFunction<R, C, Item.Properties, I> constructor, R[] rowTypes, C[] columnTypes);
 
 	<B extends Block, R extends IBlockSubtype, C extends IBlockSubtype> FeatureBlockTable.Builder<B, R, C> blockTable(TriFunction<BlockBehaviour.Properties, R, C, B> constructor, R[] rowTypes, C[] columnTypes);
 
@@ -112,25 +104,13 @@ public interface IFeatureRegistry {
 
 	Collection<IModFeature> getFeatures(ResourceKey<? extends Registry<?>> type);
 
-	ResourceLocation getModuleId();
+	Identifier getModuleId();
 
-	static BlockBehaviour.Properties setBlockId(ResourceLocation id, BlockBehaviour.Properties properties) {
-		return setId(Registries.BLOCK, id, properties);
+	static BlockBehaviour.Properties setBlockId(Identifier id, BlockBehaviour.Properties properties) {
+		return properties.setId(ResourceKey.create(Registries.BLOCK, id));
 	}
 
-	static Item.Properties setItemId(ResourceLocation id, Item.Properties properties) {
-		return setId(Registries.ITEM, id, properties);
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T, P> P setId(ResourceKey<? extends Registry<T>> registry, ResourceLocation id, P properties) {
-		try {
-			properties.getClass().getMethod("setId", ResourceKey.class).invoke(properties, ResourceKey.create((ResourceKey<? extends Registry<T>>) registry, id));
-		} catch (NoSuchMethodException ignored) {
-			// Minecraft 1.21.1 does not require registry keys on block/item properties.
-		} catch (ReflectiveOperationException exception) {
-			throw new IllegalStateException("Failed to set registry id " + id + " on " + properties.getClass().getName(), exception);
-		}
-		return properties;
+	static Item.Properties setItemId(Identifier id, Item.Properties properties) {
+		return properties.setId(ResourceKey.create(Registries.ITEM, id));
 	}
 }

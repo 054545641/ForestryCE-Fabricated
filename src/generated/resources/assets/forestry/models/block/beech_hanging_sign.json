@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/beech_planks"
-  }
+  "parent": "forestry:block/beech_hanging_sign_rot_0"
 }

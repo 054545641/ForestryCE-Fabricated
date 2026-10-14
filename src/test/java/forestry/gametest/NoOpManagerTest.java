@@ -2,7 +2,7 @@ package forestry.gametest;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -31,7 +31,7 @@ public class NoOpManagerTest {
 
 	@GameTest(template = "empty")
 	public static void noOpFarmingManagerDegrades(GameTestHelper helper) {
-		ResourceLocation any = ForestryConstants.forestry("wheat");
+		Identifier any = ForestryConstants.forestry("wheat");
 
 		if (FakeFarmingManager.INSTANCE.getFarmType(any) != null) {
 			helper.fail("No-op farming manager returned a farm type");

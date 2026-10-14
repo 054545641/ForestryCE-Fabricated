@@ -1,6 +1,6 @@
 package forestry.api.core;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -26,7 +26,7 @@ public interface IErrorManager {
 	 * @return The error with the ID.
 	 */
 	@Nullable
-	IError getError(ResourceLocation errorId);
+	IError getError(Identifier errorId);
 
 	/**
 	 * @return A set of all registered errors.

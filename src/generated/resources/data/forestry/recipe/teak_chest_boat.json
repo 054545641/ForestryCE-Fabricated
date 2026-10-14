@@ -1,16 +1,10 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "item": "forestry:teak_boat"
-    },
-    {
-      "tag": "c:chests/wooden"
-    }
+    "forestry:teak_boat",
+    "#c:chests/wooden"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:teak_chest_boat"
   }
 }

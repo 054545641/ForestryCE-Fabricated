@@ -20,7 +20,8 @@ import java.util.List;
 public class ItemCircuitBoard extends ItemForestry {
 	private final EnumCircuitBoardType type;
 
-	public ItemCircuitBoard(EnumCircuitBoardType type) {
+	public ItemCircuitBoard(EnumCircuitBoardType type, Properties properties) {
+		super(properties);
 		this.type = type;
 	}
 

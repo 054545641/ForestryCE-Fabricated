@@ -1,5 +1,6 @@
 package forestry.apiculture.alveary.multiblock;
 
+import forestry.core.platform.util.InventoryData;
 import forestry.api.IForestryApi;
 import forestry.api.apiculture.genetics.BeeLifeStage;
 import forestry.api.apiculture.genetics.IBee;
@@ -30,6 +31,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import javax.annotation.Nullable;
 import java.util.ArrayDeque;
 import java.util.List;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import forestry.core.platform.util.ValueIOUtil;
 
 public class AlvearySwarmerBlockEntity extends AbstractAlvearyBlockEntity implements WorldlyContainer, IActivatable, IAlvearyComponent.Active<AlvearyMultiblockLogic>, IAlvearyComponent.HasInventory {
 	private final AlvearySwarmerInventory inventory;
@@ -77,7 +81,7 @@ public class AlvearySwarmerBlockEntity extends AbstractAlvearyBlockEntity implem
 		}
 
 		// Try to spawn princess
-		if (this.level.random.nextFloat() < chance) {
+		if (this.level.getRandom().nextFloat() < chance) {
 			// Queue swarm spawn
 			IIndividualHandlerItem.ifPresent(princessStack, individual -> {
 				if (individual instanceof IBee princess) {
@@ -125,32 +129,28 @@ public class AlvearySwarmerBlockEntity extends AbstractAlvearyBlockEntity implem
 
 		ServerLevel level = (ServerLevel) this.level;
 
-		int x = getBlockPos().getX() + level.random.nextInt(40 * 2) - 40;
-		int z = getBlockPos().getZ() + level.random.nextInt(40 * 2) - 40;
+		int x = getBlockPos().getX() + level.getRandom().nextInt(40 * 2) - 40;
+		int z = getBlockPos().getZ() + level.getRandom().nextInt(40 * 2) - 40;
 
-		if (HiveDecorator.tryGenHive(level, level.random, x, z, hive)) {
+		if (HiveDecorator.tryGenHive(level, level.getRandom(), x, z, hive)) {
             this.pendingSpawns.pop();
 		}
 	}
 
 	/* SAVING & LOADING */
 	@Override
-	public void loadAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.loadAdditional(compoundNBT, registries);
+	protected void loadAdditional(ValueInput input) {
+		CompoundTag compoundNBT = ValueIOUtil.toTag(input);
+		HolderLookup.Provider registries = input.lookup();
+		super.loadAdditional(input);
 
-		ListTag nbttaglist = compoundNBT.getList("PendingSpawns", 10);
-		for (int i = 0; i < nbttaglist.size(); i++) {
-			CompoundTag compoundNBT1 = nbttaglist.getCompound(i);
-            this.pendingSpawns.add(ItemStack.parse(registries, compoundNBT1).orElse(ItemStack.EMPTY));
-		}
+		InventoryData.replaceStacks(this.pendingSpawns, compoundNBT.getListOrEmpty("PendingSpawns"), registries);
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-		super.saveAdditional(compoundNBT, registries);
-
-		ItemStack[] offspring = this.pendingSpawns.toArray(new ItemStack[0]);
-        compoundNBT.put("PendingSpawns", TileUtil.saveItemsToList(registries, offspring));
+	protected void saveAdditional(ValueOutput output) {
+		super.saveAdditional(output);
+		InventoryData.writeStacks(this.pendingSpawns, "PendingSpawns", output);
 	}
 
 	@Override

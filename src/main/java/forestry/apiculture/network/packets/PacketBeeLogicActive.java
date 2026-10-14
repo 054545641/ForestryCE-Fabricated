@@ -38,10 +38,14 @@ public record PacketBeeLogicActive(
 	}
 
 	public static void handle(PacketBeeLogicActive msg, Player player) {
-		IBeeHousing beeHousing = TileUtil.getTile(player.level(), msg.pos, IBeeHousing.class);
-		if (beeHousing != null) {
-			IBeekeepingLogic beekeepingLogic = beeHousing.getBeekeepingLogic();
-			beekeepingLogic.readData(msg.payload);
+		try {
+			IBeeHousing beeHousing = TileUtil.getTile(player.level(), msg.pos, IBeeHousing.class);
+			if (beeHousing != null) {
+				IBeekeepingLogic beekeepingLogic = beeHousing.getBeekeepingLogic();
+				beekeepingLogic.readData(msg.payload);
+			}
+		} finally {
+			msg.payload.release();
 		}
 	}
 }

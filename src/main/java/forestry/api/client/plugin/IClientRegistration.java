@@ -4,7 +4,7 @@ import forestry.api.client.arboriculture.ILeafSprite;
 import forestry.api.client.arboriculture.ILeafTint;
 import forestry.api.client.genetics.IAnalyzerPlugin;
 import forestry.api.core.genetics.ILifeStage;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Handles client registration for Forestry plugins.
@@ -41,7 +41,7 @@ public interface IClientRegistration {
 	 * @param stage         The life stage to set the default model for.
 	 * @param modelLocation The location of the model to use.
 	 */
-	void setDefaultBeeModel(ILifeStage stage, ResourceLocation modelLocation);
+	void setDefaultBeeModel(ILifeStage stage, Identifier modelLocation);
 
 	/**
 	 * Registers a custom model for the given bee species when at the given life stage.
@@ -50,7 +50,7 @@ public interface IClientRegistration {
 	 * @param stage     The block model for the sapling.
 	 * @param model     The location of the item model for the bee species when at the given life stage.
 	 */
-	void setCustomBeeModel(ResourceLocation speciesId, ILifeStage stage, ResourceLocation model);
+	void setCustomBeeModel(Identifier speciesId, ILifeStage stage, Identifier model);
 
 	/**
 	 * Registers the block and item models for a tree species's saplings. If you do not call this, Forestry will
@@ -60,7 +60,7 @@ public interface IClientRegistration {
 	 * @param blockModel The block model for the sapling.
 	 * @param itemModel  The item model for the sapling.
 	 */
-	void setSaplingModel(ResourceLocation speciesId, ResourceLocation blockModel, ResourceLocation itemModel);
+	void setSaplingModel(Identifier speciesId, Identifier blockModel, Identifier itemModel);
 
 	/**
 	 * Sets the leaf sprite of this species. Required for all tree species.
@@ -68,7 +68,7 @@ public interface IClientRegistration {
 	 * @param speciesId The ID of the tree species to register models for.
 	 * @param sprite    The sprite used for leaf rendering. Can be reused for multiple species.
 	 */
-	void setLeafSprite(ResourceLocation speciesId, ILeafSprite sprite);
+	void setLeafSprite(Identifier speciesId, ILeafSprite sprite);
 
 	/**
 	 * Sets the custom leaf tint object of this species. If none is registered, then a default tint based on the
@@ -77,7 +77,7 @@ public interface IClientRegistration {
 	 * @param speciesId The ID of the tree species to set the tint for.
 	 * @param tint      The tint. Can be reused for multiple species.
 	 */
-	void setLeafTint(ResourceLocation speciesId, ILeafTint tint);
+	void setLeafTint(Identifier speciesId, ILeafTint tint);
 
 	/**
 	 * Sets the sprites used by Forestry butterflies for item/entity rendering. If none is set, Forestry will
@@ -88,7 +88,7 @@ public interface IClientRegistration {
 	 * @param itemTexture   The path to the item texture.
 	 * @param entityTexture The path to the entity texture.
 	 */
-	void setButterflySprites(ResourceLocation speciesId, ResourceLocation itemTexture, ResourceLocation entityTexture);
+	void setButterflySprites(Identifier speciesId, Identifier itemTexture, Identifier entityTexture);
 
-	void setAnalyzerPlugin(ResourceLocation speciesTypeId, IAnalyzerPlugin<?, ?> plugin);
+	void setAnalyzerPlugin(Identifier speciesTypeId, IAnalyzerPlugin<?, ?> plugin);
 }

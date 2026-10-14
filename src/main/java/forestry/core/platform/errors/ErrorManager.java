@@ -6,7 +6,7 @@ import forestry.api.core.IErrorLogic;
 import forestry.api.core.IErrorManager;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -15,9 +15,9 @@ public class ErrorManager implements IErrorManager {
 	// Numeric IDs should be used only for network synchronization
 	private final Short2ObjectOpenHashMap<IError> byNumericId;
 	private final Object2ShortOpenHashMap<IError> numericIdLookup;
-	private final ImmutableMap<ResourceLocation, IError> byId;
+	private final ImmutableMap<Identifier, IError> byId;
 
-	public ErrorManager(Short2ObjectOpenHashMap<IError> byNumericId, Object2ShortOpenHashMap<IError> numericIdLookup, ImmutableMap<ResourceLocation, IError> byId) {
+	public ErrorManager(Short2ObjectOpenHashMap<IError> byNumericId, Object2ShortOpenHashMap<IError> numericIdLookup, ImmutableMap<Identifier, IError> byId) {
 		this.byNumericId = byNumericId;
 		this.numericIdLookup = numericIdLookup;
 		this.byId = byId;
@@ -30,7 +30,7 @@ public class ErrorManager implements IErrorManager {
 
 	@Nullable
 	@Override
-	public IError getError(ResourceLocation errorId) {
+	public IError getError(Identifier errorId) {
 		return this.byId.get(errorId);
 	}
 

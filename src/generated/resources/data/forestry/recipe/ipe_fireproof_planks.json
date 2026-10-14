@@ -1,10 +1,9 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "building",
+  "group": "planks",
   "ingredients": [
-    {
-      "tag": "forestry:fireproof_ipe_logs"
-    }
+    "#forestry:fireproof_ipe_logs"
   ],
   "result": {
     "count": 4,

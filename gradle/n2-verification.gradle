@@ -1,0 +1,44 @@
+def dataTestClasses = layout.buildDirectory.dir('classes/dataTest')
+def dataTestSources = [
+	'src/main/java/forestry/core/platform/util/InventoryData.java',
+	'src/main/java/forestry/core/content/machines/recipes/RecipeSerializers.java',
+	'src/main/java/forestry/core/engine/genetics/DefinitionManager.java',
+	'src/main/java/forestry/core/platform/util/ValueIOUtil.java',
+	'src/main/java/forestry/core/platform/util/NBTUtilForestry.java',
+	'src/main/java/forestry/core/platform/util/SavedDataMigration.java',
+	'src/main/java/forestry/core/platform/util/LazyMapCodec.java',
+	'src/main/java/forestry/core/platform/util/LazyStreamCodec.java',
+	'src/main/java/forestry/core/platform/network/IStreamable.java'
+]
+
+def compileN2DataTest = tasks.register('compileN2DataTest', JavaCompile) {
+	source dataTestSources, 'src/dataTest/java'
+	classpath = sourceSets.main.compileClasspath
+	destinationDirectory = dataTestClasses
+	javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }
+	options.encoding = 'UTF-8'
+}
+
+tasks.register('testN2Data', JavaExec) {
+	group = 'verification'
+	description = 'Tests production data reload, NBT, migration and codec helpers against the target Minecraft libraries.'
+	dependsOn compileN2DataTest
+	classpath = files(dataTestClasses) + sourceSets.main.compileClasspath
+	mainClass = 'forestry.core.engine.genetics.N2DataTest'
+	javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+	workingDir = layout.buildDirectory.dir('dataTest').get().asFile
+	doFirst { workingDir.mkdirs() }
+}
+
+tasks.named('check') { dependsOn 'testN2Data' }
+
+// compile together so core failures do not hide extension diagnostics
+tasks.register('compilePortingSources', JavaCompile) {
+	group = 'verification'
+	description = 'Compiles all four production source sets together for migration diagnostics; does not replace their build tasks.'
+	source sourceSets.main.allJava, sourceSets.mail.allJava, sourceSets.farms.allJava, sourceSets.butterflies.allJava
+	classpath = sourceSets.main.compileClasspath
+	destinationDirectory = layout.buildDirectory.dir('classes/portingDiagnostics')
+	javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }
+	options.encoding = 'UTF-8'
+}

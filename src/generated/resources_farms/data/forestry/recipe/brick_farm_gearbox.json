@@ -1,20 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "#": {
-      "item": "minecraft:bricks"
-    },
-    "T": {
-      "tag": "c:gears/tin"
-    }
+    "#": "minecraft:bricks",
+    "T": "#c:gears/tin"
   },
   "pattern": [
     " # ",
     "TTT"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:brick_farm_gearbox"
   }
 }

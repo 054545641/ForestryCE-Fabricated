@@ -1,5 +1,3 @@
 {
-  "textures": {
-    "particle": "forestry:block/feijoa_planks"
-  }
+  "parent": "forestry:block/feijoa_hanging_sign_rot_0"
 }

@@ -41,41 +41,46 @@ public class GrafterLootModifier extends LootModifier {
 	public static final MapCodec<GrafterLootModifier> CODEC = RecordCodecBuilder.mapCodec(inst -> codecStart(inst).apply(inst, GrafterLootModifier::new));
 
 	public GrafterLootModifier(LootItemCondition[] conditionsIn) {
-		super(conditionsIn);
+		this(conditionsIn, IGlobalLootModifier.DEFAULT_PRIORITY);
+	}
+
+	public GrafterLootModifier(LootItemCondition[] conditionsIn, int priority) {
+		super(conditionsIn, priority);
 	}
 
 	@Override
 	protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-		BlockState state = context.getParamOrNull(LootContextParams.BLOCK_STATE);
+		BlockState state = context.getOptionalParameter(LootContextParams.BLOCK_STATE);
 		if (state == null || !state.is(BlockTags.LEAVES)) {
 			return generatedLoot;
 		}
-		ItemStack harvestingTool = context.getParamOrNull(LootContextParams.TOOL);
-		if (harvestingTool == null || harvestingTool.isEmpty()) {
+		// Durability must be applied to the actual mutable harvesting stack.
+		if (!(context.getOptionalParameter(LootContextParams.TOOL) instanceof ItemStack harvestingTool) || harvestingTool.isEmpty()) {
 			return generatedLoot;
 		}
-		Entity entity = context.getParamOrNull(LootContextParams.THIS_ENTITY);
-		if (!(entity instanceof Player player)) {
+		Entity entity = context.getOptionalParameter(LootContextParams.THIS_ENTITY);
+		if (!(entity instanceof ServerPlayer player)) {
 			return generatedLoot;
 		}
 		if (generatedLoot.stream().noneMatch((stack) -> stack.is(ItemTags.SAPLINGS))) {
 			handleLoot(generatedLoot, player, harvestingTool, state, context);
 		}
-		harvestingTool.hurtAndBreak(1, context.getLevel(), (ServerPlayer) player, item -> {});
-		if (harvestingTool.isEmpty()) {
-			EventHooks.onPlayerDestroyItem(player, harvestingTool, InteractionHand.MAIN_HAND);
-		}
+		ItemStack beforeDamage = harvestingTool.copy();
+		harvestingTool.hurtAndBreak(1, context.getLevel(), player, item -> {
+			EventHooks.onPlayerDestroyItem(player, beforeDamage, InteractionHand.MAIN_HAND);
+			player.onEquippedItemBroken(item, net.minecraft.world.entity.EquipmentSlot.MAINHAND);
+		});
 		return generatedLoot;
 	}
 
 	public void handleLoot(List<ItemStack> generatedLoot, Player player, ItemStack harvestingTool, BlockState state, LootContext context) {
 		Level world = player.level();
-		BlockEntity tileEntity = context.getParamOrNull(LootContextParams.BLOCK_ENTITY);
+		BlockEntity tileEntity = context.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
 		ITree tree = getTree(state, tileEntity);
 		if (tree == null) {
 			return;
 		}
-		Vec3 origin = context.getParamOrNull(LootContextParams.ORIGIN);
+		Vec3 origin = context.getOptionalParameter(LootContextParams.ORIGIN);
 		if (origin == null) {
 			return;
 		}

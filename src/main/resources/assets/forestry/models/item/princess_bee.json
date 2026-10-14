@@ -1,5 +1,4 @@
 {
-  "parent": "forestry:item/mirror_hands",
-  "stage": "princess",
-  "loader": "forestry:bee_ge"
+  "parent": "forestry:item/bee_princess_default",
+  "stage": "princess"
 }

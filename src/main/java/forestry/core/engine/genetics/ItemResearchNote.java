@@ -11,9 +11,9 @@ import forestry.core.platform.util.NBTUtilForestry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -34,8 +34,8 @@ public class ItemResearchNote extends ItemForestry {
 	private static final String RESEARCHER_KEY = "RES";
 	private static final String NBT_INNER = "INN";
 
-	public ItemResearchNote() {
-		super(new Item.Properties());
+	public ItemResearchNote(Properties properties) {
+		super(properties);
 	}
 
 	@Override
@@ -45,9 +45,9 @@ public class ItemResearchNote extends ItemForestry {
 		if (note.researcher == null) {
 			researcherName = "Sengir";
 		} else {
-			researcherName = note.researcher.getName();
+			researcherName = note.researcher.name();
 		}
-		return Component.translatable(getDescriptionId(itemstack), researcherName);
+		return Component.translatable(getDescriptionId(), researcherName);
 	}
 
 	@Override
@@ -58,10 +58,10 @@ public class ItemResearchNote extends ItemForestry {
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
+	public InteractionResult use(Level worldIn, Player playerIn, InteractionHand handIn) {
 		ItemStack heldItem = playerIn.getItemInHand(handIn);
-		if (worldIn.isClientSide) {
-			return InteractionResultHolder.pass(heldItem);
+		if (worldIn.isClientSide()) {
+			return InteractionResult.PASS;
 		}
 
 		ResearchNote note = new ResearchNote(NBTUtilForestry.getItemStackTag(heldItem));
@@ -69,12 +69,16 @@ public class ItemResearchNote extends ItemForestry {
 			heldItem.shrink(1);
 		}
 
-		return InteractionResultHolder.success(heldItem);
+		return InteractionResult.SUCCESS;
 	}
 
 	@Nullable
 	private static IMutation<?> getEncodedMutation(CompoundTag compound) {
-		ISpeciesType<?, ?> type = IForestryApi.INSTANCE.getGeneticManager().getSpeciesTypeSafe(ResourceLocation.parse(compound.getString(TYPE_KEY)));
+		Identifier typeId = Identifier.tryParse(compound.getStringOr(TYPE_KEY, ""));
+		if (typeId == null) {
+			return null;
+		}
+		ISpeciesType<?, ?> type = IForestryApi.INSTANCE.getGeneticManager().getSpeciesTypeSafe(typeId);
 		if (type == null) {
 			return null;
 		}
@@ -195,11 +199,11 @@ public class ItemResearchNote extends ItemForestry {
 		public ResearchNote(@Nullable CompoundTag nbt) {
 			if (nbt != null) {
 				if (nbt.contains(RESEARCHER_KEY)) {
-					this.researcher = NBTUtilForestry.readGameProfile(nbt.getCompound(RESEARCHER_KEY));
+					this.researcher = NBTUtilForestry.readGameProfile(nbt.getCompoundOrEmpty(RESEARCHER_KEY));
 				} else {
 					this.researcher = null;
 				}
-				this.inner = nbt.getCompound(NBT_INNER);
+				this.inner = nbt.getCompoundOrEmpty(NBT_INNER);
 			} else {
 				this.researcher = null;
 				this.inner = new CompoundTag();

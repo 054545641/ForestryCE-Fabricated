@@ -1,16 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "T": {
-      "item": "forestry:portable_analyzer"
-    },
-    "X": {
-      "tag": "c:ingots/bronze"
-    },
-    "Y": {
-      "item": "forestry:sturdy_casing"
-    }
+    "T": "forestry:portable_analyzer",
+    "X": "#c:ingots/bronze",
+    "Y": "forestry:sturdy_casing"
   },
   "pattern": [
     "XTX",
@@ -18,7 +11,6 @@
     "X X"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:analyzer"
   }
 }

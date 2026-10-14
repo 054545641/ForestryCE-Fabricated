@@ -14,7 +14,7 @@ import forestry.core.features.CoreItems;
 import forestry.core.platform.loot.OrganismFunction;
 import forestry.core.platform.util.SpeciesUtil;
 import forestry.core.content.backpacks.features.BackpackItems;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
@@ -231,11 +231,11 @@ public class LootTableHelper {
 			));
 	}
 
-	private LootPoolSingletonContainer.Builder<?> saplingLoot(ResourceLocation species) {
+	private LootPoolSingletonContainer.Builder<?> saplingLoot(Identifier species) {
 		return saplingLoot(TreeLifeStage.SAPLING, species);
 	}
 
-	private LootPoolSingletonContainer.Builder<?> saplingLoot(TreeLifeStage type, ResourceLocation species) {
+	private LootPoolSingletonContainer.Builder<?> saplingLoot(TreeLifeStage type, Identifier species) {
 		// Reference the species by id (the tag-in-recipe pattern) rather than materializing a live species only to
 		// read back the id we already hold; the OrganismFunction JSON is identical either way (fromDefinition just
 		// forwards type.id()/species.id() to fromId), and this needs no live species type in memory at datagen time.
@@ -243,11 +243,11 @@ public class LootTableHelper {
 			.apply(OrganismFunction.fromId(SpeciesUtil.TREE_TYPE.get().id(), species));
 	}
 
-	public static LootPoolSingletonContainer.Builder<?> beeLoot(ResourceLocation species) {
+	public static LootPoolSingletonContainer.Builder<?> beeLoot(Identifier species) {
 		return beeLoot(BeeLifeStage.DRONE, species);
 	}
 
-	public static LootPoolSingletonContainer.Builder<?> beeLoot(BeeLifeStage type, ResourceLocation species) {
+	public static LootPoolSingletonContainer.Builder<?> beeLoot(BeeLifeStage type, Identifier species) {
 		// Reference the species by id (see saplingLoot). Bees are data-driven and absent from memory during a
 		// standalone datagen run, so a fromDefinition lookup would need the seeded live species type; fromId writes
 		// the id directly and defers resolution to load time, producing byte-identical loot JSON.
@@ -286,8 +286,8 @@ public class LootTableHelper {
 			this.builder = builder;
 		}
 
-		public ResourceLocation getLocation() {
-			return ForestryConstants.forestry(this.defaultLocation.location().getPath() + "/" + this.extension);
+		public Identifier getLocation() {
+			return ForestryConstants.forestry(this.defaultLocation.identifier().getPath() + "/" + this.extension);
 		}
 	}
 }

@@ -8,25 +8,24 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.AdvancementType;
-import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.advancements.critereon.EntityPredicate;
-import net.minecraft.advancements.critereon.ImpossibleTrigger;
-import net.minecraft.advancements.critereon.InventoryChangeTrigger;
-import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.advancements.critereon.PlayerTrigger;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
+import net.minecraft.advancements.predicates.entity.EntityPredicate;
+import net.minecraft.advancements.triggers.ImpossibleTrigger;
+import net.minecraft.advancements.triggers.InventoryChangeTrigger;
+import net.minecraft.advancements.predicates.ItemPredicate;
+import net.minecraft.advancements.triggers.PlayerTrigger;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootTable;
 
-import net.neoforged.neoforge.common.data.AdvancementProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.data.advancements.AdvancementProvider;
 
 import forestry.api.ForestryConstants;
 import forestry.api.ForestryTags;
@@ -58,13 +57,13 @@ import forestry.core.platform.item.FluidContainerType;
 import forestry.core.platform.util.SpeciesUtil;
 
 public class ForestryAdvancementProvider extends AdvancementProvider {
-	public ForestryAdvancementProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, ExistingFileHelper existingFileHelper) {
-		super(output, registries, existingFileHelper, List.of(new CoreAdvancements()));
+	public ForestryAdvancementProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+		super(output, registries, List.of(new CoreAdvancements()));
 	}
 
-	private static class CoreAdvancements implements AdvancementProvider.AdvancementGenerator {
+	private static class CoreAdvancements implements net.minecraft.data.advancements.AdvancementSubProvider {
 		@Override
-		public void generate(HolderLookup.Provider registries, Consumer<AdvancementHolder> writer, ExistingFileHelper existingFileHelper) {
+		public void generate(HolderLookup.Provider registries, Consumer<AdvancementHolder> writer) {
 			// Kept as the Industrious queen this tree already showed. 1.20.1 uses a Forest queen, but the
 			// icon is a presentation choice rather than a port gap
 			ItemStack icon = SpeciesUtil.BEE_TYPE.get().createStack(ForestryBeeSpecies.INDUSTRIOUS, BeeLifeStage.QUEEN);
@@ -75,10 +74,10 @@ public class ForestryAdvancementProvider extends AdvancementProvider {
 			ResourceKey<LootTable> guide = ResourceKey.create(Registries.LOOT_TABLE, ForestryConstants.forestry("grant_guide"));
 			AdvancementHolder root = Advancement.Builder.advancement()
 				.display(
-					icon,
+					net.minecraft.world.item.ItemStackTemplate.fromNonEmptyStack(icon),
 					Component.translatable("advancements.forestry.root.title"),
 					Component.translatable("advancements.forestry.root.description"),
-					ResourceLocation.withDefaultNamespace("textures/block/honeycomb_block.png"),
+					Identifier.withDefaultNamespace("textures/block/honeycomb_block.png"),
 					AdvancementType.TASK,
 					false,
 					false,
@@ -149,7 +148,7 @@ public class ForestryAdvancementProvider extends AdvancementProvider {
 			AdvancementHolder bee = ForestryAdvancements.add(writer, "get_a_bee",
 				SpeciesUtil.BEE_TYPE.get().createStack(ForestryBeeSpecies.MEADOWS, BeeLifeStage.DRONE),
 				scooped,
-				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(
+				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(registries.lookupOrThrow(Registries.ITEM),
 					ApicultureItems.BEE_DRONE.get(),
 					ApicultureItems.BEE_PRINCESS.get(),
 					ApicultureItems.BEE_QUEEN.get()
@@ -243,7 +242,7 @@ public class ForestryAdvancementProvider extends AdvancementProvider {
 			ForestryAdvancements.add(writer, "get_frames",
 				ApicultureItems.FRAME_UNTREATED.stack(),
 				apiary,
-				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(
+				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(registries.lookupOrThrow(Registries.ITEM),
 					ApicultureItems.FRAME_UNTREATED.get(),
 					ApicultureItems.FRAME_IMPREGNATED.get(),
 					ApicultureItems.FRAME_PROVEN.get()
@@ -261,7 +260,7 @@ public class ForestryAdvancementProvider extends AdvancementProvider {
 			ForestryAdvancements.add(writer, "get_alveary_upgrade",
 				ApicultureBlocks.ALVEARY.stack(AlvearyBlock.Type.SWARMER),
 				alveary,
-				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(
+				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(registries.lookupOrThrow(Registries.ITEM),
 					ApicultureBlocks.ALVEARY.get(AlvearyBlock.Type.HEATER).get(),
 					ApicultureBlocks.ALVEARY.get(AlvearyBlock.Type.FAN).get(),
 					ApicultureBlocks.ALVEARY.get(AlvearyBlock.Type.STABILIZER).get(),
@@ -360,7 +359,7 @@ public class ForestryAdvancementProvider extends AdvancementProvider {
 			AdvancementHolder engine = ForestryAdvancements.add(writer, "get_engine",
 				EnergyBlocks.ENGINES.stack(EngineBlockType.BIOGAS),
 				root,
-				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(
+				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(registries.lookupOrThrow(Registries.ITEM),
 					EnergyBlocks.ENGINES.get(EngineBlockType.CLOCKWORK).get(),
 					EnergyBlocks.ENGINES.get(EngineBlockType.PEAT).get(),
 					EnergyBlocks.ENGINES.get(EngineBlockType.BIOGAS).get(),
@@ -381,7 +380,7 @@ public class ForestryAdvancementProvider extends AdvancementProvider {
 			ForestryAdvancements.add(writer, "get_solar_panel",
 				EnergyBlocks.SOLAR_PANEL.stack(),
 				engine,
-				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(EnergyBlocks.SOLAR_PANEL.get())));
+				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(registries.lookupOrThrow(Registries.ITEM), EnergyBlocks.SOLAR_PANEL.get())));
 
 			// Next Level Crafting
 			ForestryAdvancements.add(writer, "get_carpenter",
@@ -394,7 +393,7 @@ public class ForestryAdvancementProvider extends AdvancementProvider {
 			AdvancementHolder bronzed = ForestryAdvancements.add(writer, "get_bronze",
 				CoreItems.BRONZE_INGOT.stack(),
 				engine,
-				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(ForestryTags.Items.INGOTS_BRONZE)));
+				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(registries.lookupOrThrow(Registries.ITEM), ForestryTags.Items.INGOTS_BRONZE)));
 
 			// No Thanks, I Already Ate
 			AdvancementHolder fertiliser = ForestryAdvancements.add(writer, "get_fertiliser",
@@ -420,7 +419,7 @@ public class ForestryAdvancementProvider extends AdvancementProvider {
 			ForestryAdvancements.add(writer, "get_honey",
 				CoreItems.HONEY_DROP.stack(),
 				centrifuge,
-				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(
+				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(registries.lookupOrThrow(Registries.ITEM),
 					CoreItems.HONEY_DROP.get(),
 					CoreItems.HONEYDEW.get(),
 					CoreItems.BEESWAX.get()
@@ -468,7 +467,7 @@ public class ForestryAdvancementProvider extends AdvancementProvider {
 			ForestryAdvancements.add(writer, "break_bronze_tool",
 				CoreItems.BROKEN_SURVIVALISTS_PICKAXE.stack(),
 				bronzed,
-				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(
+				InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(registries.lookupOrThrow(Registries.ITEM),
 					CoreItems.BROKEN_SURVIVALISTS_AXE.get(),
 					CoreItems.BROKEN_SURVIVALISTS_PICKAXE.get(),
 					CoreItems.BROKEN_SURVIVALISTS_SHOVEL.get(),
@@ -494,7 +493,7 @@ public class ForestryAdvancementProvider extends AdvancementProvider {
 		 * @param parent  The advancement it hangs under
 		 * @return The advancement, to hang a child under
 		 */
-		private static AdvancementHolder discoveredBee(Consumer<AdvancementHolder> writer, String name, ResourceLocation species, AdvancementHolder parent) {
+		private static AdvancementHolder discoveredBee(Consumer<AdvancementHolder> writer, String name, Identifier species, AdvancementHolder parent) {
 			return ForestryAdvancements.add(writer, name,
 				SpeciesUtil.BEE_TYPE.get().createStack(species, BeeLifeStage.DRONE),
 				parent,
@@ -511,7 +510,7 @@ public class ForestryAdvancementProvider extends AdvancementProvider {
 		 * @param type    The frame the advancement tree draws around the icon
 		 * @return The advancement, to hang a child under
 		 */
-		private static AdvancementHolder discoveredTree(Consumer<AdvancementHolder> writer, String name, ResourceLocation species, AdvancementHolder parent, AdvancementType type) {
+		private static AdvancementHolder discoveredTree(Consumer<AdvancementHolder> writer, String name, Identifier species, AdvancementHolder parent, AdvancementType type) {
 			return ForestryAdvancements.add(writer, name,
 				SpeciesUtil.TREE_TYPE.get().createStack(species, TreeLifeStage.SAPLING),
 				parent,

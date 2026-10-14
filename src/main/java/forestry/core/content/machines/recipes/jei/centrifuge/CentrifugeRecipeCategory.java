@@ -20,16 +20,16 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import mezz.jei.api.recipe.types.IRecipeType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Comparator;
 import java.util.List;
 
 public class CentrifugeRecipeCategory extends ForestryRecipeCategory<ICentrifugeRecipe> {
-	private static final ResourceLocation TEXTURE = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/centrifugesocket2.png");
+	private static final Identifier TEXTURE = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/centrifugesocket2.png");
 
 	private final IDrawableAnimated arrow;
 	private final IDrawable icon;
@@ -44,7 +44,7 @@ public class CentrifugeRecipeCategory extends ForestryRecipeCategory<ICentrifuge
 	}
 
 	@Override
-	public RecipeType<ICentrifugeRecipe> getRecipeType() {
+	public IRecipeType<ICentrifugeRecipe> getRecipeType() {
 		return ForestryRecipeType.CENTRIFUGE;
 	}
 
@@ -72,7 +72,7 @@ public class CentrifugeRecipeCategory extends ForestryRecipeCategory<ICentrifuge
 	}
 
 	@Override
-	public void draw(ICentrifugeRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+	public void draw(ICentrifugeRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
 		super.draw(recipe, recipeSlotsView, graphics, mouseX, mouseY);
 		this.arrow.draw(graphics, 32, 18);
 		this.arrow.draw(graphics, 56, 18);

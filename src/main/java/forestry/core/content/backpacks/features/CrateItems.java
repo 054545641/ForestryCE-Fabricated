@@ -18,7 +18,7 @@ public class CrateItems {
 	private static final List<FeatureItem<ItemCrated>> CRATES = new ArrayList<>();
 	private static final IFeatureRegistry REGISTRY = ModFeatureRegistry.get(ForestryModuleIds.STORAGE);
 
-	public static final FeatureItem<ItemCrated> CRATE = REGISTRY.item(() -> new ItemCrated(() -> ItemStack.EMPTY), "crate");
+	public static final FeatureItem<ItemCrated> CRATE = REGISTRY.item(properties -> new ItemCrated(() -> ItemStack.EMPTY, properties), "crate");
 
 	// Core
 	public static final FeatureItem<ItemCrated> CRATED_PEAT = register(CoreItems.PEAT, "crated_peat");
@@ -121,7 +121,7 @@ public class CrateItems {
 	}
 
 	private static FeatureItem<ItemCrated> register(ItemLike contained, String identifier) {
-		FeatureItem<ItemCrated> item = REGISTRY.item(() -> new ItemCrated(() -> new ItemStack(contained)), identifier);
+		FeatureItem<ItemCrated> item = REGISTRY.item(properties -> new ItemCrated(() -> new ItemStack(contained), properties), identifier);
 		CRATES.add(item);
 		return item;
 	}

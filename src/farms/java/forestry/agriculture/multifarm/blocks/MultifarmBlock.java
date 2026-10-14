@@ -20,17 +20,17 @@ public class MultifarmBlock extends BlockStructure implements EntityBlock {
 
 	public static final BooleanProperty BAND = BooleanProperty.create("band");
 
-	public MultifarmBlock(MultifarmBlockType type, MultifarmMaterialType farmMaterial) {
-		super(Block.Properties.of().strength(1.0f));
+	public MultifarmBlock(Properties properties, MultifarmBlockType type, MultifarmMaterialType farmMaterial) {
+		super(properties.strength(1.0f));
 		this.type = type;
 		this.farmMaterial = farmMaterial;
 	}
 
-	public static MultifarmBlock create(MultifarmBlockType type, MultifarmMaterialType material) {
+	public static MultifarmBlock create(Properties properties, MultifarmBlockType type, MultifarmMaterialType material) {
 		if (type == MultifarmBlockType.PLAIN) {
-			return new Plain(material);
+			return new Plain(properties, material);
 		} else {
-			return new MultifarmBlock(type, material);
+			return new MultifarmBlock(properties, type, material);
 		}
 	}
 
@@ -67,8 +67,8 @@ public class MultifarmBlock extends BlockStructure implements EntityBlock {
 	}
 
 	public static class Plain extends MultifarmBlock {
-		public Plain(MultifarmMaterialType farmMaterial) {
-			super(MultifarmBlockType.PLAIN, farmMaterial);
+		public Plain(Properties properties, MultifarmMaterialType farmMaterial) {
+			super(properties, MultifarmBlockType.PLAIN, farmMaterial);
 
 			registerDefaultState(defaultBlockState().setValue(BAND, false));
 		}

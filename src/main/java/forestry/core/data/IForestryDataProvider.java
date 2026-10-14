@@ -2,7 +2,7 @@ package forestry.core.data;
 
 import java.util.Set;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
@@ -32,5 +32,5 @@ public interface IForestryDataProvider {
 	 *
 	 * @return The modules this jar ships
 	 */
-	Set<ResourceLocation> moduleIds();
+	Set<Identifier> moduleIds();
 }

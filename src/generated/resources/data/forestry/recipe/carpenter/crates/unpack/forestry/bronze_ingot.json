@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/crates/unpack/forestry/bronze_ingot",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:crated_bronze"
-      }
+      "forestry:crated_bronze"
     ],
     "result": {
       "count": 9,

@@ -2,7 +2,7 @@ package forestry.api.plugin;
 
 import forestry.api.apiculture.IFlowerType;
 import forestry.api.core.genetics.filter.IFilterRuleType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 
@@ -31,7 +31,7 @@ public interface IGeneticRegistration {
 	 * @param type The flower type to register.
 	 * @since 2.10.0
 	 */
-	void registerFlowerType(ResourceLocation id, IFlowerType type);
+	void registerFlowerType(Identifier id, IFlowerType type);
 
 	/**
 	 * Defines a new taxon or retrieves an existing taxon, allows for adding subtaxa and species.
@@ -51,7 +51,7 @@ public interface IGeneticRegistration {
 	 * @param typeFactory The function to use to create the species type, given the completed karyotype.
 	 * @return A builder that can be used to define properties of the species.
 	 */
-	ISpeciesTypeBuilder registerSpeciesType(ResourceLocation id, ISpeciesTypeFactory typeFactory);
+	ISpeciesTypeBuilder registerSpeciesType(Identifier id, ISpeciesTypeFactory typeFactory);
 
 	/**
 	 * Modify an existing species, for example, adding an extra chromosome to bees, or adding additional permitted alleles to chromosomes.
@@ -60,7 +60,7 @@ public interface IGeneticRegistration {
 	 * @param id     The ID of the species to modify.
 	 * @param action The modifications to be made.
 	 */
-	void modifySpeciesType(ResourceLocation id, Consumer<ISpeciesTypeBuilder> action);
+	void modifySpeciesType(Identifier id, Consumer<ISpeciesTypeBuilder> action);
 
 	/**
 	 * Registers a new filter rule for the Genetic Filter block.

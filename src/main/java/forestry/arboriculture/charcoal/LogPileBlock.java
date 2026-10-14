@@ -45,7 +45,7 @@ public class LogPileBlock extends Block {
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		for (Direction facing : Direction.VALUES) {
+		for (Direction facing : Direction.values()) {
 			BlockState facingState = context.getLevel().getBlockState(context.getClickedPos().relative(facing));
 
 			if (facingState.is(this) && facingState.getValue(IS_ACTIVE)) {
@@ -57,10 +57,9 @@ public class LogPileBlock extends Block {
 	}
 
 	@Override
-	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, BlockPos fromPos, boolean p_220069_6_) {
-		BlockState fromState = level.getBlockState(fromPos);
-
-		if (fromState.is(Blocks.FIRE)) {
+	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, @javax.annotation.Nullable net.minecraft.world.level.redstone.Orientation orientation, boolean p_220069_6_) {
+		if (level.isClientSide()) return;
+		if (java.util.Arrays.stream(Direction.values()).anyMatch(direction -> level.getBlockState(pos.relative(direction)).is(Blocks.FIRE))) {
 			if (!state.getValue(IS_ACTIVE)) {
 				activatePile(state, level, pos, true);
 			}
@@ -71,14 +70,14 @@ public class LogPileBlock extends Block {
 		level.setBlock(pos, state.setValue(IS_ACTIVE, true), Block.UPDATE_CLIENTS);
 
 		if (scheduleUpdate) {
-			level.scheduleTick(pos, this, (TICK_RATE + level.random.nextInt(RANDOM_TICK)) / 4);
+			level.scheduleTick(pos, this, (TICK_RATE + level.getRandom().nextInt(RANDOM_TICK)) / 4);
 		}
 	}
 
 	@Override
 	public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource rand) {
 		if (state.getValue(IS_ACTIVE)) {
-			for (Direction facing : Direction.VALUES) {
+			for (Direction facing : Direction.values()) {
 				BlockPos position = pos.relative(facing);
 				if (!world.hasChunkAt(position)) {
 					continue;
@@ -106,7 +105,7 @@ public class LogPileBlock extends Block {
 					world.setBlock(pos, ashState, Block.UPDATE_CLIENTS);
 				}
 			}
-			world.scheduleTick(pos, this, TICK_RATE + world.random.nextInt(RANDOM_TICK));
+			world.scheduleTick(pos, this, TICK_RATE + world.getRandom().nextInt(RANDOM_TICK));
 		}
 	}
 
@@ -156,7 +155,7 @@ public class LogPileBlock extends Block {
 	//TODO: Precalculate, like leaf distance
 	private float getCharcoalAmount(Level world, BlockPos pos) {
 		float charcoalAmount = 0F;
-		for (Direction facing : Direction.VALUES) {
+		for (Direction facing : Direction.values()) {
 			charcoalAmount += getCharcoalFaceAmount(world, pos, facing);
 		}
 		return Mth.clamp(charcoalAmount / 6, CharcoalManager.charcoalAmountBase, 63.0F - CharcoalManager.charcoalAmountBase);

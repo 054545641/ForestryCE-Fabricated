@@ -11,14 +11,14 @@ import forestry.core.content.worktable.client.WorktableClientHandler;
 import forestry.core.content.worktable.network.packets.PacketWorktableMemoryUpdate;
 import forestry.core.content.worktable.network.packets.PacketWorktableRecipeRequest;
 import forestry.core.content.worktable.network.packets.PacketWorktableRecipeUpdate;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 
 @ForestryModule
 public class ModuleWorktable extends BlankForestryModule {
 	@Override
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return ForestryModuleIds.WORKTABLE;
 	}
 

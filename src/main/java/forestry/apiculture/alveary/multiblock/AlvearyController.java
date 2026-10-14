@@ -205,8 +205,8 @@ public class AlvearyController extends MultiblockController implements IAlvearyC
 				float fxZ = center.getZ() + 0.5F;
 				float distanceFromCenter = 1.6F;
 
-				float leftRightSpreadFromCenter = distanceFromCenter * (this.level.random.nextFloat() - 0.5F);
-				float upSpread = this.level.random.nextFloat() * 0.8F;
+				float leftRightSpreadFromCenter = distanceFromCenter * (this.level.getRandom().nextFloat() - 0.5F);
+				float upSpread = this.level.getRandom().nextFloat() * 0.8F;
 				fxY += upSpread;
 
 				// display fx on all 4 sides
@@ -234,8 +234,8 @@ public class AlvearyController extends MultiblockController implements IAlvearyC
 	public void readPayload(CompoundTag data) {
 		readOwner(data);
 
-		this.temperatureSteps = data.getByte("temperatureSteps");
-		this.humiditySteps = data.getByte("humiditySteps");
+		this.temperatureSteps = data.getByteOr("temperatureSteps", (byte) 0);
+		this.humiditySteps = data.getByteOr("humiditySteps", (byte) 0);
 
         this.beekeepingLogic.read(data, this.level.registryAccess());
         this.inventory.read(data, this.level.registryAccess());

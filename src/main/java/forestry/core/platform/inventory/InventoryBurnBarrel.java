@@ -25,7 +25,8 @@ public class InventoryBurnBarrel extends InventoryAdapterTile<TileBurnBarrel> {
 	@Override
 	public boolean canSlotAccept(int slotIndex, ItemStack stack) {
 		if (SlotUtil.isSlotInRange(slotIndex, SLOT_INPUT_1, SLOT_INPUT_COUNT)) {
-			return !stack.is(ForestryTags.Items.BURN_BARREL_BLACKLIST) && stack.getBurnTime(null) > 0;
+			Level level = this.tile.getLevel();
+			return level != null && !stack.is(ForestryTags.Items.BURN_BARREL_BLACKLIST) && stack.getBurnTime(null, level.fuelValues()) > 0;
 		}
 		return false;
 	}

@@ -1,14 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "P": [
-      {
-        "item": "forestry:ebony_planks"
-      },
-      {
-        "item": "forestry:ebony_fireproof_planks"
-      }
+      "forestry:ebony_planks",
+      "forestry:ebony_fireproof_planks"
     ]
   },
   "pattern": [
@@ -16,7 +11,6 @@
     "PPP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:ebony_boat"
   }
 }

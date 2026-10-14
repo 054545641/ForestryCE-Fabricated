@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/reclaim_bronze_axe",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:broken_survivalists_axe"
-      }
+      "forestry:broken_survivalists_axe"
     ],
     "result": {
       "count": 2,

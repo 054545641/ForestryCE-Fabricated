@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/crates/unpack/minecraft/acacia_sapling",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:crated_acacia_sapling"
-      }
+      "forestry:crated_acacia_sapling"
     ],
     "result": {
       "count": 9,

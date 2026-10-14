@@ -1,18 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "P": [
-      {
-        "item": "forestry:ipe_planks"
-      },
-      {
-        "item": "forestry:ipe_fireproof_planks"
-      }
+      "forestry:ipe_planks",
+      "forestry:ipe_fireproof_planks"
     ],
-    "S": {
-      "tag": "c:rods/wooden"
-    }
+    "S": "#c:rods/wooden"
   },
   "pattern": [
     "PPP",
@@ -20,7 +13,6 @@
     " S "
   ],
   "result": {
-    "count": 1,
     "id": "forestry:ipe_sign"
   }
 }

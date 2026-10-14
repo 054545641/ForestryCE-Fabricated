@@ -30,7 +30,7 @@ public class SnowingBeeEffect extends ThrottledBeeEffect {
 
 		Vec3i area = Bee.getParticleArea(genome, housing);
 
-		BlockPos randomPos = VecUtil.getRandomPositionInArea(level.random, area);
+		BlockPos randomPos = VecUtil.getRandomPositionInArea(level.getRandom(), area);
 		BlockPos posBlock = randomPos.offset(housing.getBlockPos()).offset(VecUtil.center(area));
 
 		// Put snow on the ground
@@ -61,12 +61,12 @@ public class SnowingBeeEffect extends ThrottledBeeEffect {
 	public IEffectData doFX(IGenome genome, IEffectData storedData, IBeeHousing housing) {
 		Level level = housing.getLevel();
 
-		if (level.random.nextInt(3) == 0) {
+		if (level.getRandom().nextInt(3) == 0) {
 			Vec3i area = Bee.getParticleArea(genome, housing);
 
 			BlockPos coordinates = housing.getBlockPos();
 
-			BlockPos spawn = VecUtil.getRandomPositionInArea(level.random, area).offset(coordinates).offset(VecUtil.center(area));
+			BlockPos spawn = VecUtil.getRandomPositionInArea(level.getRandom(), area).offset(coordinates).offset(VecUtil.center(area));
 			BeeParticleRender.addEntitySnowFX(level, spawn.getX(), spawn.getY(), spawn.getZ());
 			return storedData;
 		} else {

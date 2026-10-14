@@ -3,7 +3,6 @@
     "forestry:decaying_wheat": {
       "moistener_value": 900,
       "product": {
-        "count": 1,
         "id": "forestry:mulch"
       },
       "stage": 2
@@ -11,7 +10,6 @@
     "forestry:mouldy_wheat": {
       "moistener_value": 600,
       "product": {
-        "count": 1,
         "id": "forestry:decaying_wheat"
       },
       "stage": 1
@@ -19,7 +17,6 @@
     "minecraft:wheat": {
       "moistener_value": 300,
       "product": {
-        "count": 1,
         "id": "forestry:mouldy_wheat"
       },
       "stage": 0

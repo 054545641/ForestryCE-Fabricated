@@ -31,7 +31,7 @@ import forestry.core.engine.genetics.root.BreedingTrackerManager;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -47,52 +47,52 @@ public class BeeSpeciesType extends SpeciesType<IBeeSpecies, IBee> implements IB
 	private final IBeeEffectFactory effectFactory = new BeeEffectFactory();
 	private final IJubilanceFactory jubilanceFactory = new JubilanceFactory();
 	// Reference-value registries backing the flower_type, bee_effect, activity, and jubilance chromosomes.
-	private ImmutableMap<ResourceLocation, IBeeEffect> beeEffects = ImmutableMap.of();
-	private ImmutableMap<ResourceLocation, IBeeEffect> codeEffects = ImmutableMap.of();
+	private ImmutableMap<Identifier, IBeeEffect> beeEffects = ImmutableMap.of();
+	private ImmutableMap<Identifier, IBeeEffect> codeEffects = ImmutableMap.of();
 	@Nullable
-	private ImmutableMap<ResourceLocation, IActivityType> activityTypes;
+	private ImmutableMap<Identifier, IActivityType> activityTypes;
 	@Nullable
-	private ImmutableMap<ResourceLocation, IBeeJubilance> jubilances;
-	private ImmutableMap<ResourceLocation, IBeeJubilance> codeJubilances = ImmutableMap.of();
+	private ImmutableMap<Identifier, IBeeJubilance> jubilances;
+	private ImmutableMap<Identifier, IBeeJubilance> codeJubilances = ImmutableMap.of();
 
 	public BeeSpeciesType(IKaryotype karyotype, ISpeciesTypeBuilder builder) {
 		super(ForestrySpeciesTypes.BEE, karyotype, builder);
 	}
 
 	@Override
-	public IBeeEffect getBeeEffect(ResourceLocation id) {
+	public IBeeEffect getBeeEffect(Identifier id) {
 		return getMapValue(this.beeEffects, id, "bee effect");
 	}
 
-	public void setBeeEffects(ImmutableMap<ResourceLocation, IBeeEffect> beeEffects) {
+	public void setBeeEffects(ImmutableMap<Identifier, IBeeEffect> beeEffects) {
 		this.beeEffects = beeEffects;
 	}
 
-	public ImmutableMap<ResourceLocation, IBeeEffect> getCodeBeeEffects() {
+	public ImmutableMap<Identifier, IBeeEffect> getCodeBeeEffects() {
 		return this.codeEffects;
 	}
 
 	@Override
-	public IActivityType getActivityType(ResourceLocation id) {
+	public IActivityType getActivityType(Identifier id) {
 		return getMapValue(this.activityTypes, id, "activity type");
 	}
 
 	@Override
-	public IBeeJubilance getJubilance(ResourceLocation id) {
+	public IBeeJubilance getJubilance(Identifier id) {
 		return getMapValue(this.jubilances, id, "bee jubilance");
 	}
 
 	@Nullable
 	@Override
-	public IBeeJubilance getJubilanceSafe(ResourceLocation id) {
+	public IBeeJubilance getJubilanceSafe(Identifier id) {
 		return getMapValueSafe(this.jubilances, id);
 	}
 
-	public void setJubilances(ImmutableMap<ResourceLocation, IBeeJubilance> jubilances) {
+	public void setJubilances(ImmutableMap<Identifier, IBeeJubilance> jubilances) {
 		this.jubilances = jubilances;
 	}
 
-	public ImmutableMap<ResourceLocation, IBeeJubilance> getCodeJubilances() {
+	public ImmutableMap<Identifier, IBeeJubilance> getCodeJubilances() {
 		return this.codeJubilances;
 	}
 
@@ -125,7 +125,7 @@ public class BeeSpeciesType extends SpeciesType<IBeeSpecies, IBee> implements IB
 
 	@Override
 	public String getBreedingTrackerFile(@Nullable GameProfile profile) {
-		return "ApiaristTracker." + (profile == null ? "common" : profile.getId());
+		return "ApiaristTracker." + (profile == null ? "common" : profile.id());
 	}
 
 	@Override
@@ -171,18 +171,18 @@ public class BeeSpeciesType extends SpeciesType<IBeeSpecies, IBee> implements IB
 		List<ItemStack> bounty = super.getResearchBounty(species, level, researcher, individual, bountyLevel);
 		if (bountyLevel > 10) {
 			for (IProduct stack : species.getSpecialties()) {
-				bounty.add(formBountyStack(stack, bountyLevel, level.random));
+				bounty.add(formBountyStack(stack, bountyLevel, level.getRandom()));
 			}
 		}
 		for (IProduct stack : species.getProducts()) {
-			bounty.add(formBountyStack(stack, bountyLevel, level.random));
+			bounty.add(formBountyStack(stack, bountyLevel, level.getRandom()));
 		}
 		return bounty;
 	}
 
 
 	@Override
-	public ImmutableMap<ResourceLocation, IBeeSpecies> handleSpeciesRegistration(List<IForestryPlugin> plugins) {
+	public ImmutableMap<Identifier, IBeeSpecies> handleSpeciesRegistration(List<IForestryPlugin> plugins) {
 		ApicultureRegistration registration = new ApicultureRegistration(this);
 
 		for (IForestryPlugin plugin : plugins) {
@@ -236,12 +236,12 @@ public class BeeSpeciesType extends SpeciesType<IBeeSpecies, IBee> implements IB
 	}
 
 	@Override
-	public DataProvider createEffectProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, Map<ResourceLocation, IBeeEffect> effects) {
+	public DataProvider createEffectProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, Map<Identifier, IBeeEffect> effects) {
 		return new BeeEffectProvider(output, registries, effects);
 	}
 
 	@Override
-	public DataProvider createJubilanceProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, Map<ResourceLocation, IBeeJubilance> jubilances) {
+	public DataProvider createJubilanceProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, Map<Identifier, IBeeJubilance> jubilances) {
 		return new BeeJubilanceProvider(output, registries, jubilances);
 	}
 }

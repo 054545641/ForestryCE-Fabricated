@@ -6,7 +6,5 @@
     "amount": 1000,
     "id": "forestry:liquid_glass"
   },
-  "resource": {
-    "item": "minecraft:glass"
-  }
+  "resource": "minecraft:glass"
 }

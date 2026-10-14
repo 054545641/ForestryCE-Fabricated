@@ -4,7 +4,7 @@ import dev.latvian.mods.kubejs.event.KubeEvent;
 import forestry.api.plugin.IGeneticRegistration;
 import forestry.api.plugin.ISpeciesTypeBuilder;
 import forestry.api.plugin.ITaxonBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -33,7 +33,7 @@ public class GeneticsEventJS implements KubeEvent {
 	 */
 	// Flower types moved from the apiculture event in phase 9b: they are shared by bees and
 	// butterflies, so an addon must be able to register one without apiculture installed
-	public void registerFlowerType(ResourceLocation id, BiPredicate<Level, BlockPos> isAcceptableFlower, KubeFlowerType.PlantRandomFlowerFunction plantRandomFlower, boolean dominant) {
+	public void registerFlowerType(Identifier id, BiPredicate<Level, BlockPos> isAcceptableFlower, KubeFlowerType.PlantRandomFlowerFunction plantRandomFlower, boolean dominant) {
 		this.wrapped.registerFlowerType(id, new KubeFlowerType(isAcceptableFlower, plantRandomFlower, dominant));
 	}
 
@@ -61,7 +61,7 @@ public class GeneticsEventJS implements KubeEvent {
 	 * @param id     The ID of the species to modify.
 	 * @param action The modifications to be made.
 	 */
-	public void modifySpeciesType(ResourceLocation id, Consumer<ISpeciesTypeBuilder> action) {
+	public void modifySpeciesType(Identifier id, Consumer<ISpeciesTypeBuilder> action) {
 		this.wrapped.modifySpeciesType(id, action);
 	}
 }

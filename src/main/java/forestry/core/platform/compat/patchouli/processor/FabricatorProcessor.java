@@ -67,7 +67,7 @@ public class FabricatorProcessor implements IComponentProcessor {
 				return IVariable.from(new ItemStack(Items.SAND), registries);
 			}
 
-			return RecipeUtils.getRecipes(RecipeUtils.getRecipeManager(), FactoryRecipeTypes.FABRICATOR_SMELTING)
+			return RecipeUtils.getRecipes(RecipeUtils.getRecipeMap(), FactoryRecipeTypes.FABRICATOR_SMELTING)
 				.filter(recipe -> FluidStack.isSameFluidSameComponents(recipe.getResultFluid(), this.recipe.getResultFluid()))
 				.flatMap(recipe -> Arrays.stream(recipe.getInput().getItems()))
 				.findFirst()

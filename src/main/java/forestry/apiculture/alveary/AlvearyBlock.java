@@ -8,7 +8,7 @@ import forestry.core.platform.tile.IActivatable;
 import forestry.core.platform.tile.TileUtil;
 import forestry.core.platform.util.ItemTooltipUtil;
 import forestry.core.platform.registration.FeatureTileType;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class AlvearyBlock extends BlockStructure implements EntityBlock {
+public class AlvearyBlock extends BlockStructure implements EntityBlock, forestry.core.platform.block.IBlockTooltip {
 	public static final EnumProperty<State> STATE = EnumProperty.create("state", State.class);
 	private static final EnumProperty<AlvearyPlainType> PLAIN_TYPE = EnumProperty.create("type", AlvearyPlainType.class);
 
@@ -56,8 +56,8 @@ public class AlvearyBlock extends BlockStructure implements EntityBlock {
 
 	private final Type type;
 
-	public AlvearyBlock(Type type) {
-		super(Block.Properties.of().strength(1f).sound(SoundType.WOOD));
+	public AlvearyBlock(Properties properties, Type type) {
+		super(properties.strength(1f).sound(SoundType.WOOD));
 		this.type = type;
 		BlockState defaultState = this.getStateDefinition().any();
 		if (type == Type.PLAIN) {
@@ -142,7 +142,7 @@ public class AlvearyBlock extends BlockStructure implements EntityBlock {
 	}
 
 	@Override
-	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, BlockPos fromPos, boolean movedByPiston) {
+	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, @javax.annotation.Nullable net.minecraft.world.level.redstone.Orientation orientation, boolean movedByPiston) {
 		// The non-Forestry alveary cells (slab cap / entrance air ring) are caught here. Re-run the
 		// event-driven validation for this block (spec §5.3) instead of the deleted controller.reassemble().
 		TileUtil.actOnTile(level, pos, AbstractAlvearyBlockEntity.class, tileAlveary ->
@@ -151,7 +151,7 @@ public class AlvearyBlock extends BlockStructure implements EntityBlock {
 
 	@Override
 	public void appendHoverText(ItemStack stack, Item.TooltipContext level, List<Component> tooltip, TooltipFlag flag) {
-		if (Screen.hasShiftDown()) {
+		if (Minecraft.getInstance().hasShiftDown()) {
 			tooltip.add(Component.translatable("block.forestry.alveary_tooltip"));
 		} else {
 			ItemTooltipUtil.addShiftInformation(tooltip);

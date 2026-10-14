@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_slab",
   "key": {
-    "#": {
-      "item": "forestry:wenge_planks"
-    }
+    "#": "forestry:wenge_planks"
   },
   "pattern": [
     "###"

@@ -13,7 +13,7 @@ import forestry.core.platform.util.SpeciesUtil;
 import forestry.arboriculture.trees.TreeUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,7 +23,7 @@ import java.util.Optional;
 
 public class TreePollenType implements IPollenType<ITree> {
 	@Override
-	public ResourceLocation id() {
+	public Identifier id() {
 		return ForestryPollenTypes.TREE;
 	}
 

@@ -1,5 +1,6 @@
 package forestry.api.core.machines;
 
+import java.util.Optional;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -19,10 +20,10 @@ public interface ICarpenterRecipe extends IForestryRecipe {
 	CraftingRecipe getCraftingGridRecipe();
 
 	/**
-	 * @return the box required for this recipe. return empty stack if there is no required box.
+	 * @return The required box, or an empty optional when no box is required
 	 * Examples of boxes are the Forestry cartons and crates.
 	 */
-	Ingredient getBox();
+	Optional<Ingredient> getBox();
 
 	/**
 	 * @return the fluid required for this recipe. return {@link FluidStack#EMPTY} if there is no required fluid.

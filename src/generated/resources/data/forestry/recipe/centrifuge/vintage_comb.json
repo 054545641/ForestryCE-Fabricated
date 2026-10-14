@@ -1,9 +1,7 @@
 {
   "type": "forestry:centrifuge",
   "id": "forestry:centrifuge/vintage_comb",
-  "input": {
-    "item": "forestry:vintage_comb"
-  },
+  "input": "forestry:vintage_comb",
   "products": [
     {
       "chance": 1.0,

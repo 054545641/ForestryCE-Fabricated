@@ -1,10 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "item": "forestry:ash_block"
-    }
+    "forestry:ash_block"
   ],
   "result": {
     "count": 4,

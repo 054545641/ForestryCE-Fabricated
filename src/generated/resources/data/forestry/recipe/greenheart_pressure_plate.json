@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:greenheart_planks"
-      },
-      {
-        "item": "forestry:greenheart_fireproof_planks"
-      }
+      "forestry:greenheart_planks",
+      "forestry:greenheart_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:greenheart_pressure_plate"
   }
 }

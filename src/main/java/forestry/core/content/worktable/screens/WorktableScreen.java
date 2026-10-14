@@ -21,10 +21,9 @@ public class WorktableScreen extends GuiForestryTitled<WorktableMenu> {
 	private boolean hasRecipeConflict;
 
 	public WorktableScreen(WorktableMenu container, Inventory inv, Component title) {
-		super(Constants.TEXTURE_PATH_GUI + "/worktable2.png", container, inv, title);
+		super(Constants.TEXTURE_PATH_GUI + "/worktable2.png", container, inv, title, 176, 218);
 
 		this.worktable = container.getTile();
-		this.imageHeight = 218;
 
 		RecipeMemory memory = this.worktable.getMemory();
 
@@ -66,7 +65,6 @@ public class WorktableScreen extends GuiForestryTitled<WorktableMenu> {
 			SoundUtil.playButtonClick();
 		}));
 	}
-
 
 	@Override
 	protected void addLedgers() {

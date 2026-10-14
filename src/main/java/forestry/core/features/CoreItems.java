@@ -17,13 +17,8 @@ import forestry.core.content.tools.ToolTier;
 import forestry.core.platform.registration.*;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.StandingAndWallBlockItem;
-import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.component.ItemContainerContents;
 
 @FeatureProvider
@@ -71,16 +66,16 @@ public class CoreItems {
 	public static final FeatureItem<ItemForestry> BROKEN_SURVIVALISTS_AXE = REGISTRY.item(ItemForestry::new, "broken_survivalists_axe");
 	public static final FeatureItem<ItemForestry> BROKEN_SURVIVALISTS_SWORD = REGISTRY.item(ItemForestry::new, "broken_survivalists_sword");
 	public static final FeatureItem<ItemForestry> BROKEN_SURVIVALISTS_HOE = REGISTRY.item(ItemForestry::new, "broken_survivalists_hoe");
-	public static final FeatureItem<PickaxeItem> SURVIVALISTS_PICKAXE = REGISTRY.item(() -> new HasRemnants.Pickaxe(ToolTier.SURVIVALIST, 1, -2.8f, new Item.Properties(), BROKEN_SURVIVALISTS_PICKAXE::stack), "survivalists_pickaxe");
-	public static final FeatureItem<ShovelItem> SURVIVALISTS_SHOVEL = REGISTRY.item(() -> new HasRemnants.Shovel(ToolTier.SURVIVALIST, 1.5f, -3.0f, new Item.Properties(), BROKEN_SURVIVALISTS_SHOVEL::stack), "survivalists_shovel");
-	public static final FeatureItem<AxeItem> SURVIVALISTS_AXE = REGISTRY.item(() -> new HasRemnants.Axe(ToolTier.SURVIVALIST, 5.5f, -3.2f, new Item.Properties(), BROKEN_SURVIVALISTS_AXE::stack), "survivalists_axe");
-	public static final FeatureItem<SwordItem> SURVIVALISTS_SWORD = REGISTRY.item(() -> new HasRemnants.Sword(ToolTier.SURVIVALIST, 3, -2.4f, new Item.Properties(), BROKEN_SURVIVALISTS_SWORD::stack), "survivalists_sword");
-	public static final FeatureItem<HoeItem> SURVIVALISTS_HOE = REGISTRY.item(() -> new HasRemnants.Hoe(ToolTier.SURVIVALIST, -2, -1.0f, new Item.Properties(), BROKEN_SURVIVALISTS_HOE::stack), "survivalists_hoe");
-	public static final FeatureItem<ItemAssemblyKit> SHOVEL_KIT = REGISTRY.item(() -> new ItemAssemblyKit(SURVIVALISTS_SHOVEL::stack), "shovel_kit");
-	public static final FeatureItem<ItemAssemblyKit> PICKAXE_KIT = REGISTRY.item(() -> new ItemAssemblyKit(SURVIVALISTS_PICKAXE::stack), "pickaxe_kit");
-	public static final FeatureItem<ItemAssemblyKit> AXE_KIT = REGISTRY.item(() -> new ItemAssemblyKit(SURVIVALISTS_AXE::stack), "axe_kit");
-	public static final FeatureItem<ItemAssemblyKit> SWORD_KIT = REGISTRY.item(() -> new ItemAssemblyKit(SURVIVALISTS_SWORD::stack), "sword_kit");
-	public static final FeatureItem<ItemAssemblyKit> HOE_KIT = REGISTRY.item(() -> new ItemAssemblyKit(SURVIVALISTS_HOE::stack), "hoe_kit");
+	public static final FeatureItem<HasRemnants.Pickaxe> SURVIVALISTS_PICKAXE = REGISTRY.item(properties -> new HasRemnants.Pickaxe(ToolTier.SURVIVALIST, 1, -2.8f, properties, BROKEN_SURVIVALISTS_PICKAXE::stack), "survivalists_pickaxe");
+	public static final FeatureItem<HasRemnants.Shovel> SURVIVALISTS_SHOVEL = REGISTRY.item(properties -> new HasRemnants.Shovel(ToolTier.SURVIVALIST, 1.5f, -3.0f, properties, BROKEN_SURVIVALISTS_SHOVEL::stack), "survivalists_shovel");
+	public static final FeatureItem<HasRemnants.Axe> SURVIVALISTS_AXE = REGISTRY.item(properties -> new HasRemnants.Axe(ToolTier.SURVIVALIST, 5.5f, -3.2f, properties, BROKEN_SURVIVALISTS_AXE::stack), "survivalists_axe");
+	public static final FeatureItem<HasRemnants.Sword> SURVIVALISTS_SWORD = REGISTRY.item(properties -> new HasRemnants.Sword(ToolTier.SURVIVALIST, 3, -2.4f, properties, BROKEN_SURVIVALISTS_SWORD::stack), "survivalists_sword");
+	public static final FeatureItem<HasRemnants.Hoe> SURVIVALISTS_HOE = REGISTRY.item(properties -> new HasRemnants.Hoe(ToolTier.SURVIVALIST, -2, -1.0f, properties, BROKEN_SURVIVALISTS_HOE::stack), "survivalists_hoe");
+	public static final FeatureItem<ItemAssemblyKit> SHOVEL_KIT = REGISTRY.item(properties -> new ItemAssemblyKit(SURVIVALISTS_SHOVEL::stack, properties), "shovel_kit");
+	public static final FeatureItem<ItemAssemblyKit> PICKAXE_KIT = REGISTRY.item(properties -> new ItemAssemblyKit(SURVIVALISTS_PICKAXE::stack, properties), "pickaxe_kit");
+	public static final FeatureItem<ItemAssemblyKit> AXE_KIT = REGISTRY.item(properties -> new ItemAssemblyKit(SURVIVALISTS_AXE::stack, properties), "axe_kit");
+	public static final FeatureItem<ItemAssemblyKit> SWORD_KIT = REGISTRY.item(properties -> new ItemAssemblyKit(SURVIVALISTS_SWORD::stack, properties), "sword_kit");
+	public static final FeatureItem<ItemAssemblyKit> HOE_KIT = REGISTRY.item(properties -> new ItemAssemblyKit(SURVIVALISTS_HOE::stack, properties), "hoe_kit");
 
 	/* Machine Parts */
 	public static final FeatureItem<ItemForestry> STURDY_CASING = REGISTRY.item(ItemForestry::new, "sturdy_casing");
@@ -128,16 +123,16 @@ public class CoreItems {
 
 	/* Misc */
 	// Deviation from 1.20.1: forestry.core.items.ItemProperties no longer exists, so this uses a plain Item.Properties.
-	public static final FeatureItem<Item> PHOSPHOR_TORCH_ITEM = REGISTRY.item(() -> new StandingAndWallBlockItem(CoreBlocks.PHOSPHOR_TORCH.block(), CoreBlocks.PHOSPHOR_WALL_TORCH.block(), new Item.Properties(), Direction.DOWN), "phosphor_torch");
+	public static final FeatureItem<Item> PHOSPHOR_TORCH_ITEM = REGISTRY.item(properties -> new StandingAndWallBlockItem(CoreBlocks.PHOSPHOR_TORCH.block(), CoreBlocks.PHOSPHOR_WALL_TORCH.block(), Direction.DOWN, properties.useBlockDescriptionPrefix()), "phosphor_torch");
 	public static final FeatureItemGroup<ItemCraftingMaterial, EnumCraftingMaterial> CRAFTING_MATERIALS = REGISTRY.itemGroup(ItemCraftingMaterial::new, EnumCraftingMaterial.values()).create();
 	public static final FeatureItemGroup<ItemForestryFood, FruitItemType> FRUITS = REGISTRY
-		.itemGroup(type -> new ItemForestryFood(type.heal, type.saturation, type.useTime), FruitItemType.values())
+		.itemGroup((type, properties) -> new ItemForestryFood(type.heal, type.saturation, type.useTime, properties), FruitItemType.values())
 		.create();
 	// moved out of apiculture: the scoop catches butterflies as well as bees, and the honey
 	// drops are the Portable Analyzer's fuel, so all three are base concerns
-	public static final FeatureItem<ItemScoop> SCOOP = REGISTRY.item(() -> new ItemScoop(10), "scoop");
+	public static final FeatureItem<ItemScoop> SCOOP = REGISTRY.item(properties -> new ItemScoop(10, properties), "scoop");
 	// Deviation from 1.20.1: the id follows the target's proven_<tool> naming, so "scoop_proven" became "proven_scoop"
-	public static final FeatureItem<ItemScoop> PROVEN_SCOOP = REGISTRY.item(() -> new ItemScoop(160), "proven_scoop");
+	public static final FeatureItem<ItemScoop> PROVEN_SCOOP = REGISTRY.item(properties -> new ItemScoop(160, properties), "proven_scoop");
 	public static final FeatureItem<Item> HONEY_DROP = REGISTRY.item("honey_drop");
 	public static final FeatureItem<Item> HONEYDEW = REGISTRY.item("honeydew");
 	public static final FeatureItem<ItemBeesWax> BEESWAX = REGISTRY.item(ItemBeesWax::new, "beeswax");

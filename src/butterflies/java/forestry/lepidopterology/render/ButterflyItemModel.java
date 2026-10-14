@@ -1,145 +1,65 @@
 package forestry.lepidopterology.render;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.MapCodec;
 import forestry.api.ForestryConstants;
 import forestry.api.client.IForestryClientApi;
-import forestry.api.client.lepidopterology.IButterflyClientManager;
-import forestry.api.core.genetics.IGenome;
-import forestry.api.core.genetics.IIndividual;
 import forestry.api.core.genetics.alleles.ButterflyChromosomes;
 import forestry.api.core.genetics.capability.IIndividualHandlerItem;
-import forestry.api.lepidopterology.genetics.IButterflySpecies;
-import forestry.core.platform.models.AbstractBakedModel;
-import forestry.core.platform.models.TRSRBakedModel;
-import forestry.core.platform.util.ResourceUtil;
-import it.unimi.dsi.fastutil.floats.FloatObjectPair;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.block.model.BlockElement;
-import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.*;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.model.SeparateTransformsModel;
-import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
-import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
-import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
+import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
+import net.minecraft.client.renderer.item.CuboidItemModelWrapper;
+import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.renderer.item.ModelRenderProperties;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.resources.model.sprite.TextureSlots;
+import net.minecraft.resources.Identifier;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
+import java.util.*;
 
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-
-public class ButterflyItemModel extends AbstractBakedModel {
-	// Keyed by item texture location (not species id/instance) so bake-time dedupes correctly and render-time
-	// resolution goes through IButterflyClientManager#getTextures(species), which works for any species id -
-	// datapack-added or not - via its default-naming-convention fallback. Mirrors ModelSapling's
-	// location-keyed `baked` map from the Stage-4 tree rework.
-	private final Map<ResourceLocation, BakedModel> subModels;
-	private final Cache<FloatObjectPair<String>, BakedModel> cache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
-
-	public ButterflyItemModel(Map<ResourceLocation, BakedModel> subModels) {
-		this.subModels = subModels;
-	}
-
-	@Override
-	protected ItemOverrides createOverrides() {
-		return new OverrideList();
-	}
-
-	private BakedModel modelFor(ResourceLocation itemTexture) {
-		BakedModel model = this.subModels.get(itemTexture);
-		if (model != null) {
-			return model;
-		}
-		// The requested texture wasn't among the ones known/baked at model-load time (e.g. a datapack species added
-		// after the last resource reload) - fall back to the default butterfly's baked model rather than iterating
-		// or NPEing.
-		ResourceLocation defaultTexture = IForestryClientApi.INSTANCE.getButterflyManager().getDefaultTextures().getFirst();
-		return this.subModels.get(defaultTexture);
-	}
-
-	private class OverrideList extends ItemOverrides {
-		@Override
-		public BakedModel resolve(BakedModel model, ItemStack stack, @Nullable ClientLevel worldIn, @Nullable LivingEntity entityIn, int p_173469_) {
-			IIndividual individual = Objects.requireNonNull(IIndividualHandlerItem.getIndividual(stack));
-			IGenome genome = individual.getGenome();
-			IButterflySpecies species = genome.resolveActive(ButterflyChromosomes.SPECIES);
-			float size = genome.getActiveValue(ButterflyChromosomes.SIZE);
-			// should this be using the path? or the ID?
-			try {
-				return ButterflyItemModel.this.cache.get(FloatObjectPair.of(size, species.id().getPath()), () -> {
-					ResourceLocation itemTexture = IForestryClientApi.INSTANCE.getButterflyManager().getTextures(species).getFirst();
-					// todo include scale, otherwise having the float in the pair is useless
-					return new SeparateTransformsModel.Baked(false, true, false, ResourceUtil.getMissingTexture(), ItemOverrides.EMPTY, new TRSRBakedModel(ButterflyItemModel.this.modelFor(itemTexture), 0, 0, 0, size), ImmutableMap.of());
-				});
-			} catch (ExecutionException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
-	public record Geometry(Collection<ResourceLocation> itemTextures,
-							ResourceLocation defaultItemTexture) implements IUnbakedGeometry<Geometry> {
-		@Override
-		public BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
-			UnbakedModel modelButterfly = baker.getModel(ForestryConstants.forestry("item/butterfly_base"));
-
-			if (!(modelButterfly instanceof BlockModel modelBlock)) {
-				return null;
-			}
-			ResourceLocation parentLocation = modelBlock.getParentLocation();
-			List<BlockElement> elements = modelBlock.getElements();
-			ModelState transform = ResourceUtil.loadTransform(ForestryConstants.forestry("item/butterfly_base"));
-			Map<ResourceLocation, BakedModel> subModelBuilder = new HashMap<>();
-
-			for (ResourceLocation texture : this.itemTextures) {
-				bakeInto(subModelBuilder, parentLocation, elements, modelBlock, baker, spriteGetter, transform, texture);
-			}
-			// ensure the default texture is baked even if no species registered an explicit texture pair
-			bakeInto(subModelBuilder, parentLocation, elements, modelBlock, baker, spriteGetter, transform, this.defaultItemTexture);
-
-			return new ButterflyItemModel(subModelBuilder);
-		}
-
-		private static void bakeInto(Map<ResourceLocation, BakedModel> baked, ResourceLocation parentLocation, List<BlockElement> elements, BlockModel modelBlock, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ResourceLocation texture) {
-			if (baked.containsKey(texture)) {
-				return;
-			}
-			BlockModel model = new BlockModel(parentLocation, elements, ImmutableMap.of("butterfly", Either.left(new Material(InventoryMenu.BLOCK_ATLAS, texture))), modelBlock.hasAmbientOcclusion, modelBlock.getGuiLight(), modelBlock.getTransforms(), modelBlock.getOverrides());
-			baked.put(texture, model.bake(baker, model, spriteGetter, transform, true));
-		}
-	}
-
-	public static class Loader implements IGeometryLoader<ButterflyItemModel.Geometry> {
-		@Override
-		public ButterflyItemModel.Geometry read(JsonObject modelContents, JsonDeserializationContext context) throws JsonParseException {
-			// Built from the client-registered texture map's keys (never the live species list), so this stays
-			// correct whether species are populated (pre-sync built-ins) or empty (post-sync-empty datapack state).
-			IButterflyClientManager manager = IForestryClientApi.INSTANCE.getButterflyManager();
-			Set<ResourceLocation> itemTextures = new HashSet<>();
-			for (Pair<ResourceLocation, ResourceLocation> pair : manager.getAllTextures()) {
-				itemTextures.add(pair.getFirst());
-			}
-			ResourceLocation defaultItemTexture = manager.getDefaultTextures().getFirst();
-			return new ButterflyItemModel.Geometry(itemTextures, defaultItemTexture);
-		}
-	}
+/** Species texture and genome size both participate in the native item render identity. */
+public record ButterflyItemModel() implements ItemModel.Unbaked {
+    public static final MapCodec<ButterflyItemModel> CODEC = MapCodec.unit(new ButterflyItemModel());
+    private static final Identifier BASE = ForestryConstants.forestry("item/butterfly_base");
+    @Override public MapCodec<ButterflyItemModel> type() { return CODEC; }
+    @Override public void resolveDependencies(Resolver resolver) { resolver.markDependency(BASE); }
+    @Override public ItemModel bake(ItemModel.BakingContext context, Matrix4fc transform) {
+        var manager = IForestryClientApi.INSTANCE.getButterflyManager();
+        var baker = context.blockModelBaker();
+        var base = baker.getModel(BASE);
+        Set<Identifier> textures = new HashSet<>();
+        manager.getAllTextures().forEach(pair -> textures.add(pair.getFirst()));
+        Identifier fallback = manager.getDefaultTextures().getFirst();
+        textures.add(fallback);
+        Map<Identifier, QuadCollection> geometry = new HashMap<>();
+        Map<Identifier, ModelRenderProperties> properties = new HashMap<>();
+        for (Identifier texture : textures) {
+            var slots = new TextureSlots.Resolver().addLast(new TextureSlots.Data.Builder()
+                .addTexture("butterfly", new Material(texture)).addTexture("particle", new Material(texture)).build()).resolve(() -> "Forestry butterfly");
+            geometry.put(texture, base.bakeTopGeometry(slots, baker, BlockModelRotation.IDENTITY));
+            properties.put(texture, ModelRenderProperties.fromResolvedModel(baker, base, slots));
+        }
+        record Key(Identifier texture, float size) {}
+        var cache = com.google.common.cache.CacheBuilder.newBuilder().maximumSize(256).<Key, ItemModel>build();
+        return (output, stack, resolver, display, level, owner, seed) -> {
+            var individual = IIndividualHandlerItem.getIndividual(stack);
+            Identifier texture = fallback;
+            float size = 1;
+            if (individual != null) {
+                var genome = individual.getGenome();
+                texture = manager.getTextures(genome.resolveActive(ButterflyChromosomes.SPECIES)).getFirst();
+                size = genome.getActiveValue(ButterflyChromosomes.SIZE);
+            }
+            if (!geometry.containsKey(texture)) texture = fallback;
+            if (!Float.isFinite(size) || size <= 0) size = 1;
+            Key key = new Key(texture, size);
+            ItemModel model = cache.getIfPresent(key);
+            if (model == null) {
+                Matrix4f scaled = new Matrix4f(transform).translate(0.5f, 0.5f, 0.5f).scale(size).translate(-0.5f, -0.5f, -0.5f);
+                model = new CuboidItemModelWrapper(List.of(), geometry.get(texture), properties.get(texture), scaled);
+                cache.put(key, model);
+            }
+            model.update(output, stack, resolver, display, level, owner, seed);
+        };
+    }
 }

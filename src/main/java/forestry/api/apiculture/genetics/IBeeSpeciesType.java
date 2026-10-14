@@ -10,7 +10,7 @@ import forestry.api.plugin.IApicultureRegistration;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
 
@@ -32,23 +32,23 @@ public interface IBeeSpeciesType extends ISpeciesType<IBeeSpecies, IBee> {
 	/**
 	 * @return The bee effect registered with the given ID. Backs the {@code bee_effect} reference chromosome.
 	 */
-	IBeeEffect getBeeEffect(ResourceLocation id);
+	IBeeEffect getBeeEffect(Identifier id);
 
 	/**
 	 * @return The activity type registered with the given ID. Backs the {@code activity} reference chromosome.
 	 */
-	IActivityType getActivityType(ResourceLocation id);
+	IActivityType getActivityType(Identifier id);
 
 	/**
 	 * @return The bee jubilance registered with the given ID. Backs the {@code jubilance} reference chromosome.
 	 */
-	IBeeJubilance getJubilance(ResourceLocation id);
+	IBeeJubilance getJubilance(Identifier id);
 
 	/**
 	 * @return The bee jubilance registered with the given ID, or {@code null} if none is registered (graceful fallback variant).
 	 */
 	@Nullable
-	IBeeJubilance getJubilanceSafe(ResourceLocation id);
+	IBeeJubilance getJubilanceSafe(Identifier id);
 
 	/**
 	 * @return true if passed item is a drone. Equal to getLifeStage(ItemStack stack) == EnumBeeType.DRONE
@@ -90,7 +90,7 @@ public interface IBeeSpeciesType extends ISpeciesType<IBeeSpecies, IBee> {
 	 * @param effects    The effects to generate, by ID
 	 * @return The data provider to add to the data generator
 	 */
-	DataProvider createEffectProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, Map<ResourceLocation, IBeeEffect> effects);
+	DataProvider createEffectProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, Map<Identifier, IBeeEffect> effects);
 
 	/**
 	 * Creates a data provider that generates bee jubilance JSON.
@@ -102,5 +102,5 @@ public interface IBeeSpeciesType extends ISpeciesType<IBeeSpecies, IBee> {
 	 * @param jubilances The jubilances to generate, by ID
 	 * @return The data provider to add to the data generator
 	 */
-	DataProvider createJubilanceProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, Map<ResourceLocation, IBeeJubilance> jubilances);
+	DataProvider createJubilanceProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, Map<Identifier, IBeeJubilance> jubilances);
 }

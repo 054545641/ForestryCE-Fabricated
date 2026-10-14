@@ -1,7 +1,7 @@
 package forestry.api;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
@@ -74,7 +74,7 @@ public class ForestryTags {
 		public static final TagKey<Block> BIG_CANDLE = blockTag("big_candle");
 
 		private static TagKey<Block> commonTag(String name) {
-			return BlockTags.create(ResourceLocation.fromNamespaceAndPath("c", name));
+			return BlockTags.create(Identifier.fromNamespaceAndPath("c", name));
 		}
 	}
 
@@ -85,6 +85,8 @@ public class ForestryTags {
 		public static final TagKey<Item> BEE_COMBS = itemTag("combs");
 		public static final TagKey<Item> PROPOLIS = itemTag("propolis");
 		public static final TagKey<Item> DROP_HONEY = itemTag("drop_honey");
+		// 26.2: armor repair ingredients are tag keys, not ingredients. Holds woven silk.
+		public static final TagKey<Item> REPAIRS_APIARIST_ARMOR = itemTag("repairs_apiarist_armor");
 
 		public static final TagKey<Item> INGOTS_BRONZE = commonTag("ingots/bronze");
 		public static final TagKey<Item> INGOTS_TIN = commonTag("ingots/tin");
@@ -191,7 +193,7 @@ public class ForestryTags {
 		public static final TagKey<Item> BURN_BARREL_BLACKLIST = itemTag("burn_barrel_blacklist");
 
 		private static TagKey<Item> commonTag(String name) {
-			return ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", name));
+			return ItemTags.create(Identifier.fromNamespaceAndPath("c", name));
 		}
 	}
 
@@ -224,7 +226,7 @@ public class ForestryTags {
 		public static final TagKey<Fluid> WAX = forgeTag("wax");
 
 		private static TagKey<Fluid> forgeTag(String name) {
-			return FluidTags.create(ResourceLocation.fromNamespaceAndPath("forge", name));
+			return FluidTags.create(Identifier.fromNamespaceAndPath("forge", name));
 		}
 	}
 

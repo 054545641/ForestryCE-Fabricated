@@ -2,7 +2,7 @@ package forestry.core.data.builder;
 
 import forestry.core.content.machines.recipes.MoistenerRecipe;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
@@ -27,7 +27,7 @@ public class MoistenerRecipeBuilder {
 		return this;
 	}
 
-	public void build(RecipeOutput output, ResourceLocation id) {
-		output.accept(id, new MoistenerRecipe(id, this.resource, this.product, this.timePerItem), null);
+	public void build(RecipeOutput output, Identifier id) {
+		output.accept(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id), new MoistenerRecipe(id, this.resource, this.product, this.timePerItem), null);
 	}
 }

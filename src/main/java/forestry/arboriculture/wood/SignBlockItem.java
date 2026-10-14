@@ -6,6 +6,6 @@ import net.minecraft.world.item.SignItem;
 
 public class SignBlockItem extends SignItem {
 	public SignBlockItem(ForestryStandingSignBlock block, Item.Properties properties) {
-		super(properties, block, ArboricultureBlocks.WALL_SIGN.get(block.getWoodType()).block());
+		super(block, ArboricultureBlocks.WALL_SIGN.get(block.getWoodType()).block(), properties);
 	}
 }

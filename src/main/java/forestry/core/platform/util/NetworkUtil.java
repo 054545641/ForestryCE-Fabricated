@@ -33,7 +33,7 @@ import java.util.function.Function;
 
 public class NetworkUtil {
 	public static void sendToPlayersTrackingPos(CustomPacketPayload packet, BlockPos pos, ServerLevel level) {
-		PacketDistributor.sendToPlayersTrackingChunk(level, new ChunkPos(pos), packet);
+		PacketDistributor.sendToPlayersTrackingChunk(level, ChunkPos.containing(pos), packet);
 	}
 
 	public static void sendNetworkPacket(CustomPacketPayload packet, BlockPos pos, Level level) {
@@ -47,7 +47,7 @@ public class NetworkUtil {
 	}
 
 	public static void sendToServer(CustomPacketPayload packet) {
-		PacketDistributor.sendToServer(packet);
+		forestry.core.platform.client.ClientsideCode.sendToServer(packet);
 	}
 
 	public static void sendToAllPlayers(CustomPacketPayload packet) {
@@ -94,22 +94,11 @@ public class NetworkUtil {
 	}
 
 	public static void writeInventory(RegistryFriendlyByteBuf buffer, Container inventory) {
-		int size = inventory.getContainerSize();
-		buffer.writeVarInt(size);
-
-		for (int i = 0; i < size; i++) {
-			ItemStack stack = inventory.getItem(i);
-			ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, stack);
-		}
+		InventoryData.writeStream(buffer, inventory);
 	}
 
 	public static void readInventory(RegistryFriendlyByteBuf buffer, Container inventory) {
-		int size = buffer.readVarInt();
-
-		for (int i = 0; i < size; i++) {
-			ItemStack stack = ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer);
-			inventory.setItem(i, stack);
-		}
+		InventoryData.readStream(buffer, inventory);
 	}
 
 	// Assumes Enum.values().length < Byte.MAX_VALUE
@@ -225,7 +214,7 @@ public class NetworkUtil {
 		if (ordinal > 5 || ordinal < 0) {
 			throw new IllegalArgumentException("Tried to deserialize Direction enum from network, but got invalid ordinal: " + ordinal);
 		}
-		return Direction.VALUES[ordinal];
+		return Direction.values()[ordinal];
 	}
 
 	public static void writeShortArray(RegistryFriendlyByteBuf buffer, short[] array) {

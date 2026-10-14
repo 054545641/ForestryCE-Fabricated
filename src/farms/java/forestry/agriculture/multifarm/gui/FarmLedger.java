@@ -4,7 +4,7 @@ import forestry.core.platform.gui.ledgers.Ledger;
 import forestry.core.platform.gui.ledgers.LedgerManager;
 import forestry.core.platform.util.ResourceUtil;
 import forestry.core.platform.util.StringUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
@@ -24,7 +24,7 @@ public class FarmLedger extends Ledger {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void draw(GuiGraphics graphics, int y, int x) {
+	public void draw(GuiGraphicsExtractor graphics, int y, int x) {
 
 		// Draw background
 		drawBackground(graphics, y, x);

@@ -22,7 +22,7 @@ public class ApicultureCrates {
 	public static final FeatureItem<ItemCrated> CRATED_ROYAL_JELLY = CrateItems.registerCrate(ApicultureItems.ROYAL_JELLY, "crated_royal_jelly");
 
 	public static final FeatureItemGroup<ItemCrated, EnumHoneyComb> CRATED_BEE_COMBS = CrateItems.registry()
-		.itemGroup(comb -> new ItemCrated(() -> ApicultureItems.BEE_COMBS.get(comb).stack()), EnumHoneyComb.VALUES)
+		.itemGroup((comb, properties) -> new ItemCrated(() -> ApicultureItems.BEE_COMBS.get(comb).stack(), properties), EnumHoneyComb.VALUES)
 		.identifier(comb -> "crated_" + comb.getSerializedName() + "_comb")
 		.create();
 

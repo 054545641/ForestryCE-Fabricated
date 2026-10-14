@@ -1,7 +1,6 @@
 package forestry.core.platform.gui.widgets;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import forestry.api.client.ForestrySprites;
+import net.minecraft.client.renderer.RenderPipelines;
 import forestry.api.client.IForestryClientApi;
 import forestry.api.core.tooltips.ToolTip;
 import forestry.core.platform.gui.GuiUtil;
@@ -10,9 +9,9 @@ import forestry.core.content.escritoire.EscritoireGame;
 import forestry.core.content.escritoire.EscritoireGameToken;
 import forestry.core.platform.util.NetworkUtil;
 import forestry.core.platform.util.SoundUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -38,22 +37,14 @@ public class GameTokenWidget extends Widget {
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int startX, int startY) {
+	public void draw(GuiGraphicsExtractor graphics, int startX, int startY) {
 		EscritoireGameToken token = getToken();
 		if (token == null) {
 			return;
 		}
 
 		int tokenColour = token.getTokenColour();
-
-		float colorR = (tokenColour >> 16 & 255) / 255.0F;
-		float colorG = (tokenColour >> 8 & 255) / 255.0F;
-		float colorB = (tokenColour & 255) / 255.0F;
-
-		RenderSystem.enableDepthTest();
-		RenderSystem.setShaderColor(colorR, colorG, colorB, 1.0f);
-		graphics.blit(this.manager.gui.textureFile, startX + this.xPos, startY + this.yPos, 228, 0, 22, 22);
-		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, this.manager.gui.textureFile, startX + this.xPos, startY + this.yPos, 228, 0, 22, 22, 256, 256, 0xff000000 | tokenColour);
 
 		ItemStack tokenStack = this.HIDDEN_TOKEN;
 		if (token.isVisible()) {
@@ -62,14 +53,11 @@ public class GameTokenWidget extends Widget {
 
 		GuiUtil.drawItemStack(graphics, this.manager.gui, tokenStack, startX + this.xPos + 3, startY + this.yPos + 3);
 
-		ResourceLocation overlayToken = token.getOverlayToken();
+		Identifier overlayToken = token.getOverlayToken();
 
 		if (overlayToken != null) {
-			RenderSystem.disableDepthTest();
-			RenderSystem.setShaderTexture(0, ForestrySprites.TEXTURE_ATLAS);
 			TextureAtlasSprite icon = IForestryClientApi.INSTANCE.getTextureManager().getSprite(overlayToken);
-			graphics.blit(startX + this.xPos + 3, startY + this.yPos + 3, 0, 16, 16, icon);
-			RenderSystem.enableDepthTest();
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, icon, startX + this.xPos + 3, startY + this.yPos + 3, 16, 16);
 		}
 	}
 

@@ -11,7 +11,7 @@ import forestry.core.features.CoreBlocks;
 import forestry.core.features.CoreItems;
 import forestry.core.content.resources.EnumCraftingMaterial;
 import forestry.core.platform.item.FruitItemType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
@@ -28,7 +28,7 @@ public class ForestryItemTagsProvider {
 		tags.copy(BlockTags.LOGS, ItemTags.LOGS);
 		tags.copy(BlockTags.STANDING_SIGNS, ItemTags.SIGNS);
 		tags.copy(BlockTags.CEILING_HANGING_SIGNS, ItemTags.HANGING_SIGNS);
-		tags.copy(BlockTags.LOGS_THAT_BURN, ItemTags.LOGS_THAT_BURN);
+		tags.copy(net.minecraft.tags.BlockItemTags.LOGS_THAT_BURN.block(), ItemTags.LOGS_THAT_BURN);
 		for (ForestryWoodType type : ForestryWoodType.VALUES) {
 			tags.copy(type.blockTag, type.itemTag);
 			tags.copy(type.fireproofBlockTag, type.fireproofItemTag);
@@ -54,16 +54,16 @@ public class ForestryItemTagsProvider {
 		tags.tag(ItemTags.NON_FLAMMABLE_WOOD).add(ArboricultureBlocks.STRIPPED_LOGS_VANILLA_FIREPROOF.getItems().toArray(Item[]::new));
 		tags.tag(ItemTags.NON_FLAMMABLE_WOOD).add(ArboricultureBlocks.FENCES_VANILLA_FIREPROOF.getItems().toArray(Item[]::new));
 		tags.tag(ItemTags.NON_FLAMMABLE_WOOD).add(ArboricultureBlocks.FENCE_GATES_VANILLA_FIREPROOF.getItems().toArray(Item[]::new));
-		tags.copy(BlockTags.STAIRS, ItemTags.STAIRS);
+		tags.copy(BlockTags.STAIRS, net.minecraft.tags.BlockItemTags.STAIRS.item());
 		tags.copy(BlockTags.WOODEN_STAIRS, ItemTags.WOODEN_STAIRS);
-		tags.copy(BlockTags.FENCES, ItemTags.FENCES);
+		tags.copy(BlockTags.FENCES, Tags.Items.FENCES);
 		tags.copy(BlockTags.WOODEN_FENCES, ItemTags.WOODEN_FENCES);
 		tags.copy(Tags.Blocks.FENCES, Tags.Items.FENCES);
 		tags.copy(Tags.Blocks.FENCE_GATES, Tags.Items.FENCE_GATES);
 		tags.copy(Tags.Blocks.FENCE_GATES_WOODEN, Tags.Items.FENCE_GATES_WOODEN);
-		tags.copy(BlockTags.SLABS, ItemTags.SLABS);
+		tags.copy(BlockTags.SLABS, net.minecraft.tags.BlockItemTags.SLABS.item());
 		tags.copy(BlockTags.WOODEN_SLABS, ItemTags.WOODEN_SLABS);
-		tags.copy(BlockTags.DOORS, ItemTags.DOORS);
+		tags.copy(BlockTags.DOORS, net.minecraft.tags.BlockItemTags.DOORS.item());
 		tags.copy(BlockTags.WOODEN_DOORS, ItemTags.WOODEN_DOORS);
 		// The decorative stone and brick walls are the only forestry blocks in BlockTags.WALLS
 		tags.copy(BlockTags.WALLS, ItemTags.WALLS);
@@ -146,8 +146,8 @@ public class ForestryItemTagsProvider {
 
 		// legacy aliases from mods that never moved onto the common tag
 		tags.tag(Tags.Items.PLAYER_WORKSTATIONS_CRAFTING_TABLES)
-			.addOptionalTag(ResourceLocation.fromNamespaceAndPath("c", "workbenches"))
-			.addOptionalTag(ResourceLocation.fromNamespaceAndPath("c", "workbench"))
+			.addOptionalTag(Identifier.fromNamespaceAndPath("c", "workbenches"))
+			.addOptionalTag(Identifier.fromNamespaceAndPath("c", "workbench"))
 			.add(Items.CRAFTING_TABLE);
 
 		tags.tag(ForestryTags.Items.SCOOPS).add(CoreItems.SCOOP.item());

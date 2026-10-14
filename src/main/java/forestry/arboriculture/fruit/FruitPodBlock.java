@@ -30,13 +30,13 @@ public class FruitPodBlock extends CocoaBlock implements EntityBlock {
 
 	private final ForestryPodType podType;
 
-	public FruitPodBlock(ForestryPodType podType) {
-		super(SaplingBlock.Properties.of().randomTicks().strength(0.2f, 3.0f).sound(SoundType.WOOD));
+	public FruitPodBlock(Properties properties, ForestryPodType podType) {
+		super(properties.randomTicks().strength(0.2f, 3.0f).sound(SoundType.WOOD));
 		this.podType = podType;
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
 		FruitPodBlockEntity tile = TileUtil.getTile(level, pos, FruitPodBlockEntity.class);
 		if (tile == null) {
 			return ItemStack.EMPTY;

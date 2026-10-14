@@ -2,7 +2,7 @@ package forestry.core.platform.gui.widgets;
 
 import forestry.core.platform.gui.GuiForestry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class WidgetManager {
 		return null;
 	}
 
-	public void drawWidgets(GuiGraphics graphics) {
+	public void drawWidgets(GuiGraphicsExtractor graphics) {
 		for (Widget slot : this.widgets) {
 			slot.draw(graphics, 0, 0);
 		}

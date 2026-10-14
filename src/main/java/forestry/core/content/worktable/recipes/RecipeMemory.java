@@ -35,10 +35,10 @@ public class RecipeMemory implements INbtWritable, IStreamable {
 			return;
 		}
 
-		ListTag memoryNbt = nbt.getList("RecipeMemory", Tag.TAG_COMPOUND);
+		ListTag memoryNbt = nbt.getListOrEmpty("RecipeMemory");
 
 		for (int j = 0; j < memoryNbt.size(); ++j) {
-			CompoundTag recipeNbt = memoryNbt.getCompound(j);
+			CompoundTag recipeNbt = memoryNbt.getCompoundOrEmpty(j);
 			MemorizedRecipe recipe = new MemorizedRecipe(recipeNbt, registries);
 
 			if (recipe.hasSelectedRecipe()) {

@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -49,7 +49,7 @@ public class SpeciesFallbackTest {
 		BeeSpeciesDefinition badDefinition = TestSpeciesDefinitions.bee("Apis", "nonexistens")
 			.jubilance(ForestryConstants.forestry("nonexistent_jubilance"))
 			.build();
-		ResourceLocation badId = ForestryConstants.forestry("test_species_fallback_unknown_jubilance");
+		Identifier badId = ForestryConstants.forestry("test_species_fallback_unknown_jubilance");
 
 		// (a) Direct projection of the bad definition must fail soft: null, not an exception.
 		BeeSpecies projected = BeeSpeciesProjector.project(type, badId, badDefinition);
@@ -59,13 +59,13 @@ public class SpeciesFallbackTest {
 		}
 
 		// (b) rebuildSpecies over the real definitions plus the bad one must not crash, and must skip only the bad one.
-		Map<ResourceLocation, BeeSpeciesDefinition> realDefinitions = BeeSpeciesManager.INSTANCE.getDefinitions();
+		Map<Identifier, BeeSpeciesDefinition> realDefinitions = BeeSpeciesManager.INSTANCE.getDefinitions();
 		if (realDefinitions.isEmpty()) {
 			helper.fail("BeeSpeciesManager holds no definitions; cannot exercise rebuildSpecies with a mix of good/bad entries");
 			return;
 		}
 
-		Map<ResourceLocation, BeeSpeciesDefinition> combined = new LinkedHashMap<>(realDefinitions);
+		Map<Identifier, BeeSpeciesDefinition> combined = new LinkedHashMap<>(realDefinitions);
 		combined.put(badId, badDefinition);
 
 		try {
@@ -101,7 +101,7 @@ public class SpeciesFallbackTest {
 	@SuppressWarnings("unchecked")
 	public static void emptySpeciesSetIsTolerated(GameTestHelper helper) {
 		IBeeSpeciesType type = SpeciesUtil.BEE_TYPE.get();
-		Map<ResourceLocation, BeeSpeciesDefinition> realDefinitions = BeeSpeciesManager.INSTANCE.getDefinitions();
+		Map<Identifier, BeeSpeciesDefinition> realDefinitions = BeeSpeciesManager.INSTANCE.getDefinitions();
 		if (realDefinitions.isEmpty()) {
 			helper.fail("BeeSpeciesManager holds no definitions; cannot safely restore live state after this test");
 			return;

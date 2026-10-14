@@ -18,7 +18,7 @@ import forestry.apiculture.bees.genetics.Bee;
 import forestry.core.engine.genetics.Species;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Rarity;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class BeeSpecies extends Species<IBeeSpeciesType, IBee> implements IBeeSp
 	private final int outline;
 	private final int stripes;
 
-	public BeeSpecies(ResourceLocation id, IBeeSpeciesType speciesType, IGenome defaultGenome, IBeeSpeciesBuilder builder) {
+	public BeeSpecies(Identifier id, IBeeSpeciesType speciesType, IGenome defaultGenome, IBeeSpeciesBuilder builder) {
 		super(id, speciesType, defaultGenome, builder);
 
 		this.products = builder.buildProducts();
@@ -141,7 +141,7 @@ public class BeeSpecies extends Species<IBeeSpeciesType, IBee> implements IBeeSp
 
 		tooltip.add(GeneticsUtil.getActiveName(genome, BeeChromosomes.FLOWER_TYPE).withStyle(ChatFormatting.GRAY));
 
-		ResourceLocation activity = genome.getActiveValue(BeeChromosomes.ACTIVITY);
+		Identifier activity = genome.getActiveValue(BeeChromosomes.ACTIVITY);
 		if (!activity.equals(ForestryActivityTypes.DIURNAL)) {
 			tooltip.add(GeneticsUtil.getActiveName(genome, BeeChromosomes.ACTIVITY).withStyle(ChatFormatting.GOLD));
 		}

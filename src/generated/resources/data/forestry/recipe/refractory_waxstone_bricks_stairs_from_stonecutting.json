@@ -1,10 +1,7 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "forestry:refractory_waxstone_bricks"
-  },
+  "ingredient": "forestry:refractory_waxstone_bricks",
   "result": {
-    "count": 1,
     "id": "forestry:refractory_waxstone_brick_stairs"
   }
 }

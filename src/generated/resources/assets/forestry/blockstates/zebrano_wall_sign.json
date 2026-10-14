@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
-      "model": "forestry:block/zebrano_sign"
+    "facing=east": {
+      "model": "forestry:block/zebrano_wall_sign",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "forestry:block/zebrano_wall_sign",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "forestry:block/zebrano_wall_sign"
+    },
+    "facing=west": {
+      "model": "forestry:block/zebrano_wall_sign",
+      "y": 90
     }
   }
 }

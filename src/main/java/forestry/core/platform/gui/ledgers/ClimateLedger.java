@@ -4,7 +4,7 @@ import forestry.api.client.IForestryClientApi;
 import forestry.api.core.climate.IClimateProvider;
 import forestry.api.core.TemperatureType;
 import forestry.api.core.genetics.ClimateHelper;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -20,7 +20,7 @@ public class ClimateLedger extends Ledger {
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int y, int x) {
+	public void draw(GuiGraphicsExtractor graphics, int y, int x) {
 		TemperatureType temperature = this.climateProvider.temperature();
 
 		// Draw background

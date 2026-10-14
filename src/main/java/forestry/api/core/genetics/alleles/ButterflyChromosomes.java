@@ -9,7 +9,7 @@ import forestry.api.lepidopterology.IButterflyCocoon;
 import forestry.api.lepidopterology.IButterflyEffect;
 import forestry.api.lepidopterology.genetics.IButterflySpecies;
 import forestry.api.lepidopterology.genetics.IButterflySpeciesType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -22,7 +22,7 @@ public class ButterflyChromosomes {
 	/**
 	 * The species of a butterfly. The genome stores the species' ID.
 	 */
-	public static final IChromosome<ResourceLocation> SPECIES = ChromosomeFactory.referenceChromosome(ForestrySpeciesTypes.BUTTERFLY, ButterflyChromosomes::resolveSpeciesOrDefault, IButterflySpecies::isDominant);
+	public static final IChromosome<Identifier> SPECIES = ChromosomeFactory.referenceChromosome(ForestrySpeciesTypes.BUTTERFLY, ButterflyChromosomes::resolveSpeciesOrDefault, IButterflySpecies::isDominant);
 
 	/**
 	 * Determines physical size of a butterfly.
@@ -67,18 +67,18 @@ public class ButterflyChromosomes {
 	/**
 	 * Unimplemented.
 	 */
-	public static final IChromosome<ResourceLocation> FLOWER_TYPE = BeeChromosomes.FLOWER_TYPE;
+	public static final IChromosome<Identifier> FLOWER_TYPE = BeeChromosomes.FLOWER_TYPE;
 	/**
 	 * Unimplemented.
 	 */
-	public static final IChromosome<ResourceLocation> EFFECT = ChromosomeFactory.referenceChromosome(forestry("butterfly_effect"), ButterflyChromosomes::resolveEffectOrDefault, IButterflyEffect::isDominant);
+	public static final IChromosome<Identifier> EFFECT = ChromosomeFactory.referenceChromosome(forestry("butterfly_effect"), ButterflyChromosomes::resolveEffectOrDefault, IButterflyEffect::isDominant);
 	/**
 	 * Used for silk moths (Bombyx Mori) to affect cocoon drops.
 	 */
-	public static final IChromosome<ResourceLocation> COCOON = ChromosomeFactory.referenceChromosome(forestry("cocoon"), ButterflyChromosomes::resolveCocoonOrDefault, IButterflyCocoon::isDominant);
+	public static final IChromosome<Identifier> COCOON = ChromosomeFactory.referenceChromosome(forestry("cocoon"), ButterflyChromosomes::resolveCocoonOrDefault, IButterflyCocoon::isDominant);
 
 	@ApiStatus.Internal
-	private static IButterflyEffect resolveEffectOrDefault(ResourceLocation id) {
+	private static IButterflyEffect resolveEffectOrDefault(Identifier id) {
 		IButterflySpeciesType type = TYPE.get();
 		IButterflyEffect effect = type.getButterflyEffectSafe(id);
 		if (effect != null) {
@@ -88,7 +88,7 @@ public class ButterflyChromosomes {
 	}
 
 	@ApiStatus.Internal
-	private static IButterflyCocoon resolveCocoonOrDefault(ResourceLocation id) {
+	private static IButterflyCocoon resolveCocoonOrDefault(Identifier id) {
 		IButterflySpeciesType type = TYPE.get();
 		IButterflyCocoon cocoon = type.getCocoonSafe(id);
 		if (cocoon != null) {
@@ -98,7 +98,7 @@ public class ButterflyChromosomes {
 	}
 
 	@ApiStatus.Internal
-	private static IButterflySpecies resolveSpeciesOrDefault(ResourceLocation id) {
+	private static IButterflySpecies resolveSpeciesOrDefault(Identifier id) {
 		IButterflySpeciesType type = TYPE.get();
 		IButterflySpecies species = type.getSpeciesSafe(id);
 		if (species != null) {

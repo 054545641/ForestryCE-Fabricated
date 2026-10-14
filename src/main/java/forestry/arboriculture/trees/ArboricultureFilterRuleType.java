@@ -5,7 +5,7 @@ import forestry.api.client.ForestrySprites;
 import forestry.api.core.genetics.ForestrySpeciesTypes;
 import forestry.api.core.genetics.filter.FilterData;
 import forestry.api.core.genetics.filter.IFilterRuleType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Locale;
@@ -31,20 +31,20 @@ public enum ArboricultureFilterRuleType implements IFilterRuleType {
 	};
 
 	private final String id;
-	private final ResourceLocation sprite;
+	private final Identifier sprite;
 
-	ArboricultureFilterRuleType(ResourceLocation sprite) {
+	ArboricultureFilterRuleType(Identifier sprite) {
 		this.sprite = sprite;
 		this.id = "forestry.arboriculture." + name().toLowerCase(Locale.ENGLISH);
 	}
 
 	@Override
-	public ResourceLocation getSprite() {
+	public Identifier getSprite() {
 		return this.sprite;
 	}
 
 	@Override
-	public ResourceLocation getSpeciesTypeId() {
+	public Identifier getSpeciesTypeId() {
 		return ForestrySpeciesTypes.TREE;
 	}
 

@@ -32,7 +32,7 @@ public class SaplingBlock extends Block implements BonemealableBlock, EntityBloc
 	protected static final VoxelShape SHAPE = Block.box(2.0D, 0.0D, 2.0D, 14.0D, 12.0D, 14.0D);
 
 	public SaplingBlock(Block.Properties properties) {
-		super(properties.noCollission().strength(0.0F).sound(SoundType.GRASS).randomTicks());
+		super(properties.noCollision().strength(0.0F).sound(SoundType.GRASS).randomTicks());
 	}
 
 	@Override
@@ -71,8 +71,8 @@ public class SaplingBlock extends Block implements BonemealableBlock, EntityBloc
 	}
 
 	@Override
-	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-		if (!level.isClientSide && !canBlockStay(level, pos)) {
+	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block blockIn, @javax.annotation.Nullable net.minecraft.world.level.redstone.Orientation orientation, boolean isMoving) {
+		if (!level.isClientSide() && !canBlockStay(level, pos)) {
 			level.destroyBlock(pos, true);
 		}
 	}
@@ -87,7 +87,7 @@ public class SaplingBlock extends Block implements BonemealableBlock, EntityBloc
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
 		SaplingBlockEntity sapling = TileUtil.getTile(level, pos, SaplingBlockEntity.class);
 		if (sapling == null || sapling.getTree() == null) {
 			return ItemStack.EMPTY;
@@ -113,7 +113,7 @@ public class SaplingBlock extends Block implements BonemealableBlock, EntityBloc
 
 	@Override
 	public boolean isBonemealSuccess(Level world, RandomSource rand, BlockPos pos, BlockState state) {
-		if (world.random.nextFloat() >= 0.45F) {
+		if (world.getRandom().nextFloat() >= 0.45F) {
 			return false;
 		}
 		SaplingBlockEntity saplingTile = TileUtil.getTile(world, pos, SaplingBlockEntity.class);

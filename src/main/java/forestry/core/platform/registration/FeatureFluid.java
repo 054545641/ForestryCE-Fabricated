@@ -6,7 +6,7 @@ import forestry.core.platform.item.DrinkProperties;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -71,7 +71,7 @@ public class FeatureFluid extends ModFeature implements IFluidFeature {
 
 	public static class Builder {
 		final FeatureRegistry registry;
-		private final ResourceLocation moduleId;
+		private final Identifier moduleId;
 		final String identifier;
 
 		int density = 1000;
@@ -85,7 +85,7 @@ public class FeatureFluid extends ModFeature implements IFluidFeature {
 		DrinkProperties properties = null;
 		Supplier<Item> bucket = () -> Items.AIR;
 
-		public Builder(FeatureRegistry registry, ResourceLocation moduleId, String identifier) {
+		public Builder(FeatureRegistry registry, Identifier moduleId, String identifier) {
 			this.registry = registry;
 			this.moduleId = moduleId;
 			this.identifier = identifier;
@@ -144,8 +144,8 @@ public class FeatureFluid extends ModFeature implements IFluidFeature {
 
 	public static class ForestryFluidType extends FluidType {
 		private final int color;
-		private final ResourceLocation stillTexture;
-		private final ResourceLocation flowingTexture;
+		private final Identifier stillTexture;
+		private final Identifier flowingTexture;
 
 		public ForestryFluidType(FluidProperties forestryProps, Properties properties) {
 			super(properties);
@@ -158,11 +158,11 @@ public class FeatureFluid extends ModFeature implements IFluidFeature {
 			return this.color;
 		}
 
-		public ResourceLocation getStillTexture() {
+		public Identifier getStillTexture() {
 			return this.stillTexture;
 		}
 
-		public ResourceLocation getFlowingTexture() {
+		public Identifier getFlowingTexture() {
 			return FluidProperties.resourceExists(this.flowingTexture) ? this.flowingTexture : this.stillTexture;
 		}
 	}

@@ -1,13 +1,9 @@
 {
   "type": "forestry:carpenter",
-  "box": [],
   "id": "forestry:carpenter/crates/unpack/minecraft/jungle_log",
   "recipe": {
-    "category": "misc",
     "ingredients": [
-      {
-        "item": "forestry:crated_jungle_log"
-      }
+      "forestry:crated_jungle_log"
     ],
     "result": {
       "count": 9,

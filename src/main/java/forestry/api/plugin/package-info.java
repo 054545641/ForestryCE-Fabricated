@@ -1,10 +1,8 @@
 /**
  * Contains classes related to registration of Forestry data by {@link forestry.api.plugin.IForestryPlugin} plugins.
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NullMarked
 package forestry.api.plugin;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 
-import javax.annotation.ParametersAreNonnullByDefault;

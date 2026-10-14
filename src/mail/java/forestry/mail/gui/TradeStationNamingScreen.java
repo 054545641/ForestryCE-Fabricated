@@ -6,8 +6,9 @@ import forestry.core.platform.render.ColourProperties;
 import forestry.core.platform.util.NetworkUtil;
 import forestry.mail.network.packets.PacketTraderAddressRequest;
 import forestry.mail.tradestation.TradeStationBlockEntity;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import org.apache.commons.lang3.StringUtils;
@@ -18,10 +19,8 @@ public class TradeStationNamingScreen extends GuiForestry<TradeStationNamingMenu
 	private EditBox addressNameField;
 
 	public TradeStationNamingScreen(TradeStationNamingMenu container, Inventory inv, Component title) {
-		super(Constants.TEXTURE_PATH_GUI + "/trade_station_naming.png", container, inv, title);
+		super(Constants.TEXTURE_PATH_GUI + "/trade_station_naming.png", container, inv, title, 176, 90);
 		this.tile = container.getTile();
-		this.imageWidth = 176;
-		this.imageHeight = 90;
 	}
 
 	@Override
@@ -41,9 +40,11 @@ public class TradeStationNamingScreen extends GuiForestry<TradeStationNamingMenu
 	}
 
 	@Override
-	public boolean keyPressed(int key, int scanCode, int modifiers) {
+	public boolean keyPressed(KeyEvent event) {
+		int key = event.key();
 		if (key == GLFW.GLFW_KEY_ESCAPE) {
-			this.minecraft.player.closeContainer();
+			onClose();
+			return true;
 		}
 
 		if (key == GLFW.GLFW_KEY_ENTER && this.addressNameField.isFocused()) {
@@ -51,22 +52,22 @@ public class TradeStationNamingScreen extends GuiForestry<TradeStationNamingMenu
 			return true;
 		}
 
-		return this.addressNameField.keyPressed(key, scanCode, modifiers)
+		return this.addressNameField.keyPressed(event)
 			|| this.addressNameField.canConsumeInput()
-			|| super.keyPressed(key, scanCode, modifiers);
+			|| super.keyPressed(event);
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
-		super.renderBg(graphics, partialTicks, mouseX, mouseY);
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+		super.extractBackground(graphics, mouseX, mouseY, partialTicks);
 
         this.textLayout.startPage(graphics);
         this.textLayout.newLine();
-        this.textLayout.drawCenteredLine(graphics, Component.translatable("for.gui.mail.nametrader"), 0, ColourProperties.INSTANCE.get("gui.mail.text"));
+        this.textLayout.drawCenteredLine(graphics, Component.translatable("for.gui.mail.nametrader"), 0, (0xff000000 | ColourProperties.INSTANCE.get("gui.mail.text")));
         this.textLayout.newLine(38);
-        this.textLayout.drawCenteredLine(graphics, Component.translatable("for.gui.mail.nametrader.finish"), 0, ColourProperties.INSTANCE.get("gui.mail.text"));
+        this.textLayout.drawCenteredLine(graphics, Component.translatable("for.gui.mail.nametrader.finish"), 0, (0xff000000 | ColourProperties.INSTANCE.get("gui.mail.text")));
         this.textLayout.endPage(graphics);
-        this.addressNameField.render(graphics, mouseY, mouseX, partialTicks);
+        this.addressNameField.extractRenderState(graphics, mouseX, mouseY, partialTicks);
 	}
 
 	private void setAddress() {

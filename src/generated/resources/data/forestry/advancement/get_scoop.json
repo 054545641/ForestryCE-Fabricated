@@ -17,7 +17,6 @@
       "translate": "advancements.forestry.get_scoop.description"
     },
     "icon": {
-      "count": 1,
       "id": "forestry:scoop"
     },
     "title": {

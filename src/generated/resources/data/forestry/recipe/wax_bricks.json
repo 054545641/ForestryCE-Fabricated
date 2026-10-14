@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "X": {
-      "item": "forestry:wax_brick"
-    }
+    "X": "forestry:wax_brick"
   },
   "pattern": [
     "XX",

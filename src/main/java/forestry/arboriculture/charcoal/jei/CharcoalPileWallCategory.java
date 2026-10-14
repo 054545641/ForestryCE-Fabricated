@@ -16,9 +16,9 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import mezz.jei.api.recipe.types.IRecipeType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -32,7 +32,7 @@ public class CharcoalPileWallCategory extends ForestryRecipeCategory<ICharcoalPi
 
 	public CharcoalPileWallCategory(IGuiHelper helper) {
 		super(helper.createBlankDrawable(120, 38), "for.jei.charcoal.pile");
-		ResourceLocation resourceLocation = ForestryConstants.forestry("textures/gui/jei/recipes.png");
+		Identifier resourceLocation = ForestryConstants.forestry("textures/gui/jei/recipes.png");
         this.arrow = helper.createDrawable(resourceLocation, 0, 14, 22, 16);
 		IDrawableStatic arrowAnimated = helper.createDrawable(resourceLocation, 22, 14, 22, 16);
 		this.arrowAnimated = helper.createAnimatedDrawable(arrowAnimated, 160, StartDirection.LEFT, false);
@@ -44,7 +44,7 @@ public class CharcoalPileWallCategory extends ForestryRecipeCategory<ICharcoalPi
 	}
 
 	@Override
-	public RecipeType<ICharcoalPileWall> getRecipeType() {
+	public IRecipeType<ICharcoalPileWall> getRecipeType() {
 		return ArboricultureJeiPlugin.CHARCOAL_PILE_TYPE;
 	}
 
@@ -54,7 +54,7 @@ public class CharcoalPileWallCategory extends ForestryRecipeCategory<ICharcoalPi
 	}
 
 	@Override
-	public void draw(ICharcoalPileWall recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+	public void draw(ICharcoalPileWall recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
 		super.draw(recipe, recipeSlotsView, graphics, mouseX, mouseY);
 		this.flame.draw(graphics, 52, 0);
 		this.flameAnimated.draw(graphics, 52, 0);

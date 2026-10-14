@@ -15,6 +15,8 @@ public class ApicultureParticles {
 
 	private static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES = REGISTRY.getRegistry(Registries.PARTICLE_TYPE);
 
+	public static final DeferredHolder<ParticleType<?>, net.minecraft.core.particles.SimpleParticleType> SNOW_PARTICLE = PARTICLE_TYPES.register("snow_particle", () -> new net.minecraft.core.particles.SimpleParticleType(false));
+
 	public static final DeferredHolder<ParticleType<?>, BeeParticleData.Type> BEE_EXPLORER_PARTICLE = PARTICLE_TYPES.register("bee_explore_particle", BeeParticleData.Type::new);
 	public static final DeferredHolder<ParticleType<?>, BeeParticleData.Type> BEE_ROUND_TRIP_PARTICLE = PARTICLE_TYPES.register("bee_round_trip_particle", BeeParticleData.Type::new);
 	public static final DeferredHolder<ParticleType<?>, BeeTargetParticleData.Type> BEE_TARGET_ENTITY_PARTICLE = PARTICLE_TYPES.register("bee_target_entity_particle", BeeTargetParticleData.Type::new);

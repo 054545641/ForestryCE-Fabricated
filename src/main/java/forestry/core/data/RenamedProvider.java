@@ -7,7 +7,6 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 
 import thedarkcolour.modkit.data.DataHelper;
-import thedarkcolour.modkit.data.ProviderRegistrar;
 
 /**
  * A provider under a name of the caller's choosing. {@link DataGenerator} keys a provider by

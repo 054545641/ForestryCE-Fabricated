@@ -2,7 +2,7 @@ package forestry.api.core;
 
 import com.mojang.serialization.*;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -59,7 +59,7 @@ final class OptionalTypeMapCodec<V, T> extends MapCodec<V> {
 		O typeValue = input.get(this.typeKey);
 		DataResult<T> type = typeValue == null
 			? DataResult.success(this.defaultType.get())
-			: ResourceLocation.CODEC.parse(ops, typeValue).flatMap(this::byId);
+			: Identifier.CODEC.parse(ops, typeValue).flatMap(this::byId);
 		return type.flatMap(t -> this.codecGetter.apply(t).decode(ops, input).map(value -> (V) value));
 	}
 
@@ -68,11 +68,11 @@ final class OptionalTypeMapCodec<V, T> extends MapCodec<V> {
 	public <O> RecordBuilder<O> encode(V input, DynamicOps<O> ops, RecordBuilder<O> prefix) {
 		T type = this.typeGetter.apply(input);
 		if (type != this.defaultType.get()) {
-			ResourceLocation id = this.registry.getKey(type);
+			Identifier id = this.registry.getKey(type);
 			if (id == null) {
 				return prefix.withErrorsFrom(DataResult.error(() -> "Unregistered " + this.typeName + ": " + type));
 			}
-			prefix.add(this.typeKey, ResourceLocation.CODEC.encodeStart(ops, id));
+			prefix.add(this.typeKey, Identifier.CODEC.encodeStart(ops, id));
 		}
 		return ((MapCodec) this.codecGetter.apply(type)).encode(input, ops, prefix);
 	}
@@ -82,8 +82,8 @@ final class OptionalTypeMapCodec<V, T> extends MapCodec<V> {
 		return Stream.of(ops.createString(this.typeKey));
 	}
 
-	private DataResult<T> byId(ResourceLocation id) {
-		T type = this.registry.get(id);
+	private DataResult<T> byId(Identifier id) {
+		T type = this.registry.getValue(id);
 		if (type == null) {
 			return DataResult.error(() -> "Unknown " + this.typeName + ": " + id);
 		}

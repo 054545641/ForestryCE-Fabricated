@@ -3,9 +3,7 @@
   "category": "building",
   "group": "wooden_slab",
   "key": {
-    "#": {
-      "item": "forestry:ebony_fireproof_planks"
-    }
+    "#": "forestry:ebony_fireproof_planks"
   },
   "pattern": [
     "###"

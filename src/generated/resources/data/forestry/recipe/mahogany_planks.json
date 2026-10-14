@@ -1,10 +1,9 @@
 {
   "type": "minecraft:crafting_shapeless",
   "category": "building",
+  "group": "planks",
   "ingredients": [
-    {
-      "tag": "forestry:mahogany_logs"
-    }
+    "#forestry:mahogany_logs"
   ],
   "result": {
     "count": 4,

@@ -3,7 +3,7 @@ package forestry.core.platform.gui.widgets;
 import forestry.api.core.tooltips.ToolTip;
 import forestry.core.platform.gui.GuiUtil;
 import forestry.core.platform.util.ItemTooltipUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -16,7 +16,7 @@ public abstract class ItemStackWidgetBase extends Widget {
 	protected abstract ItemStack getItemStack();
 
 	@Override
-	public void draw(GuiGraphics graphics, int startX, int startY) {
+	public void draw(GuiGraphicsExtractor graphics, int startX, int startY) {
 		ItemStack itemStack = getItemStack();
 		if (!itemStack.isEmpty()) {
 			GuiUtil.drawItemStack(graphics, this.manager.gui, itemStack, this.xPos + startX, this.yPos + startY);

@@ -9,7 +9,7 @@ import forestry.core.platform.gui.IContainerSocketed;
 import forestry.core.platform.util.ItemTooltipUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
@@ -30,7 +30,7 @@ public class SocketWidget extends Widget {
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int startX, int startY) {
+	public void draw(GuiGraphicsExtractor graphics, int startX, int startY) {
 		ItemStack socketStack = this.tile.getSocket(this.slot);
 		if (!socketStack.isEmpty()) {
 			GuiUtil.drawItemStack(graphics, Minecraft.getInstance().font, socketStack, this.xPos, this.yPos);

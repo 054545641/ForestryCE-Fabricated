@@ -3,16 +3,11 @@
   "category": "redstone",
   "ingredients": [
     [
-      {
-        "item": "forestry:kauri_planks"
-      },
-      {
-        "item": "forestry:kauri_fireproof_planks"
-      }
+      "forestry:kauri_planks",
+      "forestry:kauri_fireproof_planks"
     ]
   ],
   "result": {
-    "count": 1,
     "id": "forestry:kauri_button"
   }
 }

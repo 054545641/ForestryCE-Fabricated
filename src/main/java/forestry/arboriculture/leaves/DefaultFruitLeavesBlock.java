@@ -10,12 +10,12 @@ import forestry.api.core.genetics.alleles.TreeChromosomes;
 import forestry.arboriculture.features.ArboricultureBlocks;
 import forestry.core.platform.util.BlockUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -43,16 +43,16 @@ public class DefaultFruitLeavesBlock extends AbstractLeavesBlock implements ILea
 	}
 
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult traceResult) {
+	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult traceResult) {
 		ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);
 		ItemStack offHand = player.getItemInHand(InteractionHand.OFF_HAND);
 		if (mainHand.isEmpty() && offHand.isEmpty()) {
 			ITree tree = getTree(level, pos);
 			if (tree == null) {
-				return ItemInteractionResult.FAIL;
+				return InteractionResult.FAIL;
 			}
-			if (level.isClientSide) {
-				return ItemInteractionResult.SUCCESS;
+			if (level.isClientSide()) {
+				return InteractionResult.SUCCESS;
 			}
 			BlockUtil.sendDestroyEffects(level, pos, state);
 			IFruit fruitProvider = tree.getGenome().resolveActive(TreeChromosomes.FRUIT);
@@ -63,10 +63,10 @@ public class DefaultFruitLeavesBlock extends AbstractLeavesBlock implements ILea
 			for (ItemStack fruit : products) {
 				ItemHandlerHelper.giveItemToPlayer(player, fruit);
 			}
-			return ItemInteractionResult.CONSUME;
+			return InteractionResult.CONSUME;
 		}
 
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.TRY_WITH_EMPTY_HAND;
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class DefaultFruitLeavesBlock extends AbstractLeavesBlock implements ILea
 		}
 	}
 
-	public ResourceLocation getSpeciesId() {
+	public Identifier getSpeciesId() {
 		return this.type.getSpeciesId();
 	}
 

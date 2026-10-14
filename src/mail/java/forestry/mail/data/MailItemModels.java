@@ -1,6 +1,6 @@
 package forestry.mail.data;
 
-import thedarkcolour.modkit.data.MKItemModelProvider;
+import forestry.core.data.models.ModelAssets;
 
 import forestry.core.data.ForestryItemModels;
 import forestry.core.platform.registration.FeatureItem;
@@ -11,7 +11,7 @@ import forestry.mail.letters.LetterItem;
  * Generates the item models for the mail jar.
  */
 public class MailItemModels {
-	public static void addModels(MKItemModelProvider models) {
+	public static void addModels(ModelAssets models) {
 		models.generic2d(MailItems.CATALOGUE);
 
 		models.generic2d(MailItems.LETTERS.get(LetterItem.Size.BIG, LetterItem.State.EMPTIED));

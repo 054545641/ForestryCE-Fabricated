@@ -1,19 +1,10 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "D": {
-      "item": "forestry:copper_electron_tube"
-    },
-    "P": {
-      "item": "minecraft:glass_pane"
-    },
-    "Q": {
-      "tag": "c:ingots/tin"
-    },
-    "S": {
-      "item": "forestry:solar_cell"
-    }
+    "D": "forestry:copper_electron_tube",
+    "P": "minecraft:glass_pane",
+    "Q": "#c:ingots/tin",
+    "S": "forestry:solar_cell"
   },
   "pattern": [
     "PPP",
@@ -21,7 +12,6 @@
     "QDQ"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:solar_panel"
   }
 }

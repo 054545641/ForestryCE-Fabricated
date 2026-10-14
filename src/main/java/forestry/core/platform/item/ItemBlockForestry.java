@@ -7,8 +7,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.List;
 
@@ -17,9 +15,6 @@ public class ItemBlockForestry<B extends Block> extends BlockItem {
 		super(block, builder);
 	}
 
-	public ItemBlockForestry(B block) {
-		this(block, new Item.Properties());
-	}
 
 	@Override
 	public B getBlock() {
@@ -27,10 +22,20 @@ public class ItemBlockForestry<B extends Block> extends BlockItem {
 		return (B) super.getBlock();
 	}
 
-	@Override
-	@OnlyIn(Dist.CLIENT)
+	/** List-based extension point for existing Forestry item subclasses. */
 	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag advanced) {
-		super.appendHoverText(stack, context, tooltip, advanced);
 		ItemTooltipUtil.addInformation(stack, tooltip);
+	}
+
+	@Override
+	public void appendHoverText(ItemStack stack, Item.TooltipContext context,
+		net.minecraft.world.item.component.TooltipDisplay display, java.util.function.Consumer<Component> output, TooltipFlag flag) {
+		super.appendHoverText(stack, context, display, output, flag);
+		List<Component> lines = new java.util.ArrayList<>();
+		appendHoverText(stack, context, lines, flag);
+		if (getBlock() instanceof forestry.core.platform.block.IBlockTooltip blockTooltip) {
+			blockTooltip.appendHoverText(stack, context, lines, flag);
+		}
+		lines.forEach(output);
 	}
 }

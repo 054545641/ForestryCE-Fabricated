@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
-      "model": "forestry:block/camelthorn_sign"
+    "facing=east": {
+      "model": "forestry:block/camelthorn_wall_sign",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "forestry:block/camelthorn_wall_sign",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "forestry:block/camelthorn_wall_sign"
+    },
+    "facing=west": {
+      "model": "forestry:block/camelthorn_wall_sign",
+      "y": 90
     }
   }
 }

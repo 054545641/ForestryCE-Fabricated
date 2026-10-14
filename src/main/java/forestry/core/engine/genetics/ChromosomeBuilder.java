@@ -3,7 +3,7 @@ package forestry.core.engine.genetics;
 import forestry.api.core.genetics.alleles.Allele;
 import forestry.api.core.genetics.alleles.IChromosome;
 import forestry.api.plugin.IChromosomeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 
@@ -13,7 +13,7 @@ public class ChromosomeBuilder<V> implements IChromosomeBuilder<V> {
 	@Nullable
 	Allele<V> defaultAllele;
 	@Nullable
-	ResourceLocation defaultReferenceId;
+	Identifier defaultReferenceId;
 	boolean weaklyInherited;
 
 	public ChromosomeBuilder(IChromosome<V> chromosome) {

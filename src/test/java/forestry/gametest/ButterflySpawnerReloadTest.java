@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -57,7 +57,7 @@ public class ButterflySpawnerReloadTest {
 		}
 
 		// Snapshot the live, full species map before mutating it, so it can be restored afterwards.
-		ImmutableMap<ResourceLocation, IButterflySpecies> snapshot = ImmutableMap.copyOf(
+		ImmutableMap<Identifier, IButterflySpecies> snapshot = ImmutableMap.copyOf(
 			type.getAllSpeciesIds().stream().collect(java.util.stream.Collectors.toMap(id -> id, type::getSpecies))
 		);
 
@@ -65,7 +65,7 @@ public class ButterflySpawnerReloadTest {
 			.genome(Map.of(ButterflyChromosomes.SIZE.id(), AlleleOverride.both(ForestryAlleles.SIZE_AVERAGE)))
 			.build();
 
-		Map<ResourceLocation, ButterflySpeciesDefinition> defs = Map.of(ForestryButterflySpecies.MONARCH, def);
+		Map<Identifier, ButterflySpeciesDefinition> defs = Map.of(ForestryButterflySpecies.MONARCH, def);
 
 		try {
 			// simulate a butterfly species reload via the real reload path (not the raw setSpecies swap)

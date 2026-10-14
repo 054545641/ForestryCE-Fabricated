@@ -4,7 +4,7 @@ import forestry.api.client.ForestrySprites;
 import forestry.api.client.IForestryClientApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class HintLedger extends Ledger {
 	}
 
 	@Override
-	public void draw(GuiGraphics graphics, int y, int x) {
+	public void draw(GuiGraphicsExtractor graphics, int y, int x) {
 
 		// Draw background
 		drawBackground(graphics, y, x);

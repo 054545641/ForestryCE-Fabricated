@@ -3,19 +3,14 @@
   "category": "redstone",
   "key": {
     "P": [
-      {
-        "item": "forestry:balsa_planks"
-      },
-      {
-        "item": "forestry:balsa_fireproof_planks"
-      }
+      "forestry:balsa_planks",
+      "forestry:balsa_fireproof_planks"
     ]
   },
   "pattern": [
     "PP"
   ],
   "result": {
-    "count": 1,
     "id": "forestry:balsa_pressure_plate"
   }
 }

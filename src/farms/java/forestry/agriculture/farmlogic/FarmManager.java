@@ -1,5 +1,7 @@
 package forestry.agriculture.farmlogic;
 
+import net.minecraft.world.level.storage.ValueOutput;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import forestry.api.core.ForestryError;
@@ -17,7 +19,7 @@ import forestry.agriculture.farmlogic.IFarmHousingInternal;
 import forestry.agriculture.multifarm.multiblock.FarmFertilizerManager;
 import forestry.agriculture.multifarm.multiblock.FarmHydrationManager;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -126,7 +128,7 @@ public class FarmManager implements INbtReadable, INbtWritable, IStreamable, IEx
 
 		Level level = this.housing.getLevel();
 		ObjectArrayList<Direction> farmDirections = new ObjectArrayList<>(HorizontalDirection.VALUES);
-		Util.shuffle(farmDirections, level.random);
+		Util.shuffle(farmDirections, level.getRandom());
 		for (Direction farmSide : farmDirections) {
 			IFarmLogic logic = this.housing.getFarmLogic(farmSide);
 			List<FarmTarget> farmTargets = this.targets.get(farmSide);
@@ -275,7 +277,17 @@ public class FarmManager implements INbtReadable, INbtWritable, IStreamable, IEx
         this.hydrationManager.write(data, registries);
         this.tankManager.write(data, registries);
         this.fertilizerManager.write(data, registries);
+		var pending = new net.minecraft.nbt.ListTag();
+		for (ItemStack stack : this.pendingProduce) pending.add(forestry.core.platform.util.InventoryData.writeStack(stack, registries));
+		data.put("PendingProduce", pending);
 		return data;
+	}
+
+	public void write(ValueOutput output) {
+		this.hydrationManager.write(output);
+		this.tankManager.write(output);
+		this.fertilizerManager.write(output);
+		output.store("PendingProduce", ItemStack.CODEC.listOf(), List.copyOf(this.pendingProduce));
 	}
 
 	@Override
@@ -283,6 +295,12 @@ public class FarmManager implements INbtReadable, INbtWritable, IStreamable, IEx
         this.hydrationManager.read(data, registries);
         this.tankManager.read(data, registries);
         this.fertilizerManager.read(data, registries);
+		this.pendingProduce.clear();
+		for (var tag : data.getListOrEmpty("PendingProduce")) {
+			if (!(tag instanceof CompoundTag entry)) throw new IllegalArgumentException("Invalid pending farm product");
+			ItemStack stack = forestry.core.platform.util.InventoryData.readStack(entry, registries);
+			if (!stack.isEmpty()) this.pendingProduce.add(stack);
+		}
 	}
 
 	@Override

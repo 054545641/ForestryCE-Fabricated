@@ -13,6 +13,7 @@
 package forestry.mail.commands;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import forestry.api.mail.ITradeStation;
@@ -29,7 +30,6 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
 public class MailCommand {
 	public static ArgumentBuilder<CommandSourceStack, ?> register() {
@@ -46,7 +46,7 @@ public class MailCommand {
 
 		public static int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
 			ServerPlayer player = context.getSource().getPlayerOrException();
-			ServerLevel level = player.serverLevel();
+			ServerLevel level = player.level();
 			for (ITradeStation trade : TradeStationRegistry.getOrCreate(level).getActiveTradeStations().values()) {
 				CommandHelpers.sendChatMessage(context.getSource(), makeTradeListEntry(trade.getTradeInfo()));
 			}
@@ -59,13 +59,13 @@ public class MailCommand {
 
 			String tradegood = "[ ? ]";
 			if (!info.tradegood().isEmpty()) {
-				tradegood = info.tradegood().getCount() + "x" + info.tradegood().getHoverName();
+				tradegood = info.tradegood().getCount() + "x" + info.tradegood().getHoverName().getString();
 			}
 			String demand = "[ ? ]";
 			if (!info.required().isEmpty()) {
 				demand = "";
 				for (ItemStack dmd : info.required()) {
-					demand = StringUtil.append(", ", demand, dmd.getCount() + "x" + dmd.getHoverName());
+					demand = StringUtil.append(", ", demand, dmd.getCount() + "x" + dmd.getHoverName().getString());
 				}
 			}
 
@@ -75,27 +75,28 @@ public class MailCommand {
 
 	public static class CommandMailVirtualize {
 		public static ArgumentBuilder<CommandSourceStack, ?> register() {
-			return Commands.literal("virtualize").requires(CommandHelpers.ADMIN).executes(CommandMailVirtualize::execute);
+			return Commands.literal("virtualize").requires(CommandHelpers.ADMIN)
+				.executes(CommandMailVirtualize::execute)
+				.then(Commands.argument("address", StringArgumentType.string())
+					.executes(context -> execute(context, StringArgumentType.getString(context, "address"))));
 		}
 
 		public static int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-			ServerPlayer player = context.getSource().getPlayerOrException();
+			return execute(context, context.getSource().getPlayerOrException().getGameProfile().name());
+		}
 
-			Level world = player.getCommandSenderWorld();
-
-			MailAddress address = new MailAddress(player.getGameProfile());
-			ITradeStation trade = TradeStationRegistry.getOrCreate((ServerLevel) world).getTradeStation(address);
+		private static int execute(CommandContext<CommandSourceStack> context, String name) {
+			ITradeStation trade = name.isBlank() ? null : TradeStationRegistry.getOrCreate(context.getSource().getLevel())
+				.getTradeStation(new MailAddress(name));
 
 			if (trade == null) {
-				Style red = Style.EMPTY;
-				red.withColor(ChatFormatting.RED);
-				CommandHelpers.sendLocalizedChatMessage(context.getSource(), red, "for.chat.command.forestry.mail.virtualize.no_tradestation", player.getDisplayName());
+				Style red = Style.EMPTY.withColor(ChatFormatting.RED);
+				CommandHelpers.sendLocalizedChatMessage(context.getSource(), red, "for.chat.command.forestry.mail.virtualize.no_tradestation", name);
 				return 0;
 			}
 
 			trade.setVirtual(!trade.isVirtual());
-			Style green = Style.EMPTY;
-			green.withColor(ChatFormatting.GREEN);
+			Style green = Style.EMPTY.withColor(ChatFormatting.GREEN);
 			CommandHelpers.sendLocalizedChatMessage(context.getSource(), green, "for.chat.command.forestry.mail.virtualize.set", trade.getAddress().getName(), trade.isVirtual());
 
 			return 1;

@@ -11,7 +11,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import forestry.api.apiculture.IBeeJubilance;
 
@@ -19,9 +19,9 @@ import forestry.api.apiculture.IBeeJubilance;
 public class BeeJubilanceProvider implements DataProvider {
 	private final PackOutput.PathProvider pathProvider;
 	private final CompletableFuture<HolderLookup.Provider> lookupProvider;
-	private final Map<ResourceLocation, IBeeJubilance> jubilances;
+	private final Map<Identifier, IBeeJubilance> jubilances;
 
-	public BeeJubilanceProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, Map<ResourceLocation, IBeeJubilance> jubilances) {
+	public BeeJubilanceProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, Map<Identifier, IBeeJubilance> jubilances) {
 		this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "bee_jubilance");
 		this.lookupProvider = lookupProvider;
 		this.jubilances = jubilances;

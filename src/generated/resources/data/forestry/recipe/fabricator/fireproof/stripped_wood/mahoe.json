@@ -8,12 +8,8 @@
   "recipe": {
     "category": "building",
     "key": {
-      "#": {
-        "item": "forestry:refractory_wax"
-      },
-      "X": {
-        "item": "forestry:mahoe_stripped_wood"
-      }
+      "#": "forestry:refractory_wax",
+      "X": "forestry:mahoe_stripped_wood"
     },
     "pattern": [
       "   ",
