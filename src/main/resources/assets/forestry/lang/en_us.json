@@ -190,7 +190,7 @@
   "for.gui.emptysocket": "Empty Socket",
   "for.gui.farm.fertilizer": "Fertilizer: %s",
   "for.gui.farm.water": "Water: %s",
-  "for.gui.socket.remove": "Removable with a Soldering Iron",
+  "for.gui.socket.remove": "Pick up a Soldering Iron with the cursor and click this socket to remove",
   "for.gui.energy": "Energy",
   "for.gui.environment": "Environment",
   "for.gui.evolution": "Evolution",

@@ -31,6 +31,7 @@ public final class LifecycleClientTest {
 
 	@SubscribeEvent
 	public static void tick(ClientTickEvent.Post event) {
+		if (Boolean.getBoolean("forestry.lifecycle.socketTest")) return;
 		if (Boolean.getBoolean("forestry.lifecycle.escritoireTest")) return;
 		if (Boolean.getBoolean("forestry.lifecycle.powerTest")) return;
 		if (Boolean.getBoolean("forestry.lifecycle.analyzerTest")) return;

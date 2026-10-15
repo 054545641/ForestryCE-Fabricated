@@ -76,8 +76,9 @@ public class ContainerSocketedHelper<T extends BlockEntity & ISocketable> implem
 
         this.tile.setSocket(slot, ItemStack.EMPTY);
 		InventoryUtil.stowInInventory(socket, player.getInventory(), true);
-		itemstack.hurtAndBreak(1, player, player.getUsedItemHand() == net.minecraft.world.InteractionHand.MAIN_HAND ? net.minecraft.world.entity.EquipmentSlot.MAINHAND : net.minecraft.world.entity.EquipmentSlot.OFFHAND);    //TODO onBreak
-		player.inventoryMenu.broadcastChanges();
+		// The soldering iron is on the menu cursor, not equipped in either hand.
+		itemstack.hurtAndBreak(1, player.level(), player, brokenItem -> {});
+		player.containerMenu.broadcastChanges();
 
 		PacketSocketUpdate packet = PacketSocketUpdate.create(this.tile);
 		NetworkUtil.sendToPlayer(packet, player);

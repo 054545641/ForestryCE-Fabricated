@@ -157,7 +157,7 @@
   "for.gui.emptysocket": "空插槽",
   "for.gui.farm.fertilizer": "肥料：%s",
   "for.gui.farm.water": "水分：%s",
-  "for.gui.socket.remove": "可用烙铁拆卸",
+  "for.gui.socket.remove": "用鼠标拿起烙铁，再点击此插槽拆卸",
   "for.gui.energy": "能量",
   "for.gui.environment": "环境",
   "for.gui.evolution": "进化",

@@ -58,6 +58,10 @@ public final class LifecycleTests {
 	private static boolean checkedUnbound;
 
 	static {
+		TESTS.register("socket_cursor_removal", () -> SocketRemovalTests::cursorRemoval);
+		TESTS.register("socket_held_iron_rejected", () -> SocketRemovalTests::heldIronRejected);
+		TESTS.register("socket_full_inventory", () -> SocketRemovalTests::fullInventory);
+		TESTS.register("socket_cursor_iron_breaks", () -> SocketRemovalTests::cursorIronBreaks);
 		TESTS.register("fluid_player_movement", () -> FluidMovementTests::playerMovement);
 		TESTS.register("fluid_honey_current_release", () -> FluidMovementTests::honeyCurrentRelease);
 		TESTS.register("analyzer_vanilla_saplings", () -> AnalyzerRegressionTests::vanillaSaplings);

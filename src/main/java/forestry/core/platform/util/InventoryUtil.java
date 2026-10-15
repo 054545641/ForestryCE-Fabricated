@@ -8,6 +8,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -207,7 +208,13 @@ public abstract class InventoryUtil {
 	private static int insert(Container inventory, ItemStack stack, int start, int size, TransactionContext tx) {
 		java.util.Objects.checkFromIndexSize(start, size, inventory.getContainerSize());
 		if (stack.isEmpty()) return 0;
-		var view = new InventoryTransferView(getTransferHandler(inventory), size, i -> start + i, (i, r) -> true, (i, r) -> true);
+		var handler = getTransferHandler(inventory);
+		if (inventory instanceof Inventory && start == 0 && size == inventory.getContainerSize()) {
+			// The player wrapper excludes body/saddle slots. Its insertion also keeps
+			// returned items in backpack slots instead of filling empty equipment slots.
+			return handler.insert(ItemResource.of(stack), stack.getCount(), tx);
+		}
+		var view = new InventoryTransferView(handler, size, i -> start + i, (i, r) -> true, (i, r) -> true);
 		return ResourceHandlerUtil.insertStacking(view, ItemResource.of(stack), stack.getCount(), tx);
 	}
 
