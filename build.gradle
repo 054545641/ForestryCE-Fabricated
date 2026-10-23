@@ -181,3 +181,4 @@ tasks.named('wrapper', Wrapper) {
     networkTimeout = 120000
 }
 apply from: 'gradle/fabric-f3-verification.gradle'
+apply from: 'gradle/loom-artifact-verification.gradle'

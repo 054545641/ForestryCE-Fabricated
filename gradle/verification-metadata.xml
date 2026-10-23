@@ -1686,7 +1686,7 @@
       </component>
       <component group="net.minecraft" name="minecraft-merged-e6ef981b3c" version="26.2">
          <artifact name="minecraft-merged-e6ef981b3c-26.2.jar">
-            <sha256 value="4f77c6eac0b776d687b45ee52ad29904458a65343cdcd29ab5efbcb3487a506a" origin="Local Loom 1.17.21 output without optional integrations; only CreativeModeTabs cache access differs from verified F3 output"/>
+            <sha256 value="a51ae4e66171043a94486a68abdf47ac10dd750525e9441125c4fb0a818bcdff" origin="Deterministic Loom archive; all 30451 file hashes matched the previously verified local output and independent Linux CI output"/>
          </artifact>
          <artifact name="minecraft-merged-e6ef981b3c-26.2.pom">
             <sha256 value="f193476c280b5f1c70d25e99b2ddd9d33b435307cacb0ccf2b96fa5696bc915c" origin="Local Loom 1.17.21 output with creative tab cache access widener"/>

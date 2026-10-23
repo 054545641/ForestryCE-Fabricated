@@ -1,0 +1,56 @@
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.time.LocalDateTime
+import java.util.zip.CRC32
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
+
+// Loom's generated ZIP contains host-specific timestamps and entry ordering
+gradle.projectsEvaluated {
+    def repository = repositories.findByName('LoomLocalMinecraft')
+    if (repository == null || repository.url.scheme != 'file') {
+        throw new GradleException('Expected LoomLocalMinecraft to be a local file repository')
+    }
+    def artifact = new File(new File(repository.url),
+        'net/minecraft/minecraft-merged-e6ef981b3c/26.2/minecraft-merged-e6ef981b3c-26.2.jar')
+    if (!artifact.isFile()) return
+    def marker = 'forestry-loom-normalized-v2'
+    def temporary = null
+    try {
+        new ZipFile(artifact).withCloseable { source ->
+            if (source.comment == marker) return
+            def entries = source.entries().toList().findAll { !it.directory }.sort { it.name }
+            if (entries.any { it.name.startsWith('/') || it.name.contains('\\') || it.name.tokenize('/').contains('..') }) {
+                throw new GradleException('Invalid entry path in generated Minecraft JAR')
+            }
+            if (entries.collect { it.name }.toSet().size() != entries.size()) {
+                throw new GradleException('Duplicate entries in generated Minecraft JAR')
+            }
+            temporary = Files.createTempFile(artifact.parentFile.toPath(), '.forestry-loom-', '.tmp')
+            new ZipOutputStream(Files.newOutputStream(temporary)).withCloseable { output ->
+                output.setComment(marker)
+                entries.each { entry ->
+                    byte[] bytes = source.getInputStream(entry).withCloseable { it.bytes }
+                    def checksum = new CRC32()
+                    checksum.update(bytes)
+                    def normalized = new ZipEntry(entry.name)
+                    normalized.setTimeLocal(LocalDateTime.of(1980, 2, 1, 0, 0))
+                    normalized.setMethod(ZipEntry.STORED)
+                    normalized.setSize(bytes.length)
+                    normalized.setCompressedSize(bytes.length)
+                    normalized.setCrc(checksum.value)
+                    output.putNextEntry(normalized)
+                    output.write(bytes)
+                    output.closeEntry()
+                }
+            }
+        }
+        if (temporary != null) {
+            Files.move(temporary, artifact.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            logger.lifecycle('FORESTRY_LOOM_ARCHIVE_NORMALIZED')
+        }
+    } finally {
+        if (temporary != null) Files.deleteIfExists(temporary)
+    }
+}
