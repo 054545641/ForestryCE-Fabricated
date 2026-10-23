@@ -10,40 +10,64 @@ on:
 permissions:
   contents: read
 
+cache-mode: none
+
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-java@v5
+      - name: Verify cache policy
+        run: |
+          test "$ACTIONS_CACHE_MODE" = none
+          printf 'ACTIONS_CACHE_MODE=%s\n' "$ACTIONS_CACHE_MODE"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
           java-version: '25'
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6
+        with:
+          # avoid uploading downloaded third-party binaries to GitHub Actions caches
+          cache-disabled: true
       - name: Build four jars and verify isolation
-        run: bash gradlew build gametestClasses -PwithJade=false -PwithJei=false --console=plain
-      - uses: actions/upload-artifact@v4
-        if: always()
+        run: bash gradlew build gametestClasses stageFabricDistribution -PwithJade=false -PwithJei=false --console=plain
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: forestry-fabric-f3-build
+          path: build/fabric-26.2/distribution/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: forestry-fabric-f3-build-diagnostics
           path: |
-            build/fabric-26.2/libs/
             build/fabric-26.2/reports/
             build/fabric-26.2/generated/f3-resources/resource-report.json
   datagen:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-java@v5
+      - name: Verify cache policy
+        run: |
+          test "$ACTIONS_CACHE_MODE" = none
+          printf 'ACTIONS_CACHE_MODE=%s\n' "$ACTIONS_CACHE_MODE"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
           java-version: '25'
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6
+        with:
+          # avoid uploading downloaded third-party binaries to GitHub Actions caches
+          cache-disabled: true
       - name: Native Fabric datagen and deterministic resource diff
         run: bash gradlew checkFabricDatagen -PwithJade=false -PwithJei=false --console=plain
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: forestry-fabric-f3-datagen
@@ -56,15 +80,24 @@ jobs:
       matrix:
         modules: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-java@v5
+      - name: Verify cache policy
+        run: |
+          test "$ACTIONS_CACHE_MODE" = none
+          printf 'ACTIONS_CACHE_MODE=%s\n' "$ACTIONS_CACHE_MODE"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
           java-version: '25'
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6
+        with:
+          # avoid uploading downloaded third-party binaries to GitHub Actions caches
+          cache-disabled: true
       - name: Verify installed modules, registration, loot, recipes and component codecs
         run: bash gradlew runGameTest -PforestryModules=${{ matrix.modules }} -PwithJade=false -PwithJei=false --console=plain
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: forestry-fabric-f3-server-${{ matrix.modules }}
@@ -78,12 +111,21 @@ jobs:
       matrix:
         modules: [0, 7]
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-java@v5
+      - name: Verify cache policy
+        run: |
+          test "$ACTIONS_CACHE_MODE" = none
+          printf 'ACTIONS_CACHE_MODE=%s\n' "$ACTIONS_CACHE_MODE"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
           java-version: '25'
-      - uses: gradle/actions/setup-gradle@v6
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6
+        with:
+          # avoid uploading downloaded third-party binaries to GitHub Actions caches
+          cache-disabled: true
       - name: Apply repository owner's explicit EULA consent
         run: |
           mkdir -p run/fabric-26.2/server-${{ matrix.modules }}
@@ -94,7 +136,7 @@ jobs:
           bash gradlew runServer -PforestryModules=${{ matrix.modules }} -PserverAutoExit=true -PwithJade=false -PwithJei=false --console=plain | tee dedicated.log
           grep -q FORESTRY_F2_SERVER_READY dedicated.log
           grep -q 'All dimensions are saved' dedicated.log
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: forestry-fabric-f3-dedicated-${{ matrix.modules }}

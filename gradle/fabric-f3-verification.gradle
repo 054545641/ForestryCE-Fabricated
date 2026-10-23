@@ -23,6 +23,7 @@ tasks.register('checkFabricF3') {
             new java.util.zip.ZipFile(artifact).withCloseable { zip ->
                 def metadata = parser.parse(zip.getInputStream(zip.getEntry('fabric.mod.json')))
                 if (metadata.id != modId || metadata.version != project.version.toString()) throw new GradleException("Wrong metadata: ${artifact.name}")
+                if (metadata.jars) throw new GradleException("Bundled dependencies are not distributed: ${modId}")
                 if (metadata.entrypoints['forestry:module']?.size() != 1) throw new GradleException("Missing module entrypoint: ${modId}")
                 metadata.entrypoints.values().flatten().each { entry ->
                     if (zip.getEntry(entry.replace('.', '/') + '.class') == null) throw new GradleException("Missing entrypoint class: ${entry}")
@@ -41,7 +42,11 @@ tasks.register('checkFabricF3') {
                 if (metadata.depends.keySet().any { it in ['jade', 'jei', 'patchouli', 'kubejs', 'rhino', 'curios'] }) throw new GradleException("Optional tool became required: ${modId}")
                 zip.entries().each { entry ->
                     entryNames.add(entry.name)
-                    if (entry.name.endsWith('.jar') || entry.name.endsWith('neoforge.mods.toml') || entry.name.endsWith('accesstransformer.cfg') ||
+                    def normalizedName = entry.name.toLowerCase(java.util.Locale.ROOT)
+                    if (['mezz/jei/', 'snownee/jade/', 'assets/jei/', 'assets/jade/', 'data/jei/', 'data/jade/'].any { normalizedName.startsWith(it) }) {
+                        throw new GradleException("Third-party JEI/Jade content in ${modId}: ${entry.name}")
+                    }
+                    if (['.jar', '.zip', '.jar.disabled'].any { normalizedName.endsWith(it) } || entry.name.endsWith('neoforge.mods.toml') || entry.name.endsWith('accesstransformer.cfg') ||
                         entry.name.startsWith('forestry/fabric/test/') || entry.name.contains('/environment/') || entry.name.contains('/datagen/')) {
                         throw new GradleException("Forbidden JAR entry: ${modId}:${entry.name}")
                     }
@@ -100,3 +105,16 @@ tasks.register('checkFabricF3') {
 }
 tasks.named('check') { dependsOn 'checkFabricF3' }
 tasks.register('checkFabricF2') { dependsOn 'checkFabricF3' }
+
+tasks.register('stageFabricDistribution', Sync) {
+    group = 'distribution'
+    description = 'Stages only the four verified Forestry jars for upload.'
+    dependsOn 'checkFabricF3'
+    // remove stray files even when the four source jars have not changed
+    outputs.upToDateWhen { false }
+    into layout.buildDirectory.dir('distribution')
+    ['jar', 'butterfliesJar', 'farmsJar', 'mailJar'].each { taskName ->
+        from tasks.named(taskName, Jar).flatMap { it.archiveFile }
+    }
+    includeEmptyDirs = false
+}

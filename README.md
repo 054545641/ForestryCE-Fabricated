@@ -55,6 +55,11 @@ On Windows, run `scripts/setup-fabric.ps1`, then `gradlew-fabric.bat runClient`.
 With Java 25, `gradlew build` produces four independent JARs in `build/fabric-26.2/libs`.
 See the [Fabric development guide](docs/fabric-development.zh-CN.md) for more details.
 
+For distribution, run `gradlew stageFabricDistribution -PwithJade=false -PwithJei=false` and use only the four verified JARs
+in `build/fabric-26.2/distribution`. JEI and Jade are obtained separately from their official projects;
+their binaries and development caches are not part of this distribution.
+See the [dependency distribution audit and policy](docs/dependency-distribution.zh-CN.md).
+
 The version remains alpha: Patchouli/KubeJS/Rhino integration is temporarily closed, extra accessory slots are not ported,
 and cross-version/cross-loader world upgrades are not certified.
 
