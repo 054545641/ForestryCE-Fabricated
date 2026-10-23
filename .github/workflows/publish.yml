@@ -16,10 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/1.21.1' && startsWith(github.event.head_commit.message, '[Release]')
     steps:
-      - name: Verify cache policy
-        run: |
-          test "$ACTIONS_CACHE_MODE" = none
-          printf 'ACTIONS_CACHE_MODE=%s\n' "$ACTIONS_CACHE_MODE"
       - name: Checkout code
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:

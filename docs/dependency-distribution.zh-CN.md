@@ -52,8 +52,9 @@
   改为 `selected`，仅允许 checkout、setup-java、setup-gradle、upload-artifact 的四个已核实提交；
   `github_owned_allowed`、`verified_allowed` 均为 `false`，`sha_pinning_required` 保持 `true`。
   完整 SHA 固定在工作流中，升级 Action 时也需同步审核远端白名单。
-- 两个工作流均设置顶层 `cache-mode: none`，各 job 在下载依赖前检查 `ACTIONS_CACHE_MODE=none`，
-  同时保留 Gradle Action 的 `cache-disabled: true`。
+- 两个工作流均设置顶层 `cache-mode: none`，同时保留 Gradle Action 的 `cache-disabled: true`。
+  实际生效状态通过 job 初始化日志中的 `Cache mode: none` 和运行后的远端缓存列表复核；
+  不依赖普通 shell 是否暴露 `ACTIONS_CACHE_MODE` 环境变量。
   [GitHub 官方说明](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#cache-mode)
   确认该模式由缓存服务按令牌权限限制读写，不仅是构建工具的缓存偏好。
 - 构建使用普通 `pull_request` 事件、GitHub 托管 runner，不向 PR 构建提供发布密钥；
@@ -63,7 +64,8 @@
   上述防护不能约束管理员主动修改安全策略。这是剩余的权限管理风险，本次未改变仓库的直接提交流程。
 - 远端没有设置 `MINECRAFT_EULA_ACCEPTED`，普通专用服务器 job 按原条件跳过，不代替用户接受 EULA。
 
-远端配置证据保留于 `.local/distribution-audit/github-actions-policy-update.json`。
+远端配置证据保留于 `.local/distribution-audit/github-actions-policy-update.json` 和
+`github-actions-allowlist-final.json`；Gradle 白名单包含 `setup-gradle` 子路径。
 CI 验证应核对目标提交的全部 job、缓存模式日志及运行结束后的缓存列表；仅看工作流文件不足以确认实际执行结果。
 
 ## 本次验证
