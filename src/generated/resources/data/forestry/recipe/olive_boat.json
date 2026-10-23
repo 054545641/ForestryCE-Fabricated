@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "P": [
+      "forestry:olive_planks",
+      "forestry:olive_fireproof_planks"
+    ]
+  },
+  "pattern": [
+    "P P",
+    "PPP"
+  ],
+  "result": {
+    "id": "forestry:olive_boat"
+  }
+}

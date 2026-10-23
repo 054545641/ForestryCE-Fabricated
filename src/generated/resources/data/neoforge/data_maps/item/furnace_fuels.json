@@ -1,0 +1,28 @@
+{
+  "values": {
+    "forestry:bituminous_peat": {
+      "burn_time": 4200
+    },
+    "forestry:charcoal_block": {
+      "burn_time": 16000
+    },
+    "forestry:cork": {
+      "burn_time": 300
+    },
+    "forestry:decorative_log_pile": {
+      "burn_time": 1200
+    },
+    "forestry:log_pile": {
+      "burn_time": 1200
+    },
+    "forestry:peat": {
+      "burn_time": 2000
+    },
+    "forestry:plywood": {
+      "burn_time": 50
+    },
+    "forestry:plywood_block": {
+      "burn_time": 300
+    }
+  }
+}

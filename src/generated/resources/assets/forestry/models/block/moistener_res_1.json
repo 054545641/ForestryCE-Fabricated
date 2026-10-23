@@ -1,0 +1,9 @@
+{
+  "parent": "forestry:block/machines/base_machine",
+  "render_type": "cutout",
+  "textures": {
+    "base": "forestry:block/machines/moistener/base",
+    "particle": "forestry:block/machines/moistener/particles",
+    "resource_tank": "forestry:block/machines/moistener/tank_res_1"
+  }
+}

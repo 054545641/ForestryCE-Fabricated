@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "P": [
+      "forestry:ipe_planks",
+      "forestry:ipe_fireproof_planks"
+    ]
+  },
+  "pattern": [
+    "PP"
+  ],
+  "result": {
+    "id": "forestry:ipe_pressure_plate"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "forestry:fermenter",
+  "fermentationValue": 100,
+  "fluidResource": {
+    "amount": 1,
+    "id": "forestry:honey"
+  },
+  "id": "forestry:fermenter/potato_honey",
+  "modifier": 1.5,
+  "output": "forestry:biomass",
+  "resource": "#c:crops/potato"
+}

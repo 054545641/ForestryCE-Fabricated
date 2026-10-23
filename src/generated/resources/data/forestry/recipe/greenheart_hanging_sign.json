@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": [
+      "forestry:greenheart_stripped_log",
+      "forestry:greenheart_fireproof_stripped_log"
+    ],
+    "X": "minecraft:iron_chain"
+  },
+  "pattern": [
+    "X X",
+    "###",
+    "###"
+  ],
+  "result": {
+    "id": "forestry:greenheart_hanging_sign"
+  }
+}

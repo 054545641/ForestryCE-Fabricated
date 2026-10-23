@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "^": "forestry:refractory_wax",
+    "|": "#c:strings"
+  },
+  "pattern": [
+    " | ",
+    " ^ "
+  ],
+  "result": {
+    "id": "forestry:refractory_candle"
+  }
+}

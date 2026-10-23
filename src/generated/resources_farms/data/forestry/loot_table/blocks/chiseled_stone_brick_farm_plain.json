@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "forestry:chiseled_stone_brick_farm_plain"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "forestry:blocks/chiseled_stone_brick_farm_plain"
+}

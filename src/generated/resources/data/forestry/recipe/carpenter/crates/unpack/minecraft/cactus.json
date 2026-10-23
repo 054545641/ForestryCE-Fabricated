@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/cactus",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_cactus"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:cactus"
+    }
+  },
+  "time": 5
+}

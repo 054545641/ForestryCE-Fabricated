@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "minecraft:quartz_pillar",
+    "T": "#c:gears/tin"
+  },
+  "pattern": [
+    " # ",
+    "TTT"
+  ],
+  "result": {
+    "id": "forestry:quartz_pillar_farm_gearbox"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "P": [
+      "forestry:balsa_planks",
+      "forestry:balsa_fireproof_planks"
+    ],
+    "S": "#c:rods/wooden"
+  },
+  "pattern": [
+    "PPP",
+    "PPP",
+    " S "
+  ],
+  "result": {
+    "id": "forestry:balsa_sign"
+  }
+}

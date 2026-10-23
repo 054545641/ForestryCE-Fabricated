@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "forestrybutterflies",
+  "version": "${version}",
+  "name": "Forestry Butterflies — Fabric",
+  "description": "Optional butterflies, breeding and pollination module for Forestry Fabric 26.2.",
+  "environment": "*",
+  "mixins": [
+    "forestrybutterflies.mixins.json"
+  ],
+  "license": "LGPL-3.0-only",
+  "entrypoints": {
+    "jei_mod_plugin": ["forestry.lepidopterology.compat.LepidopterologyJeiPlugin"],
+    "forestry:client": ["forestry.lepidopterology.client.plugin.LepidopterologyClientRegistration"],
+    "forestry:module": [
+      "forestry.lepidopterology.ButterfliesFabricModule"
+    ],
+    "client": [
+      "forestry.lepidopterology.client.ButterfliesFabricClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "26.2",
+    "java": ">=25",
+    "forestry": "${version}"
+  }
+}

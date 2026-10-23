@@ -1,0 +1,23 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:fabricator/electron_tubes/lapis",
+  "molten": {
+    "amount": 500,
+    "id": "forestry:liquid_glass"
+  },
+  "recipe": {
+    "key": {
+      "#": "#c:dusts/redstone",
+      "X": "#c:gems/lapis"
+    },
+    "pattern": [
+      " X ",
+      "#X#",
+      "XXX"
+    ],
+    "result": {
+      "count": 4,
+      "id": "forestry:lapis_electron_tube"
+    }
+  }
+}

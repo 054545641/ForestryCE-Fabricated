@@ -1,0 +1,82 @@
+package forestry.agriculture.minifarm.gui;
+
+import forestry.core.platform.config.Constants;
+import forestry.core.platform.gui.GuiForestryTitled;
+import forestry.core.platform.gui.widgets.TankWidget;
+import forestry.agriculture.minifarm.gui.widgets.GhostItemStackWidget;
+import forestry.agriculture.minifarm.inventory.MinifarmInventory;
+import forestry.agriculture.minifarm.tiles.AbstractMinifarmBlockEntity;
+import forestry.agriculture.multifarm.gui.FarmLedger;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.List;
+
+public class MinifarmScreen extends GuiForestryTitled<MinifarmMenu> {
+	private final AbstractMinifarmBlockEntity tile;
+
+	public MinifarmScreen(MinifarmMenu container, Inventory playerInventory, Component title) {
+		super(Constants.TEXTURE_PATH_GUI + "/planter.png", container, playerInventory, title, 202, 192);
+		this.tile = container.getTile();
+
+		List<ItemStack> resourceStacks = this.tile.createResourceStacks();
+		List<ItemStack> germlingStacks = this.tile.createGermlingStacks();
+		List<ItemStack> productionStacks = this.tile.createProductionStacks();
+
+        this.widgetManager.add(new TankWidget(this.widgetManager, 178, 44, 0).setOverlayOrigin(this.imageWidth, 18));
+
+		// Resources
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
+				int index = j + i * 2;
+				if (resourceStacks.size() == 4) {
+                    this.widgetManager.add(new GhostItemStackWidget(this.widgetManager, 11 + j * 18, 65 + i * 18, resourceStacks.get(index), this.getMenu().getSlot(36 + MinifarmInventory.CONFIG.resourcesStart + index)));
+				}
+			}
+		}
+
+		// Germlings
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
+				int index = j + i * 2;
+				if (germlingStacks.size() == 4) {
+                    this.widgetManager.add(new GhostItemStackWidget(this.widgetManager, 71 + j * 18, 65 + i * 18, germlingStacks.get(index), this.getMenu().getSlot(36 + MinifarmInventory.CONFIG.germlingsStart + index)));
+				}
+			}
+		}
+
+		// Production
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
+				int index = j + i * 2;
+				if (productionStacks.size() == 4) {
+                    this.widgetManager.add(new GhostItemStackWidget(this.widgetManager, 131 + j * 18, 65 + i * 18, productionStacks.get(index), getMenu().getSlot(36 + MinifarmInventory.CONFIG.productionStart + j + i * 2)));
+				}
+			}
+		}
+
+        this.widgetManager.add(new GhostItemStackWidget(this.widgetManager, 83, 22, new net.minecraft.world.item.ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(forestry.api.ForestryConstants.forestry("fertilizer"))), getMenu().getSlot(36 + MinifarmInventory.CONFIG.fertilizerStart)));
+	}
+
+	@Override
+	protected void addLedgers() {
+		addErrorLedger(this.tile);
+		addClimateLedger(this.tile);
+        this.ledgerManager.add(new FarmLedger(this.ledgerManager, this.tile.getFarmLedgerDelegate()));
+		addOwnerLedger(this.tile);
+		addPowerLedger(this.tile.getEnergyManager());
+	}
+
+	@Override
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseY, int mouseX, float partialTicks) {
+		super.extractBackground(graphics, mouseY, mouseX, partialTicks);
+
+		// Fuel remaining
+		int fertilizerRemain = this.tile.getStoredFertilizerScaled(16);
+		if (fertilizerRemain > 0) {
+			graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.textureFile, this.leftPos + 101, this.topPos + 21 + 17 - fertilizerRemain, this.imageWidth, 17 - fertilizerRemain, 4, fertilizerRemain, 256, 256);
+		}
+	}
+}

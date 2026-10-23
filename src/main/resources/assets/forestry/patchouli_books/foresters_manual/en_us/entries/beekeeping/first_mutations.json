@@ -1,0 +1,20 @@
+{
+  "name": "for.gui.book.patchouli.entry.beekeeping.mutations",
+  "category": "forestry:beekeeping",
+  "icon": "forestry:queen_bee",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "for.gui.book.patchouli.entry.beekeeping.mutations1"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "for.gui.book.patchouli.entry.beekeeping.mutations2"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "for.gui.book.patchouli.entry.beekeeping.mutations3"
+    }
+  ],
+  "__COMMENT__": "TODO: Mutation visualization"
+}

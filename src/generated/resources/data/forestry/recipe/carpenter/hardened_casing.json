@@ -1,0 +1,23 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/hardened_casing",
+  "liquid": {
+    "amount": 5000,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "X": "#c:gems/diamond",
+      "Y": "forestry:sturdy_casing"
+    },
+    "pattern": [
+      "X X",
+      " Y ",
+      "X X"
+    ],
+    "result": {
+      "id": "forestry:hardened_casing"
+    }
+  },
+  "time": 75
+}

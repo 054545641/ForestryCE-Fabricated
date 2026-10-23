@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "#forestry:jumbo_candles",
+    "#c:dyes/gray"
+  ],
+  "result": {
+    "id": "forestry:jumbo_candle_gray"
+  }
+}

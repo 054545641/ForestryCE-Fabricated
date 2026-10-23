@@ -1,0 +1,55 @@
+def owners = ['main', 'butterflies', 'farms', 'mail']
+def destination = layout.buildDirectory.dir('generated/f3-resources')
+
+def prepareF3Resources = tasks.register('prepareF3Resources', JavaExec) {
+    group = 'fabric'
+    description = 'Generates native Fabric resources from the canonical content inputs.'
+    dependsOn tasks.named('resourceGeneratorClasses')
+    classpath = sourceSets.resourceGenerator.runtimeClasspath
+    mainClass = 'forestry.datagen.ForestryResourceGenerator'
+    args projectDir.absolutePath, destination.get().asFile.absolutePath
+    inputs.file('gradle/fabric-f3-content.json')
+    inputs.files(sourceSets.resourceGenerator.allSource)
+    owners.each { owner ->
+        inputs.dir("src/${owner}/resources")
+        inputs.dir(owner == 'main' ? 'src/generated/resources' : "src/generated/resources_${owner}")
+    }
+    outputs.dir(destination)
+}
+tasks.register('prepareF2Resources') { dependsOn prepareF3Resources }
+owners.each { owner ->
+    sourceSets[owner].resources.srcDir(destination.map { it.dir(owner) })
+    tasks.named(sourceSets[owner].processResourcesTaskName) { dependsOn prepareF3Resources }
+}
+
+tasks.register('generateF3ResourcesAgain', JavaExec) {
+    group = 'verification'
+    dependsOn tasks.named('resourceGeneratorClasses')
+    classpath = sourceSets.resourceGenerator.runtimeClasspath
+    mainClass = 'forestry.datagen.ForestryResourceGenerator'
+    args projectDir.absolutePath, layout.buildDirectory.dir('generated/f3-repeated').get().asFile.absolutePath
+}
+
+tasks.register('checkFabricDatagen') {
+    group = 'verification'
+    description = 'Compares native Fabric datagen, release preparation and an independent repeated generation byte-for-byte.'
+    dependsOn 'runDatagen', 'prepareF3Resources', 'generateF3ResourcesAgain'
+    doLast {
+        def snapshot = { File root ->
+            fileTree(root).matching { exclude '.cache/**' }.files.sort().collectEntries { input ->
+                [(root.toPath().relativize(input.toPath()).toString().replace('\\', '/')):
+                    java.security.MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString()]
+            }
+        }
+        def prepared = snapshot(destination.get().asFile)
+        def nativeOutput = snapshot(layout.buildDirectory.dir('datagen').get().asFile)
+        def repeated = snapshot(layout.buildDirectory.dir('generated/f3-repeated').get().asFile)
+        if (prepared.isEmpty() || prepared != nativeOutput || prepared != repeated) throw new GradleException('Fabric datagen is incomplete or nondeterministic')
+        def report = new groovy.json.JsonSlurper().parse(destination.get().file('resource-report.json').asFile)
+        if (report.values().any { !it.deferredRecipes.isEmpty() }) throw new GradleException('Full Fabric generation deferred recipes')
+        def evidence = layout.buildDirectory.file('reports/f3/datagen.json').get().asFile
+        evidence.parentFile.mkdirs()
+        evidence.setText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson([status: 'passed', files: prepared.size(), sha256: prepared])) + '\n', 'UTF-8')
+        logger.lifecycle("FORESTRY_F3_DATAGEN_VERIFIED files=${prepared.size()}")
+    }
+}

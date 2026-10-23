@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": "#c:rods/wooden",
+    "B": "#c:ingots/bronze"
+  },
+  "pattern": [
+    "  B",
+    " # ",
+    "#  "
+  ],
+  "result": {
+    "id": "forestry:grafter"
+  }
+}

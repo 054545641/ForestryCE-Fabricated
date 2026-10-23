@@ -1,0 +1,34 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+logs
+
+# gradle
+build
+.gradle
+/.local/
+
+# other
+eclipse
+run
+runs
+libs
+/.vscode
+
+**/src/generated/**/.cache/
+
+# Local planning and acceptance documents
+/docs/superpowers/
+/docs/g1-acceptance-runbook.zh-CN.md
+/docs/phase1-acceptance-audit.zh-CN.md

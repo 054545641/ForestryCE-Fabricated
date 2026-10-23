@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_sign_rot_0",
+  "textures": {
+    "all": "forestry:entity/signs/pine",
+    "particle": "forestry:block/pine_planks"
+  }
+}

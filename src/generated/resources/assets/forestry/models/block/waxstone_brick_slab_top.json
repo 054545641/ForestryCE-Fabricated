@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "forestry:block/waxstone_bricks",
+    "side": "forestry:block/waxstone_bricks",
+    "top": "forestry:block/waxstone_bricks"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "type": "forestry:fabricator_smelting",
+  "id": "forestry:fabricator/smelting/glass_pane",
+  "melting": 1000,
+  "product": {
+    "amount": 375,
+    "id": "forestry:liquid_glass"
+  },
+  "resource": "minecraft:glass_pane"
+}

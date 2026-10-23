@@ -1,0 +1,28 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": {
+      "min": 2.0,
+      "max": 5.0
+    }
+  },
+  "gives": {
+    "id": "forestry:larch_log",
+    "count": 1
+  },
+  "max_uses": 8.0,
+  "xp": 2.0,
+  "given_item_modifiers": [
+    {
+      "function": "forestry:random_wood",
+      "kind": "log"
+    },
+    {
+      "function": "minecraft:set_count",
+      "count": {
+        "min": 6.0,
+        "max": 18.0
+      }
+    }
+  ]
+}

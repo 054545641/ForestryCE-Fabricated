@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "planks",
+  "ingredients": [
+    "#forestry:fireproof_cocobolo_logs"
+  ],
+  "result": {
+    "count": 4,
+    "id": "forestry:cocobolo_fireproof_planks"
+  }
+}

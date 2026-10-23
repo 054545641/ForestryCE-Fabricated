@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:blasting",
+  "experience": 0.5,
+  "ingredient": [
+    "forestry:tin_ore",
+    "forestry:deepslate_tin_ore",
+    "forestry:raw_tin"
+  ],
+  "result": {
+    "id": "forestry:tin_ingot"
+  }
+}

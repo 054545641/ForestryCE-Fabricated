@@ -1,0 +1,70 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "entries": [
+        {
+          "type": "minecraft:tag",
+          "expand": true,
+          "functions": [
+            {
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 4.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "forestry:village_combs"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "forestry:scoop",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "name": "forestry:bee_smoker"
+        }
+      ],
+      "name": "forestry_apiculture_items",
+      "rolls": 4.0
+    },
+    {
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "forestry:set_species_nbt",
+              "species_id": "forestry:common",
+              "type_id": "forestry:bee_species"
+            }
+          ],
+          "name": "forestry:drone_bee",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "forestry:set_species_nbt",
+              "species_id": "forestry:meadows",
+              "type_id": "forestry:bee_species"
+            }
+          ],
+          "name": "forestry:drone_bee",
+          "weight": 6
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 3
+        }
+      ],
+      "name": "forestry_apiculture_bees",
+      "rolls": 3.0
+    }
+  ],
+  "random_sequence": "forestry:chests/village_naturalist/apiculture"
+}

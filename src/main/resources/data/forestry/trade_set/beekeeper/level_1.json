@@ -1,0 +1,5 @@
+{
+  "amount": 2.0,
+  "random_sequence": "forestry:trade_set/beekeeper/level_1",
+  "trades": "#forestry:beekeeper/level_1"
+}

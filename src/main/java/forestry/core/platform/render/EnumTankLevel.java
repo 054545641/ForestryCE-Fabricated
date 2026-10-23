@@ -1,0 +1,40 @@
+package forestry.core.platform.render;
+
+import forestry.core.platform.fluids.StandardTank;
+
+public enum EnumTankLevel {
+	EMPTY(0),
+	LOW(25),
+	MEDIUM(50),
+	HIGH(75),
+	MAXIMUM(100);
+
+	private final int level;
+
+	EnumTankLevel(int level) {
+		this.level = level;
+	}
+
+	public int getLevelScaled(int scale) {
+		return this.level * scale / 100;
+	}
+
+	public static EnumTankLevel rateTankLevel(StandardTank tank) {
+		return rateTankLevel(tank.getCapacity() == 0 ? 0 : (int) (100.0 * tank.getFluidAmount() / tank.getCapacity()));
+	}
+
+	public static EnumTankLevel rateTankLevel(int scaled) {
+
+		if (scaled < 5) {
+			return EMPTY;
+		} else if (scaled < 30) {
+			return LOW;
+		} else if (scaled < 60) {
+			return MEDIUM;
+		} else if (scaled < 90) {
+			return HIGH;
+		} else {
+			return MAXIMUM;
+		}
+	}
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_hanging_sign_rot_0",
+  "textures": {
+    "all": "forestry:entity/signs/hanging/ebony",
+    "particle": "forestry:block/stripped_ebony_log"
+  }
+}

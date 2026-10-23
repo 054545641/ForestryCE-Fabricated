@@ -1,0 +1,24 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:fabricator/fireproof/stripped_wood/jungle",
+  "molten": {
+    "amount": 500,
+    "id": "forestry:liquid_glass"
+  },
+  "recipe": {
+    "category": "building",
+    "key": {
+      "#": "forestry:refractory_wax",
+      "X": "minecraft:stripped_jungle_wood"
+    },
+    "pattern": [
+      "   ",
+      "X#X",
+      "   "
+    ],
+    "result": {
+      "count": 2,
+      "id": "forestry:jungle_fireproof_stripped_wood"
+    }
+  }
+}

@@ -1,0 +1,81 @@
+package forestry.core.content.machines.recipes.jei.squeezer;
+
+import forestry.api.ForestryConstants;
+import forestry.api.core.machines.ISqueezerRecipe;
+import forestry.core.content.machines.blocks.BlockTypeFactoryPlain;
+import forestry.core.content.machines.features.FactoryBlocks;
+import forestry.core.platform.config.Constants;
+import forestry.core.platform.recipes.jei.ChanceTooltipCallback;
+import forestry.core.platform.recipes.jei.ForestryRecipeCategory;
+import forestry.core.platform.recipes.jei.ForestryRecipeType;
+import forestry.core.platform.util.JeiUtil;
+import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableAnimated;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
+import mezz.jei.api.gui.ingredient.ICraftingGridHelper;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.types.IRecipeType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import forestry.api.core.fluids.FluidVolume;
+
+import java.util.List;
+
+public class SqueezerRecipeCategory extends ForestryRecipeCategory<ISqueezerRecipe> {
+	private static final Identifier TEXTURE = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/squeezersocket.png");
+
+	private final IDrawableAnimated arrow;
+	private final IDrawable tankOverlay;
+	private final IDrawable icon;
+	private final ICraftingGridHelper craftingGridHelper;
+
+	public SqueezerRecipeCategory(IGuiHelper guiHelper) {
+		super(guiHelper.createDrawable(TEXTURE, 9, 16, 158, 62), "block.forestry.squeezer");
+
+		IDrawableStatic arrowDrawable = guiHelper.createDrawable(TEXTURE, 176, 60, 43, 18);
+		this.arrow = guiHelper.createAnimatedDrawable(arrowDrawable, 200, IDrawableAnimated.StartDirection.LEFT, false);
+		this.tankOverlay = guiHelper.createDrawable(TEXTURE, 176, 0, 16, 58);
+		ItemStack squeezer = new ItemStack(FactoryBlocks.PLAIN.get(BlockTypeFactoryPlain.SQUEEZER).block());
+		this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, squeezer);
+		this.craftingGridHelper = guiHelper.createCraftingGridHelper();
+	}
+
+	@Override
+	public IRecipeType<ISqueezerRecipe> getRecipeType() {
+		return ForestryRecipeType.SQUEEZER;
+	}
+
+	@Override
+	public IDrawable getIcon() {
+		return this.icon;
+	}
+
+	@Override
+	public void setRecipe(IRecipeLayoutBuilder builder, ISqueezerRecipe recipe, IFocusGroup focuses) {
+		List<IRecipeSlotBuilder> craftingSlots = JeiUtil.layoutSlotGrid(builder, RecipeIngredientRole.INPUT, 3, 3, 8, 5, 18);
+		JeiUtil.setCraftingItems(craftingSlots, recipe.getInputs(), 3, 3, this.craftingGridHelper);
+
+		builder.addSlot(RecipeIngredientRole.OUTPUT, 88, 44)
+			.addRichTooltipCallback(new ChanceTooltipCallback(recipe.getRemnantsChance()))
+			.addItemStack(recipe.getRemnants());
+
+		FluidVolume displayFluid = recipe.getFluidOutput().createFluidVolume();
+		builder.addSlot(RecipeIngredientRole.OUTPUT, 113, 2)
+			.setFluidRenderer(forestry.api.core.fluids.FluidUnits.fromMilliBuckets(10000), false, 16, 58)
+			.setOverlay(this.tankOverlay, 0, 0)
+			.add(displayFluid.getFluid(), displayFluid.getAmount(), displayFluid.variant().getComponentsPatch());
+	}
+
+	@Override
+	public void draw(ISqueezerRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+		super.draw(recipe, recipeSlotsView, graphics, mouseX, mouseY);
+		this.arrow.draw(graphics, 67, 25);
+	}
+}

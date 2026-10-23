@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "_": "forestry:honeystone_slab"
+  },
+  "pattern": [
+    "_",
+    "_"
+  ],
+  "result": {
+    "id": "forestry:chiseled_honeystone"
+  }
+}

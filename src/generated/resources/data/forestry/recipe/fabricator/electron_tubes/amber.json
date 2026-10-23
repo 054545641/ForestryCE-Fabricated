@@ -1,0 +1,23 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:fabricator/electron_tubes/amber",
+  "molten": {
+    "amount": 500,
+    "id": "forestry:liquid_glass"
+  },
+  "recipe": {
+    "key": {
+      "#": "#c:dusts/redstone",
+      "X": "#c:gems/amber"
+    },
+    "pattern": [
+      " X ",
+      "#X#",
+      "XXX"
+    ],
+    "result": {
+      "count": 2,
+      "id": "forestry:amber_electron_tube"
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "conditions": [
+        {
+          "condition": "minecraft:inverted",
+          "term": {
+            "block": "forestry:ash_block",
+            "condition": "minecraft:block_state_property",
+            "properties": {
+              "amount": "0"
+            }
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "forestry:ash"
+        }
+      ],
+      "functions": [
+        {
+          "count": {
+            "type": "minecraft:binomial",
+            "n": 2.0,
+            "p": 0.33333334
+          },
+          "function": "minecraft:set_count"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "conditions": [
+        {
+          "condition": "minecraft:inverted",
+          "term": {
+            "block": "forestry:ash_block",
+            "condition": "minecraft:block_state_property",
+            "properties": {
+              "amount": "0"
+            }
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:charcoal"
+        }
+      ],
+      "functions": [
+        {
+          "function": "forestry:count_from_block"
+        },
+        {
+          "enchantment": "minecraft:fortune",
+          "formula": "minecraft:binomial_with_bonus_count",
+          "function": "minecraft:apply_bonus",
+          "parameters": {
+            "extra": 2,
+            "probability": 0.575
+          }
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "conditions": [
+        {
+          "condition": "minecraft:match_tool",
+          "predicate": {
+            "predicates": {
+              "minecraft:enchantments": [
+                {
+                  "enchantments": "minecraft:silk_touch",
+                  "levels": {
+                    "min": 1
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "forestry:ash_block"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "forestry:blocks/ash_block"
+}

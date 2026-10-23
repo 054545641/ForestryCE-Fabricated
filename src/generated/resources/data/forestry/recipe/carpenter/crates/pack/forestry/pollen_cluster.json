@@ -1,0 +1,23 @@
+{
+  "type": "forestry:carpenter",
+  "box": "forestry:crate",
+  "id": "forestry:carpenter/crates/pack/forestry/pollen_cluster",
+  "liquid": {
+    "amount": 100,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "#": "forestry:pollen_cluster"
+    },
+    "pattern": [
+      "###",
+      "###",
+      "###"
+    ],
+    "result": {
+      "id": "forestry:crated_pollen_cluster_normal"
+    }
+  },
+  "time": 5
+}

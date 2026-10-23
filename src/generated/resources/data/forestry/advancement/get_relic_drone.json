@@ -1,0 +1,167 @@
+{
+  "parent": "forestry:get_analyser",
+  "criteria": {
+    "forestry:get_relic_drone": {
+      "conditions": {
+        "tag": "forestry:chronofuge"
+      },
+      "trigger": "forestry:pickup_species_trigger"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_relic_drone.description"
+    },
+    "icon": {
+      "components": {
+        "forestry:bee_generation": 0,
+        "forestry:bee_pristine": true,
+        "forestry:genome": {
+          "genome": {
+            "forestry:activity": {
+              "active": {
+                "dominant": true,
+                "value": "forestry:activity_diurnal"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "forestry:activity_diurnal"
+              }
+            },
+            "forestry:bee_effect": {
+              "active": {
+                "value": "forestry:bee_effect_rejuvenation"
+              },
+              "inactive": {
+                "value": "forestry:bee_effect_rejuvenation"
+              }
+            },
+            "forestry:bee_species": {
+              "active": {
+                "value": "forestry:chronofuge"
+              },
+              "inactive": {
+                "value": "forestry:chronofuge"
+              }
+            },
+            "forestry:cave_dwelling": {
+              "active": {
+                "dominant": true,
+                "value": false
+              },
+              "inactive": {
+                "dominant": true,
+                "value": false
+              }
+            },
+            "forestry:fertility": {
+              "active": {
+                "dominant": true,
+                "value": 1
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 1
+              }
+            },
+            "forestry:flower_type": {
+              "active": {
+                "dominant": true,
+                "value": "forestry:flower_type_ancient"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "forestry:flower_type_ancient"
+              }
+            },
+            "forestry:humidity_tolerance": {
+              "active": {
+                "value": "NONE"
+              },
+              "inactive": {
+                "value": "NONE"
+              }
+            },
+            "forestry:lifespan": {
+              "active": {
+                "value": 2147483647
+              },
+              "inactive": {
+                "value": 2147483647
+              }
+            },
+            "forestry:pollination": {
+              "active": {
+                "dominant": true,
+                "value": 5
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 5
+              }
+            },
+            "forestry:speed": {
+              "active": {
+                "dominant": true,
+                "value": 0.3
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 0.3
+              }
+            },
+            "forestry:temperature_tolerance": {
+              "active": {
+                "dominant": true,
+                "value": "DOWN_1"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "DOWN_1"
+              }
+            },
+            "forestry:territory": {
+              "active": {
+                "value": [
+                  9,
+                  6,
+                  9
+                ]
+              },
+              "inactive": {
+                "value": [
+                  9,
+                  6,
+                  9
+                ]
+              }
+            },
+            "forestry:tolerates_rain": {
+              "active": {
+                "dominant": true,
+                "value": false
+              },
+              "inactive": {
+                "dominant": true,
+                "value": false
+              }
+            }
+          },
+          "karyotype": "forestry:bee_species"
+        },
+        "forestry:health": 2147483647,
+        "forestry:max_health": 2147483647
+      },
+      "id": "forestry:drone_bee"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_relic_drone.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_relic_drone"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

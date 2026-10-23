@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/cobblestone",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_cobblestone"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:cobblestone"
+    }
+  },
+  "time": 5
+}

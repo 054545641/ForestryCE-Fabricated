@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:root",
+  "criteria": {
+    "forestry:get_cans": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:can"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_cans.description"
+    },
+    "icon": {
+      "id": "forestry:can"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_cans.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_cans"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

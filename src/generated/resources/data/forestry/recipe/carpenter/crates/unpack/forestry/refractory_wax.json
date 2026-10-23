@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/refractory_wax",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_refractory_wax"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:refractory_wax"
+    }
+  },
+  "time": 5
+}

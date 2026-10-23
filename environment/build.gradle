@@ -1,0 +1,213 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev'
+}
+
+version = '0.0.0-environment-only'
+base.archivesName = 'forestry-environment-26.2'
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+neoForge {
+    version = project.forgeVersion
+    accessTransformers = files(rootProject.file('src/main/resources/META-INF/accesstransformer.cfg'))
+    validateAccessTransformers = true
+    mods {
+        forestry_environment { sourceSet sourceSets.main }
+    }
+    runs {
+        configureEach {
+            gameDirectory = rootProject.layout.projectDirectory.dir('run/26.2/environment/' + name)
+        }
+        client {
+            client()
+            systemProperty 'forestry.environment.n5Models', providers.gradleProperty('environmentN5Models').orElse('false').get()
+            systemProperty 'forestry.environment.mailAssets', providers.gradleProperty('environmentMailAssets').orElse('false').get()
+            systemProperty 'forestry.environment.autoExit', providers.gradleProperty('environmentAutoExit').orElse('false').get()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        data {
+            clientData()
+            systemProperty 'forestry.environment.mailAssetRoot', rootProject.projectDir.absolutePath
+            programArguments.addAll '--mod', 'forestry_environment', '--all', '--output', file('build/generated').absolutePath
+        }
+        gameTestServer { type = 'gameTestServer' }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+tasks.named('compileJava', JavaCompile) {
+    source rootProject.file('src/main/java/forestry/apiculture/worldgen/TemplatePoolInsertion.java')
+    source rootProject.file('src/main/java/forestry/core/content/backpacks/BackpackTransfers.java')
+    source rootProject.file('src/main/java/forestry/core/content/backpacks/BackpackMode.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/StandardStackFilters.java')
+    source rootProject.file('src/main/java/forestry/apiculture/apiarist/ItemSmoker.java')
+    source rootProject.file('src/main/java/forestry/api/apiculture/hives/IHiveTile.java')
+    source rootProject.file('src/main/java/forestry/core/platform/render/ParticleRender.java')
+    source rootProject.file('src/main/java/forestry/core/platform/config/ForestryConfig.java')
+    source rootProject.file('src/main/java/forestry/arboriculture/leaves/BlockExtendedLeaves.java')
+    source rootProject.file('src/main/java/forestry/core/platform/tile/DropAwareBlockEntity.java')
+    source rootProject.file('src/main/java/forestry/core/content/lighting/BlockWaterloggableTorch.java')
+    source rootProject.file('src/main/java/forestry/core/content/lighting/BlockWaterloggableWallTorch.java')
+    source rootProject.file('src/main/java/forestry/core/content/decorative/BlockBigCandle.java')
+    source rootProject.file('src/main/java/forestry/core/content/decorative/BlockJumboCandle.java')
+    source rootProject.file('src/main/java/forestry/core/content/decorative/BlockTypeBigCandle.java')
+    source rootProject.file('src/main/java/forestry/core/content/decorative/BlockTypeJumboCandle.java')
+    source rootProject.file('src/main/java/forestry/core/content/decorative/BlockPlywoodBlock.java')
+    source rootProject.file('src/main/java/forestry/core/content/decorative/BlockBurnable.java')
+    source rootProject.file('src/main/java/forestry/core/content/decorative/CorkBlock.java')
+    source rootProject.file('src/main/java/forestry/apiculture/bees/BlockWax.java')
+    source rootProject.file('src/main/java/forestry/api/ForestryTags.java')
+    source rootProject.file('src/main/java/forestry/api/core/IBlockSubtype.java')
+    source rootProject.file('src/main/java/forestry/core/platform/item/ItemForestry.java')
+    source rootProject.file('src/main/java/forestry/core/platform/item/ItemBlockForestry.java')
+    source rootProject.file('src/main/java/forestry/core/platform/block/IBlockTooltip.java')
+    source rootProject.file('src/main/java/forestry/core/platform/util/ItemTooltipUtil.java')
+    source rootProject.file('src/main/java/forestry/core/platform/util/Translator.java')
+    source rootProject.file('src/main/java/forestry/core/platform/util/EntityUtil.java')
+    source rootProject.file('src/main/java/forestry/apiculture/bees/genetics/effects/BeeEffectEntities.java')
+    source rootProject.file('src/main/java/forestry/core/platform/loot/ConditionLootModifier.java')
+    source rootProject.file('src/main/java/forestry/core/platform/loot/LootPoolInjection.java')
+    source rootProject.file('src/butterflies/java/forestry/lepidopterology/render/ButterflyModel.java')
+    source rootProject.file('src/butterflies/java/forestry/lepidopterology/render/ButterflyRenderState.java')
+    source rootProject.file('src/main/java/forestry/arboriculture/entities/ForestryBoat.java')
+    source rootProject.file('src/main/java/forestry/arboriculture/entities/ForestryChestBoat.java')
+    source rootProject.file('src/main/java/forestry/arboriculture/client/ForestryBoatRenderer.java')
+    source rootProject.file('src/main/java/forestry/arboriculture/client/ForestryBoatRenderState.java')
+    source rootProject.file('src/main/java/forestry/arboriculture/client/SignEditorTexture.java')
+    source rootProject.file('src/main/java/forestry/core/platform/gui/FilterSearchField.java')
+    source rootProject.file('src/main/java/forestry/core/platform/entities/SmokeEmitterParticle.java')
+    source rootProject.file('src/main/java/forestry/core/platform/entities/ParticleIgnition.java')
+    source rootProject.file('src/main/java/forestry/core/platform/entities/ParticleSmoke.java')
+    source rootProject.file('src/main/java/forestry/arboriculture/client/BoatRenderGeometry.java')
+    source rootProject.file('src/main/java/forestry/core/platform/render/MachineGeometry.java')
+    source rootProject.file('src/main/java/forestry/core/platform/render/EngineGeometry.java')
+    source rootProject.file('src/main/java/forestry/core/platform/render/MillGeometry.java')
+    source rootProject.file('src/main/java/forestry/core/platform/render/NaturalistChestGeometry.java')
+    source rootProject.file('src/main/java/forestry/core/platform/render/MachineSpecialRenderer.java')
+    source rootProject.file('src/main/java/forestry/core/platform/render/ForestryModelLayers.java')
+    source rootProject.file('src/main/java/forestry/core/platform/render/DisplayItemRenderState.java')
+    source rootProject.file('src/main/java/forestry/core/platform/util/ResourceUtil.java')
+    source rootProject.file('src/main/java/forestry/core/platform/models/ModelTransforms.java')
+    source rootProject.file('src/main/java/forestry/core/platform/models/ForestryItemTintSource.java')
+    source rootProject.file('src/main/java/forestry/core/platform/models/FlatItemGeometry.java')
+    source rootProject.file('src/main/java/forestry/core/platform/models/FluidContainerModel.java')
+    source rootProject.file('src/main/java/forestry/core/platform/models/ModelBlockDefault.java')
+    source rootProject.file('src/main/java/forestry/core/platform/models/ModelBlockCached.java')
+    source rootProject.file('src/main/java/forestry/core/platform/models/baker/ModelBaker.java')
+    source rootProject.file('src/main/java/forestry/core/platform/models/baker/ModelBakerFace.java')
+    source rootProject.file('src/main/java/forestry/core/platform/models/baker/ModelBakerModel.java')
+    source rootProject.file('src/main/java/forestry/core/content/backpacks/client/FilledCrateModel.java')
+    source rootProject.file('src/main/java/forestry/api/ForestryConstants.java')
+    source rootProject.file('src/main/java/forestry/api/client/ForestrySprites.java')
+    source rootProject.file('src/main/java/forestry/core/platform/render/ForestrySpriteUploader.java')
+    source rootProject.file('src/mail/java/forestry/mail/data/MailItemDefinitionProvider.java')
+    source rootProject.file('src/mail/java/forestry/mail/client/StampTintSource.java')
+    source rootProject.file('src/main/java/forestry/core/platform/item/ITintedItem.java')
+    source rootProject.file('src/main/java/forestry/api/mail/IPostalState.java')
+    source rootProject.file('src/main/java/forestry/api/mail/IPostOffice.java')
+    source rootProject.file('src/mail/java/forestry/mail/letters/EnumDeliveryState.java')
+    source rootProject.file('src/mail/java/forestry/mail/postoffice/PostalTransactions.java')
+    source rootProject.file('src/mail/java/forestry/mail/postoffice/PostageLedger.java')
+    source rootProject.file('src/mail/java/forestry/mail/postoffice/PostalRegistryJournal.java')
+    source rootProject.file('src/mail/java/forestry/mail/postoffice/MailDeliveryHandler.java')
+    source rootProject.file('src/mail/java/forestry/mail/carriers/trading/TradePayment.java')
+    source rootProject.file('src/main/java/forestry/core/content/sorting/inventory/ItemHandlerFilter.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/InventoryTransferHandler.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/InventoryTransferView.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/InventoryAdapter.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/InventoryAdapterRestricted.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/InventoryAdapterTile.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/wrappers/InvWrapperBase.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/wrappers/InventoryMapper.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/ItemHandlerInventoryManipulator.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/InvIterator.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/InvSlot.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/IInvSlot.java')
+    source rootProject.file('src/main/java/forestry/core/platform/util/InventoryUtil.java')
+    source rootProject.file('src/main/java/forestry/core/platform/util/InventoryCrafting.java')
+    source rootProject.file('src/main/java/forestry/api/core/IInventoryAdapter.java')
+    source rootProject.file('src/main/java/forestry/api/core/IFilterSlotDelegate.java')
+    source rootProject.file('src/main/java/forestry/core/engine/circuits/ISocketable.java')
+    source rootProject.file('src/main/java/forestry/core/content/machines/recipes/BottlerRecipe.java')
+    source rootProject.file('src/main/java/forestry/core/platform/inventory/InventoryPlain.java')
+    source rootProject.file('src/main/java/forestry/core/platform/fluids/StandardTank.java')
+    source rootProject.file('src/main/java/forestry/core/platform/fluids/TankManager.java')
+    source rootProject.file('src/main/java/forestry/core/platform/fluids/ITankManager.java')
+    source rootProject.file('src/main/java/forestry/core/platform/fluids/ITankUpdateHandler.java')
+    source rootProject.file('src/main/java/forestry/core/platform/fluids/FluidHelper.java')
+    source rootProject.file('src/main/java/forestry/core/platform/fluids/DrainOnlyFluidHandlerWrapper.java')
+    source rootProject.file('src/main/java/forestry/api/core/ITransactionalContainer.java')
+    source rootProject.file('src/main/java/forestry/api/core/tooltips/ToolTip.java')
+    source rootProject.file('src/main/java/forestry/api/core/tooltips/TextCollection.java')
+    source rootProject.file('src/main/java/forestry/api/core/tooltips/TextCompound.java')
+    source rootProject.file('src/main/java/forestry/api/core/tooltips/ITextInstance.java')
+    source rootProject.file('src/main/java/forestry/core/content/energy/ForestryEnergyStorage.java')
+    source rootProject.file('src/main/java/forestry/core/content/energy/EnergyTransferMode.java')
+    source rootProject.file('src/main/java/forestry/core/platform/network/IStreamable.java')
+    source rootProject.file('src/main/java/forestry/api/core/INbtReadable.java')
+    source rootProject.file('src/main/java/forestry/api/core/INbtWritable.java')
+    source rootProject.file('src/main/java/forestry/core/platform/util/InventoryData.java')
+    source rootProject.file('src/main/java/forestry/core/platform/item/FluidHandlerItemForestry.java')
+    source rootProject.file('src/main/java/forestry/core/platform/item/FluidContainerType.java')
+    source rootProject.file('src/main/java/forestry/api/core/IItemSubtype.java')
+    source rootProject.file('src/main/java/forestry/api/core/IFeatureSubtype.java')
+    source rootProject.file('src/main/java/forestry/core/platform/util/SavedDataMigration.java')
+    source rootProject.file('src/main/java/forestry/core/content/machines/recipes/RecipeSerializers.java')
+}
+
+// Resource-only client probe: no production module is excluded from the real build.
+if (providers.gradleProperty('environmentMailAssets').orElse('false').get().toBoolean()) {
+    tasks.named('processResources') {
+        from(rootProject.file('src/mail/resources')) { include 'assets/forestry/models/**', 'assets/forestry/textures/**' }
+        from(rootProject.file('src/generated/resources_mail')) { include 'assets/forestry/models/**', 'assets/forestry/items/**' }
+        from(rootProject.file('src/generated/resources')) { include 'assets/forestry/atlases/gui.json' }
+        from(rootProject.file('src/main/resources')) {
+            include 'assets/minecraft/atlases/gui.json', 'assets/forestry/textures/forestry/atlas/gui/**'
+        }
+    }
+}
+
+if (providers.gradleProperty('environmentN5Models').orElse('false').get().toBoolean()) {
+    tasks.named('processResources') {
+        from(file('src/n5ModelResources'))
+        from(rootProject.file('src/generated/resources')) {
+            include 'assets/forestry/items/*_boat.json', 'assets/forestry/items/*_sign.json'
+            include 'assets/forestry/models/item/*_boat.json', 'assets/forestry/models/item/*_sign.json'
+            include 'assets/forestry/models/block/*sign*.json'
+            include 'assets/minecraft/atlases/blocks.json'
+        }
+        from(rootProject.file('src/generated/resources')) {
+            include 'assets/forestry/blockstates/*_sign.json'
+            eachFile { details -> details.path = details.path.replace('assets/forestry/blockstates/', 'assets/forestry_environment/blockstates/') }
+        }
+        from(rootProject.file('src/main/resources')) {
+            include 'assets/forestry/models/block/template_legacy_*sign*.json', 'assets/minecraft/atlases/blocks.json'
+            include 'assets/forestry/textures/gui/signs/**', 'assets/forestry/textures/gui/hanging_signs/**'
+            include 'assets/forestry/textures/entity/boat/**', 'assets/forestry/textures/entity/chest_boat/**', 'assets/forestry/textures/entity/signs/**'
+            include 'assets/forestry/textures/item/*_boat.png', 'assets/forestry/textures/item/*_sign.png'
+            include 'assets/forestry/textures/item/*_sapling.png'
+            include 'assets/forestry/textures/block/*_planks.png', 'assets/forestry/textures/block/stripped_*_log.png'
+        }
+        def machines = ['peat_engine','biogas_engine','clockwork_engine','combustion_engine','solar_engine','rainmaker','apiarists_chest','arborists_chest','lepidopterists_chest']
+        from(rootProject.file('src/generated/resources')) {
+            machines.each { include "assets/forestry/items/" + it + ".json" }
+        }
+        from(rootProject.file('src/main/resources')) {
+            machines.each { include "assets/forestry/models/item/" + it + ".json" }
+            include 'assets/forestry/textures/block/engine_*', 'assets/forestry/textures/block/rainmaker*'
+            include 'assets/forestry/textures/block/*chest.png', 'assets/forestry/textures/block/*_chest.0.png'
+        }
+        from(rootProject.file('src/generated/resources')) {
+            include 'assets/forestry/items/can.json', 'assets/forestry/items/wax_capsule.json', 'assets/forestry/items/refractory_capsule.json'
+            include 'assets/forestry/items/crated_grass_block.json', 'assets/forestry/items/crated_apatite.json'
+            include 'assets/forestry/models/item/filled_crate.json', 'assets/forestry/models/item/crated_grass_block.json', 'assets/forestry/models/item/crated_apatite.json'
+        }
+        from(rootProject.file('src/main/resources')) {
+            include 'assets/forestry/textures/item/filled_crate.png', 'assets/forestry/textures/item/apatite.png', 'assets/forestry/textures/item/liquids/**'
+        }
+    }
+}

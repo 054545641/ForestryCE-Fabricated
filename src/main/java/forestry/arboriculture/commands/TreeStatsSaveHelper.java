@@ -1,0 +1,39 @@
+package forestry.arboriculture.commands;
+
+import com.mojang.authlib.GameProfile;
+import forestry.api.core.genetics.IBreedingTracker;
+import forestry.api.core.genetics.ISpecies;
+import forestry.core.platform.commands.IStatsSaveHelper;
+import forestry.core.platform.util.SpeciesUtil;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
+
+import java.util.Collection;
+import java.util.List;
+
+public class TreeStatsSaveHelper implements IStatsSaveHelper {
+	@Override
+	public String getTranslationKey() {
+		return "for.chat.command.forestry.tree.save.stats";
+	}
+
+	@Override
+	public void addExtraInfo(Collection<Component> statistics, IBreedingTracker breedingTracker) {
+	}
+
+	@Override
+	public List<? extends ISpecies<?>> getSpecies() {
+		return SpeciesUtil.getAllTreeSpecies();
+	}
+
+	@Override
+	public String getFileSuffix() {
+		return "trees";
+	}
+
+	@Override
+	public IBreedingTracker getBreedingTracker(Level world, GameProfile gameProfile) {
+		return SpeciesUtil.TREE_TYPE.get().getBreedingTracker(world, gameProfile);
+	}
+
+}

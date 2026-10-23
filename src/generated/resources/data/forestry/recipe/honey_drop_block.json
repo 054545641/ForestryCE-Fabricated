@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "V": "forestry:honey_drop"
+  },
+  "pattern": [
+    "VVV",
+    "V V",
+    "VVV"
+  ],
+  "result": {
+    "id": "minecraft:honey_block"
+  }
+}

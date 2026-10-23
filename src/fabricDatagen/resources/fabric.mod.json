@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "forestry_datagen",
+  "version": "1.0.0",
+  "name": "Forestry development resource generator",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-datagen": ["forestry.datagen.ForestryFabricDatagen"]
+  },
+  "depends": {
+    "forestry": "*",
+    "fabric-data-generation-api-v1": "*"
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "parent": "forestry:get_forestry_sapling",
+  "criteria": {
+    "get_cherry": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:cherry"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_chestnut": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:chestnut"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_coconut": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:coconut"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_date": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:date"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_feijoa": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:feijoa"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_lemon": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:lemon"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_olive": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:olive"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_orange": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:orange"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_papaya": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:papaya"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_pear": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:pear"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_plum": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:plum"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_walnut": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:walnut"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_all_fruits.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "id": "minecraft:apple"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_all_fruits.title"
+    }
+  },
+  "requirements": [
+    [
+      "get_cherry"
+    ],
+    [
+      "get_walnut"
+    ],
+    [
+      "get_chestnut"
+    ],
+    [
+      "get_lemon"
+    ],
+    [
+      "get_plum"
+    ],
+    [
+      "get_date"
+    ],
+    [
+      "get_papaya"
+    ],
+    [
+      "get_pear"
+    ],
+    [
+      "get_orange"
+    ],
+    [
+      "get_coconut"
+    ],
+    [
+      "get_olive"
+    ],
+    [
+      "get_feijoa"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

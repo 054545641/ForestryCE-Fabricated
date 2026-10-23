@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_fertiliser",
+  "criteria": {
+    "forestry:get_biomass": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:bucket_biomass"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_biomass.description"
+    },
+    "icon": {
+      "id": "forestry:bucket_biomass"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_biomass.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_biomass"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

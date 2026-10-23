@@ -1,0 +1,10 @@
+{
+  "type": "forestry:fabricator_smelting",
+  "id": "forestry:fabricator/smelting/wax",
+  "melting": 200,
+  "product": {
+    "amount": 100,
+    "id": "forestry:wax"
+  },
+  "resource": "forestry:beeswax"
+}

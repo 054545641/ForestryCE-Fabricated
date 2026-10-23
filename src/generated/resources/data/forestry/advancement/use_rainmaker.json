@@ -1,0 +1,25 @@
+{
+  "parent": "forestry:get_bronze",
+  "criteria": {
+    "forestry:use_rainmaker": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.use_rainmaker.description"
+    },
+    "icon": {
+      "id": "forestry:rainmaker"
+    },
+    "title": {
+      "translate": "advancements.forestry.use_rainmaker.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:use_rainmaker"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

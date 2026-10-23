@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/red_sand",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_red_sand"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:red_sand"
+    }
+  },
+  "time": 5
+}

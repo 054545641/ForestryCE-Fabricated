@@ -1,0 +1,26 @@
+{
+  "values": [
+    "forestry:metal_plating_gold",
+    "forestry:metal_plating_iron",
+    "forestry:metal_plating_copper",
+    "forestry:metal_plating_tin",
+    "forestry:metal_plating_bronze",
+    "forestry:metal_plating_netherite",
+    "forestry:metal_plating_white",
+    "forestry:metal_plating_light_gray",
+    "forestry:metal_plating_gray",
+    "forestry:metal_plating_black",
+    "forestry:metal_plating_brown",
+    "forestry:metal_plating_red",
+    "forestry:metal_plating_orange",
+    "forestry:metal_plating_yellow",
+    "forestry:metal_plating_lime",
+    "forestry:metal_plating_green",
+    "forestry:metal_plating_cyan",
+    "forestry:metal_plating_blue",
+    "forestry:metal_plating_light_blue",
+    "forestry:metal_plating_purple",
+    "forestry:metal_plating_magenta",
+    "forestry:metal_plating_pink"
+  ]
+}

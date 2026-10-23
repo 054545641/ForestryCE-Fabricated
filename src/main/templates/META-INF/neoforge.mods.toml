@@ -1,0 +1,43 @@
+issueTrackerURL = "https://github.com/thedarkcolour/ForestryCE/issues"
+
+license = "GNU Lesser Public License v3"
+
+[[mods]]
+modId = "forestry"
+version = "${version}"
+displayName = "Forestry"
+displayURL = "https://github.com/thedarkcolour/ForestryCE"
+bannerFile = "forestry-ce-logo-banner.png"
+credits = "mistaqur, Binnie, CovertJaguar, MysteriousAges, Nirek, Temp1011, ramidzkh, EnderiumSmith, Spearkiller"
+authors = "thedarkcolour, SirSengir, mezz, Nedelosk"
+description ='''
+Trees, bees and more.
+'''
+
+[[dependencies.forestry]]
+modId = "neoforge"
+type = "REQUIRED"
+versionRange = "${forgeVersionRange}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.forestry]]
+modId = "jei"
+type = "OPTIONAL"
+versionRange = "${jeiVersionRange}"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.forestry]]
+modId = "curios"
+type = "OPTIONAL"
+versionRange = "${curiosVersionRange}"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.forestry]]
+modId = "minecraft"
+type = "REQUIRED"
+versionRange = "${minecraftVersionRange}"
+ordering = "NONE"
+side = "BOTH"

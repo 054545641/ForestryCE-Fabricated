@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "planks",
+  "ingredients": [
+    "#forestry:chestnut_logs"
+  ],
+  "result": {
+    "count": 4,
+    "id": "forestry:chestnut_planks"
+  }
+}

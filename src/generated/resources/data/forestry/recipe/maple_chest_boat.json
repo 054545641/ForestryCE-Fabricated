@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "forestry:maple_boat",
+    "#c:chests/wooden"
+  ],
+  "result": {
+    "id": "forestry:maple_chest_boat"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/stamp_1n",
+  "liquid": {
+    "amount": 300,
+    "id": "forestry:seed_oil"
+  },
+  "recipe": {
+    "key": {
+      "#": "#c:gems/apatite",
+      "P": "minecraft:paper"
+    },
+    "pattern": [
+      "###",
+      "PPP"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:stamp_1n"
+    }
+  },
+  "time": 5
+}

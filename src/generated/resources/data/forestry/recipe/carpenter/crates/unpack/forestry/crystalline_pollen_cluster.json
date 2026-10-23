@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/crystalline_pollen_cluster",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_pollen_cluster_crystalline"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:crystalline_pollen_cluster"
+    }
+  },
+  "time": 5
+}

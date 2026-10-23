@@ -1,0 +1,15 @@
+{
+  "type": "forestry:squeezer",
+  "chance": 0.0,
+  "id": "forestry:squeezer/magmatic_drop",
+  "output": {
+    "stack": {
+      "amount": 100,
+      "id": "forestry:honey"
+    }
+  },
+  "resources": [
+    "forestry:magmatic_drop"
+  ],
+  "time": 10
+}

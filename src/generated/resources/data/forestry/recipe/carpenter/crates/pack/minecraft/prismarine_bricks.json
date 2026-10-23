@@ -1,0 +1,23 @@
+{
+  "type": "forestry:carpenter",
+  "box": "forestry:crate",
+  "id": "forestry:carpenter/crates/pack/minecraft/prismarine_bricks",
+  "liquid": {
+    "amount": 100,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "#": "minecraft:prismarine_bricks"
+    },
+    "pattern": [
+      "###",
+      "###",
+      "###"
+    ],
+    "result": {
+      "id": "forestry:crated_prismarine_bricks"
+    }
+  },
+  "time": 5
+}

@@ -1,0 +1,18 @@
+{
+  "type": "forestry:squeezer",
+  "chance": 0.02,
+  "id": "forestry:squeezer/sponge_comb",
+  "output": {
+    "stack": {
+      "amount": 100,
+      "id": "forestry:honey"
+    }
+  },
+  "remnant": {
+    "id": "minecraft:sponge"
+  },
+  "resources": [
+    "forestry:spongy_comb"
+  ],
+  "time": 10
+}

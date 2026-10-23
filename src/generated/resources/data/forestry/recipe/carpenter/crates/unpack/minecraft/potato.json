@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/potato",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_potato"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:potato"
+    }
+  },
+  "time": 5
+}

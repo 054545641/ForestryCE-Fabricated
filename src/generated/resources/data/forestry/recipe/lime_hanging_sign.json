@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": [
+      "forestry:lime_stripped_log",
+      "forestry:lime_fireproof_stripped_log"
+    ],
+    "X": "minecraft:iron_chain"
+  },
+  "pattern": [
+    "X X",
+    "###",
+    "###"
+  ],
+  "result": {
+    "id": "forestry:lime_hanging_sign"
+  }
+}

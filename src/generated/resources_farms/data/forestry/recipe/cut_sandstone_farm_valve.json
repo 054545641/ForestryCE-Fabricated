@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "minecraft:cut_sandstone",
+    "T": "#c:gears/tin",
+    "X": "#c:glass_blocks/colorless"
+  },
+  "pattern": [
+    " # ",
+    "XTX"
+  ],
+  "result": {
+    "id": "forestry:cut_sandstone_farm_valve"
+  }
+}

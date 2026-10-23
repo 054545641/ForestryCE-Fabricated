@@ -1,0 +1,24 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:fabricator/fireproof/planks/pewen",
+  "molten": {
+    "amount": 500,
+    "id": "forestry:liquid_glass"
+  },
+  "recipe": {
+    "category": "building",
+    "key": {
+      "#": "forestry:refractory_wax",
+      "X": "forestry:pewen_planks"
+    },
+    "pattern": [
+      "XXX",
+      "X#X",
+      "XXX"
+    ],
+    "result": {
+      "count": 8,
+      "id": "forestry:pewen_fireproof_planks"
+    }
+  }
+}

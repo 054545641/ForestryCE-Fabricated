@@ -1,0 +1,127 @@
+{
+  "parent": "forestry:get_forestry_sapling",
+  "criteria": {
+    "forestry:get_baobab_sapling": {
+      "conditions": {
+        "tag": "forestry:baobab"
+      },
+      "trigger": "forestry:pickup_species_trigger"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_baobab_sapling.description"
+    },
+    "icon": {
+      "components": {
+        "forestry:genome": {
+          "genome": {
+            "forestry:fireproof": {
+              "active": {
+                "dominant": true,
+                "value": false
+              },
+              "inactive": {
+                "dominant": true,
+                "value": false
+              }
+            },
+            "forestry:fruits": {
+              "active": {
+                "value": "forestry:fruit_none"
+              },
+              "inactive": {
+                "value": "forestry:fruit_none"
+              }
+            },
+            "forestry:girth": {
+              "active": {
+                "value": 3
+              },
+              "inactive": {
+                "value": 3
+              }
+            },
+            "forestry:height": {
+              "active": {
+                "value": 1.25
+              },
+              "inactive": {
+                "value": 1.25
+              }
+            },
+            "forestry:maturation": {
+              "active": {
+                "dominant": true,
+                "value": 5
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 5
+              }
+            },
+            "forestry:saplings": {
+              "active": {
+                "dominant": true,
+                "value": 0.025
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 0.025
+              }
+            },
+            "forestry:sappiness": {
+              "active": {
+                "dominant": true,
+                "value": 0.2
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 0.2
+              }
+            },
+            "forestry:tree_effect": {
+              "active": {
+                "value": "forestry:tree_effect_none"
+              },
+              "inactive": {
+                "value": "forestry:tree_effect_none"
+              }
+            },
+            "forestry:tree_species": {
+              "active": {
+                "dominant": true,
+                "value": "forestry:baobab"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "forestry:baobab"
+              }
+            },
+            "forestry:yield": {
+              "active": {
+                "dominant": true,
+                "value": 0.025
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 0.025
+              }
+            }
+          },
+          "karyotype": "forestry:tree_species"
+        }
+      },
+      "id": "forestry:tree_sapling"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_baobab_sapling.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_baobab_sapling"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

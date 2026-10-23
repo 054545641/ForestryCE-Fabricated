@@ -1,0 +1,160 @@
+package forestry.arboriculture.trees.genetics;
+
+import com.google.common.collect.ImmutableList;
+import com.mojang.authlib.GameProfile;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import forestry.api.arboriculture.ITreeSpecies;
+import forestry.api.arboriculture.genetics.IFruit;
+import forestry.api.arboriculture.genetics.ITree;
+import forestry.api.arboriculture.genetics.ITreeEffect;
+import forestry.api.arboriculture.genetics.ITreeSpeciesType;
+import forestry.api.core.IProduct;
+import forestry.api.core.genetics.IEffectData;
+import forestry.api.core.genetics.IGenome;
+import forestry.api.core.genetics.alleles.AllelePair;
+import forestry.api.core.genetics.alleles.TreeChromosomes;
+import forestry.core.engine.genetics.Individual;
+import forestry.core.engine.genetics.mutations.Mutation;
+import forestry.core.platform.util.SpeciesUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class Tree extends Individual<ITreeSpecies, ITree, ITreeSpeciesType> implements ITree {
+	public static final Codec<Tree> CODEC = RecordCodecBuilder.create(instance -> {
+		Codec<IGenome> genomeCodec = SpeciesUtil.TREE_TYPE.get().getKaryotype().getGenomeCodec();
+
+		return Individual.fields(instance, genomeCodec).apply(instance, Tree::new);
+	});
+
+	public Tree(IGenome genome) {
+		super(genome);
+	}
+
+	private Tree(IGenome genome, Optional<IGenome> mate, boolean analyzed) {
+		super(genome, mate, analyzed);
+	}
+
+	/* EFFECTS */
+	@Override
+	public IEffectData[] doEffect(IEffectData[] storedData, Level level, BlockPos pos) {
+		ITreeEffect effect = this.genome.resolveActive(TreeChromosomes.EFFECT);
+
+		storedData[0] = doEffect(effect, storedData[0], level, pos);
+
+		// Return here if the primary can already not be combined
+		if (!effect.isCombinable()) {
+			return storedData;
+		}
+
+		ITreeEffect secondary = this.genome.resolveInactive(TreeChromosomes.EFFECT);
+		if (!secondary.isCombinable()) {
+			return storedData;
+		}
+
+		storedData[1] = doEffect(secondary, storedData[1], level, pos);
+
+		return storedData;
+	}
+
+	private IEffectData doEffect(ITreeEffect effect, IEffectData storedData, Level world, BlockPos pos) {
+		storedData = effect.validateStorage(storedData);
+		return effect.doEffect(getGenome(), storedData, world, pos);
+	}
+
+	@Override
+	public IEffectData[] doFX(IEffectData[] storedData, Level level, BlockPos pos) {
+		return storedData;
+	}
+
+	/* GROWTH */
+	@Override
+	public Feature<NoneFeatureConfiguration> getTreeGenerator(WorldGenLevel level, BlockPos pos, boolean wasBonemealed) {
+		return getSpecies().getGenerator().getTreeFeature(getSpecies());
+	}
+
+	@Override
+	public boolean canStay(BlockGetter level, BlockPos pos) {
+		BlockPos below = pos.below();
+		BlockState state = level.getBlockState(below);
+		return canPlantTreeOn(state);
+	}
+
+	public static boolean canPlantTreeOn(BlockState state) {
+		// Since 26.2, grass, moss and other planting soils are no longer all in DIRT.
+		return state.is(BlockTags.SUPPORTS_VEGETATION);
+	}
+
+	@Override
+	public int getRequiredMaturity() {
+		return this.genome.getActiveValue(TreeChromosomes.MATURATION);
+	}
+
+	@Override
+	public int getResilience() {
+		int base = (int) (getGenome().getActiveValue(TreeChromosomes.SAPLINGS) * getGenome().getActiveValue(TreeChromosomes.SAPPINESS) * 100);
+		return (Math.max(base, 1)) * 10;
+	}
+
+	/* REPRODUCTION */
+	@Override
+	public List<ITree> getSaplings(Level level, BlockPos pos, @Nullable GameProfile playerProfile, float modifier) {
+		List<ITree> prod = new ArrayList<>();
+
+		float chance = this.genome.getActiveValue(TreeChromosomes.SAPLINGS) * modifier;
+
+		if (level.getRandom().nextFloat() <= chance) {
+			if (this.mate == null) {
+				prod.add(copy());
+			} else {
+				SpeciesUtil.ISpeciesMutator mutator = (p1, p2) -> mutateSpecies(level, playerProfile, pos, p1, p2);
+				prod.add(SpeciesUtil.createOffspring(level.getRandom(), this.genome, this.mate, mutator, Tree::new));
+			}
+		}
+
+		return prod;
+	}
+
+	@Nullable
+	private static ImmutableList<AllelePair<?>> mutateSpecies(Level treeLevel, @Nullable GameProfile profile, BlockPos treePos, IGenome parent1, IGenome parent2) {
+		return SpeciesUtil.mutateSpecies(treeLevel, treePos, profile, parent1, parent2, TreeChromosomes.SPECIES, Mutation::getChance);
+	}
+
+	/* PRODUCTION */
+	@Override
+	public boolean hasFruitLeaves() {
+		IFruit fruit = this.genome.resolveActive(TreeChromosomes.FRUIT);
+		return fruit.isFruitLeaf();
+	}
+
+	@Override
+	public List<IProduct> getProducts() {
+		IFruit fruit = this.genome.resolveActive(TreeChromosomes.FRUIT);
+		return fruit.getProducts();
+	}
+
+	@Override
+	public List<IProduct> getSpecialties() {
+		IFruit fruit = this.genome.resolveActive(TreeChromosomes.FRUIT);
+		return fruit.getSpecialty();
+	}
+
+	@Override
+	public List<ItemStack> produceStacks(Level level, BlockPos pos, int ripeningTime) {
+		IFruit fruit = this.genome.resolveActive(TreeChromosomes.FRUIT);
+		return fruit.getFruits(this.genome, level, ripeningTime);
+	}
+}

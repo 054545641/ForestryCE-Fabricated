@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:gift",
+  "pools": [
+    {
+      "entries": [
+        {
+          "type": "minecraft:tag",
+          "expand": true,
+          "functions": [
+            {
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 4.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "forestry:forestry_fruits"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "forestry:proven_grafter",
+          "weight": 4
+        }
+      ],
+      "name": "forestry_arborist_gift",
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "forestry:gameplay/hero_of_the_village/arborist_gift"
+}

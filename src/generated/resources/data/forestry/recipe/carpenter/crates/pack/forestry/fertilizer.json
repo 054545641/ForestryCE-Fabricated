@@ -1,0 +1,23 @@
+{
+  "type": "forestry:carpenter",
+  "box": "forestry:crate",
+  "id": "forestry:carpenter/crates/pack/forestry/fertilizer",
+  "liquid": {
+    "amount": 100,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "#": "forestry:fertilizer"
+    },
+    "pattern": [
+      "###",
+      "###",
+      "###"
+    ],
+    "result": {
+      "id": "forestry:crated_fertilizer_compound"
+    }
+  },
+  "time": 5
+}

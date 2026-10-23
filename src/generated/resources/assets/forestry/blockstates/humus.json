@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "degrade=0": {
+      "model": "forestry:block/humus"
+    },
+    "degrade=1": {
+      "model": "forestry:block/humus_1"
+    },
+    "degrade=2": {
+      "model": "forestry:block/humus_2"
+    }
+  }
+}

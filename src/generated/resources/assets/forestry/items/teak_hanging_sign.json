@@ -1,0 +1,28 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "forestry:item/teak_hanging_sign",
+    "tints": [
+      {
+        "type": "forestry:item",
+        "tint_index": 0
+      },
+      {
+        "type": "forestry:item",
+        "tint_index": 1
+      },
+      {
+        "type": "forestry:item",
+        "tint_index": 2
+      },
+      {
+        "type": "forestry:item",
+        "tint_index": 3
+      },
+      {
+        "type": "forestry:item",
+        "tint_index": 4
+      }
+    ]
+  }
+}

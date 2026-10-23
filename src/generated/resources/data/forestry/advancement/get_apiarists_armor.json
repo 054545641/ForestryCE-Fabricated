@@ -1,0 +1,72 @@
+{
+  "parent": "forestry:get_smoker",
+  "criteria": {
+    "has_apiarist_boots": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:apiarists_shoes"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_apiarist_chestplate": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:apiarists_shirt"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_apiarist_helmet": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:apiarists_hat"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_apiarist_leggings": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:apiarists_pants"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_apiarists_armor.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "id": "forestry:apiarists_hat"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_apiarists_armor.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_apiarist_helmet"
+    ],
+    [
+      "has_apiarist_chestplate"
+    ],
+    [
+      "has_apiarist_leggings"
+    ],
+    [
+      "has_apiarist_boots"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

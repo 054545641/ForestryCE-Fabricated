@@ -1,0 +1,23 @@
+{
+  "type": "forestry:carpenter",
+  "box": "forestry:crate",
+  "id": "forestry:carpenter/crates/pack/forestry/mysterious_comb",
+  "liquid": {
+    "amount": 100,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "#": "forestry:mysterious_comb"
+    },
+    "pattern": [
+      "###",
+      "###",
+      "###"
+    ],
+    "result": {
+      "id": "forestry:crated_mysterious_comb"
+    }
+  },
+  "time": 5
+}

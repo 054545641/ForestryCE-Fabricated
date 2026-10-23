@@ -1,0 +1,10 @@
+license="GNU Lesser Public License v3"
+[[mods]]
+modId="forestrylifecycletest"
+version="0.0.0-test"
+displayName="Forestry Lifecycle Tests"
+[[dependencies.forestrylifecycletest]]
+modId="forestry"
+type="required"
+versionRange="[0,)"
+ordering="AFTER"

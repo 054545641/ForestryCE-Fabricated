@@ -1,0 +1,19 @@
+{
+  "type": "forestry:smelter",
+  "id": "forestry:smelter/bronze_from_ingots",
+  "inputs": [
+    {
+      "count": 3,
+      "ingredient": "#c:ingots/copper"
+    },
+    {
+      "count": 1,
+      "ingredient": "#c:ingots/tin"
+    }
+  ],
+  "output": {
+    "count": 4,
+    "ingredient": "#c:ingots/bronze"
+  },
+  "processingTime": 40
+}

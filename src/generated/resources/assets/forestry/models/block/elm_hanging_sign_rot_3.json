@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_hanging_sign_rot_3",
+  "textures": {
+    "all": "forestry:entity/signs/hanging/elm",
+    "particle": "forestry:block/stripped_elm_log"
+  }
+}

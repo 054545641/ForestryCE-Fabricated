@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "#c:glass_blocks/colorless",
+    "X": "#c:ingots/tin",
+    "Y": "forestry:sturdy_casing"
+  },
+  "pattern": [
+    "X#X",
+    "XYX",
+    "X#X"
+  ],
+  "result": {
+    "id": "forestry:squeezer"
+  }
+}

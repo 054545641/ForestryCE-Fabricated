@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "minecraft:dirt",
+    "X": {
+      "neoforge:ingredient_type": "forestry:fluid_container",
+      "fluid": {
+        "amount": 1000,
+        "id": "minecraft:water"
+      },
+      "item": "forestry:wax_capsule"
+    },
+    "Y": "#minecraft:sand"
+  },
+  "pattern": [
+    "#Y#",
+    "YXY",
+    "#Y#"
+  ],
+  "result": {
+    "count": 8,
+    "id": "forestry:bog_earth"
+  }
+}

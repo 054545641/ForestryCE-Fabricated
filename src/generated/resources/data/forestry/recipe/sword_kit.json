@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "forestry:survivalists_sword",
+    "forestry:carton"
+  ],
+  "result": {
+    "id": "forestry:sword_kit"
+  }
+}

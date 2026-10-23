@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_scoop",
+  "criteria": {
+    "forestry:get_smoker": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:bee_smoker"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_smoker.description"
+    },
+    "icon": {
+      "id": "forestry:bee_smoker"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_smoker.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_smoker"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

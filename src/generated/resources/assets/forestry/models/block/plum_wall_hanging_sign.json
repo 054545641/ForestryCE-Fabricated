@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_wall_hanging_sign",
+  "textures": {
+    "all": "forestry:entity/signs/hanging/plum",
+    "particle": "forestry:block/stripped_plum_log"
+  }
+}

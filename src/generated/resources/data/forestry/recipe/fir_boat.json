@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "P": [
+      "forestry:fir_planks",
+      "forestry:fir_fireproof_planks"
+    ]
+  },
+  "pattern": [
+    "P P",
+    "PPP"
+  ],
+  "result": {
+    "id": "forestry:fir_boat"
+  }
+}

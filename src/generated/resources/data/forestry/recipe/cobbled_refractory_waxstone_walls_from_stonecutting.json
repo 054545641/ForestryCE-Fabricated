@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "forestry:cobbled_refractory_waxstone",
+  "result": {
+    "id": "forestry:cobbled_refractory_waxstone_wall"
+  }
+}

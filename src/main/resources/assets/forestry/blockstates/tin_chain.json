@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "forestry:block/tin_chain",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "forestry:block/tin_chain"
+    },
+    "axis=z": {
+      "model": "forestry:block/tin_chain",
+      "x": 90
+    }
+  }
+}

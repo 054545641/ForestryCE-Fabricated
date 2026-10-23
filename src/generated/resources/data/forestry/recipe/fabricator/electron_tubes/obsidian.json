@@ -1,0 +1,23 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:fabricator/electron_tubes/obsidian",
+  "molten": {
+    "amount": 500,
+    "id": "forestry:liquid_glass"
+  },
+  "recipe": {
+    "key": {
+      "#": "#c:dusts/redstone",
+      "X": "minecraft:obsidian"
+    },
+    "pattern": [
+      " X ",
+      "#X#",
+      "XXX"
+    ],
+    "result": {
+      "count": 4,
+      "id": "forestry:obsidian_electron_tube"
+    }
+  }
+}

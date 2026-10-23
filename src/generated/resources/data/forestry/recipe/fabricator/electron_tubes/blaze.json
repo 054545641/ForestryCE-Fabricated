@@ -1,0 +1,23 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:fabricator/electron_tubes/blaze",
+  "molten": {
+    "amount": 500,
+    "id": "forestry:liquid_glass"
+  },
+  "recipe": {
+    "key": {
+      "#": "#c:dusts/redstone",
+      "X": "minecraft:blaze_powder"
+    },
+    "pattern": [
+      " X ",
+      "#X#",
+      "XXX"
+    ],
+    "result": {
+      "count": 4,
+      "id": "forestry:blazing_electron_tube"
+    }
+  }
+}

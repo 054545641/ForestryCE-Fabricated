@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/diorite",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_diorite"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:diorite"
+    }
+  },
+  "time": 5
+}

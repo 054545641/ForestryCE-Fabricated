@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:item/generated",
+  "gui_light": "front",
+  "textures": {
+    "base": "forestry:item/liquids/refractory.bottle",
+    "fluid": "forestry:item/liquids/refractory.contents",
+    "layer0": "forestry:item/liquids/refractory.bottle"
+  }
+}

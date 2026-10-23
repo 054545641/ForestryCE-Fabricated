@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/prismarine",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_prismarine"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:prismarine"
+    }
+  },
+  "time": 5
+}

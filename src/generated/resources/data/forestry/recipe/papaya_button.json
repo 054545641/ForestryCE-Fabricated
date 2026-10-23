@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    [
+      "forestry:papaya_planks",
+      "forestry:papaya_fireproof_planks"
+    ]
+  ],
+  "result": {
+    "id": "forestry:papaya_button"
+  }
+}

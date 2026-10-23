@@ -1,0 +1,18 @@
+{
+  "type": "forestry:squeezer",
+  "chance": 0.02,
+  "id": "forestry:squeezer/fruit/chestnut",
+  "output": {
+    "stack": {
+      "amount": 80,
+      "id": "forestry:seed_oil"
+    }
+  },
+  "remnant": {
+    "id": "forestry:mulch"
+  },
+  "resources": [
+    "#c:fruits/chestnut"
+  ],
+  "time": 70
+}

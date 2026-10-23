@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": [
+      "forestry:padauk_stripped_log",
+      "forestry:padauk_fireproof_stripped_log"
+    ],
+    "X": "minecraft:iron_chain"
+  },
+  "pattern": [
+    "X X",
+    "###",
+    "###"
+  ],
+  "result": {
+    "id": "forestry:padauk_hanging_sign"
+  }
+}

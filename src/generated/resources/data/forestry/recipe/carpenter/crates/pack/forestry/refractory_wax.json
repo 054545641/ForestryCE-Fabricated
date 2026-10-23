@@ -1,0 +1,23 @@
+{
+  "type": "forestry:carpenter",
+  "box": "forestry:crate",
+  "id": "forestry:carpenter/crates/pack/forestry/refractory_wax",
+  "liquid": {
+    "amount": 100,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "#": "forestry:refractory_wax"
+    },
+    "pattern": [
+      "###",
+      "###",
+      "###"
+    ],
+    "result": {
+      "id": "forestry:crated_refractory_wax"
+    }
+  },
+  "time": 5
+}

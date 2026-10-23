@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "forestry:block/honeystone",
+    "side": "forestry:block/honeystone",
+    "top": "forestry:block/honeystone"
+  }
+}

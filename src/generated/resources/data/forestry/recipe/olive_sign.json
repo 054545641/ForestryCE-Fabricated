@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "P": [
+      "forestry:olive_planks",
+      "forestry:olive_fireproof_planks"
+    ],
+    "S": "#c:rods/wooden"
+  },
+  "pattern": [
+    "PPP",
+    "PPP",
+    " S "
+  ],
+  "result": {
+    "id": "forestry:olive_sign"
+  }
+}

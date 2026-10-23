@@ -1,0 +1,20 @@
+// compile the production dependency resolver without requiring unfinished Minecraft ports
+def moduleTestClasses = layout.buildDirectory.dir('classes/moduleTest')
+def compileModuleLoadOrderTest = tasks.register('compileModuleLoadOrderTest', JavaCompile) {
+	source 'src/main/java/forestry/modules/ModuleLoadOrder.java', 'src/moduleTest/java'
+	classpath = files()
+	destinationDirectory = moduleTestClasses
+	javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }
+	options.encoding = 'UTF-8'
+}
+
+tasks.register('testModuleLoadOrder', JavaExec) {
+	group = 'verification'
+	description = 'Tests production Forestry module dependency ordering and rejection of invalid graphs.'
+	dependsOn compileModuleLoadOrderTest
+	classpath = files(moduleTestClasses)
+	mainClass = 'forestry.modules.ModuleLoadOrderTest'
+	javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+}
+
+tasks.named('check') { dependsOn 'testModuleLoadOrder' }

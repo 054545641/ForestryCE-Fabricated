@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "planks",
+  "ingredients": [
+    "#forestry:fireproof_giant_sequoia_logs"
+  ],
+  "result": {
+    "count": 4,
+    "id": "forestry:giant_sequoia_fireproof_planks"
+  }
+}

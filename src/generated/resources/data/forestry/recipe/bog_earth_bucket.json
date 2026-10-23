@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "minecraft:dirt",
+    "X": "minecraft:water_bucket",
+    "Y": "#minecraft:sand"
+  },
+  "pattern": [
+    "#Y#",
+    "YXY",
+    "#Y#"
+  ],
+  "result": {
+    "count": 6,
+    "id": "forestry:bog_earth"
+  }
+}

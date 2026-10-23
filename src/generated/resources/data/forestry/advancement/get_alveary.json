@@ -1,0 +1,25 @@
+{
+  "parent": "forestry:get_apiary",
+  "criteria": {
+    "forestry:get_alveary": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_alveary.description"
+    },
+    "icon": {
+      "id": "forestry:alveary_block"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_alveary.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_alveary"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

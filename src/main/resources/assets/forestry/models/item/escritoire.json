@@ -1,0 +1,6 @@
+{
+  "parent": "forestry:block/escritoire",
+  "textures": {
+    "particle": "forestry:block/escritoire.0"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "forestry:parched_comb_block"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "forestry:blocks/parched_comb_block"
+}

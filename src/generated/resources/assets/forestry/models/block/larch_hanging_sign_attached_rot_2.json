@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_attached_hanging_sign_rot_2",
+  "textures": {
+    "all": "forestry:entity/signs/hanging/larch",
+    "particle": "forestry:block/stripped_larch_log"
+  }
+}

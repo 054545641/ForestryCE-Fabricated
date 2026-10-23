@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "P": [
+      "forestry:larch_planks",
+      "forestry:larch_fireproof_planks"
+    ]
+  },
+  "pattern": [
+    "PP"
+  ],
+  "result": {
+    "id": "forestry:larch_pressure_plate"
+  }
+}

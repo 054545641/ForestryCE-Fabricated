@@ -1,0 +1,36 @@
+{
+  "parent": "forestry:get_apiary",
+  "criteria": {
+    "forestry:get_frames": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "forestry:untreated_frame",
+              "forestry:impregnated_frame",
+              "forestry:proven_frame"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_frames.description"
+    },
+    "icon": {
+      "id": "forestry:untreated_frame"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_frames.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_frames"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

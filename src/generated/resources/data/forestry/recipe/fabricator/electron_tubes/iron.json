@@ -1,0 +1,23 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:fabricator/electron_tubes/iron",
+  "molten": {
+    "amount": 500,
+    "id": "forestry:liquid_glass"
+  },
+  "recipe": {
+    "key": {
+      "#": "#c:dusts/redstone",
+      "X": "#c:ingots/iron"
+    },
+    "pattern": [
+      " X ",
+      "#X#",
+      "XXX"
+    ],
+    "result": {
+      "count": 4,
+      "id": "forestry:iron_electron_tube"
+    }
+  }
+}

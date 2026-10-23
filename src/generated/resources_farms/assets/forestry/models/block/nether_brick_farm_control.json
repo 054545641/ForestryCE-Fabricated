@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/nether_bricks",
+  "children": {
+    "base": "minecraft:block/nether_bricks",
+    "overlay": "forestry:block/nether_brick_farm_control_overlay"
+  },
+  "item_render_order": [
+    "base",
+    "overlay"
+  ],
+  "loader": "neoforge:composite"
+}

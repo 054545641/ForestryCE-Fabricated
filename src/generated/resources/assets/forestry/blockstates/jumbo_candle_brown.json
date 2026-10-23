@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "lit=false,shape=bottom": {
+      "model": "forestry:block/candles/brown_jumbo_bottom"
+    },
+    "lit=false,shape=middle": {
+      "model": "forestry:block/candles/brown_jumbo_middle"
+    },
+    "lit=false,shape=single": {
+      "model": "forestry:block/candles/brown_jumbo_single"
+    },
+    "lit=false,shape=top": {
+      "model": "forestry:block/candles/brown_jumbo_top"
+    },
+    "lit=true,shape=bottom": {
+      "model": "forestry:block/candles/brown_jumbo_bottom"
+    },
+    "lit=true,shape=middle": {
+      "model": "forestry:block/candles/brown_jumbo_middle"
+    },
+    "lit=true,shape=single": {
+      "model": "forestry:block/candles/brown_jumbo_single"
+    },
+    "lit=true,shape=top": {
+      "model": "forestry:block/candles/brown_jumbo_top"
+    }
+  }
+}

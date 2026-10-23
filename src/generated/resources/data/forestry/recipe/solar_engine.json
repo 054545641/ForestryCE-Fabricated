@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "D": "minecraft:piston",
+    "I": "#c:glass_blocks/colorless",
+    "P": "#c:ingots/tin",
+    "Q": "#c:gears/tin"
+  },
+  "pattern": [
+    "PPP",
+    " I ",
+    "QDQ"
+  ],
+  "result": {
+    "id": "forestry:solar_engine"
+  }
+}

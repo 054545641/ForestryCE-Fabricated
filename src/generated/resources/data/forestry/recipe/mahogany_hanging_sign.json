@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": [
+      "forestry:mahogany_stripped_log",
+      "forestry:mahogany_fireproof_stripped_log"
+    ],
+    "X": "minecraft:iron_chain"
+  },
+  "pattern": [
+    "X X",
+    "###",
+    "###"
+  ],
+  "result": {
+    "id": "forestry:mahogany_hanging_sign"
+  }
+}

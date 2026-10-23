@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/nether_bricks",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_nether_bricks"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:nether_bricks"
+    }
+  },
+  "time": 5
+}

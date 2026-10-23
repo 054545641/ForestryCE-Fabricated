@@ -1,0 +1,24 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:fabricator/fireproof/log/beech",
+  "molten": {
+    "amount": 500,
+    "id": "forestry:liquid_glass"
+  },
+  "recipe": {
+    "category": "building",
+    "key": {
+      "#": "forestry:refractory_wax",
+      "X": "forestry:beech_log"
+    },
+    "pattern": [
+      "   ",
+      "X#X",
+      "   "
+    ],
+    "result": {
+      "count": 2,
+      "id": "forestry:beech_fireproof_log"
+    }
+  }
+}

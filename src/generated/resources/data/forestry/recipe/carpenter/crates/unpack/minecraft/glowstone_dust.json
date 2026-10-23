@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/glowstone_dust",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_glowstone"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:glowstone_dust"
+    }
+  },
+  "time": 5
+}

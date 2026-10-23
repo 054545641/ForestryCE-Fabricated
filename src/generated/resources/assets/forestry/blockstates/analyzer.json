@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "forestry:block/analyzer",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "forestry:block/analyzer"
+    },
+    "facing=south": {
+      "model": "forestry:block/analyzer",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "forestry:block/analyzer",
+      "y": 270
+    }
+  }
+}

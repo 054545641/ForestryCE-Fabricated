@@ -1,0 +1,1 @@
+{"type":"forestry:carpenter","id":"forestrylifecycletest:n3_carpenter","time":2,"liquid":{"id":"minecraft:water","amount":100},"box":"minecraft:chest","recipe":{"pattern":["##"],"key":{"#":"minecraft:amethyst_shard"},"result":{"id":"minecraft:diamond","count":2}}}

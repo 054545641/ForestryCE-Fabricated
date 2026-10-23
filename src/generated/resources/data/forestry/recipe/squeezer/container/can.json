@@ -1,0 +1,12 @@
+{
+  "type": "forestry:squeezer_container",
+  "container": {
+    "id": "forestry:can"
+  },
+  "id": "forestry:squeezer/container/can",
+  "remnants": {
+    "id": "forestry:tin_ingot"
+  },
+  "remnantsChance": 0.05,
+  "time": 10
+}

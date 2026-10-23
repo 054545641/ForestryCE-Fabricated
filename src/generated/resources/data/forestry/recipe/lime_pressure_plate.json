@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "P": [
+      "forestry:lime_planks",
+      "forestry:lime_fireproof_planks"
+    ]
+  },
+  "pattern": [
+    "PP"
+  ],
+  "result": {
+    "id": "forestry:lime_pressure_plate"
+  }
+}

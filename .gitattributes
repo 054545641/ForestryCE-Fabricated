@@ -1,0 +1,17 @@
+# Disable autocrlf on generated files, they always generate with LF
+# Add any extra files or paths here to make git stop saying they
+# are changed when only line endings change.
+src/generated/**/.cache/cache text eol=lf
+src/generated/**/*.json text eol=lf
+
+# Normalize sources too. 30 files had drifted to CRLF depending on whose
+# core.autocrlf wrote them, which silently breaks line-anchored sed and shows
+# up as whole-file diffs on unrelated commits.
+*.java text eol=lf
+*.gradle text eol=lf
+*.accesswidener text eol=lf
+*.properties text eol=lf
+*.cfg text eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.md text eol=lf

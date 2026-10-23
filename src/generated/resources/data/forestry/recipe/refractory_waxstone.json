@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:smelting",
+  "experience": 0.1,
+  "ingredient": "forestry:cobbled_refractory_waxstone",
+  "result": {
+    "id": "forestry:refractory_waxstone"
+  }
+}

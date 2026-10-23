@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:glass_bottle",
+    "forestry:honey_drop",
+    "forestry:honey_drop"
+  ],
+  "result": {
+    "id": "minecraft:honey_bottle"
+  }
+}

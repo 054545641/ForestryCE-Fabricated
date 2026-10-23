@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_candle",
+  "textures": {
+    "all": "forestry:block/candles/refractory_candle",
+    "particle": "forestry:block/candles/refractory_candle"
+  }
+}

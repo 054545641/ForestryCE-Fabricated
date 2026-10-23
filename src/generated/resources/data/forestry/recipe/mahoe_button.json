@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    [
+      "forestry:mahoe_planks",
+      "forestry:mahoe_fireproof_planks"
+    ]
+  ],
+  "result": {
+    "id": "forestry:mahoe_button"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:item/generated",
+  "gui_light": "front",
+  "textures": {
+    "base": "forestry:item/liquids/capsule.bottle",
+    "fluid": "forestry:item/liquids/capsule.contents",
+    "layer0": "forestry:item/liquids/capsule.bottle"
+  }
+}

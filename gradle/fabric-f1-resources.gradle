@@ -1,0 +1,145 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+// A declared F1 resource subset, not a blanket removal of failing datapacks.
+// Every excluded recipe is listed in the report, and the original resource trees remain untouched.
+def owners = ['main', 'butterflies', 'farms', 'mail']
+def contentFile = file('gradle/fabric-f1-content.json')
+def destination = layout.buildDirectory.dir('generated/f1-resources')
+def prepareF1Resources = tasks.register('prepareF1Resources') {
+    group = 'fabric'
+    inputs.file(contentFile)
+    owners.each { owner ->
+        inputs.dir("src/${owner}/resources")
+        inputs.dir(owner == 'main' ? 'src/generated/resources' : "src/generated/resources_${owner}")
+    }
+    outputs.dir(destination)
+    doLast {
+        def outputRoot = destination.get().asFile
+        def boundary = layout.buildDirectory.get().asFile.canonicalPath + File.separator
+        if (!outputRoot.canonicalPath.startsWith(boundary)) throw new GradleException('Resource output escaped build directory')
+        delete(outputRoot)
+        def parser = new JsonSlurper()
+        def scope = parser.parse(contentFile)
+        def roots = owners.collectEntries { owner -> [(owner): [file("src/${owner}/resources"),
+            file(owner == 'main' ? 'src/generated/resources' : "src/generated/resources_${owner}")]] }
+        def report = [:]
+        def writeJson = { File target, Object json ->
+            target.parentFile.mkdirs()
+            target.setText(JsonOutput.prettyPrint(JsonOutput.toJson(json)) + '\n', 'UTF-8')
+        }
+        def strings
+        strings = { Object node ->
+            if (node instanceof Map) return node.values().collectMany { strings(it) }
+            if (node instanceof List) return node.collectMany { strings(it) }
+            node instanceof String ? [node] : []
+        }
+        owners.each { owner ->
+            def target = new File(outputRoot, owner)
+            def allowedItems = (scope.main.items + scope[owner].items).collect { "forestry:${it}".toString() } as Set
+            def allowedBlocks = (scope.main.blocks + scope[owner].blocks).collect { "forestry:${it}".toString() } as Set
+            def copied = new LinkedHashSet<String>()
+            def lookup = { String path ->
+                (roots[owner].reverse() + (owner == 'main' ? [] : roots.main.reverse()))
+                    .collect { new File(it, path) }.find { it.isFile() }
+            }
+            def copyResource
+            copyResource = { String path ->
+                if (!copied.add(path)) return
+                File input = lookup(path)
+                if (input == null) throw new GradleException("Missing F1 ${owner} resource: ${path}")
+                File output = new File(target, path)
+                output.parentFile.mkdirs()
+                output.bytes = input.bytes
+                if (path.endsWith('.png')) {
+                    File animation = lookup(path + '.mcmeta')
+                    if (animation != null) new File(target, path + '.mcmeta').bytes = animation.bytes
+                }
+                if (path.endsWith('.json') && path.startsWith('assets/')) {
+                    def json = parser.parse(input)
+                    if (input.getText('UTF-8').contains('neoforge:')) throw new GradleException("F1 model still uses NeoForge: ${path}")
+                    def follow
+                    follow = { Object node ->
+                        if (node instanceof Map) {
+                            node.each { key, value ->
+                                if (key in ['model', 'parent'] && value instanceof String && value.startsWith('forestry:')) {
+                                    copyResource('assets/forestry/models/' + value.substring(9) + '.json')
+                                } else if (key == 'textures' && value instanceof Map) {
+                                    value.values().findAll { it instanceof String && it.startsWith('forestry:') }.each { texture ->
+                                        copyResource('assets/forestry/textures/' + texture.substring(9) + '.png')
+                                    }
+                                } else follow(value)
+                            }
+                        } else if (node instanceof List) node.each { follow(it) }
+                    }
+                    follow(json)
+                }
+            }
+            scope[owner].items.each { id ->
+                def path = "assets/forestry/items/${id}.json"
+                copyResource(path)
+            }
+            scope[owner].blocks.each { id ->
+                copyResource("assets/forestry/blockstates/${id}.json")
+                copyResource("data/forestry/loot_table/blocks/${id}.json")
+            }
+
+            // Preserve the original merged locale policy: translations live in core.
+            if (owner == 'main') {
+                def locales = [:].withDefault { new TreeMap() }
+                roots.values().flatten().each { root ->
+                    fileTree(new File(root, 'assets/forestry/lang')).matching { include '*.json' }.files.sort().each { language ->
+                        locales[language.name].putAll(parser.parse(language))
+                    }
+                }
+                locales.each { name, json -> writeJson(new File(target, "assets/forestry/lang/${name}"), json) }
+                new File(target, 'forestry-f1-content.json').bytes = contentFile.bytes
+            }
+
+            int recipes = 0
+            int tags = 0
+            def deferred = []
+            def resources = new TreeMap<String, File>()
+            roots[owner].each { root -> fileTree(root).matching { include 'data/**/recipe/**/*.json', 'data/**/tags/item/**/*.json', 'data/**/tags/block/**/*.json' }.files.each { input ->
+                resources[root.toPath().relativize(input.toPath()).toString().replace('\\', '/')] = input
+            } }
+            resources.each { path, input ->
+                def json = parser.parse(input)
+                if (path.contains('/tags/')) {
+                    def allowed = path.contains('/tags/block/') ? allowedBlocks : allowedItems
+                    def values = json.values.findAll { value ->
+                        def id = value instanceof Map ? value.id : value
+                        id.startsWith('#') || id.startsWith('minecraft:') || allowed.contains(id)
+                    }.collect { value ->
+                        def id = value instanceof Map ? value.id : value
+                        // Deferred optional tag branches must not invalidate the entire active tag.
+                        id.startsWith('#') ? [id: id, required: false] : value
+                    }
+                    if (!values.isEmpty()) { writeJson(new File(target, path), [replace: json.replace ?: false, values: values]); tags++ }
+                } else {
+                    if (owner == 'mail' && path ==~ /data\/forestry\/recipe\/stamp_.*\.json/) {
+                        if (json.key?.Z instanceof Map && json.key.Z['neoforge:ingredient_type'] == 'neoforge:compound') {
+                            json.key.Z = '#forestry:stamp_adhesives'
+                        }
+                    }
+                    def references = strings(json)
+                    boolean eligible = json.type?.startsWith('minecraft:') && !JsonOutput.toJson(json).contains('neoforge:') &&
+                        references.any { allowedItems.contains(it) } &&
+                        references.findAll { it.startsWith('forestry:') }.every { allowedItems.contains(it) }
+                    if (eligible) { writeJson(new File(target, path), json); recipes++ }
+                    else deferred.add(path)
+                }
+            }
+            if (owner == 'mail') writeJson(new File(target, 'data/forestry/tags/item/stamp_adhesives.json'),
+                [values: ['#forestry:drop_honey', 'minecraft:slime_ball']])
+            report[owner] = [items: scope[owner].items.size(), blocks: scope[owner].blocks.size(), recipes: recipes, tags: tags,
+                copiedAssets: copied.size(), deferredRecipes: deferred, pending: scope[owner].pending]
+        }
+        writeJson(new File(outputRoot, 'resource-report.json'), report)
+        logger.lifecycle('F1 resource subsets: ' + report.collectEntries { owner, details -> [(owner): [items: details.items, blocks: details.blocks, recipes: details.recipes]] })
+    }
+}
+owners.each { owner ->
+    sourceSets[owner].resources.srcDir(destination.map { it.dir(owner) })
+    tasks.named(sourceSets[owner].processResourcesTaskName) { dependsOn prepareF1Resources }
+}

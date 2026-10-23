@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "P": [
+      "forestry:jacaranda_planks",
+      "forestry:jacaranda_fireproof_planks"
+    ]
+  },
+  "pattern": [
+    "P P",
+    "PPP"
+  ],
+  "result": {
+    "id": "forestry:jacaranda_boat"
+  }
+}

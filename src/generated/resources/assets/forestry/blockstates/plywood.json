@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "forestry:block/plywood",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "forestry:block/plywood",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "forestry:block/plywood",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "forestry:block/plywood",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "forestry:block/plywood"
+    },
+    "facing=west": {
+      "model": "forestry:block/plywood",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

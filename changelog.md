@@ -1,0 +1,515 @@
+## Forestry 3.0.0-alpha9
+- Remove Pulsating Dust (#113)
+- Remove Honey Pot (#189)
+- Remove Copper/Tin -> Bronze crafting recipe (must use Smelter now)
+- Fix wood recipes being incorrect (#439)
+- Fix open fence gates being destroyed by water (#451)
+
+## Forestry 3.0.0-alpha8
+- Fix Apiary not connecting to pipes, thanks to oneironautpebble
+- Add "hive_second_princess_chance" to the config from 1.12-era Forestry
+- Make Amber a Primeval specialty instead of a Vintage comb drop
+- Fix JEI hint translations for several items
+- Fix log spam for invalid species
+
+## Forestry 3.0.0-alpha7
+- Fixed localization of Refractory Capsule and Wax Capsules
+- Wood localizations no longer use template "grammar" strings, and can be customized on a per-block basis, allowing for proper gendered language support (#110)
+- Fixed Minifarms not consuming energy while working
+- A bunch of internal code renaming
+- Items can now be assigned postage values through a new NeoForge Data Map, `forestry:postage`.
+- Fix Forester's Manual completely breaking when a recipe is missing
+- Fixed crepuscular bees not working in Twilight Forest
+- Bees now support different active and inactive alleles again, adding back a missing API feature from 1.20.1:
+```json
+{
+  "genome": {
+    "forestry:fertility": {
+      "active": {
+        "value": 1, 
+        "dominant": true
+      }, 
+      "inactive": {
+        "value": 4
+      }
+    }
+  }
+}
+```
+
+## Forestry 3.0.0
+- Haploid Drones option now enabled by default (drones no longer have Inactive alleles, simplifying breeding)
+- Bees are now data-driven (trees and butterflies are too, to a lesser extent)
+- Fix Genetic Filter never moving items into adjacent inventories (broken since the 1.19 port)
+- Fix Humus never degrading into Sand (broken since the 1.14 port); its "degrade" blockstate property now maxes out at 2 instead of 3
+- Bog Earth's "maturity" blockstate property now maxes out at 2 instead of 3 (the old top value was unreachable)
+
+## Forestry 2.10.0
+- More Bee Tweaks, thanks to EnderiumSmith (#291)
+  - Changed "0" fertility to display as "Infertile"
+  - Crepuscular activity period extended to work during 0..2000, 10000..15000, and 21000..24000
+  - Scoops can now be enchanted (Unbreaking, Silk Touch, Fortune)
+  - Hives can now be silk-touched
+  - Hive drops are now affected by Fortune
+  - End Hives now generate properly
+  - End Hives now have a rare chance to drop bees with "Phasing" or "Ascension" effects
+  - Increased drop rates of bees from Marshy hives
+  - Relaxed skylight requirements so that bees don't have to see the sky directly above them, now only requiring hives to be in a skylight of 10 or greater.
+  - Phosphor makes lava again instead of Volcanic Propolis
+  - Sinister produces Phosphor instead of Volcanic Propolis
+  - Luxuriant no longer produces phosphor, now only produces combs
+  - Abyssal species now has the "Darkness" effect, which blinds nearby players
+  - Savanna and Aquatic lines now uses Crepuscular activity instead of Nocturnal activity
+  - Added the Vindictive line back, no longer tied to IndustrialCraft2
+  - Vindictive line no longer uses Radioactive effect, uses aggressive instead, and has BOTH_1 climate tolerances
+  - Flower spawning fixed to no longer fill the area with the same kind of flower
+  - Steadfast species now has Cathemeral activity
+  - Sculk species is now bred from Abyssal and Hermitic rather than Abyssal and Phantasmal
+- New Growth Update, thanks to Spearkiller (#241)
+  - **Added 15 new Tree species**: Golden Elm, Balsam Fir, Coconut, Copper Beech, Feijoa, Dogwood, Ginkgo, Jacaranda, Pewen, Macrocarpa, Olive, Sweet Orange, D'Anjou Pear, Kauri
+  - **Added 5 new Fruits**:
+    - Pear - Can be squeezed into Juice (100 mB)
+    - Orange - Can be squeezed into Juice (400 mB)
+    - Coconut - Can be squeezed into Milk (500 mB)
+    - Feijoa - Can be squeezed into Juice (100 mB)
+    - Olive - Can be squeezed into Seed Oil (100 mB)
+      - In real life, Olive Oil is not a seed oil, but this is done to avoid having two separate Oil fluids. **New best source of Seed Oil**
+  - Added Amber Drone and Amber Sapling, which can be centrifuged to recover Relic Drones and Ginkgo Saplings, respectively
+  - Added Amber, a crafting and building material
+    - Used to create Amber Electron Tubes, which grant Fortune boosts on socketed machines (Centrifuge and Squeezer)
+    - Obtained from Vintage combs
+    - Also obtained from centrifuging Amber Drone and Amber Sapling
+  - Replaced Hill Cherry species with Sour Cherry
+    - Still produces cherries as fruit and has red bark with a yellow inside, but leaves are now green to avoid resembling the Cherry Blossom, which does not produce fruit in real life
+  - Replaced Bull Pine species with Ponderosa Pine
+    - Pine generation is now taller and skinnier, resembling the Ponderosa species
+  - Improved Acacia tree generation to more closely resemble Vanilla Acacia
+  - Improved Ipe leaves texture
+  - Improved Sugar Maple leaves texture
+  - Renamed Desert Acacia species to Camelthorn
+  - Renamed Zebrawood species to Zebrano
+  - Renamed Sipiri species to Greenheart
+  - Improved textures for almost all tree saplings
+  - Add JEI descriptions for Mulch, Fertilizier, and Compost
+  - Add Analyzer descriptions for nearly every tree species
+  - Cherries now produce Juice instead of Seed Oil
+  - Changed Squeezer Juice/Oil amounts: Cherry (50 mB), Walnut (50 mB), Chestnut (80 mB)
+  - Compost and Mulch can now be used as a fertilizer
+  - Make Fertilizer particles and sound match Vanilla Bone Meal
+  - TEXTURE PACKS: Sapling models and textures have been moved to follow Vanilla naming conventions.
+- Fixed pod fruits not respecting a tree's Yield allele
+
+## Forestry 2.9.0
+- Fix incorrect bee particle positioning (#247)
+- Added tooltips to bee flower types in the portable analyzer (still missing Photosynth)
+- Changed Ipe leaves from Jungle to Acacia
+- Fix Cathemeral sleep periods not working when daylight cycle is frozen (or in Nether)
+
+## Forestry 2.8.0
+- Added Survivalist's Axe, Sword, and Hoe (#117)
+- Fix Spectacles Curio not working when wearing a helmet (#251)
+
+## Forestry 2.7.0
+- Fixed Apiarist/Arborist/Lepidopterist chest not always closing lid (#257)
+- Fix crash with Bog Earth page in Forester's Manual (#279)
+- Update Japanese translation, thanks to code-onigiri (#269)
+- Update Ukrainian translation, thanks to yevgmikh (#268)
+- Add translations for deaths from bee effects, thanks to ACCBDD (#273)
+- Fix individual deserialization errors causing a crash (#275)
+
+## Forestry 2.6.2
+- Fix egregious typo in FilterLogic
+- Change Escritoire reward calculation for Bees (#253) thanks to bnorax
+- Fix certain recipes being hardcoded to use ingot items instead of ingot tags (#256) thanks to dmdinnc
+ 
+## Forestry 2.6.1
+- Fixed Research Notes voiding items when used in the offhand (#222)
+- Fix tags for Survivalist tools (#221)
+- Fix bees using Overworld time in dimensions without a daylight cycle, like Nether and End (#223)
+- Add missing Fermenter recipes (#231)
+- Accommodate Amendments's janky Mixins that print snarky log messages about other mods causing bugs (#192)
+- Allow equipping Spectacles in Curios head slot (#224)
+- Add missing stamp recipes to Carpenter (#228)
+- Fix Vanilla fireproof log tags being empty (#237)
+- Fix worldgen crash caused by Undermod biomes (#229)
+- Add config options to forestry-server.toml to disable Apatite and Tin generation (#108)
+- Fix incorrect fruit leaves rendering when fast graphics is enabled (#159)
+- Fix missing Patchouli pages (#125)
+
+## Forestry 2.6.0
+- Fixed planks recipes for all wood types, now able to craft planks from stripped logs (#227)
+- Fix beeswax not waxing Copper blocks or Signs
+- Fix vanilla fireproof logs and wood not being strippable
+- Allow right-clicking wood with Refractory Wax to make it fireproof (#89)
+- Make crafting fireproof logs and planks cheaper in the Thermionic Fabricator (#89)
+- Fix Willow leaves decaying upon spawn (#232)
+- Allow data-driven tree generation through new "forestry:custom_tree" feature, which accepts a "genome" field (#216)
+  - To override existing tree generation, disable Forestry's tree generation in its server config file. Then, add your desired tree features.
+- Fix inconsistent tree generation by using the world gen random source rather than the world random
+- Fix potential crash from Desert Acacia generation
+
+## Forestry 2.5.4
+- Fixed incompatibility with ModernFix
+
+## Forestry 2.5.3
+- Fences no longer attach to decorative leaves (#172)
+- Deepslate Tin and Apatite now use correct sounds (#209)
+- Fix Alveary Sieve, Hygroregulator, Swarmer not dropping contents when destroyed (#207)
+- Fix Error Ledgers being covered by JEI bookmarks (#204)
+- Allow bees to pollinate potted flowers (#163)
+- Fix unsafe direct Level usage in HiveDecorator (#197)
+- Fix regression with Bee House not extending lifespan to 3x like in old versions
+- Add Vanilla bee species, obtained by right-clicking a Vanilla bee entity with a scoop
+
+## Forestry 2.5.2
+- Fix hybrids not producing drops of inactive species
+- Forestry trees no longer spawn naturally by default. Can still be enabled in the config (#206)
+- Update Chinese translation to account for new additions (#205) thanks to ChuijkYahus, FridayAnubis, ZHAY10086
+- Improve Russian translation (#212) thanks to ProgramCrafter
+- Add last of EnderiumSmith's changes (#210) thanks to EnderiumSmith
+  - Add new Relic species, whose drones are dug up by Sniffers
+  - Add new Anachrone species, whose queens can shorten the lifespan of other beehives
+  - Add new Primeval species, who produces Vintage combs with lots of Honeydew
+  - Fix centering of Beehive effect radii
+  - Adjust author tag in fifth page of Analyzer
+- Implement a variety of minor changes and Vanilla integrations (#169, #187) thanks to Spearkiller:
+  - Candles can now be crafted from Forestry beeswax and string
+  - Honey Bottles can now be crafted using Forestry honey drops
+  - Woven Silk is now cheaper to make (9 silk -> 4 silk)
+  - Vanilla Honeycomb can now be centrifuged for Forestry beeswax (but not honey drops)
+  - Simmering Comb now makes new Volcanic Propolis instead of Phosphorus, which is used to create Lava
+  - Silk Wisp can no longer be made from string
+  - Ice Shards can now be crafted into Vanilla Ice block
+  - Vanilla Honey Block can now be created from Forestry honey drops
+  - Removed Honey Pot from creative tab and can no longer be crafted. Will be fully removed in 1.21
+  - Phosphor is no longer used to create Lava (replaced by Volcanic Propolis)
+  - Phosphor can now be used to craft torches in batches of 6
+  - Changed color of Simmering Comb
+  - Luxuriant species now produces Phosphor
+
+## Forestry 2.5.1
+- Simmering comb no longer produces Phosphorus
+- Frozen Ocean is now an Icy Biome
+- Fix Apiarist armor and durability
+- Add KubeJS bindings for TemperatureType, HumidityType, and ForestryTaxa
+- Remove hive placement log spam
+- Replace all usages of old Stack with faster ArrayDeque class (free optimization)
+- Fix API init timing to always be after all mod items have registered instead of just most of the time (#196)
+- Add config option to disable enchantment glints on bees (#170)
+
+## Forestry 2.5.0
+- Added Lush and Aquatic Bees to shared breeding patterns (#190)
+- Add missing sponge comb recipes (#202)
+- Add new Zombified species, obtained by breeding an Embittered, Spiteful, or Seething princess with any drone while in a non-Hellish climate
+- Add new Sculk species, mutated from Abyssal and Phantasmal, that produces Sculk and Experience Drops that can be converted to Experience Bottles
+- Fix Mail System, thanks to Peatral (#203, #134)
+- Fix Invalid Player data when loading items with unregistered species
+- Update Chinese translations, thanks to ChuijkYahus (#184)
+
+## Forestry 2.4.5
+- Fix bugged bee breeding. Sorry! (#199)
+- Create mutable copy of block drops to fix farm crash (#193)
+
+## Forestry 2.4.4
+- Add Embittered bee genus, thanks to EnderiumSmith
+  - Add new Embittered bee species that spawns in Warped Forest biomes underneath Huge Warped Fungus
+  - Add new Spiteful bee species that produces pollen clusters
+  - Add new Seething bee species that produces Blaze powder
+  - Add new Warped bee species that produces both Mysterious and Simmering combs
+- Add ForestryEvent.BeeMatingEvent to allow for special mating conditions
+- Make Savanna & Desert lines Nocturnal instead of Metaturnal
+- Give Village common bees boosted climate tolerance
+
+## Forestry 2.4.3
+- Add Aquatic bee genus, thanks to EnderiumSmith
+  - Add new Aquatic bee species that spawns in Warm Ocean biomes by coral reefs
+  - Add new Pirate bee species that spawns in shipwreck chests and buried treasure chests
+  - Add new Prismatic bee species that produces Prismarine shards and crystals
+  - Add new Abyssal bee species that produces glow ink sacs
+- Add Solar bee genus, thanks to EnderiumSmith
+  - Added Kleptoplastic bee species that light nearby entities on fire, using sunlight to pollinate
+  - Added Photosynthetic bee species with "Fast" pollination
+  - Added Autotroph bee species with "Faster" pollination, the fastest of any species in base Forestry
+- Added missing mutation for Myrtle Ebony (#186)
+- Fix percentage values displaying incorrectly for centrifuge (#168)
+
+## Forestry 2.4.2
+- Reimplement config option for changing Forestry tree natural spawn rate
+- Reimplement config option to disable butterfly spawning
+
+## Forestry 2.4.1
+- Require Forge 47.3.5 to fix Hanging Signs crash (#174)
+- Dropped NeoForge support. There is absolutely no reason to use NeoForge in 1.20.1.
+- Fix Forestry structure loot not appearing in chests, thanks to EnderiumSmith (#183)
+- Add Shulking bee species, thanks to EnderiumSmith
+- Add Sign items to #minecraft:signs item tag
+- Add Hanging Sign items to #minecraft:hanging_signs item tag
+
+## Forestry 2.4.0
+- Add Lush bee genus, thanks to EnderiumSmith (#180)
+  - Add new Lush species, which spawns naturally in Lush Caves biomes
+  - Add new Verdant species, which can produce Small Dripleaf blocks
+  - Add new Luxuriant species, which can speed up growth of Glow Berrires and has Fast pollination
+- Fix Chinese (Simplified) translation, thanks to ChuijkYahus (#178)
+- Fix Ukrainian translation, thanks to yevgmikh (#181)
+
+## Forestry 2.3.3
+- Actually fix painting variants
+- Phase out usage of java.awt.Color in common code to avoid potential server crashes with certain providers
+- Fix fluids preventing blocks from being placed in them (#166)
+- Fix fluids not rendering their flowing textures properly in the overworld (#167)
+
+## Forestry 2.3.2
+- Fix paintings only being available through commands
+- Add GeneticsEventJS#defineTaxon method to add custom genera and other taxa through KubeJS
+
+## Forestry 2.3.1
+- Massive texture overhaul and two new paintings, thanks to Spearkiller (#171)
+- Added Pressure Plates, Buttons, Trapdoors, Signs, Hanging Signs, Boats, and Chest Boats for all wood types
+
+## Forestry 2.3.0
+- Fix saplings with default genomes not generating leaves properly (#144)
+- Add API for IBeekeepingLogic to change throttle ticks
+- Fix NBT loading bug in BeekeepingLogic to load queen max health
+- Make parts of JEI plugin public
+- Fix IBeeModifier.modifyAging and IIndividualLiving.age
+- Fix bee territory being too small on East and West (#162)
+- Remove the Analyzer widgets from Apiary and Alveary
+
+## Forestry 2.2.3
+- Add Cathemeral bee activity type, which is a random activity period of 12000 ticks that varies based on position. Check times using /forestry bee cathemeral
+- Fix Tolerant Flyer tooltip and Cave Tolerant display in analyzer
+- Fix bees not working below y=0
+- Fix Bog Earth crash when set to maturity = 3 using a debug stick
+- Add worldgen random to IHive#getPosForHive and IHiveGen#getPosForHive
+- Fix rendering glitch with Forestry doors (#158)
+
+## Forestry 2.2.2
+- Fix accidental drop shadow in Tab 4 of Analyzer for researched mutations with a + sign
+- Fix product chances not showing in JEI (#152)
+- Add missing allele translations
+
+## Forestry 2.2.1
+- Fix saplings not being able to grow through leaves
+- Fix incorrect door recipes overriding Vanilla and only producing 1 door instead of 3 (#154)
+- Actually fix tree leaves not decaying when harvested in an Arboretum/Tree farm
+
+## Forestry 2.2.0
+- Fix lifespan allele mutations not affecting offspring (#150)
+- Species types now have display names
+
+## Forestry 2.1.4
+- Fix Gourd and Mushroom farms not taking inputs (#141)
+- Add the automatic Gourd farm back to Forestry
+- Fix crash when KubeJS is not present (#149)
+- Fix tree leaves not decaying when harvested in an Arboretum/Tree farm
+- Fix /forestry bee modify setting the stack size to zero and always saying "modified genome of bee" instead of "tree" or "butterfly"
+
+## Forestry 2.1.3
+- Fixed crash in large modpacks about ITextureManager not being initialized.
+
+## Forestry 2.1.2
+- Fix crash with Diagonal Fences mod (#145)
+- Fix integer alleles always being recessive (#146)
+- Fixed Naturalist chests not closing when KubeJS is installed (#148)
+- Relax the version requirement on Forge to allow launching Forestry with NeoForge, no guarantees of stability (#147)
+- Fix Engine chaining not working
+- Electron tube tooltips are now always shown
+- Fix several missing chromosome translations that went missing in 2.1.1
+
+## Forestry 2.1.1
+- Fix IIndividualHandlerItem methods returning individuals for empty stacks that were decremented
+- Added method in IAlleleManager to get IChromosome instances by registry name
+- Fix butterfly humidity tolerance having the same range as temperature tolerance
+- Chromosomes now have translation keys and display names
+- Fixed saplings not growing (#142)
+- Allow overriding Hive generation chances in IForestryPlugin and KubeJS
+- Add partial KubeJS support for bees, documentation coming soon on [ReadTheDocs](https://forestrydocs.readthedocs.io/en/latest/)
+
+## Forestry 2.1.0
+- Fixed typo that cut off black order on the right side of the Portable Analyzer GUI
+- Add IActivityType bee chromosome for more complex sleep patterns (#97)
+- Add missing recipes for Stripped Wood, Fireproof Wood, and Fireproof Stripped Wood
+
+## Forestry 2.0.5
+- Fixed KubeJS server event error (#138)
+- Add stripped log/wood variants for Forestry wood types (#118)
+
+## Forestry 2.0.4
+- Fixed locked slots not displaying properly in the Escritoire
+- Fixed incorrect species count in Naturalist chest (#136)
+- Fix serverside crash with Merry bees (#137)
+- Fix missing textures for Snowing effect particles (#120)
+- Fix Escritoire bounding box having a solid top (#119)
+
+## Forestry 2.0.3
+- Fixed AbstractMethodError with farm and alveary (#131, #132)
+
+## Forestry 2.0.2
+- Fixed error when joining server (#130)
+
+## Forestry 2.0.1
+- Fixed crash with Alveary controller (#129)
+
+## Forestry 2.0.0
+- Ported to Forge 1.20.1.
+- Reorganized creative tabs.
+- Renamed Forestry's Cherry species to Hill Cherry.
+- Added Vanilla's Cherry trees to Forestry under the Cherry Blossom species.
+- Fixed non-default height allele being ignored by saplings.
+- Fixed rainmaker JEI recipe category icon being a rain tank instead of a rainmaker.
+- Updated Ebony log texture.
+- Updated Savanna hive texture.
+- Removed the unused Wax Cast item that used to be for making Stained Glass.
+- A bunch of other things!
+
+## Forestry 1.0.14
+- Add Falkory's textures (#33)
+- Allow Cocoa plantations to automatically replant, thanks to ACGaming
+- Fix erroneous letter NBT, thanks to ACGaming
+
+## Forestry 1.0.13
+- Fixed climate display in Alveary when Fan/Heater/Hygroregulator were used (#99)
+- Changed Apiarist villager to use Escritoire as workstation instead of Apiary (#98)
+
+## Forestry 1.0.12
+- Fixed crash when inserting fuels into Biogas engine (#105)
+- Fix Wood Pile recipe conflict with 1.13 Wood recipes (#104)
+- Rename "Wood Pile" to "Log Pile"
+
+## Forestry 1.0.11
+- Fixed world generation crash with fruit pods (#102)
+- Fixed incorrect translation of ru_ru.json (#101)
+- Add additional constructor to GuiForestryTitled that accepts ResourceLocation
+- Fix Alvearies and Multifarms not dropping their inventories when destroyed (#100)
+- Add ISpectacleBlock API so that addon mods can have their blocks highlighted by players wearing spectacles
+
+## Forestry 1.0.10
+- Fixed Grafter for Forestry trees (#95)
+- Fixed ru_ru, thanks to Quarkrus (#93)
+- Fixed non-default Girths not working with genetically modified saplings (#96)
+- Fix analyzer display for Haploid drones, thanks to EnderiumSmith (#94)
+- Implement weakly inherxited chromosomes for temperature & humidity tolerances and other traits, thanks to EnderiumSmith (#94)
+- Fix hive generation, thanks to EnderiumSmith (#94)
+- Fix Mycophilic effect replacing Tall grass instead of Grass Blocks
+
+## Forestry 1.0.9
+- Added API for using custom bee species textures. (#30)
+- Add Analyzer widget to the Alveary GUI (#66)
+- Fixes hives at Taiga villages ignoring the climate
+- Fixes inaccurate climate information in GUIs after leaving/rejoining the server/dimension (#73)
+- Fixes apiaries not reacting to changes in climate as a result of the biome changing
+- Make wild hives extensible by addon mods
+- Fix fruits not dropping from tree leaves on decay (#61)
+- Fix leaves with non-default genomes not dropping any saplings (#83)
+- Fix pod fruits not dropping when their supporting trunk is destroyed
+- Fix Alveary Hygroregulator corrupting Alveary inventories (#91)
+
+## Forestry 1.0.8 (Breaking change, backup your worlds)
+- Remove bottler recipes from JEI
+- Fix spectacles to show pollinated leaves and wild hives (#14)
+- Fix double flower bee placement (#81)
+- Creative hive frames now show in JEI and have epic rarity
+- Added the Savanna bee line to replace Modest bees in the Savanna biomes, thanks to EnderiumSmith (#76)
+- Finally fixed haploid mode, thanks to EnderiumSmith (#78)
+- Fixed end sky always being obstructed, thanks to EnderiumSmith (#71)
+- Forestry Beeswax can now be used to wax copper blocks, like Vanilla's honeycomb, thanks to EnderiumSmith
+- Set default temperature tolerance of Forest bees to `TOLERANCE_DOWN_1` to facilitate breeding with Wintry, thanks to EnderiumSmith
+- Set default humidity tolerance of Meadows bees to `TOLERANCE_DOWN_1` to work in the NORMAL / DRY climate, thanks to EnderiumSmith
+- Cultivated line can now also be bred using Valiant, Savanna, and Ended, thanks to EnderiumSmith
+- Added tags for configuring valid spawn blocks for Snowy and Desert hives.
+- Fix zh_cn.json, thanks to Obsoletes
+- Remove milk fluid (#46)
+
+## Forestry 1.0.7
+- Sort products displayed in JEI by their chances
+- Fix mating behaviour of unmated queens (ex. from Creative Menu)
+- Fix Apiaries with frames producing more than Alvearies (#79)
+- Fix blocks not dropping their inventories if blown up by Creeper (#52)
+- Fix incorrect implementation of Haploid drone breeding option (#78)
+- Fix creative frames having mixed up tooltips
+- Fixed species mutations and biome-restricted bee mutations
+- Fixed Fertile bee effect (#72)
+- Fixed snowy hives not spawning in Grove biomes
+- Fix fruits not spawning on tree leaves of non-default genome saplings (#82)
+- Fix hives not spawning below y=0 (affects some custom/superflat worlds)
+
+## Forestry 1.0.6
+- Fixed wild beehives not being able to spawn in snowy areas (#56)
+- Fix fruit squeezer recipes to use tags + correct mulch rates (#59)
+- Fix Miner's bag not accepting raw ores (#58)
+- Make all biomes in `#minecraft:is_nether` tag marked as having HELLISH climate (#65)
+- The Phantasmal line (Ended, Spectral, Phantasmal) is now actually nocturnal and only works during the night time (unless given the NEVER_SLEEPS allele).
+- Added Creative Frames for debugging Forestry mutations.
+- Hive frames can now stack up to 64.
+- Biomes in the end (tagged as `#minecraft:is_end`) will now use COLD / ARID climate.
+- Fix Forester's Manual not working on dedicated server (#57, #60)
+- Fix clientside console spam when opening menus using Database widgets (#74)
+- Fix mutation date formatting to be more human-readable (#69)
+- Add JEI support for bee/tree/butterfly mutations and products
+
+## Forestry 1.0.5
+- Fixed wild beehives not having particle effects
+- Fix biogas engine lava tank accepting any fluid
+- Fix still not working
+- Added `forestry_fruits` tag to `forge:fruits` item tag + fruit tags for each fruit added by Forestry:
+  - `forge:fruits/cherry` for Cherry
+  - `forge:fruits/walnut` for Walnut
+  - `forge:fruits/chestnut` for Chestnut
+  - `forge:fruits/lemon` for Lemon, the same tag used by Fruits Delight
+  - `forge:fruits/plum` for Plum
+  - `forge:fruits/date` for Date
+  - `forge:fruits/papaya` for Papaya
+- Replaced ICheckPollinatable and IPollinatable with new IPollenType API.
+  - A pollen type allows Forestry bees, butterflies, and Alveary Sieves to handle non-tree pollen types.
+    To use, register a new IPollenType in `IForestryPlugin#registerPollen`.
+- Fixed bug where "default" variants of Forestry leaves would never be used
+- Fixed bug where fruit ripeness would sometimes not persist
+- ACTUALLY make saplings and other items usable in the composter (#35)
+- Increase energy storage of Bottler, Still, Fermenter by 10x
+- Fixed bug where species would be able to mutate with themselves.
+- Add haploid breeding option
+- Fixed nether biome climates
+- Savannah biomes are now WARM/ARID instead of HOT/ARID, making their climate distinct from the desert biomes.
+- Fix pipette textures
+- Fix bees not planting flowers (#53)
+- Fix bronze crafting recipe only producing 1 ingot instead of 4 (#54)
+
+## Forestry 1.0.4
+- Added modify genome command. Can be used like `/forestry bee modify <chromosome> <allele> <both|dominant|recessive>` to
+  modify the genome of the player's currently held genetic item (bees, saplings, butterflies)
+- Fixed loading of Chinese (simplified) language file (#44)
+- Fixed many translation keys in Chinese (simplified) language file (#45)
+- Fixed Apiarist chest menu not displaying queens/princesses/drones in menu (#40)
+- Unused honeycombs are no longer obtainable in survival, from village houses or trades (#42)
+- Fixed fluid attributes and use honey/milk tags where possible
+- Fixed liquid container menu desync (#29, #41)
+- Fixed wild beehives dropping bees without a scoop
+- Fixed legacy farms not planting from slots correctly (#43)
+
+## Forestry 1.0.3
+- Fixed saplings not dropping themselves (#36)
+- Fixed villager professions not working (#38)
+- Added new planks textures for all wood types
+- Make saplings and other items usable in the composter (#35)
+- Fix Forest and Tropical wild hive generation (#34, #37)
+- Add TickHelper utility as public API
+- Move factory methods from IBeeSpeciesType to IHiveManager for easier access.
+
+## Forestry 1.0.2
+- Fixed Naturalist backpack crash and bugs
+- Fixed incorrect Apiarist backpack recipe
+- Fixed Forestry wood/log naming to be consistent with Vanilla
+- Fixed Analyzer not recognizing the vanilla Jungle Sapling
+- Add missing recipes for Forestry wood/bark blocks
+- Added Arborist backpack
+- Add new textures for Apiary and Bee House
+- Add new textures for Pine and Cherry planks (since they match Bee house and Apiary/Alveary planks)
+
+## Forestry 1.0.1
+- Add butterfly mating recipe
+- Fix reobf crash with IFeatureSubtype
+- Fix ore names and deepslate textures
+
+## Forestry 1.0.0
+- Initial release

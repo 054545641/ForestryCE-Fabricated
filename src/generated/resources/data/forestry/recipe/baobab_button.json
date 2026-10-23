@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    [
+      "forestry:baobab_planks",
+      "forestry:baobab_fireproof_planks"
+    ]
+  ],
+  "result": {
+    "id": "forestry:baobab_button"
+  }
+}

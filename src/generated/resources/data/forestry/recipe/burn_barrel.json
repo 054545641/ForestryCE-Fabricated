@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "minecraft:iron_bars",
+    "X": "#c:ingots/iron"
+  },
+  "pattern": [
+    "X X",
+    "X#X",
+    "XXX"
+  ],
+  "result": {
+    "id": "forestry:burn_barrel"
+  }
+}

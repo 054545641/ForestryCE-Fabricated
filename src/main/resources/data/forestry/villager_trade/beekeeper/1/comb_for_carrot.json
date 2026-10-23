@@ -1,0 +1,28 @@
+{
+  "wants": {
+    "id": "minecraft:carrot",
+    "count": {
+      "min": 8.0,
+      "max": 12.0
+    }
+  },
+  "gives": {
+    "id": "forestry:honey_comb",
+    "count": 1
+  },
+  "max_uses": 8.0,
+  "xp": 2.0,
+  "given_item_modifiers": [
+    {
+      "function": "forestry:random_item_from_tag",
+      "tag": "forestry:village_combs"
+    },
+    {
+      "function": "minecraft:set_count",
+      "count": {
+        "min": 2.0,
+        "max": 4.0
+      }
+    }
+  ]
+}

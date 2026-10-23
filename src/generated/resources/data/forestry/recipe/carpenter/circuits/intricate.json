@@ -1,0 +1,31 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/circuits/intricate",
+  "liquid": {
+    "amount": 1000,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "#": "#c:ingots/gold",
+      "R": "#c:dusts/redstone"
+    },
+    "pattern": [
+      "R#R",
+      "R#R",
+      "R#R"
+    ],
+    "result": {
+      "id": "forestry:intricate_circuit_board"
+    }
+  },
+  "result": {
+    "components": {
+      "minecraft:custom_data": {
+        "T": 3
+      }
+    },
+    "id": "forestry:intricate_circuit_board"
+  },
+  "time": 80
+}

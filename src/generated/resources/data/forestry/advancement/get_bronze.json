@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_engine",
+  "criteria": {
+    "forestry:get_bronze": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:ingots/bronze"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_bronze.description"
+    },
+    "icon": {
+      "id": "forestry:bronze_ingot"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_bronze.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_bronze"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

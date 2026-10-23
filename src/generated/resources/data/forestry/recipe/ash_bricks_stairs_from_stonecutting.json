@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "forestry:ash_bricks",
+  "result": {
+    "id": "forestry:ash_brick_stairs"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "forestry:squeezer",
+  "chance": 0.25,
+  "id": "forestry:squeezer/fruit/coconut",
+  "output": {
+    "stack": {
+      "amount": 500,
+      "id": "minecraft:milk"
+    }
+  },
+  "remnant": {
+    "id": "forestry:mulch"
+  },
+  "resources": [
+    "#c:fruits/coconut"
+  ],
+  "time": 10
+}

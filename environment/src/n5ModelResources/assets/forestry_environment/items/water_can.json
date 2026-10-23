@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "forestry:fluid_container",
+    "fluid": "minecraft:water",
+    "textures": {
+      "base": "forestry:item/liquids/can.bottle",
+      "fluid": "forestry:item/liquids/can.contents"
+    }
+  }
+}

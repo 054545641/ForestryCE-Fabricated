@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/mulch",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_mulch"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:mulch"
+    }
+  },
+  "time": 5
+}

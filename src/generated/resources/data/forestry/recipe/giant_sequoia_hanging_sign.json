@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": [
+      "forestry:giant_sequoia_stripped_log",
+      "forestry:giant_sequoia_fireproof_stripped_log"
+    ],
+    "X": "minecraft:iron_chain"
+  },
+  "pattern": [
+    "X X",
+    "###",
+    "###"
+  ],
+  "result": {
+    "id": "forestry:giant_sequoia_hanging_sign"
+  }
+}

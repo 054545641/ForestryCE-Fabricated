@@ -1,0 +1,18 @@
+{
+  "type": "forestry:squeezer",
+  "chance": 0.2,
+  "id": "forestry:squeezer/fruit/feijoa",
+  "output": {
+    "stack": {
+      "amount": 100,
+      "id": "forestry:fruit_juice"
+    }
+  },
+  "remnant": {
+    "id": "forestry:mulch"
+  },
+  "resources": [
+    "#c:fruits/feijoa"
+  ],
+  "time": 10
+}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "experience": 0.5,
+  "ingredient": [
+    "forestry:apatite_ore",
+    "forestry:deepslate_apatite_ore"
+  ],
+  "result": {
+    "id": "forestry:apatite"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_bronze",
+  "criteria": {
+    "forestry:get_fabricator": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:thermionic_fabricator"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_fabricator.description"
+    },
+    "icon": {
+      "id": "forestry:thermionic_fabricator"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_fabricator.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_fabricator"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

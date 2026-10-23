@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "texture": "forestry:block/honeystone_bricks",
+    "wall": "forestry:block/honeystone_bricks"
+  }
+}

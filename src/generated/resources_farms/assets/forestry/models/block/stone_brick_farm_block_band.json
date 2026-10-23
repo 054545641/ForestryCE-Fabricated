@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/stone_bricks",
+  "children": {
+    "base": "minecraft:block/stone_bricks",
+    "overlay": "forestry:block/stone_brick_farm_block_band_overlay"
+  },
+  "item_render_order": [
+    "base",
+    "overlay"
+  ],
+  "loader": "neoforge:composite"
+}

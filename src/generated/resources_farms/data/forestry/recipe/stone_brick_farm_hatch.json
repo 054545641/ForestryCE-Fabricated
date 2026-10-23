@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "minecraft:stone_bricks",
+    "D": "#minecraft:wooden_trapdoors",
+    "T": "#c:gears/tin"
+  },
+  "pattern": [
+    " # ",
+    "TDT"
+  ],
+  "result": {
+    "id": "forestry:stone_brick_farm_hatch"
+  }
+}

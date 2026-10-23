@@ -1,0 +1,32 @@
+package forestry.apiculture.bees.genetics.effects;
+
+import forestry.api.apiculture.IBeeHousing;
+import forestry.api.core.genetics.IEffectData;
+import forestry.api.core.genetics.IGenome;
+import forestry.apiculture.entities.AIAvoidPlayers;
+import net.minecraft.world.entity.monster.Monster;
+
+import java.util.List;
+
+public class RepulsionBeeEffect extends ThrottledBeeEffect {
+	public RepulsionBeeEffect() {
+		super(false, 100, true, true);
+	}
+
+	@Override
+	public IEffectData doEffectThrottled(IGenome genome, IEffectData storedData, IBeeHousing housing) {
+		List<Monster> mobs = ThrottledBeeEffect.getEntitiesInRange(genome, housing, Monster.class);
+		for (Monster mob : mobs) {
+			if (!isMobAvoidingPlayers(mob)) {
+				mob.getGoalSelector().addGoal(3, new AIAvoidPlayers(mob, 6.0f, 0.25f, 0.3f));
+				mob.getGoalSelector().tick();    // good job Nedelosk
+			}
+		}
+
+		return storedData;
+	}
+
+	private boolean isMobAvoidingPlayers(Monster mob) {
+		return mob.getGoalSelector().getAvailableGoals().stream().anyMatch(task -> task.isRunning() && task.getGoal() instanceof AIAvoidPlayers);
+	}
+}

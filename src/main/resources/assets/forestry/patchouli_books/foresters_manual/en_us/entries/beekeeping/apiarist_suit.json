@@ -1,0 +1,25 @@
+{
+  "name": "for.gui.book.patchouli.entry.beekeeping.suit",
+  "category": "forestry:beekeeping",
+  "icon": "forestry:apiarists_shirt",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "for.gui.book.patchouli.entry.beekeeping.suit1"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "forestry:apiarists_hat",
+      "recipe2": "forestry:apiarists_shirt"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "forestry:apiarists_pants",
+      "recipe2": "forestry:apiarists_shoes"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "for.gui.book.patchouli.entry.beekeeping.suit2"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_sign_rot_2",
+  "textures": {
+    "all": "forestry:entity/signs/macrocarpa",
+    "particle": "forestry:block/macrocarpa_planks"
+  }
+}

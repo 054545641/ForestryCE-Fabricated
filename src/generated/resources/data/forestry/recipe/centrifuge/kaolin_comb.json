@@ -1,0 +1,16 @@
+{
+  "type": "forestry:centrifuge",
+  "id": "forestry:centrifuge/kaolin_comb",
+  "input": "forestry:kaolin_comb",
+  "products": [
+    {
+      "chance": 1.0,
+      "item": "minecraft:clay_ball"
+    },
+    {
+      "chance": 0.9,
+      "item": "forestry:honey_drop"
+    }
+  ],
+  "time": 20
+}

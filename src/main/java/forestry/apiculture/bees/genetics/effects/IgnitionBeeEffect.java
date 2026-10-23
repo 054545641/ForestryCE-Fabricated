@@ -1,0 +1,67 @@
+package forestry.apiculture.bees.genetics.effects;
+
+import forestry.api.apiculture.BeeManager;
+import forestry.api.apiculture.IBeeHousing;
+import forestry.api.core.genetics.IEffectData;
+import forestry.api.core.genetics.IGenome;
+import forestry.core.platform.util.EffectParticles;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+
+public class IgnitionBeeEffect extends ThrottledBeeEffect {
+	private static final int ignitionChance = 50;
+	private static final int fireDuration = 500;
+
+	public IgnitionBeeEffect() {
+		super(false, 20, false, true);
+	}
+
+	@Override
+	public IEffectData doEffectThrottled(IGenome genome, IEffectData storedData, IBeeHousing housing) {
+		Level level = housing.getLevel();
+		List<LivingEntity> entities = ThrottledBeeEffect.getEntitiesInRange(genome, housing, LivingEntity.class);
+		for (LivingEntity entity : entities) {
+			int chance = ignitionChance;
+			int duration = fireDuration;
+
+			// Entities are not attacked if they wear a full set of apiarist's armor.
+			int count = BeeManager.armorApiaristHelper.wearsItems(entity, this, true);
+			if (count > 3) {
+				continue; // Full set, no damage/effect
+			} else if (count > 2) {
+				chance = 5;
+				duration = 50;
+			} else if (count > 1) {
+				chance = 20;
+				duration = 200;
+			} else if (count > 0) {
+				chance = 35;
+				duration = 350;
+			}
+
+			if (level.getRandom().nextInt(1000) >= chance) {
+				continue;
+			}
+
+			entity.igniteForSeconds((float) duration);
+		}
+
+		return storedData;
+	}
+
+	@Override
+	public IEffectData doFX(IGenome genome, IEffectData storedData, IBeeHousing housing) {
+		Level level = housing.getLevel();
+		if (level.getRandom().nextInt(2) != 0) {
+			super.doFX(genome, storedData, housing);
+		} else {
+			Vec3 beeFXCoordinates = housing.getBeeFXCoordinates();
+			EffectParticles.spawn(EffectParticles.Kind.IGNITION, level, beeFXCoordinates.x, beeFXCoordinates.y + 0.5, beeFXCoordinates.z, 0);
+		}
+		return storedData;
+	}
+
+}

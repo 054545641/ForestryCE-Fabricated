@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "forestry:block/ash_bricks",
+    "side": "forestry:block/ash_bricks",
+    "top": "forestry:block/ash_bricks"
+  }
+}

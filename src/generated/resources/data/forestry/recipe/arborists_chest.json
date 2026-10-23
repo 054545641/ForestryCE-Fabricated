@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "#c:glass_blocks/colorless",
+    "X": "#minecraft:saplings",
+    "Y": "#c:chests/wooden"
+  },
+  "pattern": [
+    " # ",
+    "XYX",
+    "XXX"
+  ],
+  "result": {
+    "id": "forestry:arborists_chest"
+  }
+}

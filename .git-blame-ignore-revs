@@ -1,0 +1,20 @@
+# Mass reformatting
+73ae0b49ba5759a1c24b120f75109490a710c7d1
+
+# Phase 7a: mechanical package moves (move-manifest steps 7.1-7.6)
+ad5fafa5980b9ad29b815207ab422f4506bb5035  # api: group the shared api under api.core
+2546b732616de97e3ccfc1b9a9b2dcfc5bd41bde  # core: registration framework to core.platform.registration
+b55d49aa84a00379a52e09fdcac41eb9154e4077  # core: platform layer
+6cd3e2a35a2b4bbf059f168e2aa8b2530e9c6dca  # core: engine layer
+9ad0cbca3178917c90eb1cb386912a6473c990d2  # core: fan out tiles, blocks, items and the analyzer/escritoire screens
+7960559aff696e5e7c1efebed5b4834f66eaaa9d  # core: absorb factory, energy, storage, sorting and worktable
+
+# Phase 7b: mechanical package moves (move-manifest steps 7.7-7.12, plus forestry.plugin)
+933ac828cec11f8234a88f3080182f9f30f2e136  # core: the last four classes find their layer
+a1b5eed380f6ff485cc497ead83ee5b5e1433d15  # plugin: dissolve the package, taxonomy to datagen
+a6cd8e8d5afd23e16a2826c1afa687179b9ea582  # apiculture: bees, apiary, beehouse, alveary, hives, apiarist
+685bf9b42ad88cfc7f5d7db09864cb1547fb4cbf  # arboriculture: trees, wood, leaves, fruit, sapling, charcoal
+6b61c7cffcfc215f1033f927a63d6ff626484ba2  # lepidopterology: butterflies and cocoons
+528b0770e2ad0a461c9a6b4b113b2f14b56aa6aa  # agriculture: farming and cultivation become one jar
+1efea081578c38de418ea9043c1c19570c4a3f05  # mail: letters, postoffice and tradestation
+1223a3c646196c26217c35953273d2fc0b33986c  # compat: dissolve into core.platform.compat

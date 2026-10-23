@@ -1,0 +1,15 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": {
+      "min": 1.0,
+      "max": 4.0
+    }
+  },
+  "gives": {
+    "id": "forestry:bee_smoker",
+    "count": 1
+  },
+  "max_uses": 8.0,
+  "xp": 6.0
+}

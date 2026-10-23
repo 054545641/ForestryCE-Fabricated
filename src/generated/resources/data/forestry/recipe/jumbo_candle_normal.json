@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "forestry:wax_block",
+    "|": "#c:strings"
+  },
+  "pattern": [
+    "|",
+    "#"
+  ],
+  "result": {
+    "id": "forestry:jumbo_candle_normal"
+  }
+}

@@ -1,0 +1,1 @@
+{"type":"forestry:fermenter","id":"forestrylifecycletest:n3_fermenter","resource":"minecraft:amethyst_shard","fermentationValue":300,"modifier":2.0,"output":"minecraft:lava","fluidResource":{"id":"minecraft:water","amount":100}}

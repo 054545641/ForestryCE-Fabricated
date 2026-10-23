@@ -1,0 +1,63 @@
+package forestry.mail.gui;
+
+import forestry.core.platform.gui.ContainerTile;
+import forestry.core.platform.gui.slots.SlotOutput;
+import forestry.core.platform.tile.TileUtil;
+import forestry.core.platform.util.NetworkUtil;
+import forestry.core.platform.util.SlotUtil;
+import forestry.mail.carriers.players.POBox;
+import forestry.mail.carriers.players.POBoxInfo;
+import forestry.mail.features.MailMenuTypes;
+import forestry.mail.network.packets.PacketPOBoxInfoResponse;
+import forestry.mail.postoffice.MailboxBlockEntity;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerInput;
+
+import javax.annotation.Nullable;
+
+public class MailboxMenu extends ContainerTile<MailboxBlockEntity> {
+
+	public static final short SLOT_LETTERS = 0;
+	public static final short SLOT_LETTERS_COUNT = 7 * 12;
+	@Nullable
+	private final POBox mailInventory;
+
+
+	public static MailboxMenu fromNetwork(int windowId, Inventory inv, FriendlyByteBuf data) {
+		MailboxBlockEntity tile = TileUtil.getTile(inv.player.level(), data.readBlockPos(), MailboxBlockEntity.class);
+		return new MailboxMenu(windowId, inv, tile);    //TODO nullability.
+	}
+
+	public MailboxMenu(int windowId, Inventory playerInventory, MailboxBlockEntity tile) {
+		super(windowId, MailMenuTypes.MAILBOX.menuType(), playerInventory, tile, 35, 145);
+		Container inventory = tile.getOrCreateMailInventory(playerInventory.player.level(), playerInventory.player.getGameProfile());
+
+		if (inventory instanceof POBox) {
+			this.mailInventory = (POBox) inventory;
+		} else {
+			this.mailInventory = null;
+		}
+
+		for (int i = 0; i < 7; i++) {
+			for (int j = 0; j < 12; j++) {
+				addSlot(new SlotOutput(inventory, j + i * 12, 8 + j * 18, 8 + i * 18));
+			}
+		}
+	}
+
+	@Override
+	public void clicked(int slotId, int button, ContainerInput clickTypeIn, Player player) {
+		super.clicked(slotId, button, clickTypeIn, player);
+
+		if (SlotUtil.isSlotInRange(slotId, PLAYER_INV_SLOTS + SLOT_LETTERS, SLOT_LETTERS_COUNT)) {
+			if (!player.level().isClientSide() && this.mailInventory != null) {
+				POBoxInfo info = this.mailInventory.getPOBoxInfo();
+				NetworkUtil.sendToPlayer(new PacketPOBoxInfoResponse(info, true), (ServerPlayer) player);
+			}
+		}
+	}
+}

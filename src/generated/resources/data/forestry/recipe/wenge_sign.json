@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "P": [
+      "forestry:wenge_planks",
+      "forestry:wenge_fireproof_planks"
+    ],
+    "S": "#c:rods/wooden"
+  },
+  "pattern": [
+    "PPP",
+    "PPP",
+    " S "
+  ],
+  "result": {
+    "id": "forestry:wenge_sign"
+  }
+}

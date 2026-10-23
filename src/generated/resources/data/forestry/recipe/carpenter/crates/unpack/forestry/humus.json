@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/humus",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_humus"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:humus"
+    }
+  },
+  "time": 5
+}

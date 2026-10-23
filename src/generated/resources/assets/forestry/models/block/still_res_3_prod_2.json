@@ -1,0 +1,10 @@
+{
+  "parent": "forestry:block/machines/base_machine",
+  "render_type": "cutout",
+  "textures": {
+    "base": "forestry:block/machines/still/base",
+    "particle": "forestry:block/machines/still/particles",
+    "product_tank": "forestry:block/machines/still/tank_prod_2",
+    "resource_tank": "forestry:block/machines/still/tank_res_3"
+  }
+}

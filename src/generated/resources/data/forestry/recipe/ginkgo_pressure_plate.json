@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "P": [
+      "forestry:ginkgo_planks",
+      "forestry:ginkgo_fireproof_planks"
+    ]
+  },
+  "pattern": [
+    "PP"
+  ],
+  "result": {
+    "id": "forestry:ginkgo_pressure_plate"
+  }
+}

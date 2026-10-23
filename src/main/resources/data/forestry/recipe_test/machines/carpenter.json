@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "recipeType": "forestry:carpenter",
+  "block": "forestry:carpenter",
+  "inputs": {
+    "items": {
+      "capability": "ItemHandler",
+      "slots": [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+      "layout": "shapeless"
+    },
+    "fluids": {
+      "capability": "FluidHandler",
+      "tank": 0
+    }
+  },
+  "outputs": {
+    "items": {
+      "capability": "ItemHandler",
+      "slots": [10],
+      "primary": 10
+    }
+  },
+  "energy": {
+    "capability": "EnergyStorage",
+    "preFill": 40000,
+    "trackConsumption": true
+  },
+  "tickBudget": 1500,
+  "validation": {
+    "mode": "subset",
+    "nbtCompare": "structural"
+  },
+  "lifecycle": {
+    "warmupTicks": 30,
+    "preTickCommands": [
+      "data merge block ~ ~ ~ {Energy: 40000}"
+    ]
+  }
+}

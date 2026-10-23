@@ -1,0 +1,40 @@
+{
+  "parent": "forestry:get_alveary",
+  "criteria": {
+    "forestry:get_alveary_upgrade": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "forestry:alveary_heater",
+              "forestry:alveary_fan",
+              "forestry:alveary_stabilizer",
+              "forestry:alveary_hygroregulator",
+              "forestry:alveary_sieve",
+              "forestry:alveary_swarmer"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_alveary_upgrade.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "id": "forestry:alveary_swarmer"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_alveary_upgrade.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_alveary_upgrade"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

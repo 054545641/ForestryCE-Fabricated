@@ -1,0 +1,6 @@
+{
+  "parent": "forestry:block/analyzer",
+  "textures": {
+    "particle": "forestry:block/analyzer"
+  }
+}

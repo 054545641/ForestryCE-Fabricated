@@ -1,0 +1,9 @@
+{
+  "parent": "forestry:block/machines/base_machine",
+  "render_type": "cutout",
+  "textures": {
+    "base": "forestry:block/machines/squeezer/base",
+    "particle": "forestry:block/machines/squeezer/particles",
+    "product_tank": "forestry:block/machines/squeezer/tank_prod_4"
+  }
+}

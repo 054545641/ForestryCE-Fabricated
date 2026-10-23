@@ -1,0 +1,23 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:metal_plating/netherite_metal_plating",
+  "molten": {
+    "amount": 50,
+    "id": "forestry:wax"
+  },
+  "recipe": {
+    "category": "building",
+    "key": {
+      "#": "minecraft:netherite_ingot"
+    },
+    "pattern": [
+      "###",
+      "# #",
+      "###"
+    ],
+    "result": {
+      "count": 8,
+      "id": "forestry:metal_plating_netherite"
+    }
+  }
+}

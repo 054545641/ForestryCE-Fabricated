@@ -1,0 +1,21 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/woven_silk",
+  "liquid": {
+    "amount": 500,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "X": "forestry:silk_wisp"
+    },
+    "pattern": [
+      "XX",
+      "XX"
+    ],
+    "result": {
+      "id": "forestry:woven_silk"
+    }
+  },
+  "time": 10
+}

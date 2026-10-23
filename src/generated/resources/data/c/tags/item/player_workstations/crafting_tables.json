@@ -1,0 +1,13 @@
+{
+  "values": [
+    {
+      "id": "#c:workbenches",
+      "required": false
+    },
+    {
+      "id": "#c:workbench",
+      "required": false
+    },
+    "minecraft:crafting_table"
+  ]
+}

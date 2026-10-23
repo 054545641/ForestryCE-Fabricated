@@ -1,0 +1,90 @@
+package forestry.core.content.machines.recipes.jei.moistener;
+
+import com.mojang.datafixers.util.Pair;
+import forestry.api.ForestryConstants;
+import forestry.api.ForestryDataMaps;
+import forestry.api.core.machines.IMoistenerRecipe;
+import forestry.core.content.machines.blocks.BlockTypeFactoryPlain;
+import forestry.core.content.machines.features.FactoryBlocks;
+import forestry.core.platform.config.Constants;
+import forestry.core.platform.recipes.jei.ForestryRecipeCategory;
+import forestry.core.platform.recipes.jei.ForestryRecipeType;
+import forestry.core.platform.recipes.jei.JeiDataMaps;
+import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableAnimated;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.types.IRecipeType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluids;
+import forestry.api.core.fluids.FluidVolume;
+
+public class MoistenerRecipeCategory extends ForestryRecipeCategory<IMoistenerRecipe> {
+	private static final Identifier TEXTURE = ForestryConstants.forestry(Constants.TEXTURE_PATH_GUI + "/moistener.png");
+
+	private final IDrawableAnimated arrow;
+	private final IDrawableAnimated progressBar;
+	private final IDrawable tankOverlay;
+	private final IDrawable icon;
+
+	public MoistenerRecipeCategory(IGuiHelper guiHelper) {
+		super(guiHelper.createDrawable(TEXTURE, 15, 15, 145, 60), "block.forestry.moistener");
+
+		IDrawableStatic arrowDrawable = guiHelper.createDrawable(TEXTURE, 176, 91, 29, 55);
+		this.arrow = guiHelper.createAnimatedDrawable(arrowDrawable, 80, IDrawableAnimated.StartDirection.BOTTOM, false);
+		IDrawableStatic progressBar = guiHelper.createDrawable(TEXTURE, 176, 74, 16, 15);
+		this.progressBar = guiHelper.createAnimatedDrawable(progressBar, 160, IDrawableAnimated.StartDirection.LEFT, false);
+		this.tankOverlay = guiHelper.createDrawable(TEXTURE, 176, 0, 16, 58);
+		ItemStack moistener = new ItemStack(FactoryBlocks.PLAIN.get(BlockTypeFactoryPlain.MOISTENER).block());
+		this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, moistener);
+	}
+
+	@Override
+	public IRecipeType<IMoistenerRecipe> getRecipeType() {
+		return ForestryRecipeType.MOISTENER;
+	}
+
+	@Override
+	public IDrawable getIcon() {
+		return this.icon;
+	}
+
+	@Override
+	public void setRecipe(IRecipeLayoutBuilder builder, IMoistenerRecipe recipe, IFocusGroup focuses) {
+		builder.addSlot(RecipeIngredientRole.INPUT, 128, 4)
+			.addIngredients(recipe.getInput());
+
+		var fuels = JeiDataMaps.entries(ForestryDataMaps.MOISTENER_FUELS);
+		IRecipeSlotBuilder fuelResourceSlot = builder.addSlot(RecipeIngredientRole.INPUT, 24, 43)
+			.addItemStacks(fuels.stream().map(Pair::getFirst).toList());
+
+		builder.addSlot(RecipeIngredientRole.OUTPUT, 128, 40)
+			.addItemStack(recipe.getProduct());
+
+		IRecipeSlotBuilder fuelProductsSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 90, 22)
+			.addItemStacks(fuels.stream().map(entry -> entry.getSecond().product()).toList());
+
+		FluidVolume fluidInput = FluidVolume.milliBuckets(Fluids.WATER, recipe.getTimePerItem() / 4);
+		builder.addSlot(RecipeIngredientRole.INPUT, 1, 1)
+			.setFluidRenderer(forestry.api.core.fluids.FluidUnits.fromMilliBuckets(10000), false, 16, 58)
+			.setOverlay(this.tankOverlay, 0, 0)
+			.add(fluidInput.getFluid(), fluidInput.getAmount(), fluidInput.variant().getComponentsPatch());
+
+		builder.createFocusLink(fuelResourceSlot, fuelProductsSlot);
+	}
+
+	@Override
+	public void draw(IMoistenerRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+		super.draw(recipe, recipeSlotsView, graphics, mouseX, mouseY);
+		this.arrow.draw(graphics, 78, 2);
+		this.progressBar.draw(graphics, 109, 22);
+	}
+}

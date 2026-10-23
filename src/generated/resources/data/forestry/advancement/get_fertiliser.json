@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_bronze",
+  "criteria": {
+    "forestry:get_fertiliser": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:fertilizer"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_fertiliser.description"
+    },
+    "icon": {
+      "id": "forestry:fertilizer"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_fertiliser.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_fertiliser"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

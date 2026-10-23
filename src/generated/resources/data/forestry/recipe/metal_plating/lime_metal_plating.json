@@ -1,0 +1,24 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:metal_plating/lime_metal_plating",
+  "molten": {
+    "amount": 50,
+    "id": "forestry:wax"
+  },
+  "recipe": {
+    "category": "building",
+    "key": {
+      "#": "#forestry:metal_plating",
+      "D": "#c:dyes/lime"
+    },
+    "pattern": [
+      "###",
+      "#D#",
+      "###"
+    ],
+    "result": {
+      "count": 8,
+      "id": "forestry:metal_plating_lime"
+    }
+  }
+}

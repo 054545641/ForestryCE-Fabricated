@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "forestry:farm_crops_managed"
+  ],
+  "result": {
+    "id": "forestry:farm_crops_manual"
+  }
+}

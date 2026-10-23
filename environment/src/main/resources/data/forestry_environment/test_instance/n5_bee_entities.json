@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "function": "forestry_environment:n5_bee_entities",
+  "environment": "minecraft:default",
+  "structure": "forestry_environment:empty",
+  "max_ticks": 100
+}

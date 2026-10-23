@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/apatite",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_apatite"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:apatite"
+    }
+  },
+  "time": 5
+}

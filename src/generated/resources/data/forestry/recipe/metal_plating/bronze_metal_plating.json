@@ -1,0 +1,23 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:metal_plating/bronze_metal_plating",
+  "molten": {
+    "amount": 50,
+    "id": "forestry:wax"
+  },
+  "recipe": {
+    "category": "building",
+    "key": {
+      "#": "forestry:bronze_ingot"
+    },
+    "pattern": [
+      "###",
+      "# #",
+      "###"
+    ],
+    "result": {
+      "count": 8,
+      "id": "forestry:metal_plating_bronze"
+    }
+  }
+}

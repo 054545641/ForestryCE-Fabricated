@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:book",
+    "forestry:honey_drop"
+  ],
+  "result": {
+    "id": "forestry:foresters_manual"
+  }
+}

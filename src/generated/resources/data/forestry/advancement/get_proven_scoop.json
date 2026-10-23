@@ -1,0 +1,33 @@
+{
+  "parent": "forestry:get_scoop",
+  "criteria": {
+    "forestry:get_proven_scoop": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:proven_scoop"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_proven_scoop.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "id": "forestry:proven_scoop"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_proven_scoop.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_proven_scoop"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

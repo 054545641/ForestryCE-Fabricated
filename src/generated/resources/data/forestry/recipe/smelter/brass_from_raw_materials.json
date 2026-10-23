@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:raw_materials/zinc"
+      }
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:ingots/brass"
+      }
+    }
+  ],
+  "type": "forestry:smelter",
+  "id": "forestry:smelter/brass_from_raw_materials",
+  "inputs": [
+    {
+      "count": 1,
+      "ingredient": "#c:raw_materials/copper"
+    },
+    {
+      "count": 1,
+      "ingredient": "#c:raw_materials/zinc"
+    }
+  ],
+  "output": {
+    "count": 2,
+    "ingredient": "#c:ingots/brass"
+  },
+  "processingTime": 40
+}

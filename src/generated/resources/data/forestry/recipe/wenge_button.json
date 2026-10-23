@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    [
+      "forestry:wenge_planks",
+      "forestry:wenge_fireproof_planks"
+    ]
+  ],
+  "result": {
+    "id": "forestry:wenge_button"
+  }
+}

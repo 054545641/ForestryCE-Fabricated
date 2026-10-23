@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    [
+      "forestry:ebony_planks",
+      "forestry:ebony_fireproof_planks"
+    ]
+  ],
+  "result": {
+    "id": "forestry:ebony_button"
+  }
+}

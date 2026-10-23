@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "forestry:item/combustion_engine",
+    "model": {
+      "type": "forestry:machine",
+      "kind": "combustion_engine"
+    }
+  }
+}

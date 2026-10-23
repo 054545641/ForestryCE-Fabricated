@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:gift",
+  "pools": [
+    {
+      "entries": [
+        {
+          "type": "minecraft:tag",
+          "expand": true,
+          "functions": [
+            {
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 4.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "forestry:village_combs"
+        },
+        {
+          "type": "minecraft:tag",
+          "expand": true,
+          "name": "forestry:scoops",
+          "weight": 5
+        }
+      ],
+      "name": "forestry_beekeeper_gift",
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "forestry:gameplay/hero_of_the_village/beekeeper_gift"
+}

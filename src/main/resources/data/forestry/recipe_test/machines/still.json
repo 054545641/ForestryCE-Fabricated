@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "recipeType": "forestry:still",
+  "block": "forestry:still",
+  "inputs": {
+    "fluids": {
+      "capability": "FluidHandler",
+      "tank": 0
+    }
+  },
+  "outputs": {
+    "fluids": {
+      "capability": "FluidHandler",
+      "tank": 1
+    }
+  },
+  "energy": {
+    "capability": "EnergyStorage",
+    "preFill": 40000,
+    "trackConsumption": true
+  },
+  "tickBudget": 600,
+  "validation": {
+    "mode": "exact",
+    "nbtCompare": "structural"
+  },
+  "lifecycle": {
+    "warmupTicks": 5,
+    "preTickCommands": [
+      "data merge block ~ ~ ~ {Energy: 40000}"
+    ]
+  }
+}

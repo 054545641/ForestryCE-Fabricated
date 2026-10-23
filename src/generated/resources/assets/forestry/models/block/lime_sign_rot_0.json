@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_sign_rot_0",
+  "textures": {
+    "all": "forestry:entity/signs/lime",
+    "particle": "forestry:block/lime_planks"
+  }
+}

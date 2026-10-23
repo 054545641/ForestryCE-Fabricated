@@ -1,0 +1,26 @@
+{
+  "wants": {
+    "id": "forestry:drone_bee",
+    "count": 1.0
+  },
+  "gives": {
+    "id": "forestry:drone_bee",
+    "count": 1
+  },
+  "max_uses": 8.0,
+  "xp": 15.0,
+  "additional_wants": {
+    "id": "minecraft:ender_eye",
+    "count": {
+      "min": 12.0,
+      "max": 16.0
+    }
+  },
+  "given_item_modifiers": [
+    {
+      "function": "forestry:set_species_nbt",
+      "type_id": "forestry:bee_species",
+      "species_id": "forestry:ended"
+    }
+  ]
+}

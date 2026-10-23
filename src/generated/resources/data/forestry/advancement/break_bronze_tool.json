@@ -1,0 +1,39 @@
+{
+  "parent": "forestry:get_bronze",
+  "criteria": {
+    "forestry:break_bronze_tool": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "forestry:broken_survivalists_axe",
+              "forestry:broken_survivalists_pickaxe",
+              "forestry:broken_survivalists_shovel",
+              "forestry:broken_survivalists_hoe",
+              "forestry:broken_survivalists_sword"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.break_bronze_tool.description"
+    },
+    "hidden": true,
+    "icon": {
+      "id": "forestry:broken_survivalists_pickaxe"
+    },
+    "title": {
+      "translate": "advancements.forestry.break_bronze_tool.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:break_bronze_tool"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

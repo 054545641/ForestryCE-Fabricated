@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/dark_oak_sapling",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_dark_oak_sapling"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:dark_oak_sapling"
+    }
+  },
+  "time": 5
+}

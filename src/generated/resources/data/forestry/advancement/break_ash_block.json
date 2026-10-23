@@ -1,0 +1,25 @@
+{
+  "parent": "forestry:root",
+  "criteria": {
+    "forestry:break_ash_block": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.break_ash_block.description"
+    },
+    "icon": {
+      "id": "forestry:log_pile"
+    },
+    "title": {
+      "translate": "advancements.forestry.break_ash_block.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:break_ash_block"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

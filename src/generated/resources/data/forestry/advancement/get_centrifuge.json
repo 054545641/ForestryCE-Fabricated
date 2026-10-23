@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_bronze",
+  "criteria": {
+    "forestry:get_centrifuge": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:centrifuge"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_centrifuge.description"
+    },
+    "icon": {
+      "id": "forestry:centrifuge"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_centrifuge.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_centrifuge"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

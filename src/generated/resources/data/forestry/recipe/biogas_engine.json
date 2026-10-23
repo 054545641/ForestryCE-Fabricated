@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "D": "minecraft:piston",
+    "I": "#c:glass_blocks/colorless",
+    "P": "#c:ingots/bronze",
+    "Q": "#c:gears/bronze"
+  },
+  "pattern": [
+    "PPP",
+    " I ",
+    "QDQ"
+  ],
+  "result": {
+    "id": "forestry:biogas_engine"
+  }
+}

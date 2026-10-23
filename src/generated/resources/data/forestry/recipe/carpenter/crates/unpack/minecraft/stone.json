@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/stone",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_stone"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:stone"
+    }
+  },
+  "time": 5
+}

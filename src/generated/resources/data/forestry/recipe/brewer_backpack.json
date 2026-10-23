@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": "#minecraft:wool",
+    "V": "minecraft:glass_bottle",
+    "X": "#c:strings",
+    "Y": "#c:chests/wooden"
+  },
+  "pattern": [
+    "X#X",
+    "VYV",
+    "X#X"
+  ],
+  "result": {
+    "id": "forestry:brewer_backpack"
+  }
+}

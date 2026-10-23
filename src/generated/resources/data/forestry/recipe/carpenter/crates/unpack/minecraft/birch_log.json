@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/birch_log",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_birch_log"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:birch_log"
+    }
+  },
+  "time": 5
+}

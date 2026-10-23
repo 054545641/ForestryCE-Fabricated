@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:break_ash_block",
+  "criteria": {
+    "forestry:get_burn_barrel": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:burn_barrel"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_burn_barrel.description"
+    },
+    "icon": {
+      "id": "forestry:burn_barrel"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_burn_barrel.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_burn_barrel"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,241 @@
+{
+  "parent": "forestry:get_bee_house",
+  "criteria": {
+    "get_cocoa_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:cocoa_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_dripping_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:dripping_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_frozen_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:frozen_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_honey_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:honey_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_kaolin_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:kaolin_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_mellow_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:mellow_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_mossy_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:mossy_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_mysterious_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:mysterious_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_parched_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:parched_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_powdery_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:powdery_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_sculken_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:sculken_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_silky_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:silky_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_simmering_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:simmering_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_spongy_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:spongy_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_stringy_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:stringy_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_vintage_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:vintage_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "get_wheaten_comb": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:wheaten_comb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_all_combs.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "id": "forestry:honey_comb"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_all_combs.title"
+    }
+  },
+  "requirements": [
+    [
+      "get_honey_comb"
+    ],
+    [
+      "get_cocoa_comb"
+    ],
+    [
+      "get_simmering_comb"
+    ],
+    [
+      "get_stringy_comb"
+    ],
+    [
+      "get_frozen_comb"
+    ],
+    [
+      "get_dripping_comb"
+    ],
+    [
+      "get_silky_comb"
+    ],
+    [
+      "get_parched_comb"
+    ],
+    [
+      "get_mysterious_comb"
+    ],
+    [
+      "get_powdery_comb"
+    ],
+    [
+      "get_wheaten_comb"
+    ],
+    [
+      "get_mossy_comb"
+    ],
+    [
+      "get_mellow_comb"
+    ],
+    [
+      "get_kaolin_comb"
+    ],
+    [
+      "get_vintage_comb"
+    ],
+    [
+      "get_spongy_comb"
+    ],
+    [
+      "get_sculken_comb"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

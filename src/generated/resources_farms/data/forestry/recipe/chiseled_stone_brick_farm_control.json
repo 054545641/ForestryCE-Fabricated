@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "minecraft:chiseled_stone_bricks",
+    "T": "forestry:golden_electron_tube",
+    "X": "#c:dusts/redstone"
+  },
+  "pattern": [
+    " # ",
+    "XTX"
+  ],
+  "result": {
+    "id": "forestry:chiseled_stone_brick_farm_control"
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "parent": "forestry:get_analyser",
+  "criteria": {
+    "forestry:get_zombie_drone": {
+      "conditions": {
+        "tag": "forestry:zombified"
+      },
+      "trigger": "forestry:pickup_species_trigger"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_zombie_drone.description"
+    },
+    "icon": {
+      "components": {
+        "forestry:bee_generation": 0,
+        "forestry:bee_pristine": true,
+        "forestry:genome": {
+          "genome": {
+            "forestry:activity": {
+              "active": {
+                "dominant": true,
+                "value": "forestry:activity_metaturnal"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "forestry:activity_metaturnal"
+              }
+            },
+            "forestry:bee_effect": {
+              "active": {
+                "dominant": true,
+                "value": "forestry:bee_effect_none"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "forestry:bee_effect_none"
+              }
+            },
+            "forestry:bee_species": {
+              "active": {
+                "dominant": true,
+                "value": "forestry:zombified"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "forestry:zombified"
+              }
+            },
+            "forestry:cave_dwelling": {
+              "active": {
+                "dominant": true,
+                "value": true
+              },
+              "inactive": {
+                "dominant": true,
+                "value": true
+              }
+            },
+            "forestry:fertility": {
+              "active": {
+                "dominant": true,
+                "value": 1
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 1
+              }
+            },
+            "forestry:flower_type": {
+              "active": {
+                "value": "forestry:flower_type_nether"
+              },
+              "inactive": {
+                "value": "forestry:flower_type_nether"
+              }
+            },
+            "forestry:humidity_tolerance": {
+              "active": {
+                "dominant": true,
+                "value": "UP_1"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "UP_1"
+              }
+            },
+            "forestry:lifespan": {
+              "active": {
+                "value": 2147483647
+              },
+              "inactive": {
+                "value": 2147483647
+              }
+            },
+            "forestry:pollination": {
+              "active": {
+                "dominant": true,
+                "value": 5
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 5
+              }
+            },
+            "forestry:speed": {
+              "active": {
+                "value": 1.0
+              },
+              "inactive": {
+                "value": 1.0
+              }
+            },
+            "forestry:temperature_tolerance": {
+              "active": {
+                "value": "DOWN_3"
+              },
+              "inactive": {
+                "value": "DOWN_3"
+              }
+            },
+            "forestry:territory": {
+              "active": {
+                "value": [
+                  9,
+                  6,
+                  9
+                ]
+              },
+              "inactive": {
+                "value": [
+                  9,
+                  6,
+                  9
+                ]
+              }
+            },
+            "forestry:tolerates_rain": {
+              "active": {
+                "dominant": true,
+                "value": false
+              },
+              "inactive": {
+                "dominant": true,
+                "value": false
+              }
+            }
+          },
+          "karyotype": "forestry:bee_species"
+        },
+        "forestry:health": 2147483647,
+        "forestry:max_health": 2147483647
+      },
+      "id": "forestry:drone_bee"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_zombie_drone.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_zombie_drone"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

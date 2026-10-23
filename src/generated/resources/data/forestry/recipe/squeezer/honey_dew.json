@@ -1,0 +1,15 @@
+{
+  "type": "forestry:squeezer",
+  "chance": 0.0,
+  "id": "forestry:squeezer/honey_dew",
+  "output": {
+    "stack": {
+      "amount": 100,
+      "id": "forestry:honey"
+    }
+  },
+  "resources": [
+    "forestry:honeydew"
+  ],
+  "time": 10
+}

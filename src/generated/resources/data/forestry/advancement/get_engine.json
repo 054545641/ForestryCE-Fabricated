@@ -1,0 +1,38 @@
+{
+  "parent": "forestry:root",
+  "criteria": {
+    "forestry:get_engine": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "forestry:clockwork_engine",
+              "forestry:peat_engine",
+              "forestry:biogas_engine",
+              "forestry:combustion_engine",
+              "forestry:solar_engine"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_engine.description"
+    },
+    "icon": {
+      "id": "forestry:biogas_engine"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_engine.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_engine"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

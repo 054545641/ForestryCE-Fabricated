@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "forestry:block/hive/wintry_bottom",
+    "side": "forestry:block/hive/wintry_side",
+    "top": "forestry:block/hive/wintry_top"
+  }
+}

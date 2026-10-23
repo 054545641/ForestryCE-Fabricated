@@ -1,0 +1,1 @@
+forestry.core.platform.compat.kubejs.ForestryKubeJsPlugin

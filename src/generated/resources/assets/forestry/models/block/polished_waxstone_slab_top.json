@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "forestry:block/polished_waxstone",
+    "side": "forestry:block/polished_waxstone",
+    "top": "forestry:block/polished_waxstone"
+  }
+}

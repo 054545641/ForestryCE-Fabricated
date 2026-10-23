@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "forestry_release_probe",
+  "version": "1.0.0",
+  "name": "Forestry isolated release acceptance driver",
+  "environment": "client",
+  "entrypoints": {"client": ["forestry.fabric.release.ReleaseClientProbe"]},
+  "depends": {"forestry": "*", "fabric-api": "*"}
+}

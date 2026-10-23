@@ -1,0 +1,15 @@
+{
+  "values": [
+    "#minecraft:coals",
+    "#c:dusts",
+    "#c:gems",
+    "#c:ingots",
+    "#c:nuggets",
+    "#c:obsidians",
+    "#c:ores",
+    "#c:raw_materials",
+    "forestry:broken_survivalists_pickaxe",
+    "forestry:pickaxe_kit",
+    "forestry:survivalists_pickaxe"
+  ]
+}

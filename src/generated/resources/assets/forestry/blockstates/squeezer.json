@@ -1,0 +1,79 @@
+{
+  "variants": {
+    "facing=east,tank_product_fill_level=0": {
+      "model": "forestry:block/squeezer_prod_0",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=1": {
+      "model": "forestry:block/squeezer_prod_1",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=2": {
+      "model": "forestry:block/squeezer_prod_2",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=3": {
+      "model": "forestry:block/squeezer_prod_3",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=4": {
+      "model": "forestry:block/squeezer_prod_4",
+      "y": 90
+    },
+    "facing=north,tank_product_fill_level=0": {
+      "model": "forestry:block/squeezer_prod_0"
+    },
+    "facing=north,tank_product_fill_level=1": {
+      "model": "forestry:block/squeezer_prod_1"
+    },
+    "facing=north,tank_product_fill_level=2": {
+      "model": "forestry:block/squeezer_prod_2"
+    },
+    "facing=north,tank_product_fill_level=3": {
+      "model": "forestry:block/squeezer_prod_3"
+    },
+    "facing=north,tank_product_fill_level=4": {
+      "model": "forestry:block/squeezer_prod_4"
+    },
+    "facing=south,tank_product_fill_level=0": {
+      "model": "forestry:block/squeezer_prod_0",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=1": {
+      "model": "forestry:block/squeezer_prod_1",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=2": {
+      "model": "forestry:block/squeezer_prod_2",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=3": {
+      "model": "forestry:block/squeezer_prod_3",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=4": {
+      "model": "forestry:block/squeezer_prod_4",
+      "y": 180
+    },
+    "facing=west,tank_product_fill_level=0": {
+      "model": "forestry:block/squeezer_prod_0",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=1": {
+      "model": "forestry:block/squeezer_prod_1",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=2": {
+      "model": "forestry:block/squeezer_prod_2",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=3": {
+      "model": "forestry:block/squeezer_prod_3",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=4": {
+      "model": "forestry:block/squeezer_prod_4",
+      "y": 270
+    }
+  }
+}

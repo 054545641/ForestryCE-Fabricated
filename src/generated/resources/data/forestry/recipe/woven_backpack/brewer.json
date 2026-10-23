@@ -1,0 +1,25 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:woven_backpack/brewer",
+  "liquid": {
+    "amount": 1000,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "category": "equipment",
+    "key": {
+      "T": "forestry:brewer_backpack",
+      "W": "forestry:woven_silk",
+      "X": "minecraft:diamond"
+    },
+    "pattern": [
+      "WXW",
+      "WTW",
+      "WWW"
+    ],
+    "result": {
+      "id": "forestry:woven_brewer_backpack"
+    }
+  },
+  "time": 200
+}

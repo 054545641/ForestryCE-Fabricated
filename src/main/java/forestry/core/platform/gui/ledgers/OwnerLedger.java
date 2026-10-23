@@ -1,0 +1,54 @@
+package forestry.core.platform.gui.ledgers;
+
+import com.mojang.authlib.GameProfile;
+import forestry.api.client.ForestrySprites;
+import forestry.api.client.IForestryClientApi;
+import forestry.core.platform.owner.IOwnedTile;
+import forestry.core.platform.util.PlayerUtil;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.network.chat.Component;
+
+import javax.annotation.Nullable;
+
+/**
+ * Ledger displaying ownership information
+ */
+public class OwnerLedger extends Ledger {
+	@Nullable
+	private final GameProfile owner;
+
+	public OwnerLedger(LedgerManager manager, IOwnedTile tile) {
+		super(manager, "owner");
+
+		this.owner = tile.getOwnerHandler().getOwner();
+		this.maxHeight = 40;
+	}
+
+	@Override
+	public boolean isVisible() {
+		return this.owner != null;
+	}
+
+	@Override
+	public void draw(GuiGraphicsExtractor graphics, int y, int x) {
+		// Draw background
+		drawBackground(graphics, y, x);
+
+		// Draw icon
+		TextureAtlasSprite accessIcon = IForestryClientApi.INSTANCE.getTextureManager().getSprite(ForestrySprites.MISC_ACCESS_SHARED);
+		drawSprite(graphics, accessIcon, x + 3, y + 4);
+
+		// Draw description
+		if (isFullyOpened()) {
+			drawHeader(graphics, Component.translatable("for.gui.owner"), x + 22, y + 8);
+			drawText(graphics, PlayerUtil.getOwnerName(this.owner), x + 22, y + 20);
+		}
+	}
+
+	@Override
+	public Component getTooltip() {
+		return Component.translatable("for.gui.owner")
+			.append(": " + PlayerUtil.getOwnerName(this.owner));
+	}
+}

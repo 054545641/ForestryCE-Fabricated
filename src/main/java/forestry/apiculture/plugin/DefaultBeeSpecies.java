@@ -1,0 +1,852 @@
+package forestry.apiculture.plugin;
+
+import forestry.api.apiculture.ForestryBeeSpecies;
+import forestry.api.core.HumidityType;
+import forestry.api.core.TemperatureType;
+import forestry.api.core.genetics.alleles.BeeChromosomes;
+import forestry.api.core.genetics.alleles.ForestryAlleles;
+import forestry.api.plugin.IApicultureRegistration;
+import forestry.apiculture.features.ApicultureItems;
+import forestry.apiculture.bees.genetics.FireworkProduct;
+import forestry.apiculture.bees.EnumHoneyComb;
+import forestry.apiculture.bees.EnumPollenCluster;
+import forestry.core.features.CoreItems;
+import forestry.core.content.resources.EnumCraftingMaterial;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+
+import static forestry.api.core.genetics.ForestryTaxa.*;
+import static forestry.apiculture.features.ApicultureItems.BEE_COMBS;
+import static forestry.apiculture.features.ApicultureItems.POLLEN_CLUSTER;
+import forestry.api.apiculture.ForestryActivityTypes;
+import forestry.api.apiculture.ForestryBeeEffects;
+import forestry.api.apiculture.ForestryBeeJubilances;
+import forestry.api.apiculture.ForestryFlowerTypes;
+
+public class DefaultBeeSpecies {
+	@SuppressWarnings("CodeBlock2Expr")
+	public static void register(IApicultureRegistration apiculture) {
+		Identifier[] overworldHiveBees = new Identifier[]{ForestryBeeSpecies.FOREST, ForestryBeeSpecies.MARSHY, ForestryBeeSpecies.MEADOWS, ForestryBeeSpecies.MODEST, ForestryBeeSpecies.SAVANNA, ForestryBeeSpecies.TROPICAL, ForestryBeeSpecies.VALIANT, ForestryBeeSpecies.WINTRY, ForestryBeeSpecies.LUSH, ForestryBeeSpecies.AQUATIC};
+
+		// Forest
+		apiculture.registerSpecies(ForestryBeeSpecies.FOREST, GENUS_HONEY, SPECIES_FOREST, true, TextColor.fromRgb(0x19d0ec))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.HONEY), 0.30f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_SLOWER);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_3);
+				genome.set(BeeChromosomes.TEMPERATURE_TOLERANCE, ForestryAlleles.TOLERANCE_DOWN_1);
+			});
+
+		// Meadows
+		apiculture.registerSpecies(ForestryBeeSpecies.MEADOWS, GENUS_HONEY, SPECIES_MEADOWS, true, TextColor.fromRgb(0xef131e))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.HONEY), 0.30f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_SLOWER);
+				genome.set(BeeChromosomes.HUMIDITY_TOLERANCE, ForestryAlleles.TOLERANCE_DOWN_1);
+			});
+
+		// Common
+		apiculture.registerSpecies(ForestryBeeSpecies.COMMON, GENUS_HONEY, SPECIES_COMMON, true, TextColor.fromRgb(0xb2b2b2))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.HONEY), 0.35f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+			});
+
+		// Cultivated
+		apiculture.registerSpecies(ForestryBeeSpecies.CULTIVATED, GENUS_HONEY, SPECIES_CULTIVATED, true, TextColor.fromRgb(0x5734ec))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.HONEY), 0.40f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_FAST);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORTEST);
+			});
+
+		// Noble
+		apiculture.registerSpecies(ForestryBeeSpecies.NOBLE, GENUS_NOBLE, SPECIES_NOBLE, false, TextColor.fromRgb(0xec9a19))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.DRIPPING), 0.20f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORT);
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_SLOW);
+			});
+
+		// Majestic
+		apiculture.registerSpecies(ForestryBeeSpecies.MAJESTIC, GENUS_NOBLE, SPECIES_MAJESTIC, true, TextColor.fromRgb(0x7f0000))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.DRIPPING), 0.30f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_NORMAL);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORTENED);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_4);
+			});
+
+		// Imperial
+		apiculture.registerSpecies(ForestryBeeSpecies.IMPERIAL, GENUS_NOBLE, SPECIES_IMPERIAL, false, TextColor.fromRgb(0xa3e02f))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.DRIPPING), 0.20f)
+			.addProduct(ApicultureItems.ROYAL_JELLY.stack(), 0.15f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_NORMAL);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.BEATIFIC);
+			})
+			.setGlint(true);
+
+		// Diligent
+		apiculture.registerSpecies(ForestryBeeSpecies.DILIGENT, GENUS_INDUSTRIOUS, SPECIES_DILIGENT, false, TextColor.fromRgb(0xc219ec))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.STRINGY), 0.20f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORT);
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_SLOW);
+			});
+		// Unweary
+		apiculture.registerSpecies(ForestryBeeSpecies.UNWEARY, GENUS_INDUSTRIOUS, SPECIES_UNWEARY, true, TextColor.fromRgb(0x19ec5a))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.STRINGY), 0.30f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_NORMAL);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORTENED);
+			});
+
+		// Industrious
+		apiculture.registerSpecies(ForestryBeeSpecies.INDUSTRIOUS, GENUS_INDUSTRIOUS, SPECIES_INDUSTRIOUS, false, TextColor.fromRgb(0xffffff))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.STRINGY), 0.20f)
+			.addProduct(POLLEN_CLUSTER.stack(EnumPollenCluster.NORMAL), 0.15f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_NORMAL);
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_FAST);
+			})
+			.setGlint(true);
+
+		// Sinister
+		apiculture.registerSpecies(ForestryBeeSpecies.SINISTER, GENUS_INFERNAL, SPECIES_SINISTER, false, TextColor.fromRgb(0xb3d5e4))
+			.setBody(TextColor.fromRgb(0x9a2323))
+			.setTemperature(TemperatureType.HELLISH)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SIMMERING), 0.45f)
+			.addProduct(CoreItems.CRAFTING_MATERIALS.stack(EnumCraftingMaterial.PHOSPHOR, 2), 0.30F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_NORMAL);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.AGGRESSIVE);
+			});
+
+		// Fiendish
+		apiculture.registerSpecies(ForestryBeeSpecies.FIENDISH, GENUS_INFERNAL, SPECIES_FIENDISH, true, TextColor.fromRgb(0xd7bee5))
+			.setBody(TextColor.fromRgb(0x9a2323))
+			.setTemperature(TemperatureType.HELLISH)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SIMMERING), 0.55f)
+			.addProduct(CoreItems.ASH.stack(), 0.15f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_NORMAL);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONG);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.AGGRESSIVE);
+			});
+
+		// Demonic
+		apiculture.registerSpecies(ForestryBeeSpecies.DEMONIC, GENUS_INFERNAL, SPECIES_DEMONIC, false, TextColor.fromRgb(0xf4e400))
+			.setBody(TextColor.fromRgb(0x9a2323))
+			.setTemperature(TemperatureType.HELLISH)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SIMMERING), 0.45f)
+			.addProduct(new ItemStack(Items.GLOWSTONE_DUST), 0.15f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONGER);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.IGNITION);
+			})
+			.setGlint(true);
+
+		// Modest
+		apiculture.registerSpecies(ForestryBeeSpecies.MODEST, GENUS_AUSTERE, SPECIES_MODEST, false, TextColor.fromRgb(0xc5be86))
+			.setTemperature(TemperatureType.HOT)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.PARCHED), 0.20f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORT);
+			});
+
+		// Frugal
+		apiculture.registerSpecies(ForestryBeeSpecies.FRUGAL, GENUS_AUSTERE, SPECIES_FRUGAL, true, TextColor.fromRgb(0xe8dcb1))
+			.setTemperature(TemperatureType.HOT)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.PARCHED), 0.30f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_NORMAL);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONG);
+			});
+
+		// Austere
+		apiculture.registerSpecies(ForestryBeeSpecies.AUSTERE, GENUS_AUSTERE, SPECIES_AUSTERE, false, TextColor.fromRgb(0xfffac2))
+			.setTemperature(TemperatureType.HOT)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.PARCHED), 0.20f)
+			.addSpecialty(BEE_COMBS.stack(EnumHoneyComb.POWDERY), 0.50f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWEST);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONGER);
+				genome.set(BeeChromosomes.TEMPERATURE_TOLERANCE, ForestryAlleles.TOLERANCE_DOWN_2);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.CREEPER);
+			})
+			.setGlint(true);
+
+		// Tropical
+		apiculture.registerSpecies(ForestryBeeSpecies.TROPICAL, GENUS_TROPICAL, SPECIES_TROPICAL, false, TextColor.fromRgb(0x378020))
+			.setTemperature(TemperatureType.WARM)
+			.setHumidity(HumidityType.DAMP)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SILKY), 0.20f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORT);
+			});
+
+		// Exotic
+		apiculture.registerSpecies(ForestryBeeSpecies.EXOTIC, GENUS_TROPICAL, SPECIES_EXOTIC, true, TextColor.fromRgb(0x304903))
+			.setTemperature(TemperatureType.WARM)
+			.setHumidity(HumidityType.DAMP)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SILKY), 0.30f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_NORMAL);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONG);
+			});
+
+		// Edenic
+		apiculture.registerSpecies(ForestryBeeSpecies.EDENIC, GENUS_TROPICAL, SPECIES_EDENIC, false, TextColor.fromRgb(0x393d0d))
+			.setTemperature(TemperatureType.WARM)
+			.setHumidity(HumidityType.DAMP)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SILKY), 0.20f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWEST);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONGER);
+				genome.set(BeeChromosomes.TEMPERATURE_TOLERANCE, ForestryAlleles.TOLERANCE_BOTH_2);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.EXPLORATION);
+			})
+			.setGlint(true);
+
+		// Monastic (Only obtainable from villagers)
+		apiculture.registerSpecies(ForestryBeeSpecies.MONASTIC, GENUS_MONASTIC, SPECIES_MONASTIC, false, TextColor.fromRgb(0x42371c))
+			.setJubilance(ForestryBeeJubilances.HERMIT)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.WHEATEN), 0.30f)
+			.addSpecialty(BEE_COMBS.stack(EnumHoneyComb.MELLOW), 0.10f);
+
+		// Secluded
+		apiculture.registerSpecies(ForestryBeeSpecies.SECLUDED, GENUS_MONASTIC, SPECIES_SECLUDED, true, TextColor.fromRgb(0x7b6634))
+			.setJubilance(ForestryBeeJubilances.HERMIT)
+			.addSpecialty(BEE_COMBS.stack(EnumHoneyComb.MELLOW), 0.20f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_FASTEST);
+			});
+
+		// Hermitic
+		apiculture.registerSpecies(ForestryBeeSpecies.HERMITIC, GENUS_MONASTIC, SPECIES_HERMITIC, false, TextColor.fromRgb(0xffd46c))
+			.setJubilance(ForestryBeeJubilances.HERMIT)
+			.addSpecialty(BEE_COMBS.stack(EnumHoneyComb.MELLOW), 0.20f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_FASTEST);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.REPULSION);
+			})
+			.setGlint(true);
+
+		// SHULKING
+		apiculture.registerSpecies(ForestryBeeSpecies.SHULKING, GENUS_END, SPECIES_SHULKING, false, TextColor.fromRgb(0x896D74))
+			.setBody(TextColor.fromRgb(0xd9de9e))
+			.setTemperature(TemperatureType.COLD)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.MYSTERIOUS), 0.20f)
+			.addSpecialty(new ItemStack(Items.SHULKER_SHELL), 0.015F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.ASCENSION);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOW);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// Ended
+		apiculture.registerSpecies(ForestryBeeSpecies.ENDED, GENUS_END, SPECIES_ENDED, false, TextColor.fromRgb(0xe079fa))
+			.setBody(TextColor.fromRgb(0xd9de9e))
+			.setTemperature(TemperatureType.COLD)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.MYSTERIOUS), 0.30f);
+
+		// Spectral
+		apiculture.registerSpecies(ForestryBeeSpecies.SPECTRAL, GENUS_END, SPECIES_SPECTRAL, true, TextColor.fromRgb(0xa98bed))
+			.setBody(TextColor.fromRgb(0xd9de9e))
+			.setTemperature(TemperatureType.COLD)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.MYSTERIOUS), 0.50f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.REANIMATION);
+			});
+
+		// Phantasmal
+		apiculture.registerSpecies(ForestryBeeSpecies.PHANTASMAL, GENUS_END, SPECIES_PHANTASMAL, false, TextColor.fromRgb(0xcc00fa))
+			.setBody(TextColor.fromRgb(0xd9de9e))
+			.setTemperature(TemperatureType.COLD)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.MYSTERIOUS), 0.40f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWEST);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONGEST);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.RESURRECTION);
+			})
+			.setGlint(true);
+
+		// Wintry
+		apiculture.registerSpecies(ForestryBeeSpecies.WINTRY, GENUS_FROZEN, SPECIES_WINTRY, false, TextColor.fromRgb(0xa0ffc8))
+			.setBody(TextColor.fromRgb(0xdaf5f3))
+			.setTemperature(TemperatureType.ICY)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.FROZEN), 0.30f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORT);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_4);
+			});
+
+		// Icy
+		apiculture.registerSpecies(ForestryBeeSpecies.ICY, GENUS_FROZEN, SPECIES_ICY, true, TextColor.fromRgb(0xa0ffff))
+			.setBody(TextColor.fromRgb(0xdaf5f3))
+			.setTemperature(TemperatureType.ICY)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.FROZEN), 0.20f)
+			.addProduct(CoreItems.CRAFTING_MATERIALS.stack(EnumCraftingMaterial.ICE_SHARD), 0.20f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOW);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORT);
+			});
+
+		// Glacial
+		apiculture.registerSpecies(ForestryBeeSpecies.GLACIAL, GENUS_FROZEN, SPECIES_GLACIAL, false, TextColor.fromRgb(0xefffff))
+			.setBody(TextColor.fromRgb(0xdaf5f3))
+			.setTemperature(TemperatureType.ICY)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.FROZEN), 0.20f)
+			.addProduct(CoreItems.CRAFTING_MATERIALS.stack(EnumCraftingMaterial.ICE_SHARD), 0.40f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORT);
+			})
+			.setGlint(true);
+
+		// Marshy
+		apiculture.registerSpecies(ForestryBeeSpecies.MARSHY, GENUS_BOGGY, SPECIES_MARSHY, true, TextColor.fromRgb(0x546626))
+			.setHumidity(HumidityType.DAMP)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.MOSSY), 0.30f);
+
+		// Miry
+		apiculture.registerSpecies(ForestryBeeSpecies.MIRY, GENUS_BOGGY, SPECIES_MIRY, true, TextColor.fromRgb(0x92AF42))
+			.setHumidity(HumidityType.DAMP)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.MOSSY), 0.36f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_4);
+				genome.set(BeeChromosomes.TOLERATES_RAIN, true);
+				genome.set(BeeChromosomes.ACTIVITY, ForestryActivityTypes.METATURNAL);
+			})
+			.setAuthority("MysteriousAges");
+
+		// Boggy
+		apiculture.registerSpecies(ForestryBeeSpecies.BOGGY, GENUS_BOGGY, SPECIES_BOGGY, true, TextColor.fromRgb(0x698948))
+			.setHumidity(HumidityType.DAMP)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.MOSSY), 0.39f)
+			.addSpecialty(CoreItems.PEAT.stack(), 0.08f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.TOLERATES_RAIN, true);
+				genome.set(BeeChromosomes.ACTIVITY, ForestryActivityTypes.METATURNAL);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.MYCOPHILIC);
+				genome.set(BeeChromosomes.TERRITORY, ForestryAlleles.TERRITORY_LARGER);
+			})
+			.setAuthority("MysteriousAges");
+
+		// Savanna
+		apiculture.registerSpecies(ForestryBeeSpecies.SAVANNA, GENUS_SAVANNA, SPECIES_SAVANNA, true, TextColor.fromRgb(0xb04e0f))
+			.setTemperature(TemperatureType.WARM)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.PARCHED), 0.20f)
+			.addSpecialty(new ItemStack(Items.RED_SAND), 0.10f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORT);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.TERRITORY, ForestryAlleles.TERRITORY_LARGE);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// Argil
+		apiculture.registerSpecies(ForestryBeeSpecies.ARGIL, GENUS_SAVANNA, SPECIES_ARGIL, true, TextColor.fromRgb(0x96afd2))
+			.setTemperature(TemperatureType.WARM)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.KAOLIN), 0.30f)
+			.addSpecialty(new ItemStack(Items.RED_SAND), 0.15f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORT);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOW);
+				genome.set(BeeChromosomes.TERRITORY, ForestryAlleles.TERRITORY_LARGE);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.SIFTER);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// Pride
+		apiculture.registerSpecies(ForestryBeeSpecies.PRIDE, GENUS_SAVANNA, SPECIES_PRIDE, true, TextColor.fromRgb(0x650021))
+			.setTemperature(TemperatureType.WARM)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.KAOLIN), 0.20f)
+			.addSpecialty(BEE_COMBS.stack(EnumHoneyComb.MELLOW), 0.10f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORTENED);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.TERRITORY, ForestryAlleles.TERRITORY_LARGER);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.HAKUNA_MATATA);
+			})
+			.setGlint(true)
+			.setAuthority("EnderiumSmith");
+
+		// Vindictive
+		apiculture.registerSpecies(ForestryBeeSpecies.VINDICTIVE, GENUS_VENGEFUL, SPECIES_VINDICTIVE, true, TextColor.fromRgb(0xeafff3))
+			.setTemperature(TemperatureType.WARM)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.PARCHED), 0.25f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_NORMAL);
+			});
+
+		// Vengeful
+		apiculture.registerSpecies(ForestryBeeSpecies.VENGEFUL, GENUS_VENGEFUL, SPECIES_VENGEFUL, true, TextColor.fromRgb(0xc2de00))
+			.setTemperature(TemperatureType.WARM)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.PARCHED), 0.40f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_NORMAL);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONGER);
+			});
+
+		// Avenging
+		apiculture.registerSpecies(ForestryBeeSpecies.AVENGING, GENUS_VENGEFUL, SPECIES_AVENGING, true, TextColor.fromRgb(0xddff00))
+			.setTemperature(TemperatureType.WARM)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.PARCHED), 0.40f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWEST);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONGEST);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.RADIOACTIVE);
+			})
+			.setGlint(true);
+
+		// Steadfast
+		apiculture.registerSpecies(ForestryBeeSpecies.STEADFAST, GENUS_HEROIC, SPECIES_STEADFAST, false, TextColor.fromRgb(0x4d2b15))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.COCOA), 0.20f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_NORMAL);
+			})
+			.setGlint(true);
+
+		// Valiant
+		apiculture.registerSpecies(ForestryBeeSpecies.VALIANT, GENUS_HEROIC, SPECIES_VALIANT, true, TextColor.fromRgb(0x626bdd))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.COCOA), 0.30f)
+			.addSpecialty(new ItemStack(Items.SUGAR), 0.15f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOW);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONG);
+				genome.set(BeeChromosomes.TEMPERATURE_TOLERANCE, ForestryAlleles.TOLERANCE_BOTH_1);
+				genome.set(BeeChromosomes.HUMIDITY_TOLERANCE, ForestryAlleles.TOLERANCE_BOTH_1);
+			});
+
+		// Heroic
+		apiculture.registerSpecies(ForestryBeeSpecies.HEROIC, GENUS_HEROIC, SPECIES_HEROIC, false, TextColor.fromRgb(0xb3d5e4))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.COCOA), 0.40f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOW);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONG);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.HEROIC);
+			})
+			.setGlint(true);
+
+		// Lush
+		apiculture.registerSpecies(ForestryBeeSpecies.LUSH, GENUS_LUSH, SPECIES_LUSH, true, TextColor.fromRgb(0x70922D))
+			.setTemperature(TemperatureType.WARM)
+			.setHumidity(HumidityType.DAMP)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.HONEY), 0.35F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_NORMAL);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWEST);
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_SLOWER);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// Verdant
+		apiculture.registerSpecies(ForestryBeeSpecies.VERDANT, GENUS_LUSH, SPECIES_VERDANT, true, TextColor.fromRgb(0x1C5B3A))
+			.setTemperature(TemperatureType.WARM)
+			.setHumidity(HumidityType.DAMP)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.HONEY), 0.45F)
+			.addSpecialty(new ItemStack(Items.SMALL_DRIPLEAF), 0.15F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONG);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOW);
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_SLOWER);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// LUXURIANT
+		apiculture.registerSpecies(ForestryBeeSpecies.LUXURIANT, GENUS_LUSH, SPECIES_LUXURIANT, false, TextColor.fromRgb(0xEB8931))
+			.setTemperature(TemperatureType.WARM)
+			.setHumidity(HumidityType.DAMP)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.HONEY), 0.55F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONG);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWEST);
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_FAST);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.GLOW_BERRY_GROW);
+			})
+			.setAuthority("EnderiumSmith")
+			.setGlint(true);
+
+		// KLEPTOPLASTIC
+		apiculture.registerSpecies(ForestryBeeSpecies.KLEPTOPLASTIC, GENUS_KLEPTOPLASTIC, SPECIES_KLEPTOPLASTIC, false, TextColor.fromRgb(0xffc987))
+			.setBody(TextColor.fromRgb(0x64E986))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.HONEY), 0.30F)
+			.addSpecialty(CoreItems.CRAFTING_MATERIALS.stack(EnumCraftingMaterial.PHOSPHORESCENT_JELLY), 0.05f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONGER);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_NORMAL);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// PHOTOSYNTHETIC
+		apiculture.registerSpecies(ForestryBeeSpecies.PHOTOSYNTHETIC, GENUS_KLEPTOPLASTIC, SPECIES_PHOTOSYNTHETIC, true, TextColor.fromRgb(0xB6C9FF))
+			.setBody(TextColor.fromRgb(0x64E986))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.HONEY), 0.40F)
+			.addSpecialty(CoreItems.CRAFTING_MATERIALS.stack(EnumCraftingMaterial.PHOSPHORESCENT_JELLY), 0.15F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONGER);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_FAST);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// AUTOTROPHIC
+		apiculture.registerSpecies(ForestryBeeSpecies.AUTOTROPHIC, GENUS_KLEPTOPLASTIC, SPECIES_AUTOTROPHIC, false, TextColor.fromRgb(0xFFF5EC))
+			.setBody(TextColor.fromRgb(0x64E986))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.HONEY), 0.30F)
+			.addSpecialty(CoreItems.CRAFTING_MATERIALS.stack(EnumCraftingMaterial.PHOSPHORESCENT_JELLY), 0.20F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONGEST);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_FASTER);
+			})
+			.setGlint(true)
+			.setAuthority("EnderiumSmith");
+
+		// AQUATIC
+		apiculture.registerSpecies(ForestryBeeSpecies.AQUATIC, GENUS_AQUATIC, SPECIES_AQUATIC, true, TextColor.fromRgb(0x3F76E4))
+			.setTemperature(TemperatureType.WARM)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SPONGY), 0.30F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORTEST);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOW);
+				genome.set(BeeChromosomes.FLOWER_TYPE, ForestryFlowerTypes.CORAL);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_4);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.MIASMIC);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// PIRATE
+		apiculture.registerSpecies(ForestryBeeSpecies.PIRATE, GENUS_AQUATIC, SPECIES_PIRATE, true, TextColor.fromRgb(0x3F605B))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SPONGY), 0.20F)
+			.addSpecialty(new ItemStack(Items.GOLD_NUGGET), 0.15F)
+			.addSpecialty(new ItemStack(Items.LAPIS_LAZULI), 0.02F)
+			.addSpecialty(new ItemStack(Items.EMERALD), 0.005F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORTER);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.FLOWER_TYPE, ForestryFlowerTypes.SEA);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_2);
+				genome.set(BeeChromosomes.TEMPERATURE_TOLERANCE, ForestryAlleles.TOLERANCE_BOTH_1);
+				genome.set(BeeChromosomes.ACTIVITY, ForestryActivityTypes.CATHEMERAL);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// PRISMATIC
+		apiculture.registerSpecies(ForestryBeeSpecies.PRISMATIC, GENUS_AQUATIC, SPECIES_PRISMATIC, false, TextColor.fromRgb(0x539882))
+			.setTemperature(TemperatureType.WARM)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SPONGY), 0.20F)
+			.addSpecialty(new ItemStack(Items.PRISMARINE_SHARD), 0.40F)
+			.addSpecialty(new ItemStack(Items.PRISMARINE_CRYSTALS), 0.05F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORT);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWER);
+				genome.set(BeeChromosomes.FLOWER_TYPE, ForestryFlowerTypes.CORAL);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_2);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.GUARDIAN);
+				genome.set(BeeChromosomes.TEMPERATURE_TOLERANCE, ForestryAlleles.TOLERANCE_DOWN_1);
+			})
+			.setGlint(true)
+			.setAuthority("EnderiumSmith");
+
+		// ABYSSAL
+		apiculture.registerSpecies(ForestryBeeSpecies.ABYSSAL, GENUS_AQUATIC, SPECIES_ABYSSAL, false, TextColor.fromRgb(0x050533))
+			.setTemperature(TemperatureType.COLD)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SPONGY), 0.20F)
+			.addSpecialty(new ItemStack(Items.GLOW_INK_SAC), 0.15F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONGER);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWEST);
+				genome.set(BeeChromosomes.FLOWER_TYPE, ForestryFlowerTypes.SEA);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_1);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.DARKNESS);
+				genome.set(BeeChromosomes.ACTIVITY, ForestryActivityTypes.NOCTURNAL);
+				genome.set(BeeChromosomes.CAVE_DWELLING, ForestryAlleles.TRUE);
+			})
+			.setGlint(true)
+			.setAuthority("EnderiumSmith");
+
+		// EMBITTERED
+		apiculture.registerSpecies(ForestryBeeSpecies.EMBITTERED, GENUS_EMBITTERED, SPECIES_EMBITTERED, true, TextColor.fromRgb(0x894344))
+			.setBody(TextColor.fromRgb(0x9a2323))
+			.setTemperature(TemperatureType.HELLISH)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SIMMERING), 0.45F)
+			.addProduct(CoreItems.CRAFTING_MATERIALS.stack(EnumCraftingMaterial.PHOSPHOR), 0.15F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_NORMAL);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.AGGRESSIVE);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// SPITEFUL
+		apiculture.registerSpecies(ForestryBeeSpecies.SPITEFUL, GENUS_EMBITTERED, SPECIES_SPITEFUL, false, TextColor.fromRgb(0xFEAC6D))
+			.setBody(TextColor.fromRgb(0x9a2323))
+			.setTemperature(TemperatureType.HELLISH)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SIMMERING), 0.55F)
+			.addSpecialty(POLLEN_CLUSTER.stack(EnumPollenCluster.NORMAL), 0.05F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_FAST);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.AGGRESSIVE);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// SEETHING
+		apiculture.registerSpecies(ForestryBeeSpecies.SEETHING, GENUS_EMBITTERED, SPECIES_SEETHING, false, TextColor.fromRgb(0xff8f00))
+			.setBody(TextColor.fromRgb(0x9a2323))
+			.setTemperature(TemperatureType.HELLISH)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SIMMERING), 0.45F)
+			.addProduct(new ItemStack(Items.BLAZE_POWDER), 0.15F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_NORMAL);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.IGNITION);
+			})
+			.setGlint(true)
+			.setAuthority("EnderiumSmith");
+
+		// WARPED
+		apiculture.registerSpecies(ForestryBeeSpecies.WARPED, GENUS_EMBITTERED, SPECIES_WARPED, true, TextColor.fromRgb(0x14B485))
+			.setBody(TextColor.fromRgb(0x9a2323))
+			.setTemperature(TemperatureType.HELLISH)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SIMMERING), 0.15F)
+			.addSpecialty(BEE_COMBS.stack(EnumHoneyComb.MYSTERIOUS), 0.35F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOW);
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_ELONGATED);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.PHASING);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// ZOMBIFIED
+		apiculture.registerSpecies(ForestryBeeSpecies.ZOMBIFIED, GENUS_ABOMINATION, SPECIES_ZOMBIFIED, true, TextColor.fromRgb(0x698E45))
+			.setBody(TextColor.fromRgb(0xE4686A))
+			.setTemperature(TemperatureType.HELLISH)
+			.setHumidity(HumidityType.ARID)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SIMMERING), 0.20F)
+			.addProduct(new ItemStack(Items.GOLD_NUGGET), 0.15F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_IMMORTAL);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_NORMAL);
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_SLOWEST);
+				genome.set(BeeChromosomes.FLOWER_TYPE, ForestryFlowerTypes.NETHER);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_1);
+				genome.set(BeeChromosomes.TEMPERATURE_TOLERANCE, ForestryAlleles.TOLERANCE_DOWN_3);
+				genome.set(BeeChromosomes.HUMIDITY_TOLERANCE, ForestryAlleles.TOLERANCE_UP_1);
+				genome.set(BeeChromosomes.ACTIVITY, ForestryActivityTypes.METATURNAL);
+				genome.set(BeeChromosomes.CAVE_DWELLING, ForestryAlleles.TRUE);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// SCULK
+		apiculture.registerSpecies(ForestryBeeSpecies.SCULK, GENUS_ABOMINATION, SPECIES_SCULK, true, TextColor.fromRgb(0xD1D6B6))
+			.setBody(TextColor.fromRgb(0x05625D))//0x034150//0x111B21
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SCULKEN), 0.30F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONGER);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_NORMAL);
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_SLOWEST);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_1);
+				genome.set(BeeChromosomes.FLOWER_TYPE, ForestryFlowerTypes.SCULK);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.SCULK);
+				genome.set(BeeChromosomes.TERRITORY, ForestryAlleles.TERRITORY_LARGER);
+				genome.set(BeeChromosomes.TEMPERATURE_TOLERANCE, ForestryAlleles.TOLERANCE_BOTH_1);
+				genome.set(BeeChromosomes.HUMIDITY_TOLERANCE, ForestryAlleles.TOLERANCE_BOTH_1);
+				genome.set(BeeChromosomes.ACTIVITY, ForestryActivityTypes.METATURNAL);
+				genome.set(BeeChromosomes.CAVE_DWELLING, ForestryAlleles.TRUE);
+			})
+			.setGlint(true)
+			.setAuthority("EnderiumSmith");
+
+		// Rural
+		apiculture.registerSpecies(ForestryBeeSpecies.RURAL, GENUS_AGRARIAN, SPECIES_RURAL, false, TextColor.fromRgb(0xfeff8f))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.WHEATEN), 0.20f);
+
+		// Farmerly
+		apiculture.registerSpecies(ForestryBeeSpecies.FARMERLY, GENUS_AGRARIAN, SPECIES_FARMERLY, true, TextColor.fromRgb(0xD39728))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.WHEATEN), 0.27f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOW);
+				genome.set(BeeChromosomes.TERRITORY, ForestryAlleles.TERRITORY_LARGE);
+			})
+			.setAuthority("MysteriousAges");
+
+		// Agrarian
+		apiculture.registerSpecies(ForestryBeeSpecies.AGRARIAN, GENUS_AGRARIAN, SPECIES_AGRARIAN, true, TextColor.fromRgb(0xFFCA75))
+			.setBody(TextColor.fromRgb(0xFFE047))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.WHEATEN), 0.35f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOW);
+				genome.set(BeeChromosomes.HUMIDITY_TOLERANCE, ForestryAlleles.TOLERANCE_BOTH_2);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.FERTILE);
+				genome.set(BeeChromosomes.TERRITORY, ForestryAlleles.TERRITORY_LARGE);
+			})
+			.setGlint(true)
+			.setAuthority("MysteriousAges");
+
+		// PRIMEVAL
+		apiculture.registerSpecies(ForestryBeeSpecies.PRIMEVAL, GENUS_RELIC, SPECIES_PRIMEVAL, true, TextColor.fromRgb(0x653F33))
+			.setTemperature(TemperatureType.WARM)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.VINTAGE), 0.30F)
+			.addSpecialty(CoreItems.AMBER.stack(), 0.15F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONG);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOW);
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_AVERAGE);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_2);
+			})
+			.setAuthority("EnderiumSmith");
+
+		// ANACHRONE
+		apiculture.registerSpecies(ForestryBeeSpecies.ANACHRONE, GENUS_RELIC, SPECIES_ANACHRONE, false, TextColor.fromRgb(5636095))
+			.setTemperature(TemperatureType.WARM)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.VINTAGE), 0.20F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_LONGEST);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWEST);
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_SLOWEST);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_1);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.CHRONOPHAGE);
+			})
+			.setGlint(true)
+			.setAuthority("EnderiumSmith");
+
+		// CHRONOFUGE
+		apiculture.registerSpecies(ForestryBeeSpecies.CHRONOFUGE, GENUS_RELIC, SPECIES_CHRONOFUGE, false, TextColor.fromRgb(16733695))
+			.setTemperature(TemperatureType.WARM)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.VINTAGE), 0.20F)
+			.addSpecialty(ApicultureItems.ROYAL_JELLY.stack(), 0.15F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_IMMORTAL);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWEST);
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_SLOWEST);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_1);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.REJUVENATION);
+			})
+			.setGlint(true)
+			.setAuthority("EnderiumSmith");
+
+		// VANILLA
+		apiculture.registerSpecies(ForestryBeeSpecies.VANILLA, GENUS_VANILLA, SPECIES_VANILLA, false, TextColor.fromRgb(0xEDC343))
+			.addProduct(new ItemStack(Items.HONEYCOMB), 0.65F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.LIFESPAN, ForestryAlleles.LIFESPAN_SHORTENED);
+				genome.set(BeeChromosomes.SPEED, ForestryAlleles.SPEED_SLOWEST);
+				genome.set(BeeChromosomes.POLLINATION, ForestryAlleles.POLLINATION_AVERAGE);
+				genome.set(BeeChromosomes.FERTILITY, ForestryAlleles.FERTILITY_0);
+			})
+			.setAuthority("EnderiumSmith");
+
+
+		// todo move to IC2 plugin when that's ported
+
+		// Leporine (Easter secret)
+		apiculture.registerSpecies(ForestryBeeSpecies.LEPORINE, GENUS_FESTIVE, SPECIES_LEPORINE, false, TextColor.fromRgb(0xfeff8f))
+			.setBody(TextColor.fromRgb(0x3cd757))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.SILKY), 0.30f)
+			.addProduct(new ItemStack(Items.EGG), 0.10F)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.EASTER);
+			})
+			.setGlint(true)
+			.setSecret(true);
+
+		// Merry (Christmas secret)
+		apiculture.registerSpecies(ForestryBeeSpecies.MERRY, GENUS_FESTIVE, SPECIES_MERRY, false, TextColor.fromRgb(0xffffff))
+			.setBody(TextColor.fromRgb(0xd40000))
+			.setTemperature(TemperatureType.ICY)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.FROZEN), 0.30f)
+			.addProduct(CoreItems.CRAFTING_MATERIALS.stack(EnumCraftingMaterial.ICE_SHARD), 0.20f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.ACTIVITY, ForestryActivityTypes.METATURNAL);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.SNOWING);
+			})
+			.setGlint(true)
+			.setSecret(true);
+
+		// Tipsy (New Year's secret)
+		apiculture.registerSpecies(ForestryBeeSpecies.TIPSY, GENUS_FESTIVE, SPECIES_TIPSY, false, TextColor.fromRgb(0xffffff))
+			.setBody(TextColor.fromRgb(0xc219ec))
+			.setTemperature(TemperatureType.ICY)
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.FROZEN), 0.30f)
+			.addProduct(CoreItems.CRAFTING_MATERIALS.stack(EnumCraftingMaterial.ICE_SHARD), 0.20f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.ACTIVITY, ForestryActivityTypes.METATURNAL);
+				genome.set(BeeChromosomes.EFFECT, ForestryBeeEffects.DRUNKARD);
+			})
+			.setGlint(true)
+			.setSecret(true);
+
+		// todo Solstice (Winter Solstice secret)
+
+		// Tricky (Halloween secret)
+		apiculture.registerSpecies(ForestryBeeSpecies.TRICKY, GENUS_FESTIVE, SPECIES_TRICKY, false, TextColor.fromRgb(0x49413B))
+			.setBody(TextColor.fromRgb(0xFF6A00))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.HONEY), 0.40f)
+			.addProduct(new ItemStack(Items.COOKIE), 0.15f)
+			.addSpecialty(new ItemStack(Items.SKELETON_SKULL), 0.02f)
+			.addSpecialty(new ItemStack(Items.ZOMBIE_HEAD), 0.02f)
+			.addSpecialty(new ItemStack(Items.CREEPER_HEAD), 0.02f)
+			.addSpecialty(new ItemStack(Items.PLAYER_HEAD), 0.02f)
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.ACTIVITY, ForestryActivityTypes.METATURNAL);
+				genome.set(BeeChromosomes.TOLERATES_RAIN, true);
+				genome.set(BeeChromosomes.FLOWER_TYPE, ForestryFlowerTypes.GOURD);
+			})
+			.setGlint(true)
+			.setSecret(true);
+
+		// todo Wattle (Thanksgiving secret)
+
+		// todo Bissextile (Leap Year secret)
+
+		// American (July 4th secret)
+		apiculture.registerSpecies(ForestryBeeSpecies.PATRIOTIC, GENUS_FESTIVE, SPECIES_PATRIOTIC, true, TextColor.fromRgb(0x0a3161))
+			.setBody(TextColor.fromRgb(0xb31942))
+			.setStripes(TextColor.fromRgb(0xffffff))
+			.addProduct(BEE_COMBS.stack(EnumHoneyComb.POWDERY), 0.45f)
+			.addProduct(new FireworkProduct(0.20f))
+			// todo specialty is a random firework
+			.setGenome(genome -> {
+				genome.set(BeeChromosomes.TEMPERATURE_TOLERANCE, ForestryAlleles.TOLERANCE_UP_2);
+				genome.set(BeeChromosomes.HUMIDITY_TOLERANCE, ForestryAlleles.TOLERANCE_UP_1);
+				genome.set(BeeChromosomes.TERRITORY, ForestryAlleles.TERRITORY_LARGEST);
+				genome.set(BeeChromosomes.ACTIVITY, ForestryActivityTypes.METATURNAL);
+				// todo fireworks on 4th of July effect
+				//genome.set(BeeChromosomes.EFFECT, ForestryAlleles.EFFECT_PATRIOTIC);
+			})
+			.setAuthority("TheDarkColour")
+			.setSecret(true);
+	}
+}

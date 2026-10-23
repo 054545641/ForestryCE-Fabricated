@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_sign_rot_3",
+  "textures": {
+    "all": "forestry:entity/signs/greenheart",
+    "particle": "forestry:block/greenheart_planks"
+  }
+}

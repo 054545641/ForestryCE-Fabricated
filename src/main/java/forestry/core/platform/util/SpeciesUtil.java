@@ -1,0 +1,228 @@
+package forestry.core.platform.util;
+
+import com.google.common.collect.ImmutableList;
+import com.mojang.authlib.GameProfile;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import forestry.Forestry;
+import forestry.api.IForestryApi;
+import forestry.api.apiculture.genetics.IBeeSpecies;
+import forestry.api.apiculture.genetics.IBeeSpeciesType;
+import forestry.api.arboriculture.ITreeSpecies;
+import forestry.api.arboriculture.genetics.ITreeSpeciesType;
+import forestry.api.core.climate.IClimateProvider;
+import forestry.api.core.genetics.*;
+import forestry.api.core.genetics.alleles.*;
+import forestry.api.lepidopterology.genetics.IButterflySpecies;
+import forestry.api.lepidopterology.genetics.IButterflySpeciesType;
+import forestry.api.plugin.IGenomeBuilder;
+import forestry.core.platform.config.ForestryConfig;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.level.Level;
+import java.util.function.Supplier;
+import com.google.common.base.Suppliers;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.function.Function;
+
+public class SpeciesUtil {
+	public static final Supplier<IBeeSpeciesType> BEE_TYPE = Suppliers.memoize(() -> IForestryApi.INSTANCE.getGeneticManager().getSpeciesType(ForestrySpeciesTypes.BEE, IBeeSpeciesType.class));
+	public static final Supplier<ITreeSpeciesType> TREE_TYPE = Suppliers.memoize(() -> IForestryApi.INSTANCE.getGeneticManager().getSpeciesType(ForestrySpeciesTypes.TREE, ITreeSpeciesType.class));
+	public static final Supplier<IButterflySpeciesType> BUTTERFLY_TYPE = Suppliers.memoize(() -> IForestryApi.INSTANCE.getGeneticManager().getSpeciesType(ForestrySpeciesTypes.BUTTERFLY, IButterflySpeciesType.class));
+
+	public static ITreeSpecies getTreeSpecies(Identifier id) {
+		return TREE_TYPE.get().getSpecies(id);
+	}
+
+	public static List<ITreeSpecies> getAllTreeSpecies() {
+		return TREE_TYPE.get().getAllSpecies();
+	}
+
+	public static IBeeSpecies getBeeSpecies(Identifier id) {
+		return BEE_TYPE.get().getSpecies(id);
+	}
+
+	public static List<IBeeSpecies> getAllBeeSpecies() {
+		return BEE_TYPE.get().getAllSpecies();
+	}
+
+	/**
+	 * Gets the butterfly species type, or returns {@code null} if the butterfly jar is not installed.
+	 * Base ships content that names it anyway: the lepidopterist chest, the lepidopterist backpack and
+	 * caterpillars in leaves. Each of those stays inert rather than throwing when the jar is absent.
+	 *
+	 * @return The {@link IButterflySpeciesType}, or {@code null} if the butterfly jar is not installed
+	 */
+	@Nullable
+	public static IButterflySpeciesType getButterflyTypeSafe() {
+		ISpeciesType<?, ?> type = IForestryApi.INSTANCE.getGeneticManager().getSpeciesTypeSafe(ForestrySpeciesTypes.BUTTERFLY);
+		return type instanceof IButterflySpeciesType butterflyType ? butterflyType : null;
+	}
+
+	public static IButterflySpecies getButterflySpecies(Identifier id) {
+		return BUTTERFLY_TYPE.get().getSpecies(id);
+	}
+
+	public static List<IButterflySpecies> getAllButterflySpecies() {
+		return BUTTERFLY_TYPE.get().getAllSpecies();
+	}
+
+	// Retrieves a species of an arbitrary type by its ID, searching all registered species types. Does not null check.
+	@Nullable
+	public static ISpecies<?> getAnySpecies(Identifier id) {
+		for (ISpeciesType<?, ?> type : IForestryApi.INSTANCE.getGeneticManager().getSpeciesTypes()) {
+			ISpecies<?> species = type.getSpeciesSafe(id);
+			if (species != null) {
+				return species;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Adds all non-hidden species from the given species type to the creative tab.
+	 *
+	 * @param items         The creative tab item output.
+	 * @param speciesTypeId The ID of the species type to use.
+	 */
+	public static void addTypeToCreativeTab(CreativeModeTab.Output items, Identifier speciesTypeId) {
+		ISpeciesType<?, ?> speciesType = IForestryApi.INSTANCE.getGeneticManager().getSpeciesType(speciesTypeId);
+
+		for (ILifeStage stage : speciesType.getLifeStages()) {
+			for (ISpecies<?> species : speciesType.getAllSpecies()) {
+				items.accept(species.createStack(stage));
+			}
+		}
+	}
+
+	@Nullable
+	public static <I extends IIndividual> Tag serializeIndividual(I individual) {
+		@SuppressWarnings("unchecked")
+		Codec<I> individualCodec = (Codec<I>) individual.getType().getIndividualCodec();
+		return individualCodec.encodeStart(NbtOps.INSTANCE, individual).result().orElse(null);
+	}
+
+
+	public static <I extends IIndividual> I deserializeIndividual(ISpeciesType<?, I> type, Tag nbt) {
+		return type.getIndividualCodec()
+			.decode(NbtOps.INSTANCE, nbt)
+			.resultOrPartial(Forestry.LOGGER::error)
+			.orElseGet(() -> Pair.of(type.getDefaultSpecies().createIndividual().cast(), nbt))
+			.getFirst();
+	}
+
+	@Nullable
+	public static <S extends ISpecies<?>> ImmutableList<AllelePair<?>> mutateSpecies(Level level, BlockPos pos, @Nullable GameProfile profile, IGenome parent1, IGenome parent2, IChromosome<Identifier> speciesChromosome, IMutationChanceGetter<S> chanceGetter) {
+		IGenome firstGenome;
+		IGenome secondGenome;
+
+		S firstParent;
+		S secondParent;
+
+		if (level.getRandom().nextBoolean()) {
+			firstParent = parent1.resolveActive(speciesChromosome);
+			secondParent = parent2.resolveInactive(speciesChromosome);
+
+			firstGenome = parent1;
+			secondGenome = parent2;
+		} else {
+			firstParent = parent2.resolveActive(speciesChromosome);
+			secondParent = parent1.resolveInactive(speciesChromosome);
+
+			firstGenome = parent2;
+			secondGenome = parent1;
+		}
+
+		ISpeciesType<S, ?> speciesType = parent1.getActiveSpecies().getType().cast();
+		IBreedingTracker tracker = profile == null ? null : speciesType.getBreedingTracker(level, profile);
+		IClimateProvider climate = IForestryApi.INSTANCE.getClimateManager().createClimateProvider(level, pos);
+
+		for (IMutation<S> mutation : speciesType.getMutations().getCombinationsShuffled(firstParent, secondParent, level.getRandom())) {
+			float chance = chanceGetter.getChance(mutation, level, pos, firstGenome, secondGenome, climate);
+			if (chance <= 0) {
+				continue;
+			}
+			if (tracker != null && tracker.isResearched(mutation)) {
+				float mutationBoost = chance * (ForestryConfig.SERVER.researchMutationBoostMultiplier.get().floatValue() - 1.0f);
+				mutationBoost = Math.min(ForestryConfig.SERVER.maxResearchMutationBoostPercent.get().floatValue(), mutationBoost);
+				chance += mutationBoost;
+			}
+			if (chance > level.getRandom().nextFloat()) {
+				if (tracker != null) {
+					tracker.registerMutation(mutation);
+				}
+				return mutation.getResultAlleles();
+			}
+		}
+
+		return null;
+	}
+
+	@FunctionalInterface
+	public interface IMutationChanceGetter<S extends ISpecies<?>> {
+		float getChance(IMutation<S> mutation, Level level, BlockPos pos, IGenome firstGenome, IGenome secondGenome, IClimateProvider climate);
+	}
+
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public static <I extends IIndividual> I createOffspring(RandomSource rand, IGenome self, IGenome mate, ISpeciesMutator mutator, Function<IGenome, I> individualFactory, boolean makeHaploid) {
+		IKaryotype karyotype = self.getKaryotype();
+		IGenomeBuilder genome = karyotype.createGenomeBuilder();
+		ImmutableList<AllelePair<?>> parent1 = self.getAllelePairs();
+		ImmutableList<AllelePair<?>> parent2 = mate.getAllelePairs();
+		boolean didMutate1 = false;
+		boolean didMutate2 = false;
+
+		// Check for mutation. Replace one of the parents with the mutation
+		// template if mutation occurred.
+		// Haploid drones cant mutate as they only have 1 parent
+		if (!makeHaploid) {
+			ImmutableList<AllelePair<?>> mutated1 = mutator.mutateSpecies(self, mate);
+			if (mutated1 != null) {
+				parent1 = mutated1;
+				didMutate1 = true;
+			}
+			ImmutableList<AllelePair<?>> mutated2 = mutator.mutateSpecies(mate, self);
+			if (mutated2 != null) {
+				parent2 = mutated2;
+				didMutate2 = true;
+			}
+		}
+		ImmutableList<IChromosome<?>> chromosomes = karyotype.getChromosomes();
+		for (int i = 0; i < chromosomes.size(); i++) {
+			IChromosome<?> chromosome = chromosomes.get(i);
+			// unchecked due to generics being a pain
+			AllelePair allele1 = parent1.get(i);
+			AllelePair allele2 = parent2.get(i);
+			Allele<?> defaultAllele = karyotype.getDefaultAllele(chromosome);
+
+			if (!makeHaploid && karyotype.isWeaklyInherited(chromosome)) {
+				// Mutation Template is homozygous so only need to check active
+				if (didMutate1 && allele1.active().equals(defaultAllele)) {
+					allele1 = self.getAllelePair(chromosome);
+				}
+				if (didMutate2 && allele2.active().equals(defaultAllele)) {
+					allele2 = mate.getAllelePair(chromosome);
+				}
+			}
+			genome.setUnchecked(chromosome, makeHaploid ? allele1.inheritHaploid(rand) : allele1.inheritOther(rand, allele2));
+		}
+
+		return individualFactory.apply(genome.build());
+	}
+
+	public static <I extends IIndividual> I createOffspring(RandomSource rand, IGenome self, IGenome mate, ISpeciesMutator mutator, Function<IGenome, I> individualFactory) {
+		return createOffspring(rand, self, mate, mutator, individualFactory, false);
+	}
+
+	@FunctionalInterface
+	public interface ISpeciesMutator {
+		@Nullable
+		ImmutableList<AllelePair<?>> mutateSpecies(IGenome p1, IGenome p2);
+	}
+}

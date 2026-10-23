@@ -1,0 +1,7 @@
+{
+  "asset_id": "forestry:suspicious_looking_tree",
+  "width": 2,
+  "height": 3,
+  "title": {"translate": "painting.forestry.suspicious_looking_tree.title"},
+  "author": {"translate": "painting.forestry.suspicious_looking_tree.author"}
+}

@@ -1,0 +1,4 @@
+{
+  "parent": "forestry:item/bee_drone_default",
+  "stage": "drone"
+}

@@ -1,0 +1,102 @@
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+
+tasks.register('checkFabricF3') {
+    group = 'verification'
+    description = 'Checks Fabric runtime, optional integrations, explicit client boundaries and all four jars.'
+    dependsOn 'jar', 'butterfliesJar', 'farmsJar', 'mailJar'
+    doLast {
+        def reportFile = layout.buildDirectory.file('reports/f3/isolation.json').get().asFile
+        if (reportFile.exists() && !reportFile.delete()) throw new GradleException('Cannot clear stale F3 report')
+        def parser = new JsonSlurper()
+        def sourceManifest = parser.parse(file('gradle/fabric-f2-sources.json'))
+        def owners = ['main', 'butterflies', 'farms', 'mail']
+        def additions = parser.parse(file('gradle/fabric-f3-sources.json'))
+        owners.each { sourceManifest[it] = sourceManifest[it] + additions[it] }
+        def clientBoundary = parser.parse(file('gradle/fabric-client-boundary.json')) as Set
+        def packageOwner = [butterflies: 'forestry/lepidopterology/', farms: 'forestry/agriculture/', mail: 'forestry/mail/']
+        def result = [:]
+        owners.each { owner ->
+            def artifact = tasks.named(owner == 'main' ? 'jar' : owner + 'Jar').get().archiveFile.get().asFile
+            def modId = owner == 'main' ? 'forestry' : 'forestry' + owner
+            def entryNames = []
+            new java.util.zip.ZipFile(artifact).withCloseable { zip ->
+                def metadata = parser.parse(zip.getInputStream(zip.getEntry('fabric.mod.json')))
+                if (metadata.id != modId || metadata.version != project.version.toString()) throw new GradleException("Wrong metadata: ${artifact.name}")
+                if (metadata.entrypoints['forestry:module']?.size() != 1) throw new GradleException("Missing module entrypoint: ${modId}")
+                metadata.entrypoints.values().flatten().each { entry ->
+                    if (zip.getEntry(entry.replace('.', '/') + '.class') == null) throw new GradleException("Missing entrypoint class: ${entry}")
+                }
+                (metadata.mixins ?: []).each { declaration ->
+                    def name = declaration instanceof Map ? declaration.config : declaration
+                    def configEntry = zip.getEntry(name)
+                    if (configEntry == null) throw new GradleException("Missing mixin configuration: ${name}")
+                    def config = parser.parse(zip.getInputStream(configEntry))
+                    ((config.mixins ?: []) + (config.client ?: []) + (config.server ?: [])).each { mixin ->
+                        def path = (config.package + '.' + mixin).replace('.', '/') + '.class'
+                        if (zip.getEntry(path) == null) throw new GradleException("Mixin omitted from source manifest: ${path}")
+                    }
+                }
+                if (owner != 'main' && metadata.depends.forestry != project.version.toString()) throw new GradleException("Extension must depend on exact core version: ${modId}")
+                if (metadata.depends.keySet().any { it in ['jade', 'jei', 'patchouli', 'kubejs', 'rhino', 'curios'] }) throw new GradleException("Optional tool became required: ${modId}")
+                zip.entries().each { entry ->
+                    entryNames.add(entry.name)
+                    if (entry.name.endsWith('.jar') || entry.name.endsWith('neoforge.mods.toml') || entry.name.endsWith('accesstransformer.cfg') ||
+                        entry.name.startsWith('forestry/fabric/test/') || entry.name.contains('/environment/') || entry.name.contains('/datagen/')) {
+                        throw new GradleException("Forbidden JAR entry: ${modId}:${entry.name}")
+                    }
+                    if (entry.name.endsWith('.class')) {
+                        if (owner == 'main' && packageOwner.values().any { entry.name.startsWith(it) }) throw new GradleException("Extension class in core: ${entry.name}")
+                        if (owner != 'main' && !entry.name.startsWith(packageOwner[owner])) throw new GradleException("Foreign class in ${modId}: ${entry.name}")
+                        def text = new String(zip.getInputStream(entry).bytes, java.nio.charset.StandardCharsets.ISO_8859_1)
+                        if (['net/neoforged/', 'net/minecraftforge/', 'thedarkcolour/modkit/', 'groovy/', 'org/codehaus/groovy/',
+                             'vazkii/patchouli/', 'dev/latvian/mods/', 'top/theillusivec4/curios/'].any { text.contains(it) }) {
+                            throw new GradleException("Forbidden bytecode dependency in ${entry.name}")
+                        }
+                        def topLevel = entry.name.tokenize('$').first().replace('.class', '')
+                        if (!(topLevel + '.java' in sourceManifest[owner])) throw new GradleException("Class outside active source manifest: ${entry.name}")
+                        if (text.contains('net/minecraft/client/') && !clientBoundary.contains(topLevel)) {
+                            throw new GradleException("Client reference outside reviewed client boundary: ${entry.name}")
+                        }
+                        if (text.contains('mezz/jei/') && !(entry.name.contains('/compat/') || entry.name.contains('/jei/') || topLevel == 'forestry/core/platform/util/JeiUtil')) {
+                            throw new GradleException("JEI leaked out of optional adapters: ${entry.name}")
+                        }
+                        if (text.contains('snownee/jade/') && !(entry.name.startsWith('forestry/core/platform/compat/jade/') || entry.name.startsWith('forestry/core/platform/client/compat/'))) {
+                            throw new GradleException("Jade leaked out of optional adapters: ${entry.name}")
+                        }
+                    } else if (entry.name.endsWith('.json') && new String(zip.getInputStream(entry).bytes, 'UTF-8').contains('neoforge:')) {
+                        throw new GradleException("NeoForge resource format in ${entry.name}")
+                    }
+                }
+            }
+            def active = sourceManifest[owner] as Set
+            active.each { path ->
+                def source = file("src/${owner}/java/${path}")
+                if (!source.isFile()) throw new GradleException("Manifest source missing: ${source}")
+                if (path.startsWith('forestry/api/') && source.getText('UTF-8').readLines().any { it.startsWith('import forestry.') && !it.startsWith('import forestry.api.') }) {
+                    throw new GradleException("API implementation dependency in ${path}")
+                }
+            }
+            def sourceRoot = file("src/${owner}/java").toPath()
+            def deferred = fileTree(sourceRoot).matching { include '**/*.java' }.files.collect {
+                sourceRoot.relativize(it.toPath()).toString().replace('\\', '/')
+            }.findAll { !active.contains(it) }.sort()
+            result[owner] = [modId: modId, jar: artifact.name,
+                sha256: java.security.MessageDigest.getInstance('SHA-256').digest(artifact.bytes).encodeHex().toString(),
+                activeSources: active.size(), deferredSources: deferred, entries: entryNames.size()]
+        }
+        ['compileClasspath', 'runtimeClasspath', 'butterfliesCompileClasspath', 'farmsCompileClasspath', 'mailCompileClasspath',
+         'butterfliesRuntimeClasspath', 'farmsRuntimeClasspath', 'mailRuntimeClasspath'].each { name ->
+            configurations[name].resolvedConfiguration.resolvedArtifacts.each { artifact ->
+                if (artifact.moduleVersion.id.group.startsWith('net.neoforged') || artifact.name.toLowerCase().contains('neoforge') || artifact.name.toLowerCase().contains('modkit')) {
+                    throw new GradleException("Non-Fabric dependency in ${name}: ${artifact.moduleVersion.id}")
+                }
+            }
+        }
+        reportFile.parentFile.mkdirs()
+        reportFile.setText(JsonOutput.prettyPrint(JsonOutput.toJson([scope: 'F3 native Fabric runtime and four-module source inventory', status: 'passed', modules: result])) + '\n', 'UTF-8')
+        logger.lifecycle('FORESTRY_F3_FOUR_JARS_VERIFIED')
+    }
+}
+tasks.named('check') { dependsOn 'checkFabricF3' }
+tasks.register('checkFabricF2') { dependsOn 'checkFabricF3' }

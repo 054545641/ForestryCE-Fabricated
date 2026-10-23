@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/honeydew",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_honeydew"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:honeydew"
+    }
+  },
+  "time": 5
+}

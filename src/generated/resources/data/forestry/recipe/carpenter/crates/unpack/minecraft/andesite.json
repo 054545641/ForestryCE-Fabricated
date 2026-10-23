@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/andesite",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_andesite"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:andesite"
+    }
+  },
+  "time": 5
+}

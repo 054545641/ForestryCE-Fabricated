@@ -1,0 +1,7 @@
+{
+  "type": "forestry:still",
+  "id": "forestrylifecycletest:n3_still",
+  "time": 4,
+  "input": {"id": "minecraft:water", "amount": 9},
+  "output": {"id": "minecraft:lava", "amount": 3}
+}

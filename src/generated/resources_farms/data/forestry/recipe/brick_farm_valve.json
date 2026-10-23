@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "minecraft:bricks",
+    "T": "#c:gears/tin",
+    "X": "#c:glass_blocks/colorless"
+  },
+  "pattern": [
+    " # ",
+    "XTX"
+  ],
+  "result": {
+    "id": "forestry:brick_farm_valve"
+  }
+}

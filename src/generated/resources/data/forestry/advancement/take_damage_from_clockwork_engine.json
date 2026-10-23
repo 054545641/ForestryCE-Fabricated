@@ -1,0 +1,26 @@
+{
+  "parent": "forestry:get_engine",
+  "criteria": {
+    "forestry:take_damage_from_clockwork_engine": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.take_damage_from_clockwork_engine.description"
+    },
+    "hidden": true,
+    "icon": {
+      "id": "forestry:clockwork_engine"
+    },
+    "title": {
+      "translate": "advancements.forestry.take_damage_from_clockwork_engine.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:take_damage_from_clockwork_engine"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

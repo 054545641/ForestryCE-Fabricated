@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "forestry:waxstone",
+  "result": {
+    "id": "forestry:waxstone_stairs"
+  }
+}

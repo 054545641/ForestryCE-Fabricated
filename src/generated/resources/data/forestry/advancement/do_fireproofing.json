@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_fabricator",
+  "criteria": {
+    "forestry:do_fireproofing": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:refractory_wax"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.do_fireproofing.description"
+    },
+    "icon": {
+      "id": "forestry:refractory_wax"
+    },
+    "title": {
+      "translate": "advancements.forestry.do_fireproofing.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:do_fireproofing"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

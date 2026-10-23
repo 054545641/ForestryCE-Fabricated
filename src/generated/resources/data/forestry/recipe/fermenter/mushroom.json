@@ -1,0 +1,12 @@
+{
+  "type": "forestry:fermenter",
+  "fermentationValue": 50,
+  "fluidResource": {
+    "amount": 1,
+    "id": "minecraft:water"
+  },
+  "id": "forestry:fermenter/mushroom",
+  "modifier": 1.0,
+  "output": "forestry:biomass",
+  "resource": "#c:mushrooms"
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "forestry:block/candles/jumbo_single",
+  "textures": {
+    "bottom": "forestry:block/candles/brown_bottom",
+    "particle": "forestry:block/candles/brown_side",
+    "side": "forestry:block/candles/brown_side",
+    "top": "forestry:block/candles/brown_top"
+  }
+}

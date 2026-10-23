@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "forestry:block/ash_brick_slab"
+    },
+    "type=double": {
+      "model": "forestry:block/ash_bricks"
+    },
+    "type=top": {
+      "model": "forestry:block/ash_brick_slab_top"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "forestry:survivalists_hoe",
+    "forestry:carton"
+  ],
+  "result": {
+    "id": "forestry:hoe_kit"
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "parent": "forestry:get_analyser",
+  "criteria": {
+    "forestry:get_pirate_drone": {
+      "conditions": {
+        "tag": "forestry:pirate"
+      },
+      "trigger": "forestry:pickup_species_trigger"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_pirate_drone.description"
+    },
+    "icon": {
+      "components": {
+        "forestry:bee_generation": 0,
+        "forestry:bee_pristine": true,
+        "forestry:genome": {
+          "genome": {
+            "forestry:activity": {
+              "active": {
+                "value": "forestry:activity_cathemeral"
+              },
+              "inactive": {
+                "value": "forestry:activity_cathemeral"
+              }
+            },
+            "forestry:bee_effect": {
+              "active": {
+                "dominant": true,
+                "value": "forestry:bee_effect_none"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "forestry:bee_effect_none"
+              }
+            },
+            "forestry:bee_species": {
+              "active": {
+                "dominant": true,
+                "value": "forestry:pirate"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "forestry:pirate"
+              }
+            },
+            "forestry:cave_dwelling": {
+              "active": {
+                "dominant": true,
+                "value": false
+              },
+              "inactive": {
+                "dominant": true,
+                "value": false
+              }
+            },
+            "forestry:fertility": {
+              "active": {
+                "dominant": true,
+                "value": 2
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 2
+              }
+            },
+            "forestry:flower_type": {
+              "active": {
+                "value": "forestry:flower_type_sea"
+              },
+              "inactive": {
+                "value": "forestry:flower_type_sea"
+              }
+            },
+            "forestry:humidity_tolerance": {
+              "active": {
+                "value": "NONE"
+              },
+              "inactive": {
+                "value": "NONE"
+              }
+            },
+            "forestry:lifespan": {
+              "active": {
+                "dominant": true,
+                "value": 20
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 20
+              }
+            },
+            "forestry:pollination": {
+              "active": {
+                "dominant": true,
+                "value": 5
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 5
+              }
+            },
+            "forestry:speed": {
+              "active": {
+                "dominant": true,
+                "value": 0.6
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 0.6
+              }
+            },
+            "forestry:temperature_tolerance": {
+              "active": {
+                "dominant": true,
+                "value": "BOTH_1"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "BOTH_1"
+              }
+            },
+            "forestry:territory": {
+              "active": {
+                "value": [
+                  15,
+                  13,
+                  15
+                ]
+              },
+              "inactive": {
+                "value": [
+                  15,
+                  13,
+                  15
+                ]
+              }
+            },
+            "forestry:tolerates_rain": {
+              "active": {
+                "dominant": true,
+                "value": true
+              },
+              "inactive": {
+                "dominant": true,
+                "value": true
+              }
+            }
+          },
+          "karyotype": "forestry:bee_species"
+        },
+        "forestry:health": 20,
+        "forestry:max_health": 20
+      },
+      "id": "forestry:drone_bee"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_pirate_drone.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_pirate_drone"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

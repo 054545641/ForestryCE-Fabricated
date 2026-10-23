@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "alveary",
+  "key": {
+    "#": "forestry:golden_electron_tube",
+    "I": "#c:ingots/iron",
+    "X": "forestry:alveary_block"
+  },
+  "pattern": [
+    "I I",
+    " X ",
+    "I#I"
+  ],
+  "result": {
+    "id": "forestry:alveary_fan"
+  }
+}

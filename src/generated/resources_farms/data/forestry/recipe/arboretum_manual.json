@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "forestry:arboretum_managed"
+  ],
+  "result": {
+    "id": "forestry:arboretum_manual"
+  }
+}

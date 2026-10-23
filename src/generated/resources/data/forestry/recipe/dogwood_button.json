@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    [
+      "forestry:dogwood_planks",
+      "forestry:dogwood_fireproof_planks"
+    ]
+  ],
+  "result": {
+    "id": "forestry:dogwood_button"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "forestry:block/maple_wall_hanging_sign",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "forestry:block/maple_wall_hanging_sign",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "forestry:block/maple_wall_hanging_sign"
+    },
+    "facing=west": {
+      "model": "forestry:block/maple_wall_hanging_sign",
+      "y": 90
+    }
+  }
+}

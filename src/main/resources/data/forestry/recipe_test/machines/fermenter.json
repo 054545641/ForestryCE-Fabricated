@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "recipeType": "forestry:fermenter",
+  "block": "forestry:fermenter",
+  "inputs": {
+    "items": {
+      "capability": "ItemHandler",
+      "slots": [0],
+      "layout": "shapeless"
+    },
+    "fluids": {
+      "capability": "FluidHandler",
+      "tank": 0
+    }
+  },
+  "outputs": {
+    "fluids": {
+      "capability": "FluidHandler",
+      "tank": 1
+    }
+  },
+  "energy": {
+    "capability": "EnergyStorage",
+    "preFill": 40000,
+    "trackConsumption": true
+  },
+  "tickBudget": 1200,
+  "validation": {
+    "mode": "subset",
+    "nbtCompare": "structural",
+    "fluidTolerance": { "amount": 1000 }
+  },
+  "lifecycle": {
+    "warmupTicks": 5,
+    "preTickCommands": [
+      "data merge block ~ ~ ~ {Energy: 40000, Items:[{Slot:1b,id:\"forestry:mulch\",count:8}]}"
+    ]
+  }
+}

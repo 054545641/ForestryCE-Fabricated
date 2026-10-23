@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "forestry:beeswax"
+  },
+  "pattern": [
+    " # ",
+    "# #"
+  ],
+  "result": {
+    "count": 4,
+    "id": "forestry:wax_capsule"
+  }
+}

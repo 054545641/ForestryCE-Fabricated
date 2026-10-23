@@ -1,0 +1,25 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/iodine_charge",
+  "liquid": {
+    "amount": 1000,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "#": "forestry:pollen_cluster",
+      "X": "minecraft:gunpowder",
+      "Y": "forestry:can",
+      "Z": "forestry:honey_drop"
+    },
+    "pattern": [
+      "Z#Z",
+      "#Y#",
+      "X#X"
+    ],
+    "result": {
+      "id": "forestry:iodine_capsule"
+    }
+  },
+  "time": 5
+}

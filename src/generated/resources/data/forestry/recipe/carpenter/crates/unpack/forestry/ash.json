@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/ash",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_ash"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:ash"
+    }
+  },
+  "time": 5
+}

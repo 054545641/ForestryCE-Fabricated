@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "A": {
+      "neoforge:ingredient_type": "forestry:fluid_container",
+      "fluid": {
+        "amount": 1000,
+        "id": "minecraft:milk"
+      },
+      "item": "forestry:can"
+    },
+    "B": "minecraft:sugar",
+    "C": "minecraft:wheat",
+    "E": "minecraft:egg"
+  },
+  "pattern": [
+    "AAA",
+    "BEB",
+    "CCC"
+  ],
+  "result": {
+    "id": "minecraft:cake"
+  }
+}

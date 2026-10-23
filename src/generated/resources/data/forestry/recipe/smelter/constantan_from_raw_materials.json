@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:raw_materials/nickel"
+      }
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:ingots/constantan"
+      }
+    }
+  ],
+  "type": "forestry:smelter",
+  "id": "forestry:smelter/constantan_from_raw_materials",
+  "inputs": [
+    {
+      "count": 1,
+      "ingredient": "#c:raw_materials/copper"
+    },
+    {
+      "count": 1,
+      "ingredient": "#c:raw_materials/nickel"
+    }
+  ],
+  "output": {
+    "count": 2,
+    "ingredient": "#c:ingots/constantan"
+  },
+  "processingTime": 40
+}

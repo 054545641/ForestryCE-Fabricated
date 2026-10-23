@@ -1,0 +1,8 @@
+{
+  "parent": "forestry:block/machines/base_machine",
+  "render_type": "cutout",
+  "textures": {
+    "base": "forestry:block/machines/centrifuge/base",
+    "particle": "forestry:block/machines/centrifuge/particles"
+  }
+}

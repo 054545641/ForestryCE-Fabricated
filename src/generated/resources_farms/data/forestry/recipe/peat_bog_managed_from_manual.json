@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "forestry:peat_bog_manual"
+  ],
+  "result": {
+    "id": "forestry:peat_bog_managed"
+  }
+}

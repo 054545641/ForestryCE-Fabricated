@@ -1,0 +1,16 @@
+{
+  "type": "forestry:centrifuge",
+  "id": "forestry:centrifuge/vintage_comb",
+  "input": "forestry:vintage_comb",
+  "products": [
+    {
+      "chance": 1.0,
+      "item": "forestry:beeswax"
+    },
+    {
+      "chance": 0.9,
+      "item": "forestry:honeydew"
+    }
+  ],
+  "time": 20
+}

@@ -1,0 +1,183 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+plugins {
+    id 'net.fabricmc.fabric-loom' version '1.17.21'
+    id 'groovy'
+}
+
+group = 'thedarkcolour.forestry'
+version = forestryVersion
+base.archivesName = "forestry-${minecraftVersion}-fabric"
+layout.buildDirectory = layout.projectDirectory.dir('build/fabric-26.2')
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+def contentModules = ['butterflies', 'farms', 'mail']
+def selectedMask = providers.gradleProperty('forestryModules').orElse('7').get().toInteger()
+if (selectedMask < 0 || selectedMask > 7) throw new GradleException('forestryModules must be a mask from 0 to 7')
+def selectedModules = contentModules.findAll { (selectedMask & (1 << contentModules.indexOf(it))) != 0 }
+
+repositories {
+    maven { url = 'https://maven.fabricmc.net/'; content { includeGroup 'teamreborn' } }
+    maven { url = 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
+    maven { url = 'https://maven.blamejared.com/'; content { includeGroup 'mezz.jei'; includeGroup 'net.mezzdev.config' } }
+}
+
+sourceSets {
+    resourceGenerator
+    releaseProbe
+    butterflies
+    farms
+    mail
+    test { java.setSrcDirs([]); resources.setSrcDirs([]) }
+}
+contentModules.each { module ->
+    configurations["${module}Implementation"].extendsFrom configurations.implementation
+    configurations["${module}CompileOnly"].extendsFrom configurations.compileOnly
+    sourceSets[module].compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+    sourceSets[module].runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+}
+sourceSets.releaseProbe.java.setSrcDirs(['src/fabricReleaseTest/java'])
+sourceSets.releaseProbe.resources.setSrcDirs(['src/fabricReleaseTest/resources'])
+sourceSets.releaseProbe.compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+tasks.register('releaseProbeJar', Jar) {
+    archiveBaseName = 'forestry-fabric-release-probe'
+    destinationDirectory = layout.buildDirectory.dir('test-tools')
+    from sourceSets.releaseProbe.output
+}
+def f2Sources = new JsonSlurper().parse(file('gradle/fabric-f2-sources.json'))
+def f3Sources = new JsonSlurper().parse(file('gradle/fabric-f3-sources.json'))
+['main', *contentModules].each { module ->
+    sourceSets[module].java.setIncludes(f2Sources[module] + f3Sources[module])
+    sourceSets[module].resources.setSrcDirs(["src/${module}/fabric-resources"])
+}
+apply from: 'gradle/fabric-f3-resources.gradle'
+
+loom {
+    accessWidenerPath = file('src/main/fabric-resources/forestry.accesswidener')
+    mods {
+        forestry { sourceSet sourceSets.main }
+        selectedModules.each { module -> create("forestry${module}") { sourceSet sourceSets[module] } }
+    }
+    runs {
+        client {
+            runDir "run/fabric-26.2/client-${selectedMask}"
+            property 'forestry.clientAutoExit', providers.gradleProperty('clientAutoExit').orElse('false').get()
+        }
+        server {
+            runDir "run/fabric-26.2/server-${selectedMask}"
+            programArg '--nogui'
+            property 'forestry.serverAutoExit', providers.gradleProperty('serverAutoExit').orElse('false').get()
+        }
+    }
+}
+
+dependencies {
+    resourceGeneratorImplementation localGroovy()
+    minecraft "com.mojang:minecraft:${minecraftVersion}"
+    implementation "net.fabricmc:fabric-loader:${fabricLoaderVersion}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
+    implementation("teamreborn:energy:${energyVersion}") { transitive = false }
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    compileOnly "mezz.jei:jei-${minecraftVersion}-common-api:${jeiVersion}"
+    compileOnly("mezz.jei:jei-${minecraftVersion}-fabric-api:${jeiVersion}") { transitive = false }
+    compileOnly("maven.modrinth:jade:${jadeVersion}") { transitive = false }
+    if (providers.gradleProperty('withJade').get().toBoolean()) runtimeOnly "maven.modrinth:jade:${jadeVersion}"
+    if (providers.gradleProperty('withJei').get().toBoolean()) {
+        runtimeOnly "mezz.jei:jei-${minecraftVersion}-fabric:${jeiVersion}"
+        runtimeOnly "net.mezzdev.config:mezz_config-${minecraftVersion}-fabric:${mezzConfigVersion}"
+    }
+}
+
+fabricApi {
+    configureDataGeneration {
+        createSourceSet = true
+        modId = 'forestry_datagen'
+        outputDirectory = layout.buildDirectory.file('datagen').get()
+        addToResources = false
+    }
+    configureTests {
+        createSourceSet = true
+        modId = 'forestry_f2_tests'
+        enableGameTests = true
+        enableClientGameTests = true
+        clearRunDirectory = false
+    }
+}
+sourceSets.datagen.java.setSrcDirs(['src/fabricDatagen/java'])
+sourceSets.datagen.resources.setSrcDirs(['src/fabricDatagen/resources'])
+sourceSets.datagen.compileClasspath += sourceSets.resourceGenerator.output + sourceSets.resourceGenerator.runtimeClasspath
+sourceSets.datagen.runtimeClasspath += sourceSets.resourceGenerator.output + sourceSets.resourceGenerator.runtimeClasspath
+loom.mods.forestry_datagen { sourceSet sourceSets.resourceGenerator }
+loom.runs.datagen { property 'forestry.datagen.root', projectDir.absolutePath }
+sourceSets.gametest.java.setSrcDirs(['src/fabricTest/java'])
+sourceSets.gametest.resources.setSrcDirs(['src/fabricTest/resources'])
+contentModules.each { sourceSets.gametest.compileClasspath += sourceSets[it].output }
+def persistencePhase = providers.gradleProperty('persistencePhase').getOrElse('')
+if (!(persistencePhase in ['', 'seed', 'verify'])) throw new GradleException('persistencePhase must be seed or verify')
+def serverTestDirectory = persistencePhase ? "run/fabric-26.2/f2-persistence-${selectedMask}" : "run/fabric-26.2/f2-gametest-${selectedMask}"
+def graphicsBackend = providers.gradleProperty('forestryGraphics').getOrElse('opengl')
+if (!(graphicsBackend in ['opengl', 'vulkan'])) throw new GradleException('forestryGraphics must be opengl or vulkan')
+dependencies { gametestCompileOnly "mezz.jei:jei-${minecraftVersion}-common-api:${jeiVersion}" }
+loom.runs {
+    gameTest { runDir serverTestDirectory }
+    client { programArgs '--graphicsBackend', graphicsBackend.toUpperCase(java.util.Locale.ROOT) }
+    clientGameTest {
+        runDir "run/fabric-26.2/f2-client-test-${selectedMask}" + (graphicsBackend == 'vulkan' ? '-vulkan' : '')
+        programArgs '--graphicsBackend', graphicsBackend.toUpperCase(java.util.Locale.ROOT)
+    }
+}
+loom.runs.configureEach {
+    property 'forestry.testModules', selectedMask.toString()
+    property 'forestry.expectJade', providers.gradleProperty('withJade').get()
+    property 'forestry.expectJei', providers.gradleProperty('withJei').get()
+    if (persistencePhase) property 'forestry.persistencePhase', persistencePhase
+}
+tasks.withType(net.fabricmc.loom.task.AbstractRunTask).configureEach {
+    selectedModules.each { module -> classpath(sourceSets[module].output) }
+}
+
+tasks.named('runGameTest') {
+    doFirst {
+        // The automated test world is disposable. Keep logs, and never touch interactive saves.
+        File testRoot = file(serverTestDirectory).canonicalFile
+        File world = new File(testRoot, 'world').canonicalFile
+        if (world.parentFile != testRoot) throw new GradleException('GameTest world escaped its run directory')
+        if (persistencePhase == 'verify') {
+            if (!new File(world, 'level.dat').isFile()) throw new GradleException('Persistence verification requires a completed seed run')
+        } else delete(world)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.release = 25; options.compilerArgs += ['-Xmaxerrs', '10000'] }
+tasks.withType(ProcessResources).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand version: project.version }
+}
+// Entry classes are verified before test methods run; absent extension classes must never be loaded.
+tasks.named('processGametestResources') {
+    inputs.property 'forestryModules', selectedMask
+    doLast {
+        def metadataFile = new File(destinationDir, 'fabric.mod.json')
+        def metadata = new JsonSlurper().parse(metadataFile)
+        def extensions = ['forestry.fabric.test.F2ButterflyTests': 1, 'forestry.fabric.test.F2FarmTests': 2, 'forestry.fabric.test.F2MailTests': 4]
+        metadata.entrypoints['fabric-gametest'] = metadata.entrypoints['fabric-gametest'].findAll { entry -> !extensions.containsKey(entry) || (selectedMask & extensions[entry]) != 0 }
+        metadataFile.setText(JsonOutput.prettyPrint(JsonOutput.toJson(metadata)) + '\n', 'UTF-8')
+    }
+}
+tasks.named('jar') { from('LICENSE.md') }
+contentModules.each { module ->
+    tasks.register("${module}Jar", Jar) {
+        archiveBaseName = "forestry${module}-${minecraftVersion}-fabric"
+        from sourceSets[module].output
+        from('LICENSE.md')
+    }
+    tasks.named('assemble') { dependsOn "${module}Jar" }
+}
+tasks.named('wrapper', Wrapper) {
+    distributionType = Wrapper.DistributionType.BIN
+    distributionSha256Sum = 'bafc141b619ad6350fd975fc903156dd5c151998cc8b058e8c1044ab5f7b031f'
+    networkTimeout = 120000
+}
+apply from: 'gradle/fabric-f3-verification.gradle'

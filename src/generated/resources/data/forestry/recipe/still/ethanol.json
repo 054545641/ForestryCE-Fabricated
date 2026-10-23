@@ -1,0 +1,13 @@
+{
+  "type": "forestry:still",
+  "id": "forestry:still/ethanol",
+  "input": {
+    "amount": 10,
+    "id": "forestry:biomass"
+  },
+  "output": {
+    "amount": 3,
+    "id": "forestry:ethanol"
+  },
+  "time": 100
+}

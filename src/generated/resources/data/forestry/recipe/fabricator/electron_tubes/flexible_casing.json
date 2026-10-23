@@ -1,0 +1,23 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:fabricator/electron_tubes/flexible_casing",
+  "molten": {
+    "amount": 500,
+    "id": "forestry:liquid_glass"
+  },
+  "recipe": {
+    "key": {
+      "#": "#c:ingots/bronze",
+      "B": "#c:slime_balls",
+      "E": "#c:gems/emerald"
+    },
+    "pattern": [
+      "#E#",
+      "B B",
+      "#E#"
+    ],
+    "result": {
+      "id": "forestry:flexible_casing"
+    }
+  }
+}

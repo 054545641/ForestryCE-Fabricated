@@ -1,0 +1,19 @@
+{
+  "type": "forestry:squeezer",
+  "chance": 0.0,
+  "id": "forestry:squeezer/lava_sand",
+  "output": {
+    "stack": {
+      "amount": 500,
+      "id": "minecraft:lava"
+    }
+  },
+  "resources": [
+    "forestry:phosphor",
+    [
+      "minecraft:sand",
+      "minecraft:red_sand"
+    ]
+  ],
+  "time": 20
+}

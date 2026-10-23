@@ -1,0 +1,11 @@
+{
+  "type": "forestry:hygroregulator",
+  "humidity_steps": 2,
+  "id": "forestry:hygroregulator/ice",
+  "liquid": {
+    "amount": 1,
+    "id": "forestry:crushed_ice"
+  },
+  "temperature_steps": -2,
+  "time": 10
+}

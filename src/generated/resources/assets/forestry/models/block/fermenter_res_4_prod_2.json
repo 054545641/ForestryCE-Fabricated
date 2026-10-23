@@ -1,0 +1,10 @@
+{
+  "parent": "forestry:block/machines/base_machine",
+  "render_type": "cutout",
+  "textures": {
+    "base": "forestry:block/machines/fermenter/base",
+    "particle": "forestry:block/machines/fermenter/particles",
+    "product_tank": "forestry:block/machines/fermenter/tank_prod_2",
+    "resource_tank": "forestry:block/machines/fermenter/tank_res_4"
+  }
+}

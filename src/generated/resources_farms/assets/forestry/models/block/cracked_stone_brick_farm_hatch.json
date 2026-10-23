@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cracked_stone_bricks",
+  "children": {
+    "base": "minecraft:block/cracked_stone_bricks",
+    "overlay": "forestry:block/cracked_stone_brick_farm_hatch_overlay"
+  },
+  "item_render_order": [
+    "base",
+    "overlay"
+  ],
+  "loader": "neoforge:composite"
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    [
+      "forestry:cocobolo_planks",
+      "forestry:cocobolo_fireproof_planks"
+    ]
+  ],
+  "result": {
+    "id": "forestry:cocobolo_button"
+  }
+}

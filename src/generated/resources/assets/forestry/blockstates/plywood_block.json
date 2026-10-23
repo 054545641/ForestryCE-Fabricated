@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "forestry:block/plywood_block",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "forestry:block/plywood_block"
+    },
+    "axis=z": {
+      "model": "forestry:block/plywood_block",
+      "x": 90
+    }
+  }
+}

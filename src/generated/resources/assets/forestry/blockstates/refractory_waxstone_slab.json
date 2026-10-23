@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "forestry:block/refractory_waxstone_slab"
+    },
+    "type=double": {
+      "model": "forestry:block/refractory_waxstone"
+    },
+    "type=top": {
+      "model": "forestry:block/refractory_waxstone_slab_top"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "function": "forestry_environment:n3_tanks",
+  "environment": "minecraft:default",
+  "structure": "forestry_environment:empty",
+  "max_ticks": 100
+}

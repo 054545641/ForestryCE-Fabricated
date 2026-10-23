@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    [
+      "forestry:elm_planks",
+      "forestry:elm_fireproof_planks"
+    ]
+  ],
+  "result": {
+    "id": "forestry:elm_button"
+  }
+}

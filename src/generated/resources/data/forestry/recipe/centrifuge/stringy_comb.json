@@ -1,0 +1,16 @@
+{
+  "type": "forestry:centrifuge",
+  "id": "forestry:centrifuge/stringy_comb",
+  "input": "forestry:stringy_comb",
+  "products": [
+    {
+      "chance": 1.0,
+      "item": "forestry:propolis"
+    },
+    {
+      "chance": 0.4,
+      "item": "forestry:honey_drop"
+    }
+  ],
+  "time": 20
+}

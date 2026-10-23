@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "forestry:block/refractory_wax_brick_slab"
+    },
+    "type=double": {
+      "model": "forestry:block/refractory_wax_bricks"
+    },
+    "type=top": {
+      "model": "forestry:block/refractory_wax_brick_slab_top"
+    }
+  }
+}

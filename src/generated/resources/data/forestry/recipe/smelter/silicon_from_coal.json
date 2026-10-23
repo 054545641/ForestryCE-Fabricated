@@ -1,0 +1,25 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:tag_empty",
+      "tag": "c:coal_coke"
+    }
+  ],
+  "type": "forestry:smelter",
+  "id": "forestry:smelter/silicon_from_coal",
+  "inputs": [
+    {
+      "count": 3,
+      "ingredient": "#c:gems/quartz"
+    },
+    {
+      "count": 2,
+      "ingredient": "minecraft:coal"
+    }
+  ],
+  "output": {
+    "count": 3,
+    "ingredient": "#c:silicon"
+  },
+  "processingTime": 1200
+}

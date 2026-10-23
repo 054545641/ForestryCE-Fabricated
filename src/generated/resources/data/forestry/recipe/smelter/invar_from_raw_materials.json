@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:raw_materials/nickel"
+      }
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:ingots/invar"
+      }
+    }
+  ],
+  "type": "forestry:smelter",
+  "id": "forestry:smelter/invar_from_raw_materials",
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:raw_materials/iron"
+    },
+    {
+      "count": 1,
+      "ingredient": "#c:raw_materials/nickel"
+    }
+  ],
+  "output": {
+    "count": 3,
+    "ingredient": "#c:ingots/invar"
+  },
+  "processingTime": 40
+}

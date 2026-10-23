@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/gravel",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_gravel"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:gravel"
+    }
+  },
+  "time": 5
+}

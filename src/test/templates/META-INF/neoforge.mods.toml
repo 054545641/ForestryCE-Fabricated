@@ -1,0 +1,26 @@
+license = "GNU Lesser Public License v3"
+
+[[mods]]
+modId = "forestrygametest"
+version = "${version}"
+displayName = "Forestry: GameTests"
+description = '''
+Dev-only GameTest suite. Never published; it spans every Forestry jar, so it is its own mod id and
+the partial-install boot configurations leave it out. NeoForge's gametest scanner resolves every
+@GameTest method descriptor at registration, so with this inside the core mod a core-only boot
+crashes on the first test method that names a farms type.
+'''
+
+[[dependencies.forestrygametest]]
+modId = "forestry"
+type = "REQUIRED"
+versionRange = "[${version},]"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.forestrygametest]]
+modId = "minecraft"
+type = "REQUIRED"
+versionRange = "${minecraftVersionRange}"
+ordering = "NONE"
+side = "BOTH"

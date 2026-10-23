@@ -1,0 +1,10 @@
+{
+  "values": {
+    "forestry:arborist": {
+      "loot_table": "forestry:gameplay/hero_of_the_village/arborist_gift"
+    },
+    "forestry:beekeeper": {
+      "loot_table": "forestry:gameplay/hero_of_the_village/beekeeper_gift"
+    }
+  }
+}

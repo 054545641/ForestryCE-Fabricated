@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "forestry:block/cobbled_honeystone_slab"
+    },
+    "type=double": {
+      "model": "forestry:block/cobbled_honeystone"
+    },
+    "type=top": {
+      "model": "forestry:block/cobbled_honeystone_slab_top"
+    }
+  }
+}

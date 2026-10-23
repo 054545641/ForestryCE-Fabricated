@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_apiary",
+  "criteria": {
+    "forestry:get_escritoire": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:escritoire"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_escritoire.description"
+    },
+    "icon": {
+      "id": "forestry:escritoire"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_escritoire.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_escritoire"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

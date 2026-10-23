@@ -1,0 +1,24 @@
+{
+  "type": "forestry:fabricator",
+  "id": "forestry:fabricator/solar_cell",
+  "molten": {
+    "amount": 50,
+    "id": "forestry:liquid_glass"
+  },
+  "recipe": {
+    "key": {
+      "L": "#c:gems/lapis",
+      "S": "forestry:phosphorescent_jelly",
+      "T": "#c:nuggets/tin",
+      "^": "#c:silicon"
+    },
+    "pattern": [
+      " T ",
+      "LSL",
+      " ^ "
+    ],
+    "result": {
+      "id": "forestry:solar_cell"
+    }
+  }
+}

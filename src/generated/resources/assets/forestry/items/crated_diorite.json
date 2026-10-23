@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "forestry:filled_crate",
+    "model": "forestry:item/crated_diorite"
+  }
+}

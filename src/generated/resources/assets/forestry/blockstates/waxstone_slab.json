@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "forestry:block/waxstone_slab"
+    },
+    "type=double": {
+      "model": "forestry:block/waxstone"
+    },
+    "type=top": {
+      "model": "forestry:block/waxstone_slab_top"
+    }
+  }
+}

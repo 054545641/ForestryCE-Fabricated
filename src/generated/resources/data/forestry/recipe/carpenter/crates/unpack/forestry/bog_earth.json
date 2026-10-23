@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/bog_earth",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_bog_earth"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:bog_earth"
+    }
+  },
+  "time": 5
+}

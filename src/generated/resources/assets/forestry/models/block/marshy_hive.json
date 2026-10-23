@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "forestry:block/hive/marshy_bottom",
+    "side": "forestry:block/hive/marshy_side",
+    "top": "forestry:block/hive/marshy_top"
+  }
+}

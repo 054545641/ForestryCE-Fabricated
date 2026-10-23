@@ -1,0 +1,16 @@
+{
+  "type": "forestry:centrifuge",
+  "id": "forestry:centrifuge/simmering_comb",
+  "input": "forestry:simmering_comb",
+  "products": [
+    {
+      "chance": 1.0,
+      "item": "forestry:refractory_wax"
+    },
+    {
+      "chance": 0.7,
+      "item": "forestry:magmatic_drop"
+    }
+  ],
+  "time": 20
+}

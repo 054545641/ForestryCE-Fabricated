@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_squeezer",
+  "criteria": {
+    "forestry:get_liquid_honey": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:bucket_honey"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_liquid_honey.description"
+    },
+    "icon": {
+      "id": "forestry:bucket_honey"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_liquid_honey.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_liquid_honey"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

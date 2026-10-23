@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "planks",
+  "ingredients": [
+    "#forestry:fireproof_kauri_logs"
+  ],
+  "result": {
+    "count": 4,
+    "id": "forestry:kauri_fireproof_planks"
+  }
+}

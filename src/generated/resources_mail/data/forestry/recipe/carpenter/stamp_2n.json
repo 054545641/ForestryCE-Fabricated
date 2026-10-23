@@ -1,0 +1,23 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/stamp_2n",
+  "liquid": {
+    "amount": 300,
+    "id": "forestry:seed_oil"
+  },
+  "recipe": {
+    "key": {
+      "#": "minecraft:copper_ingot",
+      "P": "minecraft:paper"
+    },
+    "pattern": [
+      "###",
+      "PPP"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:stamp_2n"
+    }
+  },
+  "time": 5
+}

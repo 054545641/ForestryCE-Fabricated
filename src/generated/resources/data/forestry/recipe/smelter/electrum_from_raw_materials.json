@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:raw_materials/silver"
+      }
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:ingots/electrum"
+      }
+    }
+  ],
+  "type": "forestry:smelter",
+  "id": "forestry:smelter/electrum_from_raw_materials",
+  "inputs": [
+    {
+      "count": 1,
+      "ingredient": "#c:raw_materials/gold"
+    },
+    {
+      "count": 1,
+      "ingredient": "#c:raw_materials/silver"
+    }
+  ],
+  "output": {
+    "count": 2,
+    "ingredient": "#c:ingots/electrum"
+  },
+  "processingTime": 40
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:paper",
+    {
+      "neoforge:ingredient_type": "neoforge:compound",
+      "children": [
+        "#forestry:propolis",
+        "#c:slime_balls"
+      ]
+    }
+  ],
+  "result": {
+    "id": "forestry:letter_empty_fresh"
+  }
+}

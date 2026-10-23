@@ -1,0 +1,76 @@
+package forestry.core.platform.util;
+
+import com.mojang.authlib.GameProfile;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.fabricmc.fabric.api.entity.FakePlayer;
+
+import javax.annotation.Nullable;
+import java.util.UUID;
+
+public abstract class PlayerUtil {
+	//TODO: use null everywhere instead of an emptyUUID
+	private static final UUID emptyUUID = new UUID(0, 0);
+
+	public static boolean isSameGameProfile(GameProfile player1, GameProfile player2) {
+		UUID id1 = player1.id();
+		UUID id2 = player2.id();
+		if (id1 != null && id2 != null && !id1.equals(emptyUUID) && !id2.equals(emptyUUID)) {
+			return id1.equals(id2);
+		}
+
+		return player1.name() != null && player1.name().equals(player2.name());
+	}
+
+	public static String getOwnerName(@Nullable GameProfile profile) {
+		if (profile == null) {
+			return Component.translatable("for.gui.derelict").getString();
+		} else {
+			return profile.name();
+		}
+	}
+
+	/**
+	 * Get a player for a given World and GameProfile.
+	 * If they are not in the World, returns a FakePlayer.
+	 * Do not store references to the return value, to prevent worlds staying in memory.
+	 */
+	@Nullable
+	public static Player getPlayer(Level world, @Nullable GameProfile profile) {
+		if (profile == null || profile.name() == null) {
+			if (world instanceof ServerLevel) {
+				return FakePlayer.get((ServerLevel) world);
+			} else {
+				return null;
+			}
+		}
+
+		Player player = world.getPlayerByUUID(profile.id());
+		if (player == null && world instanceof ServerLevel) {
+			player = FakePlayer.get((ServerLevel) world, profile);
+		}
+		return player;
+	}
+
+	/**
+	 * Get a fake player for a given World and GameProfile.
+	 * Do not store references to the return value, to prevent worlds staying in memory.
+	 */
+	@Nullable
+	public static Player getFakePlayer(Level world, @Nullable GameProfile profile) {
+		if (profile == null || profile.name() == null) {
+			if (world instanceof ServerLevel) {
+				return FakePlayer.get((ServerLevel) world);
+			} else {
+				return null;
+			}
+		}
+
+		if (world instanceof ServerLevel) {
+			return FakePlayer.get((ServerLevel) world, profile);
+		}
+		return null;
+	}
+}

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "forestry:block/cobbled_refractory_waxstone",
+    "side": "forestry:block/cobbled_refractory_waxstone",
+    "top": "forestry:block/cobbled_refractory_waxstone"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "forestry:block/machines/base_machine",
+  "render_type": "cutout",
+  "textures": {
+    "base": "forestry:block/machines/bottler/base",
+    "particle": "forestry:block/machines/bottler/particles",
+    "resource_tank": "forestry:block/machines/bottler/tank_res_1"
+  }
+}

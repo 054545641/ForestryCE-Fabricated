@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "planks",
+  "ingredients": [
+    "#forestry:fireproof_padauk_logs"
+  ],
+  "result": {
+    "count": 4,
+    "id": "forestry:padauk_fireproof_planks"
+  }
+}

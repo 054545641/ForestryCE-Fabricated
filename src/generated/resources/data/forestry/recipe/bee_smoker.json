@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": "#c:ingots/tin",
+    "F": "minecraft:flint_and_steel",
+    "L": "#c:leathers",
+    "S": "#c:rods/wooden"
+  },
+  "pattern": [
+    "LS#",
+    "LF#",
+    "###"
+  ],
+  "result": {
+    "id": "forestry:bee_smoker"
+  }
+}

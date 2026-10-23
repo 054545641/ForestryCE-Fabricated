@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/chiseled_sandstone",
+  "children": {
+    "base": "minecraft:block/chiseled_sandstone",
+    "overlay": "forestry:block/chiseled_sandstone_farm_gearbox_overlay"
+  },
+  "item_render_order": [
+    "base",
+    "overlay"
+  ],
+  "loader": "neoforge:composite"
+}

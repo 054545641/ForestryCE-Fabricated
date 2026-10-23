@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/dirt",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_dirt"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:dirt"
+    }
+  },
+  "time": 5
+}

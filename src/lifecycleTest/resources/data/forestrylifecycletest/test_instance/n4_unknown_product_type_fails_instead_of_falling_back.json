@@ -1,0 +1,1 @@
+{"type": "minecraft:function", "function": "forestrylifecycletest:n4_unknown_product_type_fails_instead_of_falling_back", "environment": "minecraft:default", "structure": "forestrylifecycletest:n4_empty", "max_ticks": 1200}

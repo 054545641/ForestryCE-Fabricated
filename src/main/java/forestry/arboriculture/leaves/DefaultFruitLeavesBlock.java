@@ -1,0 +1,112 @@
+package forestry.arboriculture.leaves;
+
+import com.mojang.authlib.GameProfile;
+import forestry.api.arboriculture.genetics.IFruit;
+import forestry.api.arboriculture.genetics.ITree;
+import forestry.api.arboriculture.genetics.TreeLifeStage;
+
+import forestry.api.core.genetics.IGenome;
+import forestry.api.core.genetics.alleles.TreeChromosomes;
+import forestry.arboriculture.features.ArboricultureBlocks;
+import forestry.core.platform.util.BlockUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.phys.BlockHitResult;
+
+
+import javax.annotation.Nullable;
+import java.util.List;
+
+/**
+ * Genetic leaves with no tile entity, used for worldgen trees.
+ * Similar to decorative leaves, but these will drop saplings and can be used for pollination.
+ */
+public class DefaultFruitLeavesBlock extends AbstractLeavesBlock implements ILeafTypeBlock {
+	private final ForestryLeafType type;
+
+	public DefaultFruitLeavesBlock(Block.Properties properties, ForestryLeafType type) {
+		super(properties);
+		this.type = type;
+	}
+
+	@Override
+	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult traceResult) {
+		ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);
+		ItemStack offHand = player.getItemInHand(InteractionHand.OFF_HAND);
+		if (mainHand.isEmpty() && offHand.isEmpty()) {
+			ITree tree = getTree(level, pos);
+			if (tree == null) {
+				return InteractionResult.FAIL;
+			}
+			if (level.isClientSide()) {
+				return InteractionResult.SUCCESS;
+			}
+			BlockUtil.sendDestroyEffects(level, pos, state);
+			IFruit fruitProvider = tree.getGenome().resolveActive(TreeChromosomes.FRUIT);
+			List<ItemStack> products = tree.produceStacks(level, pos, fruitProvider.getRipeningPeriod());
+			level.setBlock(pos, ArboricultureBlocks.LEAVES_DEFAULT.get(this.type).defaultState()
+				.setValue(LeavesBlock.PERSISTENT, state.getValue(LeavesBlock.PERSISTENT))
+				.setValue(LeavesBlock.DISTANCE, state.getValue(LeavesBlock.DISTANCE)), Block.UPDATE_CLIENTS);
+			for (ItemStack fruit : products) {
+				if (!player.getInventory().add(fruit)) player.drop(fruit, false);
+			}
+			return InteractionResult.CONSUME;
+		}
+
+		return InteractionResult.TRY_WITH_EMPTY_HAND;
+	}
+
+	@Override
+	protected void getLeafDrop(List<ItemStack> drops, Level level, @Nullable BlockPos pos, @Nullable GameProfile profile, float saplingModifier, int fortune, LootParams.Builder context) {
+		ITree tree = this.type.getIndividual();
+
+		// Add saplings
+		List<ITree> saplings = tree.getSaplings(level, pos, profile, saplingModifier);
+		for (ITree sapling : saplings) {
+			if (sapling != null) {
+				drops.add(sapling.createStack(TreeLifeStage.SAPLING));
+			}
+		}
+
+		// Add fruits
+		IGenome genome = tree.getGenome();
+		IFruit fruitProvider = genome.resolveActive(TreeChromosomes.FRUIT);
+		if (fruitProvider.isFruitLeaf()) {
+			List<ItemStack> produceStacks = tree.produceStacks(level, pos, Integer.MAX_VALUE);
+			drops.addAll(produceStacks);
+		}
+	}
+
+	public Identifier getSpeciesId() {
+		return this.type.getSpeciesId();
+	}
+
+	public ForestryLeafType getType() {
+		return this.type;
+	}
+
+	@Override
+	protected ITree getTree(BlockGetter world, BlockPos pos) {
+		return this.type.getIndividual();
+	}
+
+	@Override
+	public int colorMultiplier(BlockState state, @Nullable BlockGetter level, @Nullable BlockPos pos, int tintIndex) {
+		if (tintIndex == AbstractLeavesBlock.FRUIT_COLOR_INDEX) {
+			IFruit genome = this.type.getFruit();
+			return genome.getDecorativeColor();
+		}
+
+		return forestry.core.platform.client.ClientsideCode.getLeafTint(this.type.getIndividual().getSpecies(), level, pos);
+	}
+}

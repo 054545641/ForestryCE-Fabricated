@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "function": "forestrylifecycletest:recipe_templates",
+  "environment": "minecraft:default",
+  "structure": "forestrylifecycletest:empty",
+  "max_ticks": 1200
+}

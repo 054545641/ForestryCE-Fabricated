@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/bricks",
+  "children": {
+    "base": "minecraft:block/bricks",
+    "overlay": "forestry:block/brick_farm_valve_overlay"
+  },
+  "item_render_order": [
+    "base",
+    "overlay"
+  ],
+  "loader": "neoforge:composite"
+}

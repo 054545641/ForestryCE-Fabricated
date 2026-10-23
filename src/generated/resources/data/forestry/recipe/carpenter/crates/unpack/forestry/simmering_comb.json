@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/simmering_comb",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_simmering_comb"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:simmering_comb"
+    }
+  },
+  "time": 5
+}

@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/redstone",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_redstone"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:redstone"
+    }
+  },
+  "time": 5
+}

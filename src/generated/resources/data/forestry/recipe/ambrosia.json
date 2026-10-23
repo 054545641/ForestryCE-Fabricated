@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "forestry:honeydew",
+    "X": "forestry:royal_jelly",
+    "Y": "forestry:wax_capsule"
+  },
+  "pattern": [
+    "#Y#",
+    "XXX",
+    "###"
+  ],
+  "result": {
+    "id": "forestry:ambrosia"
+  }
+}

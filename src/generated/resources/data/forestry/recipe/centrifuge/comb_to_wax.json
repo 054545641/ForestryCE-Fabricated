@@ -1,0 +1,12 @@
+{
+  "type": "forestry:centrifuge",
+  "id": "forestry:centrifuge/comb_to_wax",
+  "input": "minecraft:honeycomb",
+  "products": [
+    {
+      "chance": 1.0,
+      "item": "forestry:beeswax"
+    }
+  ],
+  "time": 20
+}

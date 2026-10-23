@@ -1,0 +1,19 @@
+{
+  "type": "forestry:squeezer",
+  "chance": 0.0,
+  "id": "forestry:squeezer/ice",
+  "output": {
+    "stack": {
+      "amount": 4000,
+      "id": "forestry:crushed_ice"
+    }
+  },
+  "resources": [
+    "minecraft:snowball",
+    "forestry:ice_shard",
+    "forestry:ice_shard",
+    "forestry:ice_shard",
+    "forestry:ice_shard"
+  ],
+  "time": 10
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "#c:glass_blocks/colorless",
+    "X": "#c:ingots/iron",
+    "Y": "minecraft:furnace"
+  },
+  "pattern": [
+    "X#X",
+    "XYX",
+    "X#X"
+  ],
+  "result": {
+    "id": "forestry:smelter"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/phosphor",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_phosphor"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:phosphor"
+    }
+  },
+  "time": 5
+}

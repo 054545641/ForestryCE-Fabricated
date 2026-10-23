@@ -1,0 +1,230 @@
+package forestry.apiculture;
+
+import forestry.api.ForestryConstants;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import forestry.api.ForestryCapabilities;
+import forestry.api.ForestryDataMaps;
+import forestry.api.apiculture.BeeManager;
+import forestry.api.apiculture.ForestryBeeSpecies;
+import forestry.api.client.IClientModuleHandler;
+import forestry.api.client.IForestryClientApi;
+import forestry.api.client.plugin.IClientRegistration;
+import forestry.api.core.ForestryEvent;
+import forestry.api.core.TemperatureType;
+import forestry.api.core.genetics.ForestryTaxa;
+import forestry.api.core.genetics.ILifeStage;
+import forestry.api.modules.ForestryModule;
+import forestry.api.modules.ForestryModuleIds;
+import forestry.api.modules.IPacketRegistry;
+import forestry.apiculture.alveary.multiblock.AbstractAlvearyBlockEntity;
+import forestry.apiculture.alveary.multiblock.AlvearyClimatizerBlockEntity;
+import forestry.apiculture.alveary.multiblock.AlvearyHygroregulatorBlockEntity;
+import forestry.apiculture.apiarist.ArmorApiaristHelper;
+import forestry.apiculture.apiarist.ItemArmorApiarist;
+import forestry.apiculture.apiarist.villagers.ApicultureVillagers;
+import forestry.apiculture.bees.EnumPollenCluster;
+import forestry.apiculture.bees.genetics.BeeEffectManager;
+import forestry.apiculture.bees.genetics.BeeJubilanceManager;
+import forestry.apiculture.bees.genetics.BeeSpeciesManager;
+import forestry.apiculture.client.BeeClientManager;
+import forestry.apiculture.commands.CommandBee;
+import forestry.apiculture.features.ApicultureItems;
+import forestry.apiculture.features.ApicultureTiles;
+import forestry.apiculture.network.ApiculturePacketIds;
+import forestry.apiculture.network.packets.*;
+import forestry.apiculture.proxy.ApicultureClientHandler;
+import forestry.apiculture.tab.ApicultureCreativeTab;
+import forestry.apiimpl.client.ForestryClientApiImpl;
+import forestry.apiimpl.client.plugin.ClientRegistration;
+import forestry.core.platform.tile.TileForestry;
+import forestry.core.platform.util.NetworkUtil;
+import forestry.core.platform.util.SpeciesUtil;
+import forestry.modules.BlankForestryModule;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.component.DataComponents;
+import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+import net.neoforged.neoforge.event.LootTableLoadEvent;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
+import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent;
+
+import java.util.*;
+import java.util.function.Consumer;
+
+@ForestryModule
+public class ModuleApiculture extends BlankForestryModule {
+	public static boolean hivesDamageOnPeaceful = false;
+	public static boolean hivesDamageUnderwater = true;
+	public static boolean hivesDamageOnlyPlayers = false;
+	public static boolean hiveDamageOnAttack = true;
+	public static int maxFlowersSpawnedPerHive = 20;
+
+	private static void onCommonSetup(FMLCommonSetupEvent event) {
+	}
+
+	private static void registerBrewingRecipes(RegisterBrewingRecipesEvent event) {
+		// BREWING RECIPES
+		event.getBuilder().addRecipe(
+			DataComponentIngredient.of(DataComponents.POTION_CONTENTS, new PotionContents(Potions.AWKWARD), Items.POTION),
+			Ingredient.of(ApicultureItems.POLLEN_CLUSTER.item(EnumPollenCluster.NORMAL)),
+			PotionContents.createItemStack(Items.POTION, Potions.HEALING));
+		event.getBuilder().addRecipe(
+			DataComponentIngredient.of(DataComponents.POTION_CONTENTS, new PotionContents(Potions.AWKWARD), Items.POTION),
+			Ingredient.of(ApicultureItems.POLLEN_CLUSTER.item(EnumPollenCluster.CRYSTALLINE)),
+			PotionContents.createItemStack(Items.POTION, Potions.REGENERATION));
+	}
+
+	private static void registerCapabilities(RegisterCapabilitiesEvent event) {
+		event.registerItem(ForestryCapabilities.BEE_PROTECTION, (stack, context) -> ItemArmorApiarist.BeeProtection.INSTANCE,
+			ApicultureItems.APIARIST_HELMET.item(),
+			ApicultureItems.APIARIST_CHEST.item(),
+			ApicultureItems.APIARIST_LEGS.item(),
+			ApicultureItems.APIARIST_BOOTS.item());
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_PLAIN.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_SIEVE.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_SWARMER.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_HYGROREGULATOR.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_STABILISER.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_FAN.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.ALVEARY_HEATER.tileType(), AbstractAlvearyBlockEntity::getItemHandler);
+		event.registerBlockEntity(Capabilities.Item.BLOCK, ApicultureTiles.APIARY.tileType(), TileForestry::getItemHandler);
+		event.registerBlockEntity(Capabilities.Energy.BLOCK, ApicultureTiles.ALVEARY_FAN.tileType(), AlvearyClimatizerBlockEntity::getEnergyHandler);
+		event.registerBlockEntity(Capabilities.Energy.BLOCK, ApicultureTiles.ALVEARY_HEATER.tileType(), AlvearyClimatizerBlockEntity::getEnergyHandler);
+		event.registerBlockEntity(Capabilities.Fluid.BLOCK, ApicultureTiles.ALVEARY_HYGROREGULATOR.tileType(), AlvearyHygroregulatorBlockEntity::getFluidHandler);
+	}
+
+	private static void onNetherBeeMate(ForestryEvent.BeeMatingEvent event) {
+		if (event.getPrincess().getSpecies().getGenusName().equals(ForestryTaxa.GENUS_EMBITTERED) && event.getHousing().temperature() != TemperatureType.HELLISH) {
+			event.setPrincess(SpeciesUtil.getBeeSpecies(ForestryBeeSpecies.ZOMBIFIED).createIndividual());
+		}
+	}
+
+	private static void modifySnifferLoot(LootTableLoadEvent event) {
+		if (event.getKey().equals(BuiltInLootTables.SNIFFER_DIGGING)) {
+			forestry.core.platform.loot.LootPoolInjection.append(event, "main", LootItem.lootTableItem(ApicultureItems.AMBER_DRONE).build());
+		}
+	}
+
+	// todo config
+	public static double getSecondPrincessChance() {
+		return (float) 0;
+	}
+
+	@Override
+	public Identifier getId() {
+		return ForestryModuleIds.APICULTURE;
+	}
+
+	// declared so the load order that carries the reload ordering is stated rather than incidental
+	@Override
+	public List<Identifier> getModuleDependencies() {
+		return List.of(ForestryModuleIds.CORE);
+	}
+
+	@Override
+	public void registerReloadListeners(AddServerReloadListenersEvent event) {
+		// Flower types load in ModuleCore, not here: butterflies carry the same FLOWER_TYPE
+		// chromosome, so base owns them.
+
+		// Load bee effects from the "bee_effect" folder. Registered before BeeSpeciesManager: species
+		// projection resolves each genome's bee_effect reference via getBeeEffect, so effects must exist
+		// first.
+		event.addListener(ForestryConstants.forestry("bee_effects"), BeeEffectManager.INSTANCE);
+
+		// before BeeSpeciesManager, a species resolves its jubilance when it is built
+		event.addListener(ForestryConstants.forestry("bee_jubilance"), BeeJubilanceManager.INSTANCE);
+
+		// Load bee species from the "bee_species" datapack folder and rebuild the live species map from
+		// them. SimpleJsonResourceReloadListener#apply already runs on the game executor, so no extra
+		// marshalling is needed here. Core registers the mutation rebuild after every module, and
+		// mutations must resolve species that already exist in the live map.
+		event.addListener(ForestryConstants.forestry("bee_species"), BeeSpeciesManager.INSTANCE);
+	}
+
+	@Override
+	public void sendDatapackData(OnDatapackSyncEvent event) {
+		BeeEffectSyncPacket beeEffects = new BeeEffectSyncPacket(BeeEffectManager.INSTANCE.getDefinitions());
+		BeeJubilanceSyncPacket beeJubilances = new BeeJubilanceSyncPacket(BeeJubilanceManager.INSTANCE.getDefinitions());
+		BeeSpeciesSyncPacket beeSpecies = new BeeSpeciesSyncPacket(BeeSpeciesManager.INSTANCE.getDefinitions());
+
+		// send effects, jubilances and bee species to clients
+		event.getRelevantPlayers().forEach(player -> {
+			// effects and jubilances come before species
+			NetworkUtil.sendToPlayer(beeEffects, player);
+			NetworkUtil.sendToPlayer(beeJubilances, player);
+			NetworkUtil.sendToPlayer(beeSpecies, player);
+		});
+	}
+
+	@Override
+	public void registerEvents(IEventBus modBus) {
+		modBus.addListener(ApicultureCreativeTab::addToForestryTab);
+		modBus.addListener(ModuleApiculture::registerCapabilities);
+		modBus.addListener(ModuleApiculture::registerDataMaps);
+		modBus.addListener(ModuleApiculture::onCommonSetup);
+
+		NeoForge.EVENT_BUS.addListener(ModuleApiculture::registerBrewingRecipes);
+		NeoForge.EVENT_BUS.addListener(ModuleApiculture::onNetherBeeMate);
+		NeoForge.EVENT_BUS.addListener(ModuleApiculture::modifySnifferLoot);
+	}
+
+	private static void registerDataMaps(RegisterDataMapTypesEvent event) {
+		event.register(ForestryDataMaps.SWARMER_FEED);
+	}
+
+	@Override
+	public void addToRootCommand(LiteralArgumentBuilder<CommandSourceStack> command) {
+		command.then(CommandBee.register());
+	}
+
+	@Override
+	public void setupApi() {
+		BeeManager.armorApiaristHelper = new ArmorApiaristHelper();
+	}
+
+	@Override
+	public void registerPackets(IPacketRegistry registry) {
+		registry.clientbound(ApiculturePacketIds.BEE_EFFECT_SYNC, BeeEffectSyncPacket::encode, BeeEffectSyncPacket::decode, BeeEffectSyncPacket::handle);
+		registry.clientbound(ApiculturePacketIds.BEE_JUBILANCE_SYNC, BeeJubilanceSyncPacket::encode, BeeJubilanceSyncPacket::decode, BeeJubilanceSyncPacket::handle);
+		registry.clientbound(ApiculturePacketIds.BEE_SPECIES_SYNC, BeeSpeciesSyncPacket::encode, BeeSpeciesSyncPacket::decode, BeeSpeciesSyncPacket::handle);
+		registry.clientbound(ApiculturePacketIds.BEE_LOGIC_ACTIVE, PacketBeeLogicActive::encode, PacketBeeLogicActive::decode, PacketBeeLogicActive::handle);
+		registry.clientbound(ApiculturePacketIds.HABITAT_BIOME_POINTER, PacketHabitatBiomePointer::encode, PacketHabitatBiomePointer::decode, PacketHabitatBiomePointer::handle);
+	}
+
+	@Override
+	public void registerClientHandler(Consumer<IClientModuleHandler> registrar) {
+		registrar.accept(new ApicultureClientHandler());
+	}
+
+	@Override
+	public void applyClientPluginRegistration(IClientRegistration registration) {
+		ClientRegistration impl = (ClientRegistration) registration;
+
+		// id-keyed: resolving a specific species happens at render time, so the (possibly
+		// datapack-driven) species list is not needed here.
+		IdentityHashMap<ILifeStage, Identifier> defaultBeeModels = new IdentityHashMap<>();
+		IdentityHashMap<ILifeStage, Map<Identifier, Identifier>> customBeeModels = new IdentityHashMap<>();
+
+		for (ILifeStage stage : SpeciesUtil.BEE_TYPE.get().getLifeStages()) {
+			Identifier defaultModel = Objects.requireNonNull(impl.getDefaultBeeModel(stage), "IClientRegistration.setDefaultBeeModel has not been called for life stage " + stage.getSerializedName() + ", unable to resolve bee default model");
+			defaultBeeModels.put(stage, defaultModel);
+			customBeeModels.put(stage, impl.getBeeModels().getOrDefault(stage, Map.of()));
+		}
+		((ForestryClientApiImpl) IForestryClientApi.INSTANCE).setBeeManager(new BeeClientManager(defaultBeeModels, customBeeModels));
+	}
+}

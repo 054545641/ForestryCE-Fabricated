@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "candles=1,lit=false,waterlogged=false": {
+      "model": "forestry:block/candles/rainbow_candle_one"
+    },
+    "candles=1,lit=false,waterlogged=true": {
+      "model": "forestry:block/candles/rainbow_candle_one"
+    },
+    "candles=1,lit=true,waterlogged=false": {
+      "model": "forestry:block/candles/rainbow_candle_one_lit"
+    },
+    "candles=1,lit=true,waterlogged=true": {
+      "model": "forestry:block/candles/rainbow_candle_one_lit"
+    },
+    "candles=2,lit=false,waterlogged=false": {
+      "model": "forestry:block/candles/rainbow_candle_two"
+    },
+    "candles=2,lit=false,waterlogged=true": {
+      "model": "forestry:block/candles/rainbow_candle_two"
+    },
+    "candles=2,lit=true,waterlogged=false": {
+      "model": "forestry:block/candles/rainbow_candle_two_lit"
+    },
+    "candles=2,lit=true,waterlogged=true": {
+      "model": "forestry:block/candles/rainbow_candle_two_lit"
+    },
+    "candles=3,lit=false,waterlogged=false": {
+      "model": "forestry:block/candles/rainbow_candle_three"
+    },
+    "candles=3,lit=false,waterlogged=true": {
+      "model": "forestry:block/candles/rainbow_candle_three"
+    },
+    "candles=3,lit=true,waterlogged=false": {
+      "model": "forestry:block/candles/rainbow_candle_three_lit"
+    },
+    "candles=3,lit=true,waterlogged=true": {
+      "model": "forestry:block/candles/rainbow_candle_three_lit"
+    },
+    "candles=4,lit=false,waterlogged=false": {
+      "model": "forestry:block/candles/rainbow_candle_four"
+    },
+    "candles=4,lit=false,waterlogged=true": {
+      "model": "forestry:block/candles/rainbow_candle_four"
+    },
+    "candles=4,lit=true,waterlogged=false": {
+      "model": "forestry:block/candles/rainbow_candle_four_lit"
+    },
+    "candles=4,lit=true,waterlogged=true": {
+      "model": "forestry:block/candles/rainbow_candle_four_lit"
+    }
+  }
+}

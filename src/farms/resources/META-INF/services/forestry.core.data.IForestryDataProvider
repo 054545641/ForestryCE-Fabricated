@@ -1,0 +1,3 @@
+# The farms jar's datagen entry point. It is named from this source set because a provides entry binds
+# the class to the module that declares it, and this is the module the class compiles into
+forestry.agriculture.data.AgricultureData

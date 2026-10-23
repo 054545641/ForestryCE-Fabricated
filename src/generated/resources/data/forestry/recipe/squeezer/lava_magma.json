@@ -1,0 +1,16 @@
+{
+  "type": "forestry:squeezer",
+  "chance": 0.0,
+  "id": "forestry:squeezer/lava_magma",
+  "output": {
+    "stack": {
+      "amount": 1000,
+      "id": "minecraft:lava"
+    }
+  },
+  "resources": [
+    "forestry:phosphor",
+    "minecraft:magma_block"
+  ],
+  "time": 20
+}

@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/sugar_cane",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_sugar_cane"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:sugar_cane"
+    }
+  },
+  "time": 5
+}

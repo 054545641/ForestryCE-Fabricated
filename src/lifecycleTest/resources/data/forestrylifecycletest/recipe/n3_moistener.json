@@ -1,0 +1,10 @@
+{
+  "type": "forestry:moistener",
+  "id": "forestrylifecycletest:n3_moistener",
+  "resource": "minecraft:amethyst_shard",
+  "product": {
+    "id": "minecraft:diamond",
+    "count": 2
+  },
+  "time": 8
+}

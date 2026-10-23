@@ -1,0 +1,15 @@
+{
+  "type": "forestry:squeezer",
+  "chance": 0.0,
+  "id": "forestry:squeezer/cactus",
+  "output": {
+    "stack": {
+      "amount": 500,
+      "id": "minecraft:water"
+    }
+  },
+  "resources": [
+    "minecraft:cactus"
+  ],
+  "time": 10
+}

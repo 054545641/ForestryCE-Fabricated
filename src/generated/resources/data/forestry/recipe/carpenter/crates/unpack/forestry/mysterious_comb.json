@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/mysterious_comb",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_mysterious_comb"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:mysterious_comb"
+    }
+  },
+  "time": 5
+}

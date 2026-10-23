@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget",
+    "forestry:tin_nugget"
+  ],
+  "result": {
+    "id": "forestry:tin_ingot"
+  }
+}

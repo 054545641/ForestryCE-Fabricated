@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_sign_rot_3",
+  "textures": {
+    "all": "forestry:entity/signs/acacia_desert",
+    "particle": "forestry:block/camelthorn_planks"
+  }
+}

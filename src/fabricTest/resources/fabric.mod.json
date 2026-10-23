@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "forestry_f2_tests",
+  "version": "1.0.0",
+  "name": "Forestry Fabric platform regression tests",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": [
+      "forestry.fabric.test.F3FermenterTests",
+      "forestry.fabric.test.F3SolderingIronTests",
+      "forestry.fabric.test.F3WorldTests",
+      "forestry.fabric.test.F1RegistrationTests",
+      "forestry.modules.FabricModuleOrderTests",
+      "forestry.fabric.test.F2TransferTests",
+      "forestry.fabric.test.F2PlatformTests",
+      "forestry.fabric.test.F2MailTests",
+      "forestry.fabric.test.F2TreeTests",
+      "forestry.fabric.test.F2ButterflyTests",
+      "forestry.fabric.test.F2FarmTests",
+      "forestry.fabric.test.F2MachineTests",
+      "forestry.fabric.test.F2FuelTests",
+      "forestry.fabric.test.F2HousingTests",
+      "forestry.fabric.test.F2UtilityTests",
+      "forestry.fabric.test.F2ChunkTests",
+      "forestry.fabric.test.F2BackpackTests",
+      "forestry.fabric.test.F2StorageTests",
+      "forestry.fabric.test.F2ContainerTests",
+      "forestry.fabric.test.F2RecipeTests"
+    ],
+    "fabric-client-gametest": [
+      "forestry.fabric.test.F3LeafItemClientTest",
+      "forestry.fabric.test.F3FermenterClientTest",
+      "forestry.fabric.test.F3WorldgenClientTest",
+      "forestry.fabric.test.F3ClientTest",
+      "forestry.fabric.test.F1ClientTest",
+      "forestry.fabric.test.F2LifecycleClientTest"
+    ],
+    "jei_mod_plugin": [
+      "forestry.fabric.test.F1JeiProbe"
+    ],
+    "main": [
+      "forestry.fabric.test.F2RestartProbe"
+    ]
+  },
+  "depends": {
+    "forestry": "*"
+  }
+}

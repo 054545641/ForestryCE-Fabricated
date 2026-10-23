@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/nether_wart",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_nether_wart"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:nether_wart"
+    }
+  },
+  "time": 5
+}

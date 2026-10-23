@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "#c:glass_blocks/colorless",
+    "X": "forestry:butterfly",
+    "Y": "#c:chests/wooden"
+  },
+  "pattern": [
+    " # ",
+    "XYX",
+    "XXX"
+  ],
+  "result": {
+    "id": "forestry:lepidopterists_chest"
+  }
+}

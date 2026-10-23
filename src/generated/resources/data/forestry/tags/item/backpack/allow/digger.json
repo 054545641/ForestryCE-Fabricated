@@ -1,0 +1,20 @@
+{
+  "values": [
+    "#minecraft:dirt",
+    "#c:cobblestones",
+    "#c:gravels",
+    "#c:netherracks",
+    "#c:sands",
+    "#c:sandstone/blocks",
+    "#c:stones",
+    "forestry:broken_survivalists_pickaxe",
+    "forestry:pickaxe_kit",
+    "forestry:survivalists_pickaxe",
+    "minecraft:clay",
+    "minecraft:clay_ball",
+    "minecraft:flint",
+    "minecraft:snow",
+    "minecraft:snowball",
+    "minecraft:soul_sand"
+  ]
+}

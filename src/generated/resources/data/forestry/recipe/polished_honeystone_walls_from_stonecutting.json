@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "forestry:polished_honeystone",
+  "result": {
+    "id": "forestry:polished_honeystone_wall"
+  }
+}

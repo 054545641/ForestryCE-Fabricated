@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_grafter",
+  "criteria": {
+    "forestry:get_forestry_sapling": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:tree_sapling"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_forestry_sapling.description"
+    },
+    "icon": {
+      "id": "minecraft:oak_sapling"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_forestry_sapling.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_forestry_sapling"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

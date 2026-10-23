@@ -1,0 +1,19 @@
+{
+  "values": [
+    "forestry:ash_brick_wall",
+    "forestry:wax_brick_wall",
+    "forestry:refractory_wax_brick_wall",
+    "forestry:waxstone_wall",
+    "forestry:cobbled_waxstone_wall",
+    "forestry:waxstone_brick_wall",
+    "forestry:polished_waxstone_wall",
+    "forestry:refractory_waxstone_wall",
+    "forestry:cobbled_refractory_waxstone_wall",
+    "forestry:refractory_waxstone_brick_wall",
+    "forestry:polished_refractory_waxstone_wall",
+    "forestry:honeystone_wall",
+    "forestry:cobbled_honeystone_wall",
+    "forestry:honeystone_brick_wall",
+    "forestry:polished_honeystone_wall"
+  ]
+}

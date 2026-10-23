@@ -1,0 +1,24 @@
+{
+  "values": [
+    "#c:grasses",
+    "#c:flowers",
+    "#minecraft:logs",
+    "#minecraft:saplings",
+    "#c:crops",
+    "#c:seeds",
+    "minecraft:apple",
+    "minecraft:beetroot",
+    "minecraft:brown_mushroom",
+    "minecraft:cactus",
+    "minecraft:chorus_fruit",
+    "minecraft:chorus_plant",
+    "minecraft:golden_apple",
+    "minecraft:melon",
+    "minecraft:nether_wart",
+    "minecraft:pumpkin",
+    "minecraft:red_mushroom",
+    "minecraft:stick",
+    "minecraft:sugar_cane",
+    "minecraft:vine"
+  ]
+}

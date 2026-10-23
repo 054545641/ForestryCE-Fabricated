@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "#c:ingots/tin",
+    "X": "#c:chests/wooden",
+    "Y": "forestry:sturdy_casing"
+  },
+  "pattern": [
+    " # ",
+    "#Y#",
+    "XXX"
+  ],
+  "result": {
+    "id": "forestry:mailbox"
+  }
+}

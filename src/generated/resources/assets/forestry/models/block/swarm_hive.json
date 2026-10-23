@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "forestry:block/hive/swarm_bottom",
+    "side": "forestry:block/hive/swarm_side",
+    "top": "forestry:block/hive/swarm_top"
+  }
+}

@@ -1,0 +1,96 @@
+package forestry.apiculture.bees.genetics.effects;
+
+import forestry.api.IForestryApi;
+import forestry.api.apiculture.IBeeHousing;
+import forestry.api.apiculture.IBeeModifier;
+import forestry.api.apiculture.genetics.IBeeEffect;
+import forestry.api.core.genetics.IEffectData;
+import forestry.api.core.genetics.IGenome;
+import forestry.apiculture.bees.genetics.Bee;
+import forestry.core.engine.genetics.EffectData;
+import forestry.core.platform.util.VecUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
+
+import java.util.List;
+
+public abstract class ThrottledBeeEffect extends DummyBeeEffect implements IBeeEffect {
+	private final ThrottleSettings settings;
+
+	protected ThrottledBeeEffect(ThrottleSettings settings) {
+		super(settings.dominant());
+		this.settings = settings;
+	}
+
+	/** Kept for the bespoke code-only subclasses, which have no codec and so no reason to name the record. */
+	protected ThrottledBeeEffect(boolean dominant, int throttle, boolean requiresWorking, boolean isCombinable) {
+		this(new ThrottleSettings(dominant, throttle, requiresWorking, isCombinable));
+	}
+
+	public ThrottleSettings settings() {
+		return this.settings;
+	}
+
+	public static AABB getBounding(IBeeHousing housing, IGenome genome) {
+		IBeeModifier beeModifier = IForestryApi.INSTANCE.getHiveManager().createBeeHousingModifier(housing);
+		Vec3i territory = Bee.getAdjustedTerritory(genome, beeModifier);
+
+		BlockPos min = housing.getBlockPos().offset(VecUtil.center(territory));
+		BlockPos max = min.offset(territory);
+
+		return new AABB(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
+	}
+
+	public static <T extends Entity> List<T> getEntitiesInRange(IGenome genome, IBeeHousing housing, Class<T> entityClass) {
+		AABB boundingBox = getBounding(housing, genome);
+		return housing.getLevel().getEntitiesOfClass(entityClass, boundingBox);
+	}
+
+	public int getThrottle() {
+		return this.settings.throttle();
+	}
+
+	@Override
+	public boolean isCombinable() {
+		return this.settings.combinable();
+	}
+
+	@Override
+	public IEffectData validateStorage(IEffectData storedData) {
+		if (storedData instanceof EffectData) {
+			return storedData;
+		}
+
+		return new EffectData(1, 0);
+	}
+
+	@Override
+	public final IEffectData doEffect(IGenome genome, IEffectData storedData, IBeeHousing housing) {
+		if (isThrottled(storedData, housing)) {
+			return storedData;
+		}
+		return doEffectThrottled(genome, storedData, housing);
+	}
+
+	private boolean isThrottled(IEffectData storedData, IBeeHousing housing) {
+		if (this.settings.requiresWorking() && housing.getErrorLogic().hasErrors()) {
+			return true;
+		}
+
+		int time = storedData.getInteger(0);
+		time++;
+		storedData.setInteger(0, time);
+
+		if (time < this.settings.throttle()) {
+			return true;
+		}
+
+		// Reset since we are done throttling.
+		storedData.setInteger(0, 0);
+		return false;
+	}
+
+	abstract IEffectData doEffectThrottled(IGenome genome, IEffectData storedData, IBeeHousing housing);
+}

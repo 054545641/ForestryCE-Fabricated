@@ -1,0 +1,28 @@
+{
+  "icon": "forestry:biogas_engine",
+  "name": "for.gui.book.patchouli.entry.core.engine.biogas",
+  "category": "forestry:engines",
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "forestry:biogas_engine",
+      "text": "for.gui.book.patchouli.entry.core.engine.biogas1"
+    },
+    {
+      "type": "text",
+      "text": "for.gui.book.patchouli.entry.core.engine.biogas2"
+    },
+    {
+      "type": "text",
+      "text": "for.gui.book.patchouli.entry.core.engine.biogas3"
+    },
+    {
+      "type": "text",
+      "text": "for.gui.book.patchouli.entry.core.engine.biogas4"
+    },
+    {
+      "type": "text",
+      "text": "for.gui.book.patchouli.entry.core.engine.biogas5"
+    }
+  ]
+}

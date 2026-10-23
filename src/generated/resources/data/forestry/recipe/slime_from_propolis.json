@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "forestry:propolis",
+    "X": "forestry:pollen_cluster"
+  },
+  "pattern": [
+    "#X#",
+    "#X#",
+    "#X#"
+  ],
+  "result": {
+    "id": "minecraft:slime_ball"
+  }
+}

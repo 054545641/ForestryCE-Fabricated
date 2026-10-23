@@ -1,0 +1,16 @@
+{
+  "values": [
+    "forestry:forest_hive",
+    "forestry:meadows_hive",
+    "forestry:modest_hive",
+    "forestry:tropical_hive",
+    "forestry:ender_hive",
+    "forestry:wintry_hive",
+    "forestry:marshy_hive",
+    "forestry:savanna_hive",
+    "forestry:lush_hive",
+    "forestry:aquatic_hive",
+    "forestry:nether_hive",
+    "forestry:swarm_hive"
+  ]
+}

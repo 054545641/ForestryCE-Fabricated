@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/mellow_comb",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_mellow_comb"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:mellow_comb"
+    }
+  },
+  "time": 5
+}

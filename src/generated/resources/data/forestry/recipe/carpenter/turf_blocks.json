@@ -1,0 +1,22 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/turf_blocks",
+  "liquid": {
+    "amount": 100,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "X": "minecraft:grass_block"
+    },
+    "pattern": [
+      "XX",
+      "XX"
+    ],
+    "result": {
+      "count": 4,
+      "id": "forestry:turf_block"
+    }
+  },
+  "time": 20
+}

@@ -1,0 +1,7 @@
+{
+  "asset_id": "forestry:mystical_tree",
+  "width": 2,
+  "height": 2,
+  "title": {"translate": "painting.forestry.mystical_tree.title"},
+  "author": {"translate": "painting.forestry.mystical_tree.author"}
+}

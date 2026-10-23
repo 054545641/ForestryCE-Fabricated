@@ -1,0 +1,47 @@
+{
+  "parent": "forestry:get_fabricator",
+  "criteria": {
+    "forestry:farming_simulator": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "forestry:arboretum_managed",
+              "forestry:farm_crops_managed",
+              "forestry:farm_mushroom_managed",
+              "forestry:farm_gourd_managed",
+              "forestry:farm_nether_managed",
+              "forestry:farm_ender_managed",
+              "forestry:peat_bog_managed",
+              "forestry:arboretum_manual",
+              "forestry:farm_crops_manual",
+              "forestry:farm_mushroom_manual",
+              "forestry:farm_gourd_manual",
+              "forestry:farm_nether_manual",
+              "forestry:farm_ender_manual",
+              "forestry:peat_bog_manual"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.farming_simulator.description"
+    },
+    "icon": {
+      "id": "forestry:arboretum_managed"
+    },
+    "title": {
+      "translate": "advancements.forestry.farming_simulator.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:farming_simulator"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

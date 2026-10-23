@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "forestry:block/plywood_top",
+    "particle": "forestry:block/plywood_top",
+    "side": "forestry:block/plywood_side"
+  }
+}

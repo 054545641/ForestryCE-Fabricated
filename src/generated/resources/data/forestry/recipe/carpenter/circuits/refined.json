@@ -1,0 +1,31 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/circuits/refined",
+  "liquid": {
+    "amount": 1000,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "#": "#c:ingots/iron",
+      "R": "#c:dusts/redstone"
+    },
+    "pattern": [
+      "R#R",
+      "R#R",
+      "R#R"
+    ],
+    "result": {
+      "id": "forestry:refined_circuit_board"
+    }
+  },
+  "result": {
+    "components": {
+      "minecraft:custom_data": {
+        "T": 2
+      }
+    },
+    "id": "forestry:refined_circuit_board"
+  },
+  "time": 80
+}

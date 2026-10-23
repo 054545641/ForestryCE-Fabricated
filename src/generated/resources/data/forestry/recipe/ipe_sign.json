@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "P": [
+      "forestry:ipe_planks",
+      "forestry:ipe_fireproof_planks"
+    ],
+    "S": "#c:rods/wooden"
+  },
+  "pattern": [
+    "PPP",
+    "PPP",
+    " S "
+  ],
+  "result": {
+    "id": "forestry:ipe_sign"
+  }
+}

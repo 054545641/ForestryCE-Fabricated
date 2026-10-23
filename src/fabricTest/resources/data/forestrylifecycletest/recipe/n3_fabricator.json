@@ -1,0 +1,1 @@
+{"type":"forestry:fabricator","id":"forestrylifecycletest:n3_fabricator","molten":{"id":"minecraft:lava","amount":100},"recipe":{"pattern":["##"],"key":{"#":"minecraft:amethyst_shard"},"result":{"id":"minecraft:diamond","count":2}}}

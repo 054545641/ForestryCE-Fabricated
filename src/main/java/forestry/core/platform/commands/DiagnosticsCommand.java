@@ -1,0 +1,86 @@
+package forestry.core.platform.commands;
+
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import forestry.Forestry;
+import forestry.api.IForestryApi;
+import forestry.api.core.genetics.IGeneticManager;
+import forestry.api.core.genetics.ISpecies;
+import forestry.api.core.genetics.ISpeciesType;
+import forestry.api.core.genetics.alleles.*;
+import forestry.core.platform.util.GeneticsUtil;
+import forestry.core.platform.util.SpeciesUtil;
+import forestry.core.platform.util.Translator;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
+
+import java.util.List;
+
+// Test command to make sure things aren't broken after the API rewrite.
+public class DiagnosticsCommand {
+	public static ArgumentBuilder<CommandSourceStack, ?> register() {
+		return Commands.literal("diagnostics")
+			.executes(DiagnosticsCommand::diagnostics);
+	}
+
+	private static int diagnostics(CommandContext<CommandSourceStack> ctx) {
+		CommandSourceStack source = ctx.getSource();
+
+		source.sendSystemMessage(Component.literal("Running Forestry diagnostics..."));
+
+		IGeneticManager genetics = IForestryApi.INSTANCE.getGeneticManager();
+		ISpeciesType<?, ?>[] types = genetics.getSpeciesTypes().toArray(ISpeciesType<?, ?>[]::new);
+		Forestry.LOGGER.info("Found {} species types", types.length);
+
+		for (ISpeciesType<?, ?> type : types) {
+			List<? extends ISpecies<?>> allSpecies = type.getAllSpecies();
+			Forestry.LOGGER.info("Species type {} has {} registered species", type.id(), allSpecies.size());
+
+			for (ISpecies<?> species : allSpecies) {
+				if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+					// Name translation
+					if (!Translator.canTranslateToLocal(species.getTranslationKey())) {
+						Forestry.LOGGER.error(species.id() + " is missing a translated name");
+					}
+					// Bee descriptions (Sengir never added descriptions for the other species types)
+					if (species.getType() == SpeciesUtil.BEE_TYPE.get() && !Translator.canTranslateToLocal(species.getDescriptionTranslationKey())) {
+						Forestry.LOGGER.error(species.id() + " is missing a description");
+					}
+				}
+			}
+
+			if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+				IKaryotype karyotype = type.getKaryotype();
+
+				for (IChromosome<?> chromosome : karyotype.getChromosomes()) {
+					if (chromosome == karyotype.getSpeciesChromosome() || karyotype.getDefaultAllele(chromosome).value() instanceof Boolean || chromosome == BeeChromosomes.FERTILITY || chromosome == ButterflyChromosomes.FERTILITY) {
+						continue;
+					}
+
+					checkAlleleTranslations(chromosome);
+				}
+			}
+		}
+
+		source.sendSystemMessage(Component.literal("Diagnostics complete. Check log for details"));
+
+		return 0;
+	}
+
+	private static <V> void checkAlleleTranslations(IChromosome<V> chromosome) {
+		List<Allele<V>> alleles = GeneticsUtil.getKnownAlleles(chromosome);
+
+		Forestry.LOGGER.info("Chromosome {} has {} alleles", chromosome.id(), alleles.size());
+
+		for (Allele<V> allele : alleles) {
+			String translationKey = chromosome.translationKey(allele.value());
+
+			if (!Translator.canTranslateToLocal(translationKey)) {
+				Forestry.LOGGER.error("Allele for chromosome {} is missing a translation - {}", chromosome.id(), translationKey);
+			}
+		}
+	}
+}

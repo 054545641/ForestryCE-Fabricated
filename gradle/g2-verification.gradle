@@ -1,0 +1,68 @@
+// These integrations are temporarily closed by the G2 acceptance scope because
+// no verified 26.2 artifacts are available. Keep their dormant source isolated.
+tasks.register('checkG2OptionalIsolation') {
+    group = 'verification'
+    description = 'Verifies that disabled Patchouli/KubeJS/Rhino integrations are absent from resolved classpaths and release jars.'
+    def jarTasks = ['jar', 'butterfliesJar', 'farmsJar', 'mailJar']
+    dependsOn jarTasks
+    doLast {
+        def report = layout.buildDirectory.file('reports/g2/optional-isolation.json').get().asFile
+        report.delete()
+        def scopes = ['main', 'butterflies', 'farms', 'mail', 'mainJei', 'butterfliesJei', 'farmsJei', 'mailJei', 'curios', 'datagen']
+        def classpaths = [:]
+        scopes.each { name ->
+            def source = sourceSets[name]
+            [source.compileClasspathConfigurationName, source.runtimeClasspathConfigurationName].each { scope ->
+                // Resolve transitive dependencies too; checking declarations alone misses them.
+                def resolution = configurations[scope].incoming.resolutionResult
+                def unresolved = resolution.allDependencies.findAll { it instanceof org.gradle.api.artifacts.result.UnresolvedDependencyResult }
+                if (unresolved) throw new GradleException("Unresolved G2 classpath ${scope}: ${unresolved.collect { it.attempted.displayName }}")
+                def modules = resolution.allComponents.collect { it.id }
+                    .findAll { it instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier }
+                def forbidden = modules.findAll {
+                    it.group == 'vazkii.patchouli' || (it.group == 'dev.latvian.mods' && it.module ==~ /(?:kubejs|rhino)(?:-.*)?/)
+                }
+                if (forbidden) throw new GradleException("Inactive G2 integration on ${scope}: ${forbidden}")
+                classpaths[scope] = modules.collect { it.displayName }.sort()
+            }
+        }
+        def packages = ['vazkii.patchouli', 'dev.latvian.mods.kubejs', 'dev.latvian.mods.rhino',
+                        'forestry.core.platform.compat.patchouli', 'forestry.core.platform.compat.kubejs']
+        def references = packages.collectMany { [it, it.replace('.', '/')] }
+        def artifacts = [:]
+        jarTasks.each { taskName ->
+            def artifact = tasks.named(taskName).get().archiveFile.get().asFile
+            def classes = 0
+            new java.util.zip.ZipFile(artifact).withCloseable { zip ->
+                def entries = zip.entries().findAll { !it.directory }
+                entries.each { entry ->
+                    if (entry.name.endsWith('.class')) classes++
+                    if (entry.name.endsWith('.jar') || entry.name.contains('/patchouli_books/') || entry.name == 'kubejs.plugins.txt'
+                        || entry.name == 'META-INF/services/forestry.core.manual.IManualAccess'
+                        || references.any { entry.name.contains(it) }) {
+                        throw new GradleException("Inactive integration or embedded dependency in ${artifact.name}: ${entry.name}")
+                    }
+                    if (entry.name.endsWith('.class') || entry.name.endsWith('.json') || entry.name.endsWith('.toml')
+                        || entry.name.endsWith('.txt') || entry.name.startsWith('META-INF/services/')) {
+                        def content = new String(zip.getInputStream(entry).bytes, 'ISO-8859-1')
+                        if (references.any { content.contains(it) }) {
+                            throw new GradleException("Inactive integration reference in ${artifact.name}: ${entry.name}")
+                        }
+                    }
+                }
+                def metadata = zip.getInputStream(zip.getEntry('META-INF/neoforge.mods.toml')).getText('UTF-8')
+                if (metadata =~ /(?m)^\s*modId\s*=\s*["'](?:patchouli|kubejs|rhino)["']\s*$/) {
+                    throw new GradleException("Disabled integration declared in ${artifact.name}")
+                }
+            }
+            artifacts[artifact.name] = [sha256: java.security.MessageDigest.getInstance('SHA-256').digest(artifact.bytes).encodeHex().toString(), classes: classes]
+        }
+        report.parentFile.mkdirs()
+        report.setText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(
+            [result: 'passed', disabledIntegrations: ['patchouli', 'kubejs', 'rhino'], classpaths: classpaths, artifacts: artifacts]
+        )) + '\n', 'UTF-8')
+        logger.lifecycle("G2 optional isolation: ${classpaths.size()} resolved classpaths and four release jars have no Patchouli/KubeJS/Rhino dependencies, references or entry points.")
+    }
+}
+
+tasks.named('check') { dependsOn 'checkG2OptionalIsolation' }

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "minecraft:cobblestone",
+    "X": [
+      "forestry:honey_drop",
+      "forestry:honeydew"
+    ]
+  },
+  "pattern": [
+    "###",
+    "#X#",
+    "###"
+  ],
+  "result": {
+    "count": 8,
+    "id": "forestry:cobbled_honeystone"
+  }
+}

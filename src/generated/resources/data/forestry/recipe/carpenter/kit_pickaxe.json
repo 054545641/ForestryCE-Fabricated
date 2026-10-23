@@ -1,0 +1,21 @@
+{
+  "type": "forestry:carpenter",
+  "box": "forestry:carton",
+  "id": "forestry:carpenter/kit_pickaxe",
+  "recipe": {
+    "category": "equipment",
+    "key": {
+      "#": "#c:ingots/bronze",
+      "X": "minecraft:stick"
+    },
+    "pattern": [
+      "###",
+      " X ",
+      " X "
+    ],
+    "result": {
+      "id": "forestry:pickaxe_kit"
+    }
+  },
+  "time": 20
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "alveary",
+  "key": {
+    "G": "#c:gems/quartz",
+    "X": "forestry:alveary_block"
+  },
+  "pattern": [
+    "G G",
+    "GXG",
+    "G G"
+  ],
+  "result": {
+    "id": "forestry:alveary_stabilizer"
+  }
+}

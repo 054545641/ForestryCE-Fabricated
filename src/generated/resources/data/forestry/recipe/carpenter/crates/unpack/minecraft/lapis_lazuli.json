@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/lapis_lazuli",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_lapis"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:lapis_lazuli"
+    }
+  },
+  "time": 5
+}

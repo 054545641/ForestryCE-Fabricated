@@ -1,0 +1,18 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/wood_pulp",
+  "liquid": {
+    "amount": 250,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "ingredients": [
+      "#minecraft:logs"
+    ],
+    "result": {
+      "count": 4,
+      "id": "forestry:wood_pulp"
+    }
+  },
+  "time": 5
+}

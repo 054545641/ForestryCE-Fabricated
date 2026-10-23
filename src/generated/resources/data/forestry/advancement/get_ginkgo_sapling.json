@@ -1,0 +1,125 @@
+{
+  "parent": "forestry:get_forestry_sapling",
+  "criteria": {
+    "forestry:get_ginkgo_sapling": {
+      "conditions": {
+        "tag": "forestry:ginkgo"
+      },
+      "trigger": "forestry:pickup_species_trigger"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_ginkgo_sapling.description"
+    },
+    "icon": {
+      "components": {
+        "forestry:genome": {
+          "genome": {
+            "forestry:fireproof": {
+              "active": {
+                "dominant": true,
+                "value": false
+              },
+              "inactive": {
+                "dominant": true,
+                "value": false
+              }
+            },
+            "forestry:fruits": {
+              "active": {
+                "value": "forestry:fruit_none"
+              },
+              "inactive": {
+                "value": "forestry:fruit_none"
+              }
+            },
+            "forestry:girth": {
+              "active": {
+                "value": 1
+              },
+              "inactive": {
+                "value": 1
+              }
+            },
+            "forestry:height": {
+              "active": {
+                "value": 1.25
+              },
+              "inactive": {
+                "value": 1.25
+              }
+            },
+            "forestry:maturation": {
+              "active": {
+                "dominant": true,
+                "value": 5
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 5
+              }
+            },
+            "forestry:saplings": {
+              "active": {
+                "dominant": true,
+                "value": 0.01
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 0.01
+              }
+            },
+            "forestry:sappiness": {
+              "active": {
+                "value": 0.8
+              },
+              "inactive": {
+                "value": 0.8
+              }
+            },
+            "forestry:tree_effect": {
+              "active": {
+                "value": "forestry:tree_effect_none"
+              },
+              "inactive": {
+                "value": "forestry:tree_effect_none"
+              }
+            },
+            "forestry:tree_species": {
+              "active": {
+                "dominant": true,
+                "value": "forestry:ginkgo"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "forestry:ginkgo"
+              }
+            },
+            "forestry:yield": {
+              "active": {
+                "dominant": true,
+                "value": 0.025
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 0.025
+              }
+            }
+          },
+          "karyotype": "forestry:tree_species"
+        }
+      },
+      "id": "forestry:tree_sapling"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_ginkgo_sapling.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_ginkgo_sapling"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

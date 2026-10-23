@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": [
+      "forestry:letter_empty_fresh",
+      "forestry:letter_empty_stamped",
+      "forestry:letter_empty_opened",
+      "forestry:letter_empty_emptied"
+    ]
+  },
+  "pattern": [
+    " # ",
+    " # ",
+    " # "
+  ],
+  "result": {
+    "id": "minecraft:paper"
+  }
+}

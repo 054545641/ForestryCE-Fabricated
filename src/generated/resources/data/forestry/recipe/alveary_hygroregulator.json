@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "alveary",
+  "key": {
+    "G": "#c:glass_blocks/colorless",
+    "I": "#c:ingots/iron",
+    "X": "forestry:alveary_block"
+  },
+  "pattern": [
+    "GIG",
+    "GXG",
+    "GIG"
+  ],
+  "result": {
+    "id": "forestry:alveary_hygroregulator"
+  }
+}

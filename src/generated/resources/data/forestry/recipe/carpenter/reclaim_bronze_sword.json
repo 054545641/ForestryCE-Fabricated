@@ -1,0 +1,13 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/reclaim_bronze_sword",
+  "recipe": {
+    "ingredients": [
+      "forestry:broken_survivalists_sword"
+    ],
+    "result": {
+      "id": "forestry:bronze_ingot"
+    }
+  },
+  "time": 5
+}

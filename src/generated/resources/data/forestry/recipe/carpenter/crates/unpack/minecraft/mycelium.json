@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/mycelium",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_mycelium"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:mycelium"
+    }
+  },
+  "time": 5
+}

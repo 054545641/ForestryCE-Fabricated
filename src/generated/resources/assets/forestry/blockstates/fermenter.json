@@ -1,0 +1,379 @@
+{
+  "variants": {
+    "facing=east,tank_product_fill_level=0,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_0",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=0,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_0",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=0,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_0",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=0,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_0",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=0,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_0",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=1,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_1",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=1,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_1",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=1,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_1",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=1,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_1",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=1,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_1",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=2,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_2",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=2,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_2",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=2,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_2",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=2,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_2",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=2,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_2",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=3,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_3",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=3,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_3",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=3,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_3",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=3,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_3",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=3,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_3",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=4,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_4",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=4,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_4",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=4,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_4",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=4,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_4",
+      "y": 90
+    },
+    "facing=east,tank_product_fill_level=4,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_4",
+      "y": 90
+    },
+    "facing=north,tank_product_fill_level=0,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_0"
+    },
+    "facing=north,tank_product_fill_level=0,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_0"
+    },
+    "facing=north,tank_product_fill_level=0,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_0"
+    },
+    "facing=north,tank_product_fill_level=0,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_0"
+    },
+    "facing=north,tank_product_fill_level=0,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_0"
+    },
+    "facing=north,tank_product_fill_level=1,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_1"
+    },
+    "facing=north,tank_product_fill_level=1,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_1"
+    },
+    "facing=north,tank_product_fill_level=1,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_1"
+    },
+    "facing=north,tank_product_fill_level=1,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_1"
+    },
+    "facing=north,tank_product_fill_level=1,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_1"
+    },
+    "facing=north,tank_product_fill_level=2,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_2"
+    },
+    "facing=north,tank_product_fill_level=2,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_2"
+    },
+    "facing=north,tank_product_fill_level=2,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_2"
+    },
+    "facing=north,tank_product_fill_level=2,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_2"
+    },
+    "facing=north,tank_product_fill_level=2,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_2"
+    },
+    "facing=north,tank_product_fill_level=3,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_3"
+    },
+    "facing=north,tank_product_fill_level=3,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_3"
+    },
+    "facing=north,tank_product_fill_level=3,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_3"
+    },
+    "facing=north,tank_product_fill_level=3,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_3"
+    },
+    "facing=north,tank_product_fill_level=3,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_3"
+    },
+    "facing=north,tank_product_fill_level=4,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_4"
+    },
+    "facing=north,tank_product_fill_level=4,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_4"
+    },
+    "facing=north,tank_product_fill_level=4,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_4"
+    },
+    "facing=north,tank_product_fill_level=4,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_4"
+    },
+    "facing=north,tank_product_fill_level=4,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_4"
+    },
+    "facing=south,tank_product_fill_level=0,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_0",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=0,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_0",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=0,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_0",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=0,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_0",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=0,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_0",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=1,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_1",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=1,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_1",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=1,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_1",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=1,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_1",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=1,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_1",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=2,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_2",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=2,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_2",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=2,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_2",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=2,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_2",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=2,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_2",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=3,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_3",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=3,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_3",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=3,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_3",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=3,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_3",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=3,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_3",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=4,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_4",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=4,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_4",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=4,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_4",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=4,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_4",
+      "y": 180
+    },
+    "facing=south,tank_product_fill_level=4,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_4",
+      "y": 180
+    },
+    "facing=west,tank_product_fill_level=0,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_0",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=0,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_0",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=0,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_0",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=0,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_0",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=0,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_0",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=1,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_1",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=1,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_1",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=1,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_1",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=1,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_1",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=1,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_1",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=2,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_2",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=2,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_2",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=2,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_2",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=2,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_2",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=2,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_2",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=3,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_3",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=3,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_3",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=3,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_3",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=3,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_3",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=3,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_3",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=4,tank_resource_fill_level=0": {
+      "model": "forestry:block/fermenter_res_0_prod_4",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=4,tank_resource_fill_level=1": {
+      "model": "forestry:block/fermenter_res_1_prod_4",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=4,tank_resource_fill_level=2": {
+      "model": "forestry:block/fermenter_res_2_prod_4",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=4,tank_resource_fill_level=3": {
+      "model": "forestry:block/fermenter_res_3_prod_4",
+      "y": 270
+    },
+    "facing=west,tank_product_fill_level=4,tank_resource_fill_level=4": {
+      "model": "forestry:block/fermenter_res_4_prod_4",
+      "y": 270
+    }
+  }
+}

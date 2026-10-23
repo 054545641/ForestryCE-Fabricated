@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    [
+      "forestry:sequoia_planks",
+      "forestry:sequoia_fireproof_planks"
+    ]
+  ],
+  "result": {
+    "id": "forestry:sequoia_button"
+  }
+}

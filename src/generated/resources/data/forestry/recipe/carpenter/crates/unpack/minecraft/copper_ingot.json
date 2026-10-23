@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/copper_ingot",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_copper"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:copper_ingot"
+    }
+  },
+  "time": 5
+}

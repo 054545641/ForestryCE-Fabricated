@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/soul_sand",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_soul_sand"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:soul_sand"
+    }
+  },
+  "time": 5
+}

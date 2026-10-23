@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    ".": "#c:nuggets/tin",
+    "|": "#c:ingots/tin"
+  },
+  "pattern": [
+    ".",
+    "|",
+    "."
+  ],
+  "result": {
+    "id": "forestry:tin_chain"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "icon": "forestry:peat_engine",
+  "name": "for.gui.book.patchouli.entry.core.engine.peat",
+  "category": "forestry:engines",
+  "pages": [
+    {
+      "type": "crafting",
+      "recipe": "forestry:peat_engine",
+      "text": "for.gui.book.patchouli.entry.core.engine.peat1"
+    },
+    {
+      "type": "text",
+      "text": "for.gui.book.patchouli.entry.core.engine.peat2"
+    }
+  ]
+}

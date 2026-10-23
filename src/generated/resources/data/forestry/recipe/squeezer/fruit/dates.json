@@ -1,0 +1,18 @@
+{
+  "type": "forestry:squeezer",
+  "chance": 0.2,
+  "id": "forestry:squeezer/fruit/dates",
+  "output": {
+    "stack": {
+      "amount": 50,
+      "id": "forestry:fruit_juice"
+    }
+  },
+  "remnant": {
+    "id": "forestry:mulch"
+  },
+  "resources": [
+    "#c:fruits/date"
+  ],
+  "time": 10
+}

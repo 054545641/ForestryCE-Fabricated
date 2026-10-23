@@ -1,0 +1,1 @@
+{"type": "minecraft:function", "function": "forestrylifecycletest:n4_shading_a_panel_stops_it_counting_as_active", "environment": "minecraft:default", "structure": "forestrylifecycletest:n4_empty", "max_ticks": 1200}

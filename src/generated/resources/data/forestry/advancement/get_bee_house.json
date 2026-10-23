@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_a_bee",
+  "criteria": {
+    "forestry:get_bee_house": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:bee_house"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_bee_house.description"
+    },
+    "icon": {
+      "id": "forestry:bee_house"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_bee_house.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_bee_house"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

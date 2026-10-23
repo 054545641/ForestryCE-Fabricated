@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "forestry:raw_tin_block"
+  ],
+  "result": {
+    "count": 9,
+    "id": "forestry:raw_tin"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_escritoire",
+  "criteria": {
+    "forestry:use_research_note": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:research_note"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.use_research_note.description"
+    },
+    "icon": {
+      "id": "forestry:research_note"
+    },
+    "title": {
+      "translate": "advancements.forestry.use_research_note.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:use_research_note"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

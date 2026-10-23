@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    [
+      "forestry:pewen_planks",
+      "forestry:pewen_fireproof_planks"
+    ]
+  ],
+  "result": {
+    "id": "forestry:pewen_button"
+  }
+}

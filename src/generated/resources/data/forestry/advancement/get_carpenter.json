@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:get_engine",
+  "criteria": {
+    "forestry:get_carpenter": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:carpenter"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_carpenter.description"
+    },
+    "icon": {
+      "id": "forestry:carpenter"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_carpenter.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_carpenter"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

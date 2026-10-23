@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/chiseled_quartz_block",
+  "children": {
+    "base": "minecraft:block/chiseled_quartz_block",
+    "overlay": "forestry:block/chiseled_quartz_farm_hatch_overlay"
+  },
+  "item_render_order": [
+    "base",
+    "overlay"
+  ],
+  "loader": "neoforge:composite"
+}

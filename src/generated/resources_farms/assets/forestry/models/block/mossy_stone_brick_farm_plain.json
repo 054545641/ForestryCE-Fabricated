@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/mossy_stone_bricks",
+  "children": {
+    "base": "minecraft:block/mossy_stone_bricks",
+    "overlay": "forestry:block/mossy_stone_brick_farm_plain_overlay"
+  },
+  "item_render_order": [
+    "base",
+    "overlay"
+  ],
+  "loader": "neoforge:composite"
+}

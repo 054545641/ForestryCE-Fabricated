@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "forestry:refractory_wax"
+  },
+  "pattern": [
+    " # ",
+    "# #"
+  ],
+  "result": {
+    "count": 4,
+    "id": "forestry:refractory_capsule"
+  }
+}

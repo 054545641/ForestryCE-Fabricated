@@ -1,0 +1,32 @@
+{
+  "parent": "forestry:root",
+  "criteria": {
+    "forestry:get_scoop": {
+      "conditions": {
+        "items": [
+          {
+            "items": "forestry:scoop"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_scoop.description"
+    },
+    "icon": {
+      "id": "forestry:scoop"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_scoop.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_scoop"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,35 @@
+issueTrackerURL = "https://github.com/thedarkcolour/ForestryCE/issues"
+
+license = "GNU Lesser Public License v3"
+
+[[mods]]
+modId = "forestrymail"
+version = "${version}"
+displayName = "Forestry: Mail"
+displayURL = "https://github.com/thedarkcolour/ForestryCE"
+bannerFile = "forestry-ce-logo-banner.png"
+authors = "thedarkcolour, SirSengir, mezz, Nedelosk"
+description = '''
+Letters, the post office and trade stations.
+'''
+
+[[dependencies.forestrymail]]
+modId = "neoforge"
+type = "REQUIRED"
+versionRange = "${forgeVersionRange}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.forestrymail]]
+modId = "forestry"
+type = "REQUIRED"
+versionRange = "[${version},]"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.forestrymail]]
+modId = "minecraft"
+type = "REQUIRED"
+versionRange = "${minecraftVersionRange}"
+ordering = "NONE"
+side = "BOTH"

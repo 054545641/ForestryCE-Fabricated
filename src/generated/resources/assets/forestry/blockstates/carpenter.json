@@ -1,0 +1,79 @@
+{
+  "variants": {
+    "facing=east,tank_resource_fill_level=0": {
+      "model": "forestry:block/carpenter_res_0",
+      "y": 90
+    },
+    "facing=east,tank_resource_fill_level=1": {
+      "model": "forestry:block/carpenter_res_1",
+      "y": 90
+    },
+    "facing=east,tank_resource_fill_level=2": {
+      "model": "forestry:block/carpenter_res_2",
+      "y": 90
+    },
+    "facing=east,tank_resource_fill_level=3": {
+      "model": "forestry:block/carpenter_res_3",
+      "y": 90
+    },
+    "facing=east,tank_resource_fill_level=4": {
+      "model": "forestry:block/carpenter_res_4",
+      "y": 90
+    },
+    "facing=north,tank_resource_fill_level=0": {
+      "model": "forestry:block/carpenter_res_0"
+    },
+    "facing=north,tank_resource_fill_level=1": {
+      "model": "forestry:block/carpenter_res_1"
+    },
+    "facing=north,tank_resource_fill_level=2": {
+      "model": "forestry:block/carpenter_res_2"
+    },
+    "facing=north,tank_resource_fill_level=3": {
+      "model": "forestry:block/carpenter_res_3"
+    },
+    "facing=north,tank_resource_fill_level=4": {
+      "model": "forestry:block/carpenter_res_4"
+    },
+    "facing=south,tank_resource_fill_level=0": {
+      "model": "forestry:block/carpenter_res_0",
+      "y": 180
+    },
+    "facing=south,tank_resource_fill_level=1": {
+      "model": "forestry:block/carpenter_res_1",
+      "y": 180
+    },
+    "facing=south,tank_resource_fill_level=2": {
+      "model": "forestry:block/carpenter_res_2",
+      "y": 180
+    },
+    "facing=south,tank_resource_fill_level=3": {
+      "model": "forestry:block/carpenter_res_3",
+      "y": 180
+    },
+    "facing=south,tank_resource_fill_level=4": {
+      "model": "forestry:block/carpenter_res_4",
+      "y": 180
+    },
+    "facing=west,tank_resource_fill_level=0": {
+      "model": "forestry:block/carpenter_res_0",
+      "y": 270
+    },
+    "facing=west,tank_resource_fill_level=1": {
+      "model": "forestry:block/carpenter_res_1",
+      "y": 270
+    },
+    "facing=west,tank_resource_fill_level=2": {
+      "model": "forestry:block/carpenter_res_2",
+      "y": 270
+    },
+    "facing=west,tank_resource_fill_level=3": {
+      "model": "forestry:block/carpenter_res_3",
+      "y": 270
+    },
+    "facing=west,tank_resource_fill_level=4": {
+      "model": "forestry:block/carpenter_res_4",
+      "y": 270
+    }
+  }
+}

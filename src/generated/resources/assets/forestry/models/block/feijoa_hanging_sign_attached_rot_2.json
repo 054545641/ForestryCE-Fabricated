@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_attached_hanging_sign_rot_2",
+  "textures": {
+    "all": "forestry:entity/signs/hanging/feijoa",
+    "particle": "forestry:block/stripped_feijoa_log"
+  }
+}

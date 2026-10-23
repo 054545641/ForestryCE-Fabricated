@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "forestry:block/hive/lush_bottom",
+    "side": "forestry:block/hive/lush_side",
+    "top": "forestry:block/hive/lush_top"
+  }
+}

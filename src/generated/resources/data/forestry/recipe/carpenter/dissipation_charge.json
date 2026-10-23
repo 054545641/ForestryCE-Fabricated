@@ -1,0 +1,25 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/dissipation_charge",
+  "liquid": {
+    "amount": 1000,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "#": "forestry:royal_jelly",
+      "X": "minecraft:gunpowder",
+      "Y": "forestry:can",
+      "Z": "forestry:honeydew"
+    },
+    "pattern": [
+      "Z#Z",
+      "#Y#",
+      "X#X"
+    ],
+    "result": {
+      "id": "forestry:dissipation_charge"
+    }
+  },
+  "time": 5
+}

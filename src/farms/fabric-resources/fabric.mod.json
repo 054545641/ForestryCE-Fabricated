@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "forestryfarms",
+  "version": "${version}",
+  "name": "Forestry Farms — Fabric",
+  "description": "Optional minifarms and multiblock farms for Forestry Fabric 26.2.",
+  "environment": "*",
+  "license": "LGPL-3.0-only",
+  "entrypoints": {
+    "jei_mod_plugin": ["forestry.agriculture.compat.FarmingJeiPlugin"],
+    "client": ["forestry.agriculture.client.FarmsFabricClient"],
+    "forestry:module": [
+      "forestry.agriculture.FarmsFabricModule"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "26.2",
+    "java": ">=25",
+    "forestry": "${version}"
+  }
+}

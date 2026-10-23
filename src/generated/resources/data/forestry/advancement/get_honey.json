@@ -1,0 +1,36 @@
+{
+  "parent": "forestry:get_centrifuge",
+  "criteria": {
+    "forestry:get_honey": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "forestry:honey_drop",
+              "forestry:honeydew",
+              "forestry:beeswax"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.get_honey.description"
+    },
+    "icon": {
+      "id": "forestry:honey_drop"
+    },
+    "title": {
+      "translate": "advancements.forestry.get_honey.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:get_honey"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

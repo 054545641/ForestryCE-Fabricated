@@ -1,0 +1,7 @@
+{
+  "asset_id": "forestry:tools",
+  "width": 2,
+  "height": 2,
+  "title": {"translate": "painting.forestry.tools.title"},
+  "author": {"translate": "painting.forestry.tools.author"}
+}

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "forestry:farm_mushroom_manual"
+  ],
+  "result": {
+    "id": "forestry:farm_mushroom_managed"
+  }
+}

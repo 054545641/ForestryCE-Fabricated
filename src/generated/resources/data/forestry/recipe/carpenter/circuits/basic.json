@@ -1,0 +1,31 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/circuits/basic",
+  "liquid": {
+    "amount": 1000,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "key": {
+      "#": "#c:ingots/tin",
+      "R": "#c:dusts/redstone"
+    },
+    "pattern": [
+      "R R",
+      "R#R",
+      "R R"
+    ],
+    "result": {
+      "id": "forestry:basic_circuit_board"
+    }
+  },
+  "result": {
+    "components": {
+      "minecraft:custom_data": {
+        "T": 0
+      }
+    },
+    "id": "forestry:basic_circuit_board"
+  },
+  "time": 20
+}

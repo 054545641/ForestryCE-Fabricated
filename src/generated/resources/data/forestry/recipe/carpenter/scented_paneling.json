@@ -1,0 +1,25 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/scented_paneling",
+  "liquid": {
+    "amount": 500,
+    "id": "forestry:honey"
+  },
+  "recipe": {
+    "key": {
+      "#": "#minecraft:planks",
+      "J": "forestry:royal_jelly",
+      "P": "forestry:pollen_cluster",
+      "W": "forestry:beeswax"
+    },
+    "pattern": [
+      " J ",
+      "###",
+      "WPW"
+    ],
+    "result": {
+      "id": "forestry:scented_paneling"
+    }
+  },
+  "time": 50
+}

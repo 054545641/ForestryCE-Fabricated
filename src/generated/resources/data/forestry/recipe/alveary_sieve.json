@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "alveary",
+  "key": {
+    "I": "#c:ingots/iron",
+    "W": "forestry:woven_silk",
+    "X": "forestry:alveary_block"
+  },
+  "pattern": [
+    "III",
+    " X ",
+    "WWW"
+  ],
+  "result": {
+    "id": "forestry:alveary_sieve"
+  }
+}

@@ -1,0 +1,57 @@
+var productionSets = ['main', 'butterflies', 'farms', 'mail']
+neoForge.mods.create('forestrydatagen') { sourceSet sourceSets.datagen }
+neoForge.runs.configureEach {
+    if (name == 'data') {
+        loadedMods = [neoForge.mods.forestry, neoForge.mods.forestrybutterflies,
+                      neoForge.mods.forestryfarms, neoForge.mods.forestrymail, neoForge.mods.forestrydatagen]
+    } else {
+        if (name == 'gameTestServer') {
+            sourceSet = sourceSets.gametest
+            loadedMods = [neoForge.mods.forestry, neoForge.mods.forestrybutterflies,
+                          neoForge.mods.forestryfarms, neoForge.mods.forestrymail,
+                          neoForge.mods.forestrygametest, neoForge.mods.forestrydatagen]
+        } else if (name in ['client', 'server']) {
+            loadedMods = [neoForge.mods.forestry, neoForge.mods.forestrybutterflies,
+                          neoForge.mods.forestryfarms, neoForge.mods.forestrymail]
+        }
+    }
+}
+productionSets.each { owner ->
+	// The same release jars support both presence and absence of JEI. Runtime toggles
+	// must not silently produce jars with different integration functionality.
+	var adapter = sourceSets["${owner}Jei"]
+	neoForge.mods[owner == 'main' ? 'forestry' : "forestry${owner}"].sourceSet(adapter)
+	tasks.named(owner == 'main' ? 'jar' : "${owner}Jar", Jar) { from adapter.output }
+    if (providers.gradleProperty('withJei').get().toBoolean()) {
+        configurations.runtimeOnly.extendsFrom configurations[adapter.runtimeOnlyConfigurationName]
+    }
+}
+neoForge.mods.forestry.sourceSet(sourceSets.curios)
+tasks.named('jar', Jar) { from sourceSets.curios.output }
+if (providers.gradleProperty('withCurios').get().toBoolean()) {
+    configurations.runtimeOnly.extendsFrom configurations.curiosRuntimeOnly
+}
+
+var checkPortingIsolation = tasks.register('checkPortingIsolation') {
+    group = 'verification'
+    description = 'Checks that production sources and dependencies exclude inactive adapters and ModKit.'
+    doLast {
+        productionSets.each { owner ->
+            sourceSets[owner].allJava.files.each { file ->
+                if (file.text =~ /(?m)^import (?:static )?(?:thedarkcolour\.modkit|vazkii\.patchouli|dev\.latvian|mezz\.jei|top\.theillusivec4\.curios)\./) {
+                    throw new GradleException("Optional API leaked into ${owner}: ${file}")
+                }
+            }
+            configurations[sourceSets[owner].runtimeClasspathConfigurationName].allDependencies.each { dependency ->
+                var forbidden = ['com.github.thedarkcolour', 'vazkii.patchouli', 'dev.latvian.mods']
+                if (!providers.gradleProperty('withJei').get().toBoolean()) forbidden.add('mezz.jei')
+                if (!providers.gradleProperty('withCurios').get().toBoolean()) forbidden.add('top.theillusivec4.curios')
+                if (dependency.group in forbidden) {
+                    throw new GradleException("Optional dependency leaked into ${owner}: ${dependency}")
+                }
+            }
+        }
+        logger.lifecycle('Production sources and runtime dependency declarations are isolated from optional APIs and ModKit.')
+    }
+}
+tasks.named('check') { dependsOn checkPortingIsolation }

@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/minecraft/wheat_seeds",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_seeds"
+    ],
+    "result": {
+      "count": 9,
+      "id": "minecraft:wheat_seeds"
+    }
+  },
+  "time": 5
+}

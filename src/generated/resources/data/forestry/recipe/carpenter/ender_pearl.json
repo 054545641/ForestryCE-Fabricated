@@ -1,0 +1,18 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/ender_pearl",
+  "recipe": {
+    "key": {
+      "#": "forestry:pulsating_mesh"
+    },
+    "pattern": [
+      " # ",
+      "###",
+      " # "
+    ],
+    "result": {
+      "id": "minecraft:ender_pearl"
+    }
+  },
+  "time": 100
+}

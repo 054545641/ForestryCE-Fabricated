@@ -1,0 +1,126 @@
+{
+  "parent": "forestry:use_research_note",
+  "criteria": {
+    "forestry:complete_tree_research": {
+      "conditions": {
+        "percent": 1.0
+      },
+      "trigger": "forestry:arboriculture_research_trigger"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.complete_tree_research.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "components": {
+        "forestry:genome": {
+          "genome": {
+            "forestry:fireproof": {
+              "active": {
+                "dominant": true,
+                "value": false
+              },
+              "inactive": {
+                "dominant": true,
+                "value": false
+              }
+            },
+            "forestry:fruits": {
+              "active": {
+                "value": "forestry:fruit_none"
+              },
+              "inactive": {
+                "value": "forestry:fruit_none"
+              }
+            },
+            "forestry:girth": {
+              "active": {
+                "value": 1
+              },
+              "inactive": {
+                "value": 1
+              }
+            },
+            "forestry:height": {
+              "active": {
+                "value": 1.0
+              },
+              "inactive": {
+                "value": 1.0
+              }
+            },
+            "forestry:maturation": {
+              "active": {
+                "value": 4
+              },
+              "inactive": {
+                "value": 4
+              }
+            },
+            "forestry:saplings": {
+              "active": {
+                "dominant": true,
+                "value": 0.025
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 0.025
+              }
+            },
+            "forestry:sappiness": {
+              "active": {
+                "dominant": true,
+                "value": 0.3
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 0.3
+              }
+            },
+            "forestry:tree_effect": {
+              "active": {
+                "value": "forestry:tree_effect_none"
+              },
+              "inactive": {
+                "value": "forestry:tree_effect_none"
+              }
+            },
+            "forestry:tree_species": {
+              "active": {
+                "dominant": true,
+                "value": "forestry:elm"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "forestry:elm"
+              }
+            },
+            "forestry:yield": {
+              "active": {
+                "dominant": true,
+                "value": 0.025
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 0.025
+              }
+            }
+          },
+          "karyotype": "forestry:tree_species"
+        }
+      },
+      "id": "forestry:tree_sapling"
+    },
+    "title": {
+      "translate": "advancements.forestry.complete_tree_research.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:complete_tree_research"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

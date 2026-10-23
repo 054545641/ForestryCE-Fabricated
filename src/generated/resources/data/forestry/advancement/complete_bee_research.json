@@ -1,0 +1,166 @@
+{
+  "parent": "forestry:use_research_note",
+  "criteria": {
+    "forestry:complete_bee_research": {
+      "conditions": {
+        "percent": 1.0
+      },
+      "trigger": "forestry:apiculture_research_trigger"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.complete_bee_research.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "components": {
+        "forestry:bee_generation": 0,
+        "forestry:bee_pristine": true,
+        "forestry:genome": {
+          "genome": {
+            "forestry:activity": {
+              "active": {
+                "dominant": true,
+                "value": "forestry:activity_diurnal"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "forestry:activity_diurnal"
+              }
+            },
+            "forestry:bee_effect": {
+              "active": {
+                "value": "forestry:bee_effect_beatific"
+              },
+              "inactive": {
+                "value": "forestry:bee_effect_beatific"
+              }
+            },
+            "forestry:bee_species": {
+              "active": {
+                "value": "forestry:imperial"
+              },
+              "inactive": {
+                "value": "forestry:imperial"
+              }
+            },
+            "forestry:cave_dwelling": {
+              "active": {
+                "dominant": true,
+                "value": false
+              },
+              "inactive": {
+                "dominant": true,
+                "value": false
+              }
+            },
+            "forestry:fertility": {
+              "active": {
+                "dominant": true,
+                "value": 2
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 2
+              }
+            },
+            "forestry:flower_type": {
+              "active": {
+                "dominant": true,
+                "value": "forestry:flower_type_vanilla"
+              },
+              "inactive": {
+                "dominant": true,
+                "value": "forestry:flower_type_vanilla"
+              }
+            },
+            "forestry:humidity_tolerance": {
+              "active": {
+                "value": "NONE"
+              },
+              "inactive": {
+                "value": "NONE"
+              }
+            },
+            "forestry:lifespan": {
+              "active": {
+                "value": 40
+              },
+              "inactive": {
+                "value": 40
+              }
+            },
+            "forestry:pollination": {
+              "active": {
+                "dominant": true,
+                "value": 5
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 5
+              }
+            },
+            "forestry:speed": {
+              "active": {
+                "dominant": true,
+                "value": 0.6
+              },
+              "inactive": {
+                "dominant": true,
+                "value": 0.6
+              }
+            },
+            "forestry:temperature_tolerance": {
+              "active": {
+                "value": "NONE"
+              },
+              "inactive": {
+                "value": "NONE"
+              }
+            },
+            "forestry:territory": {
+              "active": {
+                "value": [
+                  9,
+                  6,
+                  9
+                ]
+              },
+              "inactive": {
+                "value": [
+                  9,
+                  6,
+                  9
+                ]
+              }
+            },
+            "forestry:tolerates_rain": {
+              "active": {
+                "dominant": true,
+                "value": false
+              },
+              "inactive": {
+                "dominant": true,
+                "value": false
+              }
+            }
+          },
+          "karyotype": "forestry:bee_species"
+        },
+        "forestry:health": 40,
+        "forestry:max_health": 40
+      },
+      "id": "forestry:queen_bee"
+    },
+    "title": {
+      "translate": "advancements.forestry.complete_bee_research.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:complete_bee_research"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

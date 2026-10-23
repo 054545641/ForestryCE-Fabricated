@@ -1,0 +1,14 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/crates/unpack/forestry/powdery_comb",
+  "recipe": {
+    "ingredients": [
+      "forestry:crated_powdery_comb"
+    ],
+    "result": {
+      "count": 9,
+      "id": "forestry:powdery_comb"
+    }
+  },
+  "time": 5
+}

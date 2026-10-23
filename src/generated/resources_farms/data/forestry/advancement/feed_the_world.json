@@ -1,0 +1,26 @@
+{
+  "parent": "forestry:farming_simulator",
+  "criteria": {
+    "forestry:feed_the_world": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.forestry.feed_the_world.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "id": "forestry:stone_brick_farm_block"
+    },
+    "title": {
+      "translate": "advancements.forestry.feed_the_world.title"
+    }
+  },
+  "requirements": [
+    [
+      "forestry:feed_the_world"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

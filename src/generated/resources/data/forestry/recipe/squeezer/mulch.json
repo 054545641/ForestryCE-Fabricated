@@ -1,0 +1,21 @@
+{
+  "type": "forestry:squeezer",
+  "chance": 0.2,
+  "id": "forestry:squeezer/mulch",
+  "output": {
+    "stack": {
+      "amount": 200,
+      "id": "forestry:fruit_juice"
+    }
+  },
+  "remnant": {
+    "id": "forestry:mulch"
+  },
+  "resources": [
+    [
+      "minecraft:apple",
+      "minecraft:carrot"
+    ]
+  ],
+  "time": 10
+}

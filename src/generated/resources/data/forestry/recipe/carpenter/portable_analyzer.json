@@ -1,0 +1,26 @@
+{
+  "type": "forestry:carpenter",
+  "id": "forestry:carpenter/portable_analyzer",
+  "liquid": {
+    "amount": 2000,
+    "id": "minecraft:water"
+  },
+  "recipe": {
+    "category": "equipment",
+    "key": {
+      "#": "#c:glass_panes",
+      "D": "#c:gems/diamond",
+      "R": "#c:dusts/redstone",
+      "X": "#c:ingots/tin"
+    },
+    "pattern": [
+      "X#X",
+      "X#X",
+      "RDR"
+    ],
+    "result": {
+      "id": "forestry:portable_analyzer"
+    }
+  },
+  "time": 100
+}

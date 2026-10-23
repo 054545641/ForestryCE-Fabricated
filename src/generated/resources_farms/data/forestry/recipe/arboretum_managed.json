@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "B": "forestry:basic_circuit_board",
+    "C": "forestry:flexible_casing",
+    "G": "#c:glass_blocks/colorless",
+    "T": "forestry:golden_electron_tube"
+  },
+  "pattern": [
+    "GTG",
+    "TCT",
+    "GBG"
+  ],
+  "result": {
+    "id": "forestry:arboretum_managed"
+  }
+}

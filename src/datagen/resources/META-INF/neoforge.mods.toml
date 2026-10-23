@@ -1,0 +1,15 @@
+license="GNU Lesser Public License v3"
+[[mods]]
+modId="forestrydatagen"
+version="0.0.0-dev"
+displayName="Forestry Data Generators"
+description="Development-only data generators. Never shipped in a Forestry release."
+[[dependencies.forestrydatagen]]
+modId="forestry"
+type="required"
+ordering="AFTER"
+versionRange="[3.0.0-alpha8-26.2-dev]"
+[[dependencies.forestrydatagen]]
+modId="minecraft"
+type="required"
+versionRange="[26.2]"

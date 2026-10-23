@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "minecraft:clock",
+    "D": "minecraft:piston",
+    "I": "#c:glass_blocks/colorless",
+    "P": "#minecraft:planks",
+    "Q": "#c:gears/copper"
+  },
+  "pattern": [
+    "PPP",
+    " I ",
+    "QDC"
+  ],
+  "result": {
+    "id": "forestry:clockwork_engine"
+  }
+}

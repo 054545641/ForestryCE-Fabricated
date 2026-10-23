@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_hanging_sign_rot_2",
+  "textures": {
+    "all": "forestry:entity/signs/hanging/poplar",
+    "particle": "forestry:block/stripped_poplar_log"
+  }
+}

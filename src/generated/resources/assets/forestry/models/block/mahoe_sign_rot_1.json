@@ -1,0 +1,7 @@
+{
+  "parent": "forestry:block/template_legacy_sign_rot_1",
+  "textures": {
+    "all": "forestry:entity/signs/mahoe",
+    "particle": "forestry:block/mahoe_planks"
+  }
+}

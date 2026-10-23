@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "hanging=false": {
+      "model": "forestry:block/phosphor_lantern"
+    },
+    "hanging=true": {
+      "model": "forestry:block/phosphor_lantern_hanging"
+    }
+  }
+}

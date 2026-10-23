@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cut_sandstone",
+  "children": {
+    "base": "minecraft:block/cut_sandstone",
+    "overlay": "forestry:block/cut_sandstone_farm_gearbox_overlay"
+  },
+  "item_render_order": [
+    "base",
+    "overlay"
+  ],
+  "loader": "neoforge:composite"
+}

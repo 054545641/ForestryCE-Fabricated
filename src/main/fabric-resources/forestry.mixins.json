@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "package": "forestry.core.platform.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "VillagerGiftMixin",
+    "EntityFluidTrackingMixin",
+    "EntityFluidCurrentMixin",
+    "LivingFluidMovementMixin",
+    "FireBlockMixin",
+    "ItemStackMixin",
+    "ItemEntityPickupMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

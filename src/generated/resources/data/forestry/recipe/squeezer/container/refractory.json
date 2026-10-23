@@ -1,0 +1,12 @@
+{
+  "type": "forestry:squeezer_container",
+  "container": {
+    "id": "forestry:refractory_capsule"
+  },
+  "id": "forestry:squeezer/container/refractory",
+  "remnants": {
+    "id": "forestry:refractory_wax"
+  },
+  "remnantsChance": 0.1,
+  "time": 10
+}

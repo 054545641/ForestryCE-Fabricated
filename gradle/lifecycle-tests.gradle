@@ -1,0 +1,290 @@
+// Native 26.2 tests against all production mods, independent of the legacy datagen test suite.
+sourceSets { lifecycleTest }
+['main', 'mail', 'farms', 'butterflies'].each { owner ->
+    sourceSets.lifecycleTest.compileClasspath += sourceSets[owner].output
+    sourceSets.lifecycleTest.runtimeClasspath += sourceSets[owner].output
+}
+configurations.lifecycleTestImplementation.extendsFrom configurations.implementation
+neoForge {
+    addModdingDependenciesTo sourceSets.lifecycleTest
+    mods { forestrylifecycletest { sourceSet sourceSets.lifecycleTest } }
+    runs {
+        n5TestClient {
+            client()
+            gameDirectory = layout.projectDirectory.dir('run/26.2/n5-client')
+            logLevel = org.slf4j.event.Level.INFO
+            loadedMods = [mods.forestry, mods.forestryfarms, mods.forestrymail, mods.forestrybutterflies, mods.forestrylifecycletest]
+            programArguments.addAll('--quickPlaySingleplayer', 'n5-acceptance', '--username', 'N5Client', '--width', '1280', '--height', '800')
+            programArguments.addAll('--graphicsBackend', providers.gradleProperty('n5Graphics').orElse('opengl').get().toUpperCase(java.util.Locale.ROOT))
+            systemProperty 'forestry.lifecycle.n5Client', 'true'
+            systemProperty 'forestry.lifecycle.n5ModelsOnly', providers.gradleProperty('n5ModelsOnly').orElse('false').get()
+            systemProperty 'forestry.lifecycle.n5Graphics', providers.gradleProperty('n5Graphics').orElse('opengl').get()
+        }
+        lifecycleTestClient {
+            client()
+            gameDirectory = layout.projectDirectory.dir('run/26.2/lifecycle-client')
+            logLevel = org.slf4j.event.Level.INFO
+            loadedMods = [mods.forestry, mods.forestryfarms, mods.forestrymail, mods.forestrybutterflies, mods.forestrylifecycletest]
+            programArguments.addAll('--quickPlaySingleplayer', 'lifecycle-ready', '--username', 'ForestryTest')
+            systemProperty 'forestry.lifecycle.clientAutoExit', providers.gradleProperty('lifecycleClientAutoExit').orElse('true').get()
+            systemProperty 'forestry.lifecycle.creativeTest', providers.gradleProperty('lifecycleCreativeTest').orElse('false').get()
+            systemProperty 'forestry.lifecycle.escritoireTest', providers.gradleProperty('lifecycleEscritoireTest').orElse('false').get()
+        }
+        lifecycleTestServer {
+            type = 'gameTestServer'
+            systemProperty 'forestry.lifecycle.itemModelReport', layout.projectDirectory.file('.local/n2-lifecycle-item-models.json').asFile.absolutePath
+            gameDirectory = layout.projectDirectory.dir('run/26.2/lifecycle-tests')
+            logLevel = org.slf4j.event.Level.INFO
+            loadedMods = [mods.forestry, mods.forestryfarms, mods.forestrymail, mods.forestrybutterflies, mods.forestrylifecycletest]
+        }
+        postalTestServer {
+            server()
+            gameDirectory = layout.projectDirectory.dir('run/26.2/postal-server')
+            logLevel = org.slf4j.event.Level.INFO
+            loadedMods = [mods.forestry, mods.forestryfarms, mods.forestrymail, mods.forestrybutterflies, mods.forestrylifecycletest]
+            programArguments.addAll('--nogui', '--port', '25572')
+            systemProperty 'forestry.lifecycle.postalPhase', providers.gradleProperty('postalPhase').orElse('verify').get()
+        }
+        n2TestServer {
+            server()
+            gameDirectory = layout.projectDirectory.dir('run/26.2/n2-server')
+            logLevel = org.slf4j.event.Level.INFO
+            loadedMods = [mods.forestry, mods.forestryfarms, mods.forestrymail, mods.forestrybutterflies, mods.forestrylifecycletest]
+            programArguments.addAll('--nogui', '--port', '25573')
+            systemProperty 'forestry.lifecycle.n2Phase', providers.gradleProperty('n2Phase').orElse('verify').get()
+        }
+        n2PeerServer {
+            server()
+            gameDirectory = layout.projectDirectory.dir('run/26.2/n2-peer')
+            logLevel = org.slf4j.event.Level.INFO
+            loadedMods = [mods.forestry, mods.forestryfarms, mods.forestrymail, mods.forestrybutterflies, mods.forestrylifecycletest]
+            programArguments.addAll('--nogui', '--port', '25574')
+            systemProperty 'forestry.lifecycle.n2Phase', 'peer'
+        }
+        n3TestServer {
+            server()
+            gameDirectory = layout.projectDirectory.dir('run/26.2/n3-server')
+            logLevel = org.slf4j.event.Level.INFO
+            loadedMods = [mods.forestry, mods.forestryfarms, mods.forestrymail, mods.forestrybutterflies, mods.forestrylifecycletest]
+            programArguments.addAll('--nogui', '--port', '25575')
+            systemProperty 'forestry.lifecycle.n3Phase', providers.gradleProperty('n3Phase').orElse('verify').get()
+        }
+        n4TestServer {
+            server()
+            gameDirectory = layout.projectDirectory.dir('run/26.2/n4-server')
+            logLevel = org.slf4j.event.Level.INFO
+            loadedMods = [mods.forestry, mods.forestryfarms, mods.forestrymail, mods.forestrybutterflies, mods.forestrylifecycletest]
+            programArguments.addAll('--nogui', '--port', '25576')
+            systemProperty 'forestry.lifecycle.n4Phase', providers.gradleProperty('n4Phase').orElse('verify').get()
+        }
+        n2TestClient {
+            client()
+            gameDirectory = layout.projectDirectory.dir('run/26.2/n2-client')
+            logLevel = org.slf4j.event.Level.INFO
+            loadedMods = [mods.forestry, mods.forestryfarms, mods.forestrymail, mods.forestrybutterflies, mods.forestrylifecycletest]
+            programArguments.addAll('--quickPlayMultiplayer', '127.0.0.1:25573', '--username', 'N2Client')
+            systemProperty 'forestry.lifecycle.n2Client', 'true'
+        }
+        postalTestClient {
+            client()
+            gameDirectory = layout.projectDirectory.dir('run/26.2/postal-client')
+            logLevel = org.slf4j.event.Level.INFO
+            loadedMods = [mods.forestry, mods.forestryfarms, mods.forestrymail, mods.forestrybutterflies, mods.forestrylifecycletest]
+            programArguments.addAll('--quickPlayMultiplayer', '127.0.0.1:25572', '--username', 'PostalTest')
+            systemProperty 'forestry.lifecycle.postalClient', 'true'
+            systemProperty 'forestry.lifecycle.postalReconnect', providers.gradleProperty('postalReconnect').orElse('false').get()
+        }
+    }
+}
+
+tasks.named('runN5TestClient') {
+    doFirst {
+        def dir = file('run/26.2/n5-client')
+        dir.mkdirs()
+        def world = new File(dir, 'saves/n5-acceptance')
+        if (!world.exists()) {
+            def source = file('run/26.2/lifecycle-client/saves/lifecycle-ready')
+            if (!source.exists()) throw new GradleException('Prepare the isolated lifecycle-ready world first (see docs/local-development.zh-CN.md)')
+            copy { from source; into world; exclude 'session.lock' }
+        }
+        new File(dir, 'n5-client.passed').delete()
+        def backend = providers.gradleProperty('n5Graphics').orElse('opengl').get()
+        if (!(backend in ['opengl', 'vulkan'])) throw new GradleException('Unknown n5Graphics: ' + backend)
+        def options = new File(dir, 'options.txt')
+        def lines = options.exists() ? options.readLines('UTF-8') : []
+        lines.removeAll { it ==~ /^(preferredGraphicsBackend|guiScale|lang|renderDistance|pauseOnLostFocus|tutorialStep):.*/ }
+        lines += ['preferredGraphicsBackend:"' + backend + '"', 'guiScale:2', 'lang:zh_cn', 'renderDistance:5', 'pauseOnLostFocus:false', 'tutorialStep:none']
+        options.setText(lines.join('\n') + '\n', 'UTF-8')
+        new File(dir, 'config').mkdirs()
+        new File(dir, 'config/neoforge-client.toml').setText('showLoadWarnings = false\n', 'UTF-8')
+        // FML 11.0.16's early OpenGL window cannot be reused as a Vulkan surface.
+        def fml = new File(dir, 'config/fml.toml')
+        def fmlLines = fml.exists() ? fml.readLines('UTF-8') : []
+        fmlLines.removeAll { it ==~ /earlyWindowControl\s*=.*/ }
+        fmlLines += 'earlyWindowControl = false'
+        fml.setText(fmlLines.join('\n') + '\n', 'UTF-8')
+    }
+    doLast {
+        if (!file('run/26.2/n5-client/n5-client.passed').exists()) throw new GradleException('N5 client assertions did not finish; inspect client log')
+    }
+}
+
+def preparePostalValidation = tasks.register('preparePostalValidation') {
+    doLast {
+        def serverDir = file('run/26.2/postal-server')
+        serverDir.mkdirs()
+        def properties = new File(serverDir, 'server.properties')
+        if (!properties.exists()) properties.text = '''server-ip=127.0.0.1
+server-port=25572
+online-mode=false
+level-name=postal-acceptance
+level-type=minecraft:flat
+generate-structures=false
+view-distance=4
+simulation-distance=4
+spawn-protection=0
+max-players=2
+'''
+        def clientDir = file('run/26.2/postal-client')
+        new File(clientDir, 'config').mkdirs()
+        def options = new File(clientDir, 'options.txt')
+        def previousOptions = file('run/26.2/lifecycle-client/options.txt')
+        if (!options.exists() && previousOptions.exists()) options.bytes = previousOptions.bytes
+        def warnings = new File(clientDir, 'config/neoforge-client.toml')
+        if (!warnings.exists()) warnings.text = 'showLoadWarnings = false\n'
+    }
+}
+tasks.matching { it.name in ['runPostalTestServer', 'runPostalTestClient'] }.configureEach {
+    dependsOn preparePostalValidation
+}
+
+tasks.named('runPostalTestServer') {
+    doFirst {
+        def phase = providers.gradleProperty('postalPhase').orElse('verify').get()
+        if (!(phase in ['seed', 'verify', 'network', 'reconnect'])) throw new GradleException('Unknown postalPhase: ' + phase)
+        file("run/26.2/postal-server/postal-${phase}.passed").delete()
+    }
+    doLast {
+        def phase = providers.gradleProperty('postalPhase').orElse('verify').get()
+        if (!file("run/26.2/postal-server/postal-${phase}.passed").exists()) throw new GradleException('Postal assertions did not complete; inspect the server log')
+    }
+}
+
+tasks.named('runN2TestServer') {
+    doFirst {
+        def serverDir = file('run/26.2/n2-server')
+        serverDir.mkdirs()
+        def phase = providers.gradleProperty('n2Phase').orElse('verify').get()
+        if (!(phase in ['seed', 'verify', 'network', 'world-seed', 'world-verify'])) throw new GradleException('Unknown n2Phase: ' + phase)
+        new File(serverDir, "n2-${phase}.passed").delete()
+    }
+    doLast {
+        def phase = providers.gradleProperty('n2Phase').orElse('verify').get()
+        if (!file("run/26.2/n2-server/n2-${phase}.passed").exists()) {
+            throw new GradleException('N2 assertions did not complete; inspect the server log')
+        }
+    }
+}
+
+tasks.named('runN2TestClient') {
+    doFirst {
+        def clientDir = file('run/26.2/n2-client')
+        new File(clientDir, 'config').mkdirs()
+        new File(clientDir, 'n2-client.passed').delete()
+        def options = new File(clientDir, 'options.txt')
+        if (!options.exists()) options.text = 'pauseOnLostFocus:false\nmaxFps:60\nrenderDistance:4\n'
+        def warnings = new File(clientDir, 'config/neoforge-client.toml')
+        if (!warnings.exists()) warnings.text = 'showLoadWarnings = false\n'
+    }
+    doLast {
+        if (!file('run/26.2/n2-client/n2-client.passed').exists()) {
+            throw new GradleException('N2 client assertions did not complete; inspect the client log')
+        }
+    }
+}
+
+tasks.named('runN2PeerServer') {
+    doFirst {
+        def dir = file('run/26.2/n2-peer')
+        dir.mkdirs()
+        new File(dir, 'n2-peer.passed').delete()
+    }
+    doLast {
+        if (!file('run/26.2/n2-peer/n2-peer.passed').exists()) throw new GradleException('N2 peer assertions did not complete')
+    }
+}
+
+// The watchdog and unattended fixture ticks must keep running without connected players.
+tasks.matching { it.name in ['runN2TestServer', 'runN2PeerServer'] }.configureEach {
+    doFirst {
+        def dir = file(name == 'runN2PeerServer' ? 'run/26.2/n2-peer' : 'run/26.2/n2-server')
+        dir.mkdirs()
+        def properties = new File(dir, 'server.properties')
+        def values = new Properties()
+        if (properties.exists()) properties.withInputStream { values.load(it) }
+        values.setProperty('pause-when-empty-seconds', '0')
+        if (!properties.exists()) {
+            values.setProperty('server-ip', '127.0.0.1')
+            values.setProperty('online-mode', 'false')
+            values.setProperty('level-name', name == 'runN2PeerServer' ? 'n2-peer' : 'n2-acceptance')
+            values.setProperty('level-type', 'minecraft:flat')
+            values.setProperty('generate-structures', 'false')
+            values.setProperty('view-distance', '4')
+            values.setProperty('simulation-distance', '4')
+            values.setProperty('spawn-protection', '0')
+            values.setProperty('max-players', '2')
+        }
+        properties.withOutputStream { values.store(it, 'Isolated N2 acceptance server') }
+    }
+}
+tasks.named('runN3TestServer') {
+    doFirst {
+        def dir = file('run/26.2/n3-server')
+        dir.mkdirs()
+        def phase = providers.gradleProperty('n3Phase').orElse('verify').get()
+        if (!(phase in ['seed', 'resume', 'verify'])) throw new GradleException('Unknown n3Phase: ' + phase)
+        new File(dir, "n3-${phase}.passed").delete()
+        def properties = new File(dir, 'server.properties')
+        if (!properties.exists()) properties.text = '''server-ip=127.0.0.1
+online-mode=false
+level-name=n3-acceptance
+level-type=minecraft:flat
+generate-structures=false
+view-distance=4
+simulation-distance=4
+pause-when-empty-seconds=0
+spawn-protection=0
+max-players=2
+'''
+    }
+    doLast {
+        def phase = providers.gradleProperty('n3Phase').orElse('verify').get()
+        if (!file("run/26.2/n3-server/n3-${phase}.passed").exists()) throw new GradleException('N3 assertions did not complete; inspect the server log')
+    }
+}
+
+tasks.named('runN4TestServer') {
+    doFirst {
+        def dir = file('run/26.2/n4-server')
+        dir.mkdirs()
+        def phase = providers.gradleProperty('n4Phase').orElse('verify').get()
+        if (!(phase in ['seed', 'verify'])) throw new GradleException('Unknown n4Phase: ' + phase)
+        new File(dir, "n4-${phase}.passed").delete()
+        def properties = new File(dir, 'server.properties')
+        if (!properties.exists()) properties.text = '''server-ip=127.0.0.1
+online-mode=false
+level-name=n4-acceptance
+level-type=minecraft:flat
+generate-structures=false
+view-distance=4
+simulation-distance=4
+pause-when-empty-seconds=0
+spawn-protection=0
+max-players=2
+'''
+    }
+    doLast {
+        def phase = providers.gradleProperty('n4Phase').orElse('verify').get()
+        if (!file("run/26.2/n4-server/n4-${phase}.passed").exists()) throw new GradleException('N4 assertions did not complete; inspect the server log')
+    }
+}
