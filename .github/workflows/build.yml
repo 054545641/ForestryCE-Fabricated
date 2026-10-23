@@ -30,6 +30,9 @@ jobs:
           cache-disabled: true
       - name: Build four jars and verify isolation
         run: bash gradlew build gametestClasses stageFabricDistribution -PwithJade=false -PwithJei=false --console=plain
+      - name: Report generated Minecraft JAR hashes
+        if: failure()
+        run: python3 scripts/report-loom-jar.py --minecraft-maven .gradle/loom-cache/minecraftMaven --output build/reports/dependency-verification/loom-jars.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: forestry-fabric-f3-build
@@ -42,6 +45,7 @@ jobs:
           path: |
             build/fabric-26.2/reports/
             build/fabric-26.2/generated/f3-resources/resource-report.json
+            build/reports/dependency-verification/
   datagen:
     runs-on: ubuntu-latest
     timeout-minutes: 20
