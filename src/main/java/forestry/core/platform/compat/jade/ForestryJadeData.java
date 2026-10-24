@@ -10,13 +10,22 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import snownee.jade.api.Accessor;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IServerDataProvider;
+import snownee.jade.api.view.EnergyView;
+import snownee.jade.api.view.IServerExtensionProvider;
+import snownee.jade.api.view.ViewGroup;
+import team.reborn.energy.api.EnergyStorage;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public enum ForestryJadeData implements IServerDataProvider<BlockAccessor> {
     INSTANCE;
 
     public static final Identifier ID = Identifier.fromNamespaceAndPath("forestry", "status");
+    public static final Identifier ENERGY_ID = Identifier.fromNamespaceAndPath("forestry", "energy");
 
     @Override
     public Identifier getUid() {
@@ -44,5 +53,35 @@ public enum ForestryJadeData implements IServerDataProvider<BlockAccessor> {
             status.putInt("ripeness", Math.clamp(Math.round(fruit.getRipeness() * 100), 0, 100));
         }
         if (!status.isEmpty()) data.put("forestry:status", status);
+    }
+
+    public enum Energy implements IServerExtensionProvider<EnergyView.Data> {
+        INSTANCE;
+
+        @Override
+        public Identifier getUid() {
+            return ENERGY_ID;
+        }
+
+        @Override
+        public boolean shouldRequestData(Accessor<?> accessor) {
+            return findStorage(accessor) != null;
+        }
+
+        @Override
+        public @Nullable List<ViewGroup<EnergyView.Data>> getGroups(Accessor<?> accessor) {
+            EnergyStorage storage = findStorage(accessor);
+            if (storage == null) return null;
+            return List.of(new ViewGroup<>(List.of(new EnergyView.Data(storage.getAmount(), storage.getCapacity()))));
+        }
+
+        private static @Nullable EnergyStorage findStorage(Accessor<?> accessor) {
+            if (!(accessor instanceof BlockAccessor block)) return null;
+            BlockEntity entity = block.getBlockEntity();
+            if (entity == null || !BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(entity.getType()).getNamespace().equals("forestry")) return null;
+            // Match Jade's unsided lookup; only replace Forestry's display unit.
+            EnergyStorage storage = EnergyStorage.SIDED.find(block.getLevel(), block.getPosition(), block.getBlockState(), entity, null);
+            return storage != null && storage.getCapacity() > 0 ? storage : null;
+        }
     }
 }

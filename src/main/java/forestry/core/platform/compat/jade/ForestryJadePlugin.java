@@ -10,10 +10,12 @@ public final class ForestryJadePlugin implements IWailaPlugin {
     @Override
     public void register(IWailaCommonRegistration registration) {
         registration.registerBlockDataProvider(ForestryJadeData.INSTANCE, BlockEntity.class);
+        registration.registerEnergyStorage(ForestryJadeData.Energy.INSTANCE, BlockEntity.class);
     }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         registration.registerBlockComponent(forestry.core.platform.client.compat.ForestryJadeTooltip.INSTANCE, Block.class);
+        registration.registerEnergyStorageClient(forestry.core.platform.client.compat.ForestryJadeTooltip.Energy.INSTANCE);
     }
 }
