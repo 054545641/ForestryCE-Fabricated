@@ -70,7 +70,7 @@ Jade、JEI 仅在开发运行时加载，不是四个 JAR 的硬依赖，也不�
 | Minecraft / Java | 26.2 / Temurin 25.0.4.1+1 |
 | Gradle / Loom | 9.5.1 / `net.fabricmc.fabric-loom` 1.17.21 |
 | Fabric Loader / API | 0.19.5 / 0.161.0+26.2 |
-| Team Reborn Energy | 5.0.0，外部运行依赖；能量数值保持原单位 1:1 |
+| Team Reborn Energy | 核心 JAR 内嵌官方 5.0.0，运行时接受兼容 5.x；1 FE = 1 E，无需 Tech Reborn |
 | Jade | 26.2.11，Modrinth ID `ue8CO97w` |
 | JEI / Mezz Config | 30.42.0.236 / 0.6.8（配置库上游标记 beta） |
 
@@ -107,7 +107,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\test-fabric-f2.ps1
 .\gradlew-fabric.bat runGameTest -PforestryModules=7 -PwithJade=false -PwithJei=false
 .\gradlew-fabric.bat runClientGameTest
 .\gradlew-fabric.bat checkFabricF2
+
+# 验证实际发行包的 Energy 嵌套发现、去重和版本选择，不启动游戏
+.\scripts\test-energy-bundling.ps1
 ```
+
+Energy 校验使用当前 Fabric Loader 的真实发现/解析器，覆盖客户端及服务端、无其他 API 提供者、
+仅引用 API 的消费者、同版本重复内嵌/外置和不兼容主版本拒绝。较新/较旧版本使用合成元数据验证选择规则，
+不代表验证未来 API 的二进制兼容性。可用 `-CompanionJar <包1>,<包2>` 加入本机实际模组包检查共存；
+运行时能量传输、方向、限额及事务回滚由 `F2TransferTests` 的 GameTest 覆盖。
+依赖解析探针的实例、输入包和结果只保存在忽略目录 `.local/energy-bundling/`，不放入 CI 上传的 `build/reports/`。
 
 只检查普通主菜单或专服启动时可分别添加 `-PclientAutoExit=true`、`-PserverAutoExit=true`。
 正常交互不传这些开关。`build` 包含四 JAR 隔离检查和当前选定组合的服务端 GameTest；完整组合、图形和普通专服由上面的验证脚本显式执行。
@@ -120,6 +129,44 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\test-fabric-f2.ps1
 
 F2 最终基线见 [f2-baseline.json](porting/f2-baseline.json)：四包哈希、八组合结果、两种图形客户端、跨 JVM 保存恢复和两种普通专服均已验证。
 验证脚本将本次选定检查记录到 `.local/f2-validation/results.json`；验收时合并并核对的完整历史证据另存为 `final-results.json`。
+
+### BC / TR 原生服务器能量联调
+
+2026-10-24 使用当前四个发行 JAR，在非开发模式的 Minecraft 26.2 / Fabric Loader 0.19.5 专服中完成以下检查。
+外部模组为 BCRefabricated `26.9.17+mc26.2`、Tech Reborn `6.1.1`（内含 RebornCore `6.1.1`）。
+每组都是新建的隔离世界，只在初始化时预充有限能量，之后由真实机器和线缆运行 300 个游戏 tick。
+
+| 安装组合（均含 Forestry 和 Fabric API） | Forestry → 对方 | 对方 → Forestry | 已加载 Energy API |
+| --- | --- | --- | --- |
+| 仅 BC | 4000 E 全部到达 | 4000 E 全部到达 | 1 份 5.0.0 |
+| 仅 TR | 4096 E 全部到达 | 4096 E 全部到达 | 1 份 5.0.0 |
+| BC + TR | BC 4000 E、TR 4096 E 均全部到达 | BC 4000 E、TR 4096 E 均全部到达 | 1 份 5.0.0 |
+
+BC 正向为泥炭引擎 → 木/石 RF 管 → BC Energy Engine；反向为 MJ Dynamo → 木/石 RF 管 → Forestry 离心机。
+BC 反向初始使用等价 4000 E 的 MJ，按该包默认配置转换（1 E = 100000 microMJ），不是把 MJ 与 E 当作 1:1。
+TR 两个方向均通过两段绝缘铜线，TR 端使用低压储能块；Forestry 端分别为泥炭引擎和离心机。
+八条实际传输线路全部通过，最终源和线缆余量为零，没有能量丢失或增加，Forestry 保持 1 FE = 1 E。
+
+三个实例的 `mods/` 均没有独立 Energy JAR。传输前后都断言恰好一个 `team_reborn_energy` ModContainer、
+一个 `EnergyStorage.class` 类资源，并记录嵌套来源和实际类加载位置；此次三组均由 Forestry 的嵌套 API 提供。
+TR 和 RebornCore 自带的同版本 API 没有重复加载，三个服务器均正常保存并退出。
+这是原生专服业务测试，不包含图形客户端界面验证。
+
+复跑先准备发行包和原生运行库，再传入本机模组包和已有的 EULA 接受文件：
+
+```powershell
+.\gradlew-fabric.bat stageFabricDistribution -PwithJade=false -PwithJei=false
+python scripts/test-fabric-release.py runtime
+python scripts/test-energy-interop.py `
+  --runtime-manifest .local/f3-production/runtime/manifest.json `
+  --bc '实际路径/BCRefabricated-26.9.17+mc26.2.jar' `
+  --tr '实际路径/TechReborn-6.1.1.jar' `
+  --eula-from '实际路径/eula.txt'
+```
+
+脚本按发行校验报告验证四包哈希，测试探针不会进入发行 JAR。结果、输入哈希、启动参数和完整日志保存于
+`.local/energy-interop/runs/<run>/`，最新路径见 `.local/energy-interop/latest-run.txt`。
+此次通过记录为 `1792824936540373100/results.json`；早先沙箱回环连接受限的失败尝试单独保留，不计为模组故障。
 
 ## F2 数据与配置
 

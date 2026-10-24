@@ -1,6 +1,11 @@
 import groovy.json.JsonSlurper
 import groovy.json.JsonOutput
 
+def bundledDependencies = configurations.resolvable('bundledDependencyVerification') {
+    extendsFrom configurations.include
+    transitive = false
+}
+
 tasks.register('checkFabricF3') {
     group = 'verification'
     description = 'Checks Fabric runtime, optional integrations, explicit client boundaries and all four jars.'
@@ -9,6 +14,23 @@ tasks.register('checkFabricF3') {
         def reportFile = layout.buildDirectory.file('reports/f3/isolation.json').get().asFile
         if (reportFile.exists() && !reportFile.delete()) throw new GradleException('Cannot clear stale F3 report')
         def parser = new JsonSlurper()
+        def includedArtifacts = bundledDependencies.get().resolvedConfiguration.resolvedArtifacts
+        if (includedArtifacts.size() != 1 || !includedArtifacts.every {
+            it.moduleVersion.id.group == 'teamreborn' && it.name == 'energy' && it.moduleVersion.id.version == energyVersion
+        }) throw new GradleException('Only the pinned Team Reborn Energy API may be bundled')
+        def energyArtifact = includedArtifacts.first().file
+        def energyJarPath = "META-INF/jars/energy-${energyVersion}.jar".toString()
+        def energySha256 = java.security.MessageDigest.getInstance('SHA-256').digest(energyArtifact.bytes).encodeHex().toString()
+        new java.util.zip.ZipFile(energyArtifact).withCloseable { energyZip ->
+            def energyMetadata = parser.parse(energyZip.getInputStream(energyZip.getEntry('fabric.mod.json')))
+            if (energyMetadata.id != 'team_reborn_energy' || energyMetadata.version != energyVersion || energyMetadata.license != 'MIT' || energyMetadata.jars) {
+                throw new GradleException('Unexpected bundled Energy API metadata')
+            }
+            def license = energyZip.getEntry('LICENSE')
+            if (license == null || !energyZip.getInputStream(license).getText('UTF-8').contains('Copyright (c) 2022')) {
+                throw new GradleException('Bundled Energy API must preserve its copyright and MIT license')
+            }
+        }
         def sourceManifest = parser.parse(file('gradle/fabric-f2-sources.json'))
         def owners = ['main', 'butterflies', 'farms', 'mail']
         def additions = parser.parse(file('gradle/fabric-f3-sources.json'))
@@ -23,7 +45,15 @@ tasks.register('checkFabricF3') {
             new java.util.zip.ZipFile(artifact).withCloseable { zip ->
                 def metadata = parser.parse(zip.getInputStream(zip.getEntry('fabric.mod.json')))
                 if (metadata.id != modId || metadata.version != project.version.toString()) throw new GradleException("Wrong metadata: ${artifact.name}")
-                if (metadata.jars) throw new GradleException("Bundled dependencies are not distributed: ${modId}")
+                def expectedJars = owner == 'main' ? [[file: energyJarPath]] : []
+                if ((metadata.jars ?: []) != expectedJars) throw new GradleException("Unexpected bundled dependencies: ${modId}")
+                if (owner == 'main') {
+                    if (metadata.depends.team_reborn_energy != '^5.0.0') throw new GradleException('Energy API must allow compatible 5.x versions')
+                    def nestedEnergy = zip.getEntry(energyJarPath)
+                    if (nestedEnergy == null || java.security.MessageDigest.getInstance('SHA-256').digest(zip.getInputStream(nestedEnergy).bytes).encodeHex().toString() != energySha256) {
+                        throw new GradleException('Bundled Energy API must be the complete, unmodified verified dependency')
+                    }
+                }
                 if (metadata.entrypoints['forestry:module']?.size() != 1) throw new GradleException("Missing module entrypoint: ${modId}")
                 metadata.entrypoints.values().flatten().each { entry ->
                     if (zip.getEntry(entry.replace('.', '/') + '.class') == null) throw new GradleException("Missing entrypoint class: ${entry}")
@@ -39,14 +69,14 @@ tasks.register('checkFabricF3') {
                     }
                 }
                 if (owner != 'main' && metadata.depends.forestry != project.version.toString()) throw new GradleException("Extension must depend on exact core version: ${modId}")
-                if (metadata.depends.keySet().any { it in ['jade', 'jei', 'patchouli', 'kubejs', 'rhino', 'curios'] }) throw new GradleException("Optional tool became required: ${modId}")
+                if (metadata.depends.keySet().any { it in ['jade', 'jei', 'patchouli', 'kubejs', 'rhino', 'curios', 'techreborn', 'reborncore'] }) throw new GradleException("Optional mod became required: ${modId}")
                 zip.entries().each { entry ->
                     entryNames.add(entry.name)
                     def normalizedName = entry.name.toLowerCase(java.util.Locale.ROOT)
                     if (['mezz/jei/', 'snownee/jade/', 'assets/jei/', 'assets/jade/', 'data/jei/', 'data/jade/'].any { normalizedName.startsWith(it) }) {
                         throw new GradleException("Third-party JEI/Jade content in ${modId}: ${entry.name}")
                     }
-                    if (['.jar', '.zip', '.jar.disabled'].any { normalizedName.endsWith(it) } || entry.name.endsWith('neoforge.mods.toml') || entry.name.endsWith('accesstransformer.cfg') ||
+                    if ((['.jar', '.zip', '.jar.disabled'].any { normalizedName.endsWith(it) } && !(owner == 'main' && entry.name == energyJarPath)) || entry.name.endsWith('neoforge.mods.toml') || entry.name.endsWith('accesstransformer.cfg') ||
                         entry.name.startsWith('forestry/fabric/test/') || entry.name.contains('/environment/') || entry.name.contains('/datagen/')) {
                         throw new GradleException("Forbidden JAR entry: ${modId}:${entry.name}")
                     }
@@ -88,7 +118,8 @@ tasks.register('checkFabricF3') {
             }.findAll { !active.contains(it) }.sort()
             result[owner] = [modId: modId, jar: artifact.name,
                 sha256: java.security.MessageDigest.getInstance('SHA-256').digest(artifact.bytes).encodeHex().toString(),
-                activeSources: active.size(), deferredSources: deferred, entries: entryNames.size()]
+                activeSources: active.size(), deferredSources: deferred, entries: entryNames.size(),
+                bundledDependencies: owner == 'main' ? [[modId: 'team_reborn_energy', version: energyVersion, path: energyJarPath, sha256: energySha256, license: 'MIT']] : []]
         }
         ['compileClasspath', 'runtimeClasspath', 'butterfliesCompileClasspath', 'farmsCompileClasspath', 'mailCompileClasspath',
          'butterfliesRuntimeClasspath', 'farmsRuntimeClasspath', 'mailRuntimeClasspath'].each { name ->

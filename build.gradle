@@ -77,7 +77,8 @@ dependencies {
     minecraft "com.mojang:minecraft:${minecraftVersion}"
     implementation "net.fabricmc:fabric-loader:${fabricLoaderVersion}"
     implementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
-    implementation("teamreborn:energy:${energyVersion}") { transitive = false }
+    // let Loader resolve a single API mod when other mods also nest it
+    include(implementation("teamreborn:energy:${energyVersion}") { transitive = false })
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
     compileOnly "mezz.jei:jei-${minecraftVersion}-common-api:${jeiVersion}"
     compileOnly("mezz.jei:jei-${minecraftVersion}-fabric-api:${jeiVersion}") { transitive = false }

@@ -2,8 +2,11 @@ package forestry.fabric.test;
 
 import forestry.api.core.fluids.FluidUnits;
 import forestry.api.core.fluids.FluidVolume;
+import forestry.core.content.energy.EnergyHelper;
 import forestry.core.content.energy.EnergyTransferMode;
 import forestry.core.content.energy.ForestryEnergyStorage;
+import forestry.core.content.energy.blocks.EngineBlock;
+import forestry.core.content.energy.tiles.EngineBlockEntity;
 import forestry.core.platform.fluids.StandardTank;
 import forestry.core.platform.inventory.InventoryPlain;
 import forestry.core.platform.inventory.InventoryTransferView;
@@ -15,17 +18,153 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
+import team.reborn.energy.api.EnergyStorage;
+import team.reborn.energy.api.EnergyStorageUtil;
+import team.reborn.energy.api.base.SimpleEnergyStorage;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import static forestry.fabric.test.F1RegistrationTests.require;
 
 public final class F2TransferTests {
+    private record EnergyLocation(Level level, BlockPos pos) {}
+
+    private static final class ExternalEnergy extends SimpleEnergyStorage {
+        private static final Map<EnergyLocation, ExternalEnergy> STORAGES = new HashMap<>();
+        static {
+            EnergyStorage.SIDED.registerForBlocks((level, pos, state, entity, side) ->
+                side == null || side == Direction.WEST ? STORAGES.get(new EnergyLocation(level, pos)) : null, Blocks.LODESTONE);
+        }
+        private int insertions;
+        private int commits;
+
+        private ExternalEnergy(long capacity, long maxInsert, long maxExtract) {
+            super(capacity, maxInsert, maxExtract);
+        }
+
+        @Override public long insert(long maxAmount, TransactionContext transaction) {
+            insertions++;
+            return super.insert(maxAmount, transaction);
+        }
+
+        @Override protected void onFinalCommit() { commits++; }
+    }
+
+    @GameTest public void externalEnergySourcePushesOneToOneIntoForestry(GameTestHelper test) {
+        var machine = (forestry.core.platform.tile.TilePowered) F2MachineTests.place(test.getLevel(),
+            test.absolutePos(new BlockPos(1, 1, 1)), "squeezer");
+        var destination = EnergyStorage.SIDED.find(test.getLevel(), machine.getBlockPos(), Direction.WEST);
+        require(destination != null && destination.supportsInsertion() && !destination.supportsExtraction(), "Powered machine must expose an input");
+        var source = new ExternalEnergy(1000, 0, 1000);
+        source.amount = 400;
+        var notifications = new AtomicInteger();
+        machine.getEnergyManager().onChange(notifications::incrementAndGet);
+        try (var outer = Transaction.openOuter()) {
+            require(EnergyStorageUtil.move(source, destination, 173, outer) == 173, "External E source did not push into Forestry");
+            require(destination.getAmount() == 173 && source.amount == 227, "1 E must equal 1 FE inside the transaction");
+            require(source.commits == 0 && notifications.get() == 0, "Nested transfer notified before outer commit");
+        }
+        require(destination.getAmount() == 0 && source.amount == 400 && source.commits == 0 && notifications.get() == 0,
+            "Parent abort did not restore both mods' energy");
+        require(EnergyStorageUtil.move(source, destination, 173, null) == 173, "Committed external push failed");
+        require(destination.getAmount() == 173 && source.amount == 227 && source.commits == 1 && notifications.get() == 1,
+            "Committed transfer changed units or notified more than once");
+        try (var transaction = Transaction.openOuter()) {
+            require(destination.extract(Long.MAX_VALUE, transaction) == 0, "External extraction bypassed the machine input boundary");
+        }
+        test.succeed();
+    }
+
+    @GameTest public void enginePushesToExternalSidedBlockStorage(GameTestHelper test) {
+        var level = test.getLevel();
+        var enginePos = test.absolutePos(new BlockPos(1, 1, 1));
+        var engine = (EngineBlockEntity) F2MachineTests.place(level, enginePos, "peat_engine");
+        level.setBlockAndUpdate(enginePos, engine.getBlockState().setValue(EngineBlock.VERTICAL_FACING, Direction.EAST));
+        engine = (EngineBlockEntity) level.getBlockEntity(enginePos);
+        require(engine != null, "Engine missing after rotation");
+        var source = engine.getEnergyManager();
+        source.setEnergyStored(1000);
+        var changes = new AtomicInteger();
+        source.onChange(changes::incrementAndGet);
+        require(EnergyStorage.SIDED.find(level, enginePos, null) == source, "Null-side lookup must expose the full engine storage");
+        for (var side : Direction.values()) {
+            require((EnergyStorage.SIDED.find(level, enginePos, side) != null) == (side == Direction.EAST), "Engine exposed an incorrect output face");
+        }
+        require(!source.supportsInsertion() && source.supportsExtraction(), "Engine must remain output-only");
+        var target = enginePos.east();
+        level.setBlockAndUpdate(target, Blocks.LODESTONE.defaultBlockState());
+        require(level.getBlockEntity(target) == null, "External fixture must exercise a block without a block entity");
+        var receiver = new ExternalEnergy(500, 137, 0);
+        var location = new EnergyLocation(level, target);
+        ExternalEnergy.STORAGES.put(location, receiver);
+        try {
+            receiver.amount = receiver.capacity;
+            require(EnergyHelper.isEnergyReceiverOrEngine(Direction.WEST, level, target), "Full receivers must retain their connection");
+            require(!EnergyHelper.isEnergyReceiverOrEngine(Direction.EAST, level, target), "Receiver accepted its disabled face");
+            require(receiver.insertions == 0, "Connection discovery must not attempt even a simulated insertion");
+            receiver.amount = 0;
+            require(EnergyHelper.sendEnergy(source, Direction.WEST, level, target, 1000, false) == 0, "Sender queried the wrong receiving face");
+            require(EnergyHelper.canSendEnergy(source, Direction.EAST, level, target), "External block receiver was not found");
+            require(source.getAmount() == 1000 && receiver.amount == 0 && receiver.commits == 0 && changes.get() == 0,
+                "Transfer simulation mutated storage or notified either owner");
+            try (var outer = Transaction.openOuter()) {
+                require(EnergyHelper.sendEnergy(source, Direction.EAST, level, target, 1000, false) == 137, "Receiver's transfer limit was ignored");
+            }
+            require(source.getAmount() == 1000 && receiver.amount == 0 && receiver.commits == 0 && changes.get() == 0,
+                "Aborted external transfer lost energy or notified an owner");
+            require(EnergyHelper.sendEnergy(source, Direction.EAST, level, target, 1000, false) == 137, "Engine failed to push to an external receiver");
+            require(source.getAmount() == 863 && receiver.amount == 137 && receiver.commits == 1 && changes.get() == 1,
+                "Committed engine output must conserve FE/E and notify once");
+            engine.stagePiston = 1;
+            engine.serverTick(level, enginePos, engine.getBlockState());
+            require(receiver.amount == 274, "Engine tick failed to push into a receiver without a block entity");
+            receiver.amount = 490;
+            require(EnergyHelper.sendEnergy(source, Direction.EAST, level, target, 1000, false) == 10 && receiver.amount == 500,
+                "Near-full receiver did not accept exactly its remaining space");
+            long remaining = source.getAmount();
+            require(EnergyHelper.sendEnergy(source, Direction.EAST, level, target, 1000, false) == 0 && source.getAmount() == remaining,
+                "Full receiver consumed source energy");
+            level.setBlockAndUpdate(target, Blocks.AIR.defaultBlockState());
+            require(EnergyHelper.sendEnergy(source, Direction.EAST, level, target, 1000, false) == 0 && source.getAmount() == remaining,
+                "Removed receiver retained stale storage");
+        } finally {
+            ExternalEnergy.STORAGES.remove(location);
+        }
+        test.succeed();
+    }
+
+    @GameTest public void energyApiLongAmountsRemainBounded(GameTestHelper test) {
+        var energy = new ForestryEnergyStorage(Long.MAX_VALUE, Long.MAX_VALUE, EnergyTransferMode.BOTH);
+        try (var transaction = Transaction.openOuter()) {
+            require(energy.insert(Long.MAX_VALUE, transaction) == Long.MAX_VALUE, "Long energy amount was truncated");
+            require(energy.insert(Long.MAX_VALUE, transaction) == 0, "Full long storage overflowed");
+            require(energy.extract(Long.MAX_VALUE, transaction) == Long.MAX_VALUE && energy.getAmount() == 0, "Long extraction changed units");
+            try { energy.insert(-1, transaction); throw new AssertionError("Negative insertion accepted"); }
+            catch (IllegalArgumentException expected) {}
+            try { energy.extract(-1, transaction); throw new AssertionError("Negative extraction accepted"); }
+            catch (IllegalArgumentException expected) {}
+            transaction.commit();
+        }
+        energy.setEnergyStored(Long.MAX_VALUE - 1);
+        energy.generateEnergy(Long.MAX_VALUE);
+        require(energy.getAmount() == Long.MAX_VALUE, "Internal generation overflowed");
+        energy.drainEnergy(Long.MAX_VALUE);
+        require(energy.getAmount() == 0, "Internal drain underflowed");
+        test.succeed();
+    }
+
     @GameTest public void bottlingOutputFailureAndParentAbortConserveFluid(GameTestHelper test) {
         var inventory = new InventoryPlain(2, "bottler", 64);
         inventory.setItem(0, new ItemStack(Items.BUCKET, 2));

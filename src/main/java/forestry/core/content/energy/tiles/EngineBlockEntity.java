@@ -19,7 +19,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import team.reborn.energy.api.EnergyStorage;
@@ -149,7 +148,7 @@ public abstract class EngineBlockEntity extends TileBase implements IActivatable
 		// Determine targeted tile
 		BlockState blockState = getBlockState();
 		Direction facing = blockState.getValue(EngineBlock.VERTICAL_FACING);
-		BlockEntity tile = level.getBlockEntity(getBlockPos().relative(facing));
+		BlockPos target = getBlockPos().relative(facing);
 
 		float newPistonSpeed = getPistonSpeed();
 		if (newPistonSpeed != this.pistonSpeedServer) {
@@ -160,7 +159,7 @@ public abstract class EngineBlockEntity extends TileBase implements IActivatable
 		if (this.stagePiston != 0) {
             this.progress += this.pistonSpeedServer;
 
-			EnergyHelper.sendEnergy(this.energyStorage, facing, tile);
+			EnergyHelper.sendEnergy(this.energyStorage, facing, level, target, Integer.MAX_VALUE, false);
 
 			if (this.progress > 0.25 && this.stagePiston == 1) {
                 this.stagePiston = 2;
@@ -168,8 +167,8 @@ public abstract class EngineBlockEntity extends TileBase implements IActivatable
                 this.progress = 0;
                 this.stagePiston = 0;
 			}
-		} else if (enabledRedstone && EnergyHelper.isEnergyReceiverOrEngine(facing.getOpposite(), tile)) {
-			if (EnergyHelper.canSendEnergy(this.energyStorage, facing, tile)) {
+		} else if (enabledRedstone && EnergyHelper.isEnergyReceiverOrEngine(facing.getOpposite(), level, target)) {
+			if (EnergyHelper.canSendEnergy(this.energyStorage, facing, level, target)) {
                 this.stagePiston = 1; // If we can transfer energy, start running
 				setActive(true);
                 this.cantSendEnergyCountdown = CANT_SEND_ENERGY_TIME;
@@ -336,7 +335,7 @@ public abstract class EngineBlockEntity extends TileBase implements IActivatable
 
 	@Nullable
 	public EnergyStorage getEnergyStorage(@Nullable Direction side) {
-		if (this.remove || side != getBlockState().getValue(EngineBlock.VERTICAL_FACING)) {
+		if (this.remove || (side != null && side != getBlockState().getValue(EngineBlock.VERTICAL_FACING))) {
 			return null;
 		}
 		return this.energyStorage;

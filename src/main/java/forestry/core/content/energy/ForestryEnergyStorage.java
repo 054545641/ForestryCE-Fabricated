@@ -13,7 +13,7 @@ import forestry.core.platform.transfer.CommitParticipant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
-/** One legacy Forestry energy unit remains one Energy API unit; recipe costs are unchanged. */
+// FE and Energy API amounts are identical, so saved energy and recipe costs need no conversion
 public class ForestryEnergyStorage extends CommitParticipant<Long> implements EnergyStorage, IStreamable, INbtReadable, INbtWritable {
 	private final long capacity;
 	private final long maxReceive;
@@ -23,6 +23,7 @@ public class ForestryEnergyStorage extends CommitParticipant<Long> implements En
 	private final EnergyStorage chainedInput = new EnergyStorage() {
 		public long getAmount() { return energy; }
 		public long getCapacity() { return capacity; }
+		public boolean supportsExtraction() { return ForestryEnergyStorage.this.supportsExtraction(); }
 		public long insert(long amount, TransactionContext transaction) { return insertLimited(amount, Long.MAX_VALUE, transaction); }
 		public long extract(long amount, TransactionContext transaction) { return ForestryEnergyStorage.this.extract(amount, transaction); }
 	};
@@ -79,7 +80,7 @@ public class ForestryEnergyStorage extends CommitParticipant<Long> implements En
 		return extractLimited(amount, this.maxExtract, transaction);
 	}
 
-	/** Machine work bypasses the external transfer direction, but participates in the same journal. */
+	// machine work must consume receive-only storage within the caller's transaction
 	public long extractInternal(long amount, TransactionContext transaction) {
 		return extractLimited(amount, Long.MAX_VALUE, transaction);
 	}

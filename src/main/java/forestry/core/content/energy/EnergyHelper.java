@@ -2,7 +2,9 @@ package forestry.core.content.energy;
 
 import forestry.core.platform.config.Preference;
 import forestry.core.platform.tile.IChainedPowerHandler;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import team.reborn.energy.api.EnergyStorage;
@@ -42,12 +44,18 @@ public class EnergyHelper {
 	}
 
 	public static int sendEnergy(ForestryEnergyStorage energyStorage, Direction face, @Nullable BlockEntity tile, int amount, boolean simulate) {
-		if (tile == null || tile.getLevel() == null) {
+		if (tile == null || tile.isRemoved() || tile.getLevel() == null) {
 			return 0;
 		}
-		EnergyStorage destination = tile instanceof IChainedPowerHandler engine
+		return sendEnergy(energyStorage, face, tile.getLevel(), tile.getBlockPos(), amount, simulate);
+	}
+
+	public static int sendEnergy(ForestryEnergyStorage energyStorage, Direction face, Level level, BlockPos target, int amount, boolean simulate) {
+		if (level.isClientSide()) return 0;
+		BlockEntity tile = level.getBlockEntity(target);
+		EnergyStorage destination = tile instanceof IChainedPowerHandler engine && !tile.isRemoved()
 			? engine.getEnergyManager().chainedInput()
-			: EnergyStorage.SIDED.find(tile.getLevel(), tile.getBlockPos(), face.getOpposite());
+			: EnergyStorage.SIDED.find(level, target, face.getOpposite());
 		try (var transaction = Transaction.openNested(Transaction.getCurrentUnsafe())) {
 			int moved = Math.toIntExact(EnergyStorageUtil.move(energyStorage, destination, amount, transaction));
 			if (!simulate) {
@@ -61,25 +69,25 @@ public class EnergyHelper {
 		return sendEnergy(energyStorage, orientation, tile, Integer.MAX_VALUE, true) > 0;
 	}
 
+	public static boolean canSendEnergy(ForestryEnergyStorage energyStorage, Direction orientation, Level level, BlockPos target) {
+		return sendEnergy(energyStorage, orientation, level, target, Integer.MAX_VALUE, true) > 0;
+	}
+
 	public static boolean isEnergyReceiverOrEngine(Direction side, @Nullable BlockEntity tile) {
-		if (tile == null) {
+		if (tile == null || tile.isRemoved() || tile.getLevel() == null) {
 			return false;
 		}
-		if (tile instanceof IChainedPowerHandler) { // engine chaining
+		return isEnergyReceiverOrEngine(side, tile.getLevel(), tile.getBlockPos());
+	}
+
+	public static boolean isEnergyReceiverOrEngine(Direction side, Level level, BlockPos target) {
+		BlockEntity tile = level.getBlockEntity(target);
+		if (tile instanceof IChainedPowerHandler && !tile.isRemoved()) { // engine chaining
 			return true;
 		}
-
-		if (tile.getLevel() == null) {
-			return false;
-		}
-
-		EnergyStorage energyStorage = EnergyStorage.SIDED.find(tile.getLevel(), tile.getBlockPos(), side);
-		if (energyStorage == null) {
-			return false;
-		}
-		try (var transaction = Transaction.openNested(Transaction.getCurrentUnsafe())) {
-			return energyStorage.insert(1, transaction) > 0;
-		}
+		EnergyStorage energyStorage = EnergyStorage.SIDED.find(level, target, side);
+		// placement also runs on clients, where even simulated transfers are forbidden
+		return energyStorage != null && energyStorage.supportsInsertion();
 	}
 
 }

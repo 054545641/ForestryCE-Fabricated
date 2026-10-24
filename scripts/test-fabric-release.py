@@ -131,7 +131,7 @@ def prepare(runtime_only=False):
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, destination)
         outputs[mod] = {"path": str(destination), "sha256": digest(destination)}
-    required = [artifact("net.fabricmc.fabric-api", "fabric-api", properties["fabricApiVersion"]), artifact("teamreborn", "energy", properties["energyVersion"])]
+    required = [artifact("net.fabricmc.fabric-api", "fabric-api", properties["fabricApiVersion"])]
     optional = [artifact("maven.modrinth", "jade", properties["jadeVersion"]), artifact("mezz.jei", "jei-26.2-fabric", properties["jeiVersion"]), artifact("net.mezzdev.config", "mezz_config-26.2-fabric", properties["mezzConfigVersion"])]
     probe = ROOT / "build/fabric-26.2/test-tools" / f"forestry-fabric-release-probe-{properties['forestryVersion']}.jar"
     manifest = {"version": properties["forestryVersion"], "loader": properties["fabricLoaderVersion"], "artifacts": outputs,

@@ -89,6 +89,35 @@ CI 验证应核对目标提交的全部 job、缓存模式日志及运行结束�
 
 ## 后续发布
 
+### Team Reborn Energy 内嵌例外（2026-10-24）
+
+为使 Forestry 与仅提供能量兼容代码的模组在没有 Tech Reborn 时也可互通，核心包通过 Loom `include`
+内嵌官方 `teamreborn:energy:5.0.0`，路径为 `META-INF/jars/energy-5.0.0.jar`；三个扩展包不重复内嵌。
+该 API 的[官方许可](https://github.com/TechReborn/Energy/blob/master/LICENSE)为 MIT。
+已核对精确版本 JAR 内的 `LICENSE`，保留完整原包中的版权及许可声明，不解包合并、修改或重定位 API 类。
+原包 SHA-256 为 `889afc438d3e4add5cfdac76517da7987a2c495e4731690a56f2c5dee775db59`，继续由 Gradle 严格依赖校验。
+
+`team_reborn_energy` 保留原 mod ID，核心要求 `^5.0.0`，由 Fabric Loader 统一选择满足各模组要求的 5.x 版本。
+这允许与其他模组内嵌的兼容 API 共存，不增加 Tech Reborn / RebornCore 依赖，也不要求玩家另装 Energy API。
+能量交互固定为 1 FE = 1 E，遵循[上游推送与事务约定](https://github.com/TechReborn/Energy#conventions)。
+
+此项替代上文原先对所有嵌套 JAR 的一概拒绝：`checkFabricF3` 仅放行核心元数据中这一条嵌套声明，
+并逐字节摘要核对所嵌入的原包（包含许可），其他嵌套包、扩展包内嵌、JEI/Jade 内容仍然拒绝。
+正式实例测试不再另放独立 Energy JAR，以免掩盖缺失的嵌套 API。四包发布数量不变。
+
+本次 `stageFabricDistribution` 与全模块的 103 项服务端 GameTest 通过。真实 Fabric Loader 的客户端/服务端
+共 20 项解析检查通过，包含本机 BCRefabricated `26.9.17+mc26.2`、Tech Reborn `6.1.1` 单独及共同安装；
+这轮检查验证依赖共存，未启动这两款模组的游戏入口点。能量收发通过官方 `SimpleEnergyStorage` 与真实 Forestry
+机器/引擎的 GameTest 验证。另用实际 Gradle 校验脚本完成 7 项隔离检查，确认原包放行，额外嵌套、
+API 篡改/遗漏、缺失声明、扩展重复内嵌及 Jade 资源混入均被拒绝。
+
+随后完成 BC 单装、TR 单装、BC+TR 三组原生专服联调：实际八条双向传输线路全部通过，
+BC 每方向完整传输 4000 E，TR 每方向完整传输 4096 E，源及管线最终清零。
+没有放置独立 Energy JAR，三组在游戏中均只加载一个 API 模组和一份 API 类资源；
+详见[开发指南的实机联调记录](fabric-development.zh-CN.md)及 `scripts/test-energy-interop.py`。
+
+### 发布命令
+
 ```powershell
 .\gradlew-fabric.bat stageFabricDistribution -PwithJade=false -PwithJei=false
 ```
@@ -99,5 +128,5 @@ Linux/macOS 使用 `bash gradlew` 执行同一任务。仅在命令成功后取
 
 玩家从 [JEI 官方项目](https://modrinth.com/mod/jei)和 [Jade 官方项目](https://modrinth.com/mod/jade)
 另行获取可选模组。开发所用 Maven 依赖声明、坐标、哈希和自有兼容代码可以保留；
-不要把开发实例、Gradle 缓存或第三方模组包混入仓库、Actions artifacts 或发行压缩包。
+除上述核实并由构建内嵌的 Energy API 外，不要把开发实例、Gradle 缓存或第三方模组包混入仓库、Actions artifacts 或发行压缩包。
 如以后确实需要再分发第三方内容，应针对那次具体版本和用途重新核对许可、附带声明并满足相应条件。
